@@ -258,6 +258,12 @@ resourcestring
   DSC_CBENEF = 'Código do Benefício Fiscal';
   DSC_TPPREST = 'Tipo de Prestação';
 
+  DSC_CLASSDUTO = 'Classificação do Dutoviário';
+  DSC_TPCONTRATACAO = 'Tipo de contratação do serviço de transporte (apenas para gasoduto)';
+  DSC_CODPONTOENTRADA = 'Código do Ponto de Entrada';
+  DSC_CODPONTOSAIDA = 'Código do Ponto de Saída';
+  DSC_NCONTRATO = 'Número do Contrato de Capacidade';
+
 implementation
 
 end.

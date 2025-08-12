@@ -1094,7 +1094,7 @@ object frmACBrMDFe: TfrmACBrMDFe
               Caption = 'Salvar Documento pelo campo Data de Emiss'#227'o'
               TabOrder = 3
             end
-            object cbxSalvaPathEvento: TCheckBox
+            object cbxSalvarEvento: TCheckBox
               Left = 6
               Top = 64
               Width = 233
@@ -1564,13 +1564,35 @@ object frmACBrMDFe: TfrmACBrMDFe
           OnClick = btnDistribuicaoDFeClick
         end
       end
+      object tsoutros: TTabSheet
+        Caption = 'Outros'
+        ImageIndex = 4
+        object btnLerArqINI: TButton
+          Left = 4
+          Top = 9
+          Width = 177
+          Height = 25
+          Caption = 'Ler Arquivo INI/Gerar XML'
+          TabOrder = 0
+          OnClick = btnLerArqINIClick
+        end
+        object btnGerarArqINI: TButton
+          Left = 187
+          Top = 9
+          Width = 177
+          Height = 25
+          Caption = 'Gerar Arquivo INI'
+          TabOrder = 1
+          OnClick = btnGerarArqINIClick
+        end
+      end
     end
     object pgRespostas: TPageControl
       Left = 1
       Top = 198
       Width = 567
       Height = 413
-      ActivePage = Dados
+      ActivePage = TabSheet5
       Align = alClient
       TabOrder = 1
       object TabSheet5: TTabSheet

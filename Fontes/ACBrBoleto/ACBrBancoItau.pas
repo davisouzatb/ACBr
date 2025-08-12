@@ -66,6 +66,7 @@ type
     function ConverteEspecieDoc(const ACodigoEspecie: Integer = 0): String;
     procedure DefineDataProtestoNegativacao(const ACBrTitulo: TACBrTitulo);
     procedure EhObrigatorioAgenciaDV; override;
+    procedure NaoPermiteFiltroWSNenhum; override;
   public
     Constructor create(AOwner: TACBrBanco);
     function MontarCampoNossoNumero ( const ACBrTitulo: TACBrTitulo) : String; override;
@@ -285,7 +286,7 @@ begin
     end;
   end else
   begin
-    case ACBrTitulo.ACBrBoleto.Cedente.TipoInscricao of
+    case ACBrTitulo.Sacado.Pessoa of
       pFisica   : Result := '1'; //N DO CPF DO BENEFICIÁRIO
       pJuridica : Result := '2'; //N DO CNPJ DO BENEFICIÁRIO
     else
@@ -309,6 +310,11 @@ begin
 end;
 
 procedure TACBrBancoItau.EhObrigatorioAgenciaDV;
+begin
+  //sem validação
+end;
+
+procedure TACBrBancoItau.NaoPermiteFiltroWSNenhum;
 begin
   //sem validação
 end;

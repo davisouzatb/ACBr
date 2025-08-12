@@ -47,7 +47,9 @@ uses
    System.Contnrs,
   {$IFEND}
   ACBrBase,
-  pcnConversao, pmdfeConversaoMDFe, pcnSignature, pmdfeProcMDFe, pcnGerador;
+  pcnConversao, pmdfeConversaoMDFe, pcnSignature,
+  ACBrDFeComum.Proc,
+  pcnGerador;
 
 type
 
@@ -138,11 +140,9 @@ type
   private
     FId: string;
     FVersao: Double;
-//    function GetVersaoStr: string;
   public
     property Id: string read FId write FId;
     property versao: Double read FVersao write FVersao;
-//    property VersaoStr: string read GetVersaoStr;
   end;
 
   TinfMunCarregaCollection = class(TACBrObjectList)
@@ -679,9 +679,11 @@ type
     FinfEmbComb: TinfEmbCombCollection;
     FinfUnidCargaVazia: TinfUnidCargaVaziaCollection;
     FinfUnidTranspVazia: TinfUnidTranspVaziaCollection;
+    FMMSI: string;
   public
     constructor Create;
     destructor Destroy; override;
+
     property CNPJAgeNav: string                              read FCNPJAgeNav        write FCNPJAgeNav;
     property irin: string                                    read Firin              write Firin;
     property tpEmb: string                                   read FtpEmb             write FtpEmb;
@@ -697,6 +699,7 @@ type
     property infEmbComb: TinfEmbCombCollection               read FinfEmbComb        write FinfEmbComb;
     property infUnidCargaVazia: TinfUnidCargaVaziaCollection read FinfUnidCargaVazia write FinfUnidCargaVazia;
     property infUnidTranspVazia: TinfUnidTranspVaziaCollection read FinfUnidTranspVazia write FinfUnidTranspVazia;
+    property MMSI: string                                    read FMMSI              write FMMSI;
   end;
 
   TinfTermCarregCollection = class(TACBrObjectList)
@@ -1329,7 +1332,7 @@ type
     FinfMDFeSupl: TinfMDFeSupl;
     FprodPred: TprodPred;
 
-    FProcMDFe: TProcMDFe;
+    FProcMDFe: TProcDFe;
     FSignature: TSignature;
 
     procedure Setlacres(const Value: TlacresCollection);
@@ -1359,19 +1362,20 @@ type
     property infMDFeSupl: TinfMDFeSupl read FinfMDFeSupl write FinfMDFeSupl;
     property prodPred: TprodPred        read FprodPred    write FprodPred;
 
-    property procMDFe: TProcMDFe   read FProcMDFe  write FProcMDFe;
+    property procMDFe: TProcDFe   read FProcMDFe  write FProcMDFe;
     property signature: Tsignature read Fsignature write Fsignature;
   end;
-
+{
 const
   CMUN_EXTERIOR = 9999999;
   XMUN_EXTERIOR = 'EXTERIOR';
   UF_EXTERIOR = 'EX';
-
+}
 implementation
 
 uses
-  ACBrUtil.Base;
+  ACBrUtil.Base,
+  ACBrMDFe.Consts;
 
 { TMDFe }
 
@@ -1398,8 +1402,8 @@ begin
   FinfMDFeSupl := TinfMDFeSupl.Create;
   FprodPred    := TprodPred.Create;
 
-  FProcMDFe  := TProcMDFe.create;
-  Fsignature := Tsignature.create;
+  FProcMDFe  := TProcDFe.Create('3.00', NAME_SPACE_MDFE, 'mdfeProc', 'MDFe');
+  Fsignature := Tsignature.Create;
 end;
 
 destructor TMDFe.Destroy;

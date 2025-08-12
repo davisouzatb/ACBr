@@ -114,6 +114,7 @@ type
     FindUniao: string;
     FdtTransfFinsLucr: TDateTime;
     FdtObito: TDateTime;
+    FindPertIRRF: String;
     FContato: TContato;
     FSoftwareHouse: TSoftwareHouseCollection;
     FinfoEFR: TinfoEFR;
@@ -129,6 +130,7 @@ type
     property indUniao: string read FindUniao write FindUniao;
     property dtTransfFinsLucr: TDateTime read FdtTransfFinsLucr write FdtTransfFinsLucr;
     property dtObito: TDateTime read FdtObito write FdtObito;
+    property indPertIRRF: String read FindPertIRRF write FindPertIRRF;
     property Contato: TContato read FContato write FContato;
     property SoftwareHouse: TSoftwareHouseCollection read FSoftwareHouse write FSoftwareHouse;
     property infoEFR: TinfoEFR read FinfoEFR write FinfoEFR;
@@ -170,7 +172,7 @@ type
     constructor Create(AACBrReinf: TObject); override;
     destructor  Destroy; override;
 
-    function GerarXML: Boolean; override;
+    function GerarXML: Boolean; overload;
     function LerArqIni(const AIniString: String): Boolean;
 
     property ModoLancamento: TTipoOperacao read FModoLancamento write FModoLancamento;
@@ -372,6 +374,7 @@ begin
     Gerador.wCampo(tcStr, '', 'indUniao',           1,   1, 0, Self.infoContribuinte.infoCadastro.indUniao);
     Gerador.wCampo(tcDat, '', 'dtTransfFinsLucr',  10,  10, 0, Self.infoContribuinte.infoCadastro.dtTransfFinsLucr);
     Gerador.wCampo(tcDat, '', 'dtObito',           10,  10, 0, Self.infoContribuinte.infoCadastro.dtObito);
+    Gerador.wCampo(tcStr, '', 'indPertIRRF',        0,   1, 0, Self.infoContribuinte.infoCadastro.indPertIRRF);
   end;
   
   GerarContato;
@@ -432,9 +435,9 @@ end;
 
 function TevtInfoContri.GerarXML: Boolean;
 begin
-  try
-    Self.VersaoDF := TACBrReinf(FACBrReinf).Configuracoes.Geral.VersaoDF;
+  inherited GerarXML;
 
+  try
     Self.Id := GerarChaveReinf(now, self.ideContri.NrInsc, self.Sequencial, self.ideContri.TpInsc);
 
     GerarCabecalho('evtInfoContribuinte');
@@ -518,6 +521,7 @@ begin
         infoContribuinte.infoCadastro.indUniao           := INIRec.ReadString(sSecao, 'indUniao', '');
         infoContribuinte.infoCadastro.dtTransfFinsLucr   := StringToDateTime(INIRec.ReadString(sSecao, 'dtTransfFinsLucr', '0'));
         infoContribuinte.infoCadastro.dtObito            := StringToDateTime(INIRec.ReadString(sSecao, 'dtObito', '0'));
+        infoContribuinte.infoCadastro.indPertIRRF        := INIRec.ReadString(sSecao, 'indPertIRRF', '');
 
         sSecao := 'contato';
         infoContribuinte.infoCadastro.Contato.NmCtt    := INIRec.ReadString(sSecao, 'nmCtt', EmptyStr);

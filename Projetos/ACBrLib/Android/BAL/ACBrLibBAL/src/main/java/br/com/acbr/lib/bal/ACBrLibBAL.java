@@ -22,7 +22,7 @@ public class ACBrLibBAL extends ACBrLibBase {
 
     @Override
     protected String getLibName() {
-        return "acbrbal";
+        return "ACBrLibBAL";
     }
 
     protected Library getInstance() {
@@ -110,7 +110,7 @@ public class ACBrLibBAL extends ACBrLibBase {
         checkResult(status);
     }
 
-    public double lerPeso(int millisecTimeOut) throws Exception {
+    public double lePeso(int millisecTimeOut) throws Exception {
         DoubleByReference peso = new DoubleByReference();
         Log.i(this.getLibName(), "BAL_LerPeso");
         int status = ((ACBrBALBridge) this.getInstance()).BAL_LePeso(this.getHandle(), millisecTimeOut, peso);
@@ -122,7 +122,7 @@ public class ACBrLibBAL extends ACBrLibBase {
     public String lePesoStr(int millisecTimeOut) throws Exception {
         ACBrLibBuffer  sValor = new ACBrLibBuffer();
         Log.i(this.getLibName(), "BAL_LePesoStr");
-        int status = ((ACBrBALBridge) this.getInstance()).BAL_LePesoStr(this.getHandle(), millisecTimeOut, sValor.bufferData);
+        int status = ((ACBrBALBridge) this.getInstance()).BAL_LePesoStr(this.getHandle(), millisecTimeOut, sValor.bufferData, sValor.bufferSizeNeeded);
         Log.i(this.getLibName(),"BAL_LePesoStr, status = " + status);
         checkResult(status);
         return checkBuffer(sValor);
@@ -137,10 +137,10 @@ public class ACBrLibBAL extends ACBrLibBase {
         return peso.getValue();
     }
 
-    public String ultimoPesoLisoStr() throws Exception {
+    public String ultimoPesoLidoStr() throws Exception {
         ACBrLibBuffer buffer = new ACBrLibBuffer();
         Log.i(this.getLibName(), "BAL_UltimoPesoLisoStr");
-        int status = ((ACBrBALBridge) this.getInstance()).BAL_UltimoPesoLisoStr(this.getHandle(),  buffer.bufferData);
+        int status = ((ACBrBALBridge) this.getInstance()).BAL_UltimoPesoLidoStr(this.getHandle(),  buffer.bufferData, buffer.bufferSizeNeeded);
         Log.i(this.getLibName(),"BAL_UltimoPesoLisoStr, status = " + status);
         checkResult(status);
         return checkBuffer(buffer);
@@ -158,7 +158,7 @@ public class ACBrLibBAL extends ACBrLibBase {
     public String interpretarRespostaPesoStr(String aResposta) throws Exception {
         ACBrLibBuffer buffer = new ACBrLibBuffer();
         Log.i(this.getLibName(), "BAL_InterpretarRespostaPesoStr");
-        int status = ((ACBrBALBridge) this.getInstance()).BAL_InterpretarRespostaPesoStr(this.getHandle(), aResposta, buffer.bufferData);
+        int status = ((ACBrBALBridge) this.getInstance()).BAL_InterpretarRespostaPesoStr(this.getHandle(), aResposta, buffer.bufferData, buffer.bufferSizeNeeded);
         Log.i(this.getLibName(),"BAL_InterpretarRespostaPesoStr, status = " + status);
         checkResult(status);
         return checkBuffer(buffer);

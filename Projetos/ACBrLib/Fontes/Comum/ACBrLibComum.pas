@@ -257,11 +257,6 @@ destructor TACBrLib.Destroy;
 begin
   GravarLog('TACBrLib.Destroy', logSimples);
 
-{$IFDEF Demo}
-  if Assigned(FPDemo) then
-    FPDemo.Free;
-{$ENDIF}
-
 {$IfDef FPC}
   fpFileVerInfo.Free;
 {$EndIf}
@@ -1016,5 +1011,11 @@ begin
     Result := ACBrAnsiToUTF8(AData)
 {$EndIf}
 end;
+
+finalization
+  {$IFDEF DEMO}
+  if Assigned(FPDemo) then
+    FreeAndNil(FPDemo);
+    {$ENDIF}
 
 end.

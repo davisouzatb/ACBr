@@ -276,7 +276,9 @@ begin
   AuxNode := ANode.Childrens.FindAnyNs('nfdok');
 
   if AuxNode <> nil then
-    AuxNode := AuxNode.Childrens.FindAnyNs('NewDataSet');
+    AuxNode := AuxNode.Childrens.FindAnyNs('NewDataSet')
+  else
+    AuxNode := ANode.Childrens.FindAnyNs('NewDataSet');
 
   if AuxNode <> nil then
     AuxNode := AuxNode.Childrens.FindAnyNs('NOTA_FISCAL');

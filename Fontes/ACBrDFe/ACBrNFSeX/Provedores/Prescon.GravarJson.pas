@@ -99,10 +99,7 @@ function TNFSeW_Prescon.GerarDadosNota: String;
 var
   LJSonArray: TACBrJSONArray;
   AJSon: TACBrJSONObject;
-  tipoPessoa: String;
-  issRetido: String;
-  devidoNoLocal: String;
-  tipoEnquadramento: String;
+  tipoPessoa, issRetido, devidoNoLocal, tipoEnquadramento, tipoISS: string;
   deducaoMaterial: double;
   i: Integer;
 begin
@@ -135,6 +132,13 @@ begin
     tipoEnquadramento := 'E'
   else
     tipoEnquadramento := '';
+
+  case NFSe.FrmRec of
+    frmFixoAnual: tipoISS := 'F';
+    frmFixoMensal: tipoISS := 'M';
+  else
+    tipoISS := 'F';
+  end;
 
   deducaoMaterial := 0;
   if NFSe.DeducaoMateriais = snSim then
@@ -186,7 +190,7 @@ begin
       .AddPair('COFINS', NFSe.Servico.Valores.ValorCofins)
       .AddPair('PISPASEP', NFSe.Servico.Valores.ValorPis)
       .AddPair('CEPServico', NFSe.ConstrucaoCivil.Endereco.CEP)
-      .AddPair('PAISServico', NFSe.ConstrucaoCivil.Endereco.CodigoPais)
+      .AddPair('PAISServico', NFSe.ConstrucaoCivil.Endereco.xPais)
       .AddPair('descricao', NFSe.Servico.Discriminacao)
       .AddPair('atividade', FormatarItemServico(NFSe.Servico.ItemListaServico, FormatoItemListaServico))
       .AddPair('valor', NFSe.Servico.Valores.ValorServicos)
@@ -199,7 +203,7 @@ begin
       .AddPair('valorIss', NFSe.Servico.Valores.ValorIss)
       .AddPair('valorTotalNota', NFSe.Servico.Valores.ValorLiquidoNfse)
       .AddPair('tipoEnquadramento', tipoEnquadramento)
-      .AddPair('tipoIss', 'F')
+      .AddPair('tipoIss', tipoISS)
       .AddPair('hashMd5', '');
 
     LJSonArray

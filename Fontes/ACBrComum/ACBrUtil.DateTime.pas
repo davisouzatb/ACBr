@@ -155,9 +155,13 @@ type
   function ParseDataHora(const DataStr: string): string;
   function AjustarData(const DataStr: string): string;
 
-  var
-    TimeZoneConfInstance: TTimeZoneConf;
-    OnAjustarDataHoraParaUf: TAjustarDataHoraParaUfFunc;
+  function UnixDateTimeBase: TDateTime;
+  function DateTimeToUnixMilliseconds(const AValue: TDateTime; InputIsUTC: Boolean = True): Int64;
+  function UnixMillisecondsToDateTime(const AValue: Int64; InputIsUTC: Boolean = True): TDateTime;
+
+var
+  TimeZoneConfInstance: TTimeZoneConf;
+  OnAjustarDataHoraParaUf: TAjustarDataHoraParaUfFunc;
 
 implementation
 
@@ -1174,6 +1178,42 @@ begin
       Result := 0
     else
       Result := StringToDateTime(xData, xFormatoData);
+  end;
+end;
+
+{-----------------------------------------------------------------------------
+  Retornar a Data Base para calculos de Unix time:  https://currentmillis.com/
+ -----------------------------------------------------------------------------}
+function UnixDateTimeBase: TDateTime;
+begin
+  Result := 25569;  // EncodeDate(1970, 1, 1);
+end;
+
+{-----------------------------------------------------------------------------
+  Converte um TDateTime Para Milisegundos, considerando a DataBase de Unix Time
+ -----------------------------------------------------------------------------}
+function DateTimeToUnixMilliseconds(const AValue: TDateTime; InputIsUTC: Boolean): Int64;
+var
+  t: TDateTime;
+begin
+  t := AValue;
+  if (not InputIsUTC) then
+    t := IncMinute(t, TimeZoneToBias(GetUTCSistema));
+  Result := Round((t - UnixDateTimeBase) * 86400 * 1000);  // 86400 = segundos por dia
+end;
+
+{-----------------------------------------------------------------------------
+  Converte um Valor de Unix Time em Milisegundos para Pascal TDateTime
+ -----------------------------------------------------------------------------}
+function UnixMillisecondsToDateTime(const AValue: Int64; InputIsUTC: Boolean): TDateTime;
+var
+  tzb: Integer;
+begin
+  Result := IncMilliSecond(UnixDateTimeBase, AValue);
+  if (not InputIsUTC) then
+  begin
+    tzb := TimeZoneToBias(GetUTCSistema);
+    Result := IncMinute(Result, -tzb);
   end;
 end;
 

@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#1976D2</color>
+    <color name="primary_dark">#1565C0</color>
+    <color name="primary_light">#42A5F5</color>
+    <color name="accent">#FF4081</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="error">#B00020</color>
+    
+    <!-- Cores de fundo para modo claro -->
+    <color name="background_dark">#FFFFFF</color>
+    <color name="surface_dark">#FFFFFF</color>
+    <color name="primary_text_dark">#212121</color>
 </resources>

@@ -39,6 +39,69 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+04/08/2025
+-- ACBrDFe, ACBrDFeWebService --
+[+] Inclusão do evento OnTransmitted em TACBrDFe.
+
+-- ACBrDFeDANFeReport --
+[+] Inclusão do método 'ImprimirCupomVerde' responsável pela impressão Reduzida do Cupom Verde.
+
+-- ACBrNFeDANFeESCPOS --
+[+] Implementação do novo método 'ImprimirCupomVerde'.
+    por: Elias César
+
+31/07/2025
+-- ACBrXmlBase --
+[*] Acrescentado a troca de </br> por ; (ponto e virgula) na função RemoverCaracteresDesnecessarios.
+   Por: Sergio Fuchs
+
+18/07/2025
+-- ACBrDFe.Conversao --
+[*] TK-7355: Correção do cClassTrib estava ct410099 sendo que o correto é ct410999.
+   Por: Daniel Pohren
+
+20/06/2025
+-- ACBrDFe.Conversao --
+[*] TK-7238: Incluído os enumerados: tcgNenhum ao tipo TtpEnteGov e 
+    togNenhum ao tipo TtpOperGov para a situação de não existir compra governamental.
+   Por: bnobre/Italo Giurizzato Junior
+
+18/06/2025
+-- ACBrDFe.Conversao --
+[*] Incluído novos CST, cClassTrib e os cCredPres com base nas tabelas 
+    disponibilizadas no portal da SEFAZ-Virtual do RS.
+   Por: Italo Giurizzato Junior
+
+16/06/2025
+-- ACBrXmlWriter --
+[*] Estava gerando a tag Transform com espaço em branco no final.
+   Por: Luiz Alberto da Silva Lope
+
+11/06/2025
+-- ACBrDFeConsts --
+[*] Correção no nome da constante e inclusão de uma nova constante.
+   Por: Italo Giurizzato Junior
+
+09/06/2025
+-- ACBrDFe.Conversao --
+[+] Criado o tipo TtpOperGov e as funções de conversão.
+-- ACBrDFeConsts --
+[+] As constantes com as respectivas mensagens referente a Reforma Tributária
+    foram concentradas na referida unit em vez de estarem duplicadas em cada unit
+    de constantes de cada componente.
+   Por: Italo Giurizzato Junior
+
+26/05/2025
+-- ACBrDFe.Conversao --
+[+] Criado o tipo TcCredPres e as funções de conversão.
+   Por: Italo Giurizzato Junior
+
+21/05/2025
+-- ACBrDFe.Conversao --
+[+] Criada a unit para inicialmente concentrar os tipos e funções de conversão 
+    referente a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
 28/11/2024
 -- ACBrXmlBase --
 [*] Comentado a linha que executa o ParseText na função FiltrarTextoXML, uma vez que

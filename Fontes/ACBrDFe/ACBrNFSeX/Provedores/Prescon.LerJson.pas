@@ -231,6 +231,7 @@ begin
   begin
     Servico := NFSe.Servico;
     Servico.ItemListaServico := ObterConteudo(AuxNode.Childrens.FindAnyNs('codigo'), tcStr);
+    Servico.xItemListaServico := ItemListaServicoDescricao(Servico.ItemListaServico);
     Servico.Discriminacao := ObterConteudo(AuxNode.Childrens.FindAnyNs('descricao'), tcStr);
     Servico.Discriminacao := StringReplace(Servico.Discriminacao, FpQuebradeLinha,
                                                     sLineBreak, [rfReplaceAll]);
@@ -258,7 +259,7 @@ begin
                                          Servico.Valores.ValorIr +
                                          Servico.Valores.ValorCsll;
 
-          if ObterConteudo(AuxNode.Childrens.FindAnyNs('issretido'), tcStr) = '0' then
+    if ObterConteudo(AuxNode.Childrens.FindAnyNs('issretido'), tcStr) = '0' then
       NFSe.Servico.Valores.IssRetido := stNormal
     else
       NFSe.Servico.Valores.IssRetido := stRetencao;

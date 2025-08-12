@@ -903,7 +903,8 @@ function TDCeConsulta.TratarResposta: Boolean;
 
 procedure SalvarEventos(Retorno: string);
 var
-  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJ: string;
+  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJCPF: string;
+  DhEvt: TDateTime;
   Inicio, Fim: Integer;
   TipoEvento: TpcnTpEvento;
   Ok: Boolean;
@@ -930,10 +931,15 @@ begin
       aIDEvento := Copy(aProcEvento, Inicio, Fim);
 
     TipoEvento  := StrToTpEventoDCe(Ok, SeparaDados(aEvento, 'tpEvento'));
-    sCNPJ       := SeparaDados(aEvento, 'CNPJ');
-    sPathEvento := PathWithDelim(FPConfiguracoesDCe.Arquivos.GetPathEvento(TipoEvento, sCNPJ));
+    DhEvt       := EncodeDataHora(SeparaDados(aEvento, 'dhEvento'), 'YYYY-MM-DD');
+    sCNPJCPF    := SeparaDados(aEvento, 'CNPJ');
 
-    if (aProcEvento <> '') then
+    if EstaVazio(sCNPJCPF) then
+      sCNPJCPF := SeparaDados(aEvento, 'CPF');
+
+    sPathEvento := PathWithDelim(FPConfiguracoesDCe.Arquivos.GetPathEvento(TipoEvento, sCNPJCPF, '', DhEvt));
+
+    if FPConfiguracoesDCe.Arquivos.SalvarEvento and (aProcEvento <> '') then
       FPDFeOwner.Gravar( aIDEvento + '-procEventoDCe.xml', aProcEvento, sPathEvento);
   end;
 end;
@@ -1202,7 +1208,7 @@ begin
       end
       else
       begin
-        if ExtrairEventos and FPConfiguracoesDCe.Arquivos.Salvar and
+        if ExtrairEventos and FPConfiguracoesDCe.Arquivos.SalvarEvento and
            (NaoEstaVazio(SeparaDados(FPRetWS, 'procEventoDCe'))) then
         begin
           Inicio := Pos('<procEventoDCe', FPRetWS);
@@ -1364,6 +1370,7 @@ begin
     end;
 
     EventoDCe.Versao := FPVersaoServico;
+    AjustarOpcoes(EventoDCe.Opcoes);
 
     EventoDCe.GerarXML;
 
@@ -1473,7 +1480,7 @@ begin
                 '</retEventoDCe>' +
                '</procEventoDCe>';
 
-      if FPConfiguracoesDCe.Arquivos.Salvar then
+      if FPConfiguracoesDCe.Arquivos.SalvarEvento then
       begin
         NomeArq := OnlyNumber(FEvento.Evento[0].InfEvento.Id) + '-procEventoDCe.xml';
         PathArq := PathWithDelim(GerarPathEvento(FEvento.Evento[0].InfEvento.CNPJCPF));

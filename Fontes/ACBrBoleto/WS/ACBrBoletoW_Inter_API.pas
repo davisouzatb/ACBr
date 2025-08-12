@@ -45,7 +45,6 @@ type
   { TBoletoW_Inter_API }
   TBoletoW_Inter_API = class(TBoletoWSREST)
   private
-//    function CodigoTipoTitulo(AEspecieDoc: String): String;
     function DateIntertoDateTime(const AValue: String): TDateTime;
     function DateTimeToDateInter( const AValue:TDateTime ):String;
   protected
@@ -138,11 +137,19 @@ begin
         end;
     end;
 
-
-  if Boleto.Configuracoes.WebService.Ambiente = tawsProducao then
-   FPURL := IfThen(Boleto.Cedente.CedenteWS.IndicadorPix, C_URLPIX, C_URL)
-  else
-   FPURL := IfThen(Boleto.Cedente.CedenteWS.IndicadorPix, C_URL_HOMPIX, C_URL_HOM);
+  if Boleto.Cedente.CedenteWS.IndicadorPix then
+  begin
+    case Boleto.Configuracoes.WebService.Ambiente of
+      tawsProducao   : FPURL.URLProducao    := C_URLPIX;
+      tawsHomologacao: FPURL.URLHomologacao := C_URL_HOMPIX;
+    end;
+  end else
+  begin
+    case Boleto.Configuracoes.WebService.Ambiente of
+      tawsProducao   : FPURL.URLProducao    := C_URL;
+      tawsHomologacao: FPURL.URLHomologacao := C_URL_HOM;
+    end;
+  end;
 
   if Boleto.Cedente.CedenteWS.IndicadorPix then
     begin
@@ -151,21 +158,21 @@ begin
          raise Exception.Create('Boleto PIX necessario informar codigoSolicitacao, Exemplo:'+sLineBreak+
                                 'NossoNumeroCorrespondente := "183e982a-34e5-4bc0-9643-def5432a"');
       case Boleto.Configuracoes.WebService.Operacao of
-        tpInclui:         FPURL := FPURL + '/cobrancas';
-        tpConsulta:       FPURL := FPURL + '/cobrancas?' + DefinirParametros;
-        tpAltera:         FPURL := FPURL + '/comandoInstrucao';
-        tpConsultaDetalhe:FPURL := FPURL + '/cobrancas/' + LNossoNumeroCorrespondente;
-        tpBaixa:          FPURL := FPURL + '/cobrancas/' + LNossoNumeroCorrespondente + '/cancelar';
+        tpInclui:         FPURL.SetPathURI( '/cobrancas' );
+        tpConsulta:       FPURL.SetPathURI( '/cobrancas?' + DefinirParametros);
+        tpAltera:         FPURL.SetPathURI( '/comandoInstrucao');
+        tpConsultaDetalhe:FPURL.SetPathURI( '/cobrancas/' + LNossoNumeroCorrespondente);
+        tpBaixa:          FPURL.SetPathURI( '/cobrancas/' + LNossoNumeroCorrespondente + '/cancelar');
       end;
     end
   else
     begin
       case Boleto.Configuracoes.WebService.Operacao of
-        tpInclui:         FPURL := FPURL + '/boletos';
-        tpConsulta:       FPURL := FPURL + '/boletos?' + DefinirParametros;
-        tpAltera:         FPURL := FPURL + '/comandoInstrucao';
-        tpConsultaDetalhe:FPURL := FPURL + '/boletos/' + LNossoNumero;
-        tpBaixa:          FPURL := FPURL + '/boletos/' + LNossoNumero + '/cancelar';
+        tpInclui:         FPURL.SetPathURI( '/boletos' );
+        tpConsulta:       FPURL.SetPathURI( '/boletos?' + DefinirParametros );
+        tpAltera:         FPURL.SetPathURI( '/comandoInstrucao' );
+        tpConsultaDetalhe:FPURL.SetPathURI( '/boletos/' + LNossoNumero );
+        tpBaixa:          FPURL.SetPathURI( '/boletos/' + LNossoNumero + '/cancelar' );
       end
     end;
 
@@ -452,7 +459,7 @@ end;
 procedure TBoletoW_Inter_API.GerarPagador(AJson: TACBrJSONObject);
 var
   LJsonDadosPagador: TACBrJSONObject;
-
+  LTelefone : String;
 begin
   if Assigned(ATitulo) and Assigned(AJson) then
   begin
@@ -469,7 +476,20 @@ begin
     LJsonDadosPagador.AddPair('cep',OnlyNumber(ATitulo.Sacado.CEP));
     LJsonDadosPagador.AddPair('cidade',ATitulo.Sacado.Cidade);
     LJsonDadosPagador.AddPair('uf',ATitulo.Sacado.UF);
-    LJsonDadosPagador.AddPair('telefone',IfThen(ATitulo.Sacado.Fone = '', '0', ATitulo.Sacado.Fone));
+
+
+    LTelefone := OnlyNumber(ATitulo.Sacado.Fone);
+
+    if Length(LTelefone) = 0 then
+      LTelefone := '0';
+
+    if Length(LTelefone) >= 10  then
+    begin
+      LJsonDadosPagador.AddPair('ddd',copy(LTelefone,0,2));
+      LJsonDadosPagador.AddPair('telefone',copy(LTelefone,3,Length(LTelefone)));
+    end else
+      LJsonDadosPagador.AddPair('telefone', LTelefone);
+
     LJsonDadosPagador.AddPair('email',ATitulo.Sacado.Email);
 
 
@@ -601,10 +621,6 @@ begin
               LJsonMulta.AddPair('codigo','PERCENTUAL');
               LJsonMulta.AddPair('taxa',ATitulo.PercentualMulta);
             end;
-          3:
-            begin
-//                  //LJsonMulta.AddPair('codigoMulta').Value.asString := 'NAOTEMMULTA'; //2024-01-08 - TK5016 - 00215-23 - retirado
-            end;
         end;
       end
       else  // qdo nao é hibrido
@@ -643,96 +659,24 @@ var
 begin
   if Assigned(ATitulo) and Assigned(AJson) then
   begin
-    LJsonDesconto := TACBrJSONObject.Create; // verificar
+    LJsonDesconto := TACBrJSONObject.Create;
     if (ATitulo.DataDesconto > 0) then
     begin
-
-      LJsonDesconto.AddPair('data',DateTimeToDateInter(ATitulo.DataDesconto ));
-
-      case Integer(ATitulo.TipoDesconto) of
-        1: // Valor Fixo até a data informada
+      case ATitulo.TipoDesconto of
+        tdValorFixoAteDataInformada: // Valor Fixo até a data informada
           begin
-            if Boleto.Cedente.CedenteWS.IndicadorPix then
-              begin
-                LJsonDesconto.AddPair('codigo','VALORFIXODATAINFORMADA');
-                LJsonDesconto.AddPair('taxa',ATitulo.ValorDesconto);
-                LJsonDesconto.AddPair('quantidadeDias',(ATitulo.Vencimento - ATitulo.DataDesconto));
-              end
-            else
-              begin
-                LJsonDesconto.AddPair('codigoDesconto','VALORFIXODATAINFORMADA');
-                LJsonDesconto.AddPair('valor',ATitulo.ValorDesconto);
-                LJsonDesconto.AddPair('taxa',0);
-              end;
+            LJsonDesconto.AddPair('codigo','VALORFIXODATAINFORMADA');
+            LJsonDesconto.AddPair('valor',ATitulo.ValorDesconto);
+            LJsonDesconto.AddPair('quantidadeDias',(ATitulo.Vencimento - ATitulo.DataDesconto));
           end;
-        2: // percentual até a data informada
+        tdPercentualAteDataInformada: // percentual até a data informada
           begin
-            if Boleto.Cedente.CedenteWS.IndicadorPix then
-              begin
-                LJsonDesconto.AddPair('codigo','PERCENTUALDATAINFORMADA');
-                LJsonDesconto.AddPair('taxa',ATitulo.ValorDesconto);
-                LJsonDesconto.AddPair('quantidadeDias',(ATitulo.Vencimento - ATitulo.DataDesconto));
-              end
-            else
-              begin
-                LJsonDesconto.AddPair('codigoDesconto','PERCENTUALDATAINFORMADA');
-                LJsonDesconto.AddPair('taxa',ATitulo.ValorDesconto);
-                LJsonDesconto.AddPair('valor',0);
-              end;
+            LJsonDesconto.AddPair('codigo','PERCENTUALDATAINFORMADA');
+            LJsonDesconto.AddPair('taxa',ATitulo.ValorDesconto);
+            LJsonDesconto.AddPair('quantidadeDias',(ATitulo.Vencimento - ATitulo.DataDesconto));
           end;
-      else
-        begin
-          if not Boleto.Cedente.CedenteWS.IndicadorPix then
-            begin
-              LJsonDesconto.AddPair('codigoDesconto','NAOTEMDESCONTO');
-              LJsonDesconto.AddPair('valor',0);
-              LJsonDesconto.AddPair('taxa',0);
-            end;
-        end;
       end;
-    end
-    else
-    begin
-      if not Boleto.Cedente.CedenteWS.IndicadorPix then
-        begin
-          LJsonDesconto.AddPair('codigoDesconto','NAOTEMDESCONTO');
-          LJsonDesconto.AddPair('valor',0);
-          LJsonDesconto.AddPair('taxa',0);
-        end;
-    end;
-
-    if ((Boleto.Cedente.CedenteWS.IndicadorPix) and (ATitulo.DataDesconto > 0))  then
-       AJson.AddPair('desconto', LJsonDesconto)
-    else if not Boleto.Cedente.CedenteWS.IndicadorPix then
-       AJson.AddPair('desconto1', LJsonDesconto) ;
-
-    if ((ATitulo.DataDesconto2 > 0) and (not Boleto.Cedente.CedenteWS.IndicadorPix)) then
-    begin
-      LJsonDesconto2 := TACBrJSONObject.Create;
-      LJsonDesconto2.AddPair('data',ATitulo.DataDesconto2);
-
-      case Integer(ATitulo.TipoDesconto) of
-        1:
-          begin
-            LJsonDesconto2.AddPair('codigoDesconto','VALORFIXODATAINFORMADA');
-            LJsonDesconto2.AddPair('valor',ATitulo.ValorDesconto2);
-            LJsonDesconto2.AddPair('taxa',0);
-          end;
-        2:
-          begin
-            LJsonDesconto2.AddPair('codigoDesconto','PERCENTUALDATAINFORMADA');
-            LJsonDesconto2.AddPair('taxa',ATitulo.ValorDesconto2);
-            LJsonDesconto2.AddPair('valor',0);
-          end;
-      else
-        begin
-          LJsonDesconto2.AddPair('codigoDesconto','NAOTEMDESCONTO');
-          LJsonDesconto2.AddPair('valor',0);
-          LJsonDesconto2.AddPair('taxa',0);
-        end;
-      end;
-
-      AJson.AddPair('desconto2',LJsonDesconto2);
+      AJson.AddPair('desconto', LJsonDesconto);
     end;
   end;
 end;
@@ -811,22 +755,18 @@ begin
   // sem Payload
 end;
 
-//function TBoletoW_Inter_API.CodigoTipoTitulo(AEspecieDoc: String): String;
-//begin
-//end;
-
 constructor TBoletoW_Inter_API.Create(ABoletoWS: TBoletoWS);
 begin
   inherited Create(ABoletoWS);
 
-  FPAccept := C_ACCEPT;
+  FPAccept := '';
 
   if Assigned(OAuth) then
   begin
-    if OAuth.Ambiente = tawsProducao then
-      OAuth.URL := C_URL_OAUTH_PROD
-    else
-      OAuth.URL := C_URL_OAUTH_HOM;
+    case OAuth.Ambiente of
+      tawsProducao: OAuth.URL.URLProducao := C_URL_OAUTH_PROD;
+      tawsHomologacao: OAuth.URL.URLHomologacao := C_URL_OAUTH_HOM;
+    end;
 
     OAuth.Payload := not (OAuth.Ambiente = tawsProducao);
   end;

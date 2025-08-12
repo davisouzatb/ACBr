@@ -44,6 +44,7 @@ uses
   ACBrNFSeXClass, ACBrNFSeXConversao,
   ACBrNFSeXGravarXml, ACBrNFSeXLerXml,
   ACBrNFSeXProviderProprio,
+  ACBrNFSeXProviderABRASFv1,
   ACBrNFSeXWebserviceBase, ACBrNFSeXWebservicesResponse;
 
 type
@@ -87,6 +88,46 @@ type
     function SituacaoTributariaToStr(const t: TnfseSituacaoTributaria): string; override;
     function StrToSituacaoTributaria(out ok: boolean; const s: string): TnfseSituacaoTributaria; override;
     function SituacaoTributariaDescricao(const t: TnfseSituacaoTributaria): string; override;
+  end;
+
+  TACBrNFSeXWebserviceGiap101 = class(TACBrNFSeXWebserviceGiap)
+  private
+//    function GetNameSpace: string;
+  public
+    {
+    function Recepcionar(const ACabecalho, AMSG: String): string; override;
+    function ConsultarLote(const ACabecalho, AMSG: String): string; override;
+    function ConsultarSituacao(const ACabecalho, AMSG: String): string; override;
+    function ConsultarNFSePorRps(const ACabecalho, AMSG: String): string; override;
+    function ConsultarNFSe(const ACabecalho, AMSG: String): string; override;
+    function Cancelar(const ACabecalho, AMSG: String): string; override;
+
+    function TratarXmlRetornado(const aXML: string): string; override;
+
+    property NameSpace: string read GetNameSpace;
+    }
+  end;
+
+  TACBrNFSeProviderGiap101 = class (TACBrNFSeProviderABRASFv1)
+  protected
+    procedure Configuracao; override;
+
+    function CriarGeradorXml(const ANFSe: TNFSe): TNFSeWClass; override;
+    function CriarLeitorXml(const ANFSe: TNFSe): TNFSeRClass; override;
+    function CriarServiceClient(const AMetodo: TMetodo): TACBrNFSeXWebservice; override;
+
+    procedure TratarRetornoEmitir(Response: TNFSeEmiteResponse); override;
+
+    procedure PrepararConsultaNFSeporRps(Response: TNFSeConsultaNFSeporRpsResponse); override;
+    procedure TratarRetornoConsultaNFSeporRps(Response: TNFSeConsultaNFSeporRpsResponse); override;
+
+    procedure PrepararCancelaNFSe(Response: TNFSeCancelaNFSeResponse); override;
+    procedure TratarRetornoCancelaNFSe(Response: TNFSeCancelaNFSeResponse); override;
+
+    procedure ProcessarMensagemErros(RootNode: TACBrXmlNode;
+                                     Response: TNFSeWebserviceResponse;
+                                     const AListTag: string = '';
+                                     const AMessageTag: string = 'Erro'); override;
   end;
 
 implementation
@@ -202,7 +243,11 @@ var
 begin
   ANode := RootNode.Document.Root.Childrens.FindAnyNs('notaFiscal');
 
-  if not Assigned(ANode) then exit;
+  if not Assigned(ANode) then
+    ANode := RootNode.Document.Root;
+
+  if not Assigned(ANode) then
+    exit;
 
   if ObterConteudoTag(ANode.Childrens.FindAnyNs('statusEmissao'), tcInt) <> 200 then
   begin
@@ -340,6 +385,7 @@ begin
              CodigoVerificacao := aCodigoVerificacao;
              Link := aLink;
              IdentificacaoRps.Numero := aNumeroRps;
+             tpXML := txmlNFSe;
              ANota.LerXML(ANota.GerarXML);
           end;
 
@@ -611,6 +657,445 @@ begin
   FPMsgOrig := AMSG;
 
   Result := Executar('', AMSG, [], []);
+end;
+
+{ TACBrNFSeProviderGiap101 }
+
+procedure TACBrNFSeProviderGiap101.Configuracao;
+begin
+  inherited Configuracao;
+
+  with ConfigGeral do
+  begin
+    QuebradeLinha := '\n';
+
+    Autenticacao.RequerChaveAutorizacao := True;
+
+    ServicosDisponibilizados.EnviarLoteAssincrono := True;
+    ServicosDisponibilizados.ConsultarSituacao := False;
+    ServicosDisponibilizados.ConsultarLote := False;
+    ServicosDisponibilizados.ConsultarNfse := False;
+    ServicosDisponibilizados.ConsultarRps := True;
+    ServicosDisponibilizados.CancelarNfse := True;
+  end;
+
+  with ConfigMsgDados do
+  begin
+    Prefixo := 'ns3';
+    PrefixoTS := 'ns4';
+
+    ConsultarNFSePorFaixa.DocElemento := 'ConsultarNfseEnvio';
+
+    DadosCabecalho := '<ns2:cabecalho versao="3" xmlns:ns2="http://www.ginfes.com.br/cabecalho_v03.xsd">' +
+                      '<versaoDados>3</versaoDados>' +
+                      '</ns2:cabecalho>';
+
+    XmlRps.xmlns := 'http://www.ginfes.com.br/tipos_v03.xsd';
+
+    LoteRps.xmlns := 'http://www.ginfes.com.br/servico_enviar_lote_rps_envio_v03.xsd';
+  end;
+
+  with ConfigAssinar do
+  begin
+    LoteRps := True;
+  end;
+
+  SetNomeXSD('***');
+
+  with ConfigSchemas do
+  begin
+    Recepcionar := 'servico_enviar_lote_rps_envio_v03.xsd';
+    Validar := False;
+  end;
+end;
+
+function TACBrNFSeProviderGiap101.CriarGeradorXml(
+  const ANFSe: TNFSe): TNFSeWClass;
+begin
+  Result := TNFSeW_Giap101.Create(Self);
+  Result.NFSe := ANFSe;
+end;
+
+function TACBrNFSeProviderGiap101.CriarLeitorXml(
+  const ANFSe: TNFSe): TNFSeRClass;
+begin
+  Result := TNFSeR_Giap101.Create(Self);
+  Result.NFSe := ANFSe;
+end;
+
+function TACBrNFSeProviderGiap101.CriarServiceClient(
+  const AMetodo: TMetodo): TACBrNFSeXWebservice;
+var
+  URL: string;
+begin
+  URL := GetWebServiceURL(AMetodo);
+
+  if URL <> '' then
+    Result := TACBrNFSeXWebserviceGiap101.Create(FAOwner, AMetodo, URL)
+  else
+  begin
+    if ConfigGeral.Ambiente = taProducao then
+      raise EACBrDFeException.Create(ERR_SEM_URL_PRO)
+    else
+      raise EACBrDFeException.Create(ERR_SEM_URL_HOM);
+  end;
+end;
+
+procedure TACBrNFSeProviderGiap101.TratarRetornoEmitir(
+  Response: TNFSeEmiteResponse);
+var
+  Document: TACBrXmlDocument;
+  AErro: TNFSeEventoCollectionItem;
+  AResumo: TNFSeResumoCollectionItem;
+  ANodeArray: TACBrXmlNodeArray;
+  ANode: TACBrXmlNode;
+  i: Integer;
+  ANota: TNotaFiscal;
+  aNumeroNota, aCodigoVerificacao, aSituacao, aLink, aNumeroRps: string;
+begin
+  Document := TACBrXmlDocument.Create;
+
+  try
+    try
+      if Response.ArquivoRetorno = '' then
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod201;
+        AErro.Descricao := ACBrStr(Desc201);
+        Exit
+      end;
+
+      Document.LoadFromXml(Response.ArquivoRetorno);
+
+      ProcessarMensagemErros(Document.Root, Response, '', '');
+
+      Response.Sucesso := (Response.Erros.Count = 0);
+
+      if Response.Sucesso then
+      begin
+        ANode := Document.Root;
+        ANodeArray := ANode.Childrens.FindAllAnyNs('notaFiscal');
+
+        if not Assigned(ANodeArray) then
+        begin
+          AErro := Response.Erros.New;
+          AErro.Codigo := Cod203;
+          AErro.Descricao := ACBrStr(Desc203);
+          Exit;
+        end;
+
+        for I := Low(ANodeArray) to High(ANodeArray) do
+        begin
+          ANode := ANodeArray[I];
+
+          aNumeroNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('numeroNota'), tcStr);
+          aCodigoVerificacao := ObterConteudoTag(ANode.Childrens.FindAnyNs('codigoVerificacao'), tcStr);
+          aSituacao := ObterConteudoTag(ANode.Childrens.FindAnyNs('statusEmissao'), tcStr);
+          aLink := ObterConteudoTag(ANode.Childrens.FindAnyNs('link'), tcStr);
+          aLink := StringReplace(aLink, '&amp;', '&', [rfReplaceAll]);
+          aNumeroRps := ObterConteudoTag(ANode.Childrens.FindAnyNs('numeroRps'), tcStr);
+
+          with Response do
+          begin
+            NumeroNota := aNumeroNota;
+            CodigoVerificacao := aCodigoVerificacao;
+            Situacao := aSituacao;
+            Link := aLink;
+            NumeroRps := aNumeroRps;
+          end;
+
+          AResumo := Response.Resumos.New;
+          AResumo.NumeroNota := aNumeroNota;
+          AResumo.CodigoVerificacao := aCodigoVerificacao;
+          AResumo.NumeroRps := aNumeroRps;
+          AResumo.Link := aLink;
+          AResumo.Situacao := aSituacao;
+
+          // GIAP Não retorna o XML da Nota sendo necessário imprimir a Nota já
+          // gerada. Se Não der erro, passo a Nota de Envio para ser impressa já
+          // que não deu erro na emissão.
+
+          ANota := TACBrNFSeX(FAOwner).NotasFiscais.FindByRps(aNumeroRps);
+          ANota := CarregarXmlNfse(ANota, Response.XmlEnvio);
+
+          {
+           Carregando dados da NFS-e emitida que não constam no XML de envio e
+           só retornam no Response
+          }
+          with ANota.NFSe do
+          begin
+            tpXML := txmlNFSe;
+            Numero := aNumeroNota;
+            CodigoVerificacao := aCodigoVerificacao;
+            Link := aLink;
+            IdentificacaoRps.Numero := aNumeroRps;
+            ANota.LerXML(ANota.GerarXML);
+          end;
+
+          SalvarXmlNfse(ANota);
+        end;
+      end;
+    except
+      on E:Exception do
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod999;
+        AErro.Descricao := ACBrStr(Desc999 + E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Document);
+  end;
+end;
+
+procedure TACBrNFSeProviderGiap101.PrepararConsultaNFSeporRps(
+  Response: TNFSeConsultaNFSeporRpsResponse);
+var
+  AErro: TNFSeEventoCollectionItem;
+  Emitente: TEmitenteConfNFSe;
+begin
+  if EstaVazio(Response.CodigoVerificacao) then
+  begin
+    AErro := Response.Erros.New;
+    AErro.Codigo := Cod117;
+    AErro.Descricao := ACBrStr(Desc117);
+    Exit;
+  end;
+
+  Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
+
+  Response.ArquivoEnvio := '<consulta>' +
+                              '<inscricaoMunicipal>' +
+                                OnlyNumber(Emitente.InscMun) +
+                              '</inscricaoMunicipal>' +
+                              '<codigoVerificacao>' +
+                                Response.CodigoVerificacao +
+                              '</codigoVerificacao>' +
+                           '</consulta>';
+end;
+
+procedure TACBrNFSeProviderGiap101.TratarRetornoConsultaNFSeporRps(
+  Response: TNFSeConsultaNFSeporRpsResponse);
+var
+  Document: TACBrXmlDocument;
+  AErro: TNFSeEventoCollectionItem;
+  ANode: TACBrXmlNode;
+begin
+  Document := TACBrXmlDocument.Create;
+
+  try
+    try
+      if Response.ArquivoRetorno = '' then
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod201;
+        AErro.Descricao := ACBrStr(Desc201);
+        Exit
+      end;
+
+      Document.LoadFromXml(Response.ArquivoRetorno);
+
+      ProcessarMensagemErros(Document.Root, Response, '', '');
+
+      Response.Sucesso := (Response.Erros.Count = 0);
+
+      ANode := Document.Root;
+
+      if ANode <> nil then
+      begin
+        Response.CodigoVerificacao := ObterConteudoTag(ANode.Childrens.FindAnyNs('codigoVerificacao'), tcStr);
+
+        if ObterConteudoTag(ANode.Childrens.FindAnyNs('notaExiste'), tcStr) = 'Sim' then
+          Response.DescSituacao := 'Nota Autorizada'
+        else
+        if ObterConteudoTag(ANode.Childrens.FindAnyNs('notaExiste'), tcStr) = 'Cancelada' then
+        begin
+          Response.DescSituacao := 'Nota Cancelada';
+          Response.Cancelamento.DataHora := ObterConteudoTag(ANode.Childrens.FindAnyNs('dataCancelamento'), tcDatVcto);
+          Response.Cancelamento.Motivo := 'Nota Cancelada';
+        end
+        else
+          Response.DescSituacao := ACBrStr('Nota não Encontrada');
+
+        Response.NumeroNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('numeroNota'), tcStr);
+        Response.Link := ObterConteudoTag(ANode.Childrens.FindAnyNs('wsLink'), tcStr);
+      end;
+    except
+      on E:Exception do
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod999;
+        AErro.Descricao := ACBrStr(Desc999 + E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Document);
+  end;
+end;
+
+procedure TACBrNFSeProviderGiap101.PrepararCancelaNFSe(
+  Response: TNFSeCancelaNFSeResponse);
+var
+  AErro: TNFSeEventoCollectionItem;
+begin
+  if EstaVazio(Response.InfCancelamento.CodCancelamento) then
+  begin
+    AErro := Response.Erros.New;
+    AErro.Codigo := Cod109;
+    AErro.Descricao := ACBrStr(Desc109);
+    Exit;
+  end;
+
+  if EstaVazio(Response.InfCancelamento.NumeroNFSe) then
+  begin
+    AErro := Response.Erros.New;
+    AErro.Codigo := Cod108;
+    AErro.Descricao := ACBrStr(Desc108);
+    Exit;
+  end;
+
+  Response.ArquivoEnvio := '<nfe>' +
+                             '<cancelaNota>' +
+                               '<codigoMotivo>' +
+                                  Response.InfCancelamento.CodCancelamento +
+                               '</codigoMotivo>' +
+                               '<numeroNota>' +
+                                  Response.InfCancelamento.NumeroNFSe +
+                               '</numeroNota>' +
+                             '</cancelaNota>' +
+                           '</nfe>';
+end;
+
+procedure TACBrNFSeProviderGiap101.TratarRetornoCancelaNFSe(
+  Response: TNFSeCancelaNFSeResponse);
+var
+  Document: TACBrXmlDocument;
+  AErro: TNFSeEventoCollectionItem;
+  ANode: TACBrXmlNode;
+  ANodeArray: TACBrXmlNodeArray;
+  I: Integer;
+  NumRps: String;
+begin
+  Document := TACBrXmlDocument.Create;
+
+  try
+    try
+      if Response.ArquivoRetorno = '' then
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod201;
+        AErro.Descricao := ACBrStr(Desc201);
+        Exit
+      end;
+
+      Document.LoadFromXml(Response.ArquivoRetorno);
+
+      ProcessarMensagemErros(Document.Root, Response, '', '');
+
+      Response.Sucesso := (Response.Erros.Count = 0);
+
+      ANode := Document.Root;
+
+      Response.NumeroLote := ObterConteudoTag(ANode.Childrens.FindAnyNs('NumeroLote'), tcStr);
+
+      ANodeArray := ANode.Childrens.FindAllAnyNs('notaFiscal');
+
+      if not Assigned(ANodeArray) then
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod203;
+        AErro.Descricao := ACBrStr(Desc203);
+        Exit;
+      end;
+
+      for I := Low(ANodeArray) to High(ANodeArray) do
+      begin
+        ANode := ANodeArray[I];
+
+        if ANode <> nil then
+          NumRps := ObterConteudoTag(ANode.Childrens.FindAnyNs('numeroRps'), tcStr);
+
+        // Ele não retorna o XML por isso nao posso salvar o retorno,
+        // se não ira sobreescrever o XML de envio.
+      end;
+    except
+      on E:Exception do
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod999;
+        AErro.Descricao := ACBrStr(Desc999 + E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Document);
+  end;
+end;
+
+procedure TACBrNFSeProviderGiap101.ProcessarMensagemErros(
+  RootNode: TACBrXmlNode; Response: TNFSeWebserviceResponse; const AListTag,
+  AMessageTag: string);
+
+  function ObterValor(ANode: TACBrXmlNode; const ATag: string): string;
+  var
+    Node: TACBrXmlNode;
+    Attr: TACBrXmlAttribute;
+  begin
+    Attr := ANode.Attributes.Items[ATag];
+    if Attr <> nil then
+      Result := ObterConteudoTag(Attr)
+    else
+    begin
+      Node := ANode.Childrens.FindAnyNs(ATag);
+      if Node <> nil then
+        Result := ObterConteudoTag(Node, tcStr)
+      else
+        Result := '';
+    end;
+  end;
+
+var
+  I: Integer;
+  ANode: TACBrXmlNode;
+  ANodeArray: TACBrXmlNodeArray;
+  AErro: TNFSeEventoCollectionItem;
+  Codigo, Mensagem: string;
+begin
+  ANode := RootNode.Document.Root.Childrens.FindAnyNs('notaFiscal');
+
+  if not Assigned(ANode) then
+    ANode := RootNode.Document.Root;
+
+  if not Assigned(ANode) then
+    exit;
+
+  Codigo := ObterConteudoTag(ANode.Childrens.FindAnyNs('statusEmissao'), tcStr);
+
+  if StrToIntDef(Codigo, 0) <> 200 then
+  begin
+    Mensagem := ObterConteudoTag(ANode.Childrens.FindAnyNs('messages'), tcStr);
+
+    if Mensagem <> '' then
+    begin
+      AErro := Response.Erros.New;
+      AErro.Codigo := Codigo;
+      AErro.Descricao := Mensagem;
+      AErro.Correcao := '';
+    end
+    else
+    begin
+      ANodeArray := ANode.Childrens.FindAllAnyNs('messages');
+
+      for I := Low(ANodeArray) to High(ANodeArray) do
+      begin
+        ANode := ANodeArray[I];
+
+        AErro := Response.Erros.New;
+        AErro.Codigo := ObterValor(ANode, 'code');
+        AErro.Descricao := ObterValor(ANode, 'message');
+        AErro.Correcao := '';
+      end;
+    end;
+  end;
 end;
 
 end.

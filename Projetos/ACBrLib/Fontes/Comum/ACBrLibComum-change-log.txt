@@ -42,6 +42,41 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+06/05/2025
+-- ACBrLibConfig, ACBrLibConsts --
+[*] #TK-6998: Formata mensagem para exibir chave/seção inexistente de forma explícita.
+    Por: Julio Cavalcanti \ Rev: Diego Folieni
+
+23/04/2025
+--- ACBrLibConfig.pas, ACBrLibConsts.pas ---
+[*] Controle para zerar configurações SSL desativadas para não levantar exceção.
+    Por: Renato Rubinho
+
+11/04/2025
+--- ACBrLibComum.pas ---
+[-] Corrige erro de compilação na lib pro
+    Por: doszapro
+
+10/04/2025
+--- ACBrLibComum.pas ---
+[-] Corrige AV do FPDemo, previne múltiplas liberações de memória na variável FPDemo
+    Por: doszapro
+
+10/03/2025
+-- ACBrComum.php --
+[*] #TK-6733 - Controle para localizar a lib na pasta padrão de bibliotecas do linux
+   Por: Renato Rubinho
+
+24/02/2025
+-- ACBrLibConfig, ACBrLibConsts --
+[*] Criptografia da propriedade CSRT - #TK-6625
+   Por: Antonio Carlos Junior
+
+06/02/2025
+-- ACBrComum.php --
+[*] Sem TK: Removida trava da CarregaContents() quando não for identificado ambiente gráfico
+  Por: Renato Rubinho
+
 10/12/2024
 -- ACBrConsultaCNPJ.php, ACBrConsultaCNPJ.php --
 [*] #TK-6342: Correção na composição do caminho da lib para usar somente DIRECTORY_SEPARATOR

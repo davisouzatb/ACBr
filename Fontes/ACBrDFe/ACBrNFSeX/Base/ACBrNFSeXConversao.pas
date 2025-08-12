@@ -118,14 +118,14 @@ type
   TnfseProvedor = (proNenhum,
                    proPadraoNacional,
                    proAbaco, proABase, proActcon, proAdm, proADPM, proAEG,
-                   proAgili, proAssessorPublico, proAsten, proBauhaus, proBetha,
-                   proBHISS, proCenti, proCIGA, proCitta, proConam, proContass,
-                   proCoplan, proCTA, proCTAConsult, proDataSmart, proDBSeller,
-                   proDeISS, proDesenvolve, proDigifred, proDSF, proeGoverneISS,
-                   proeISS, proEL, proElmar, proEloTech, proEquiplano, proeReceita,
-                   proEtherium, proFacundo, proFGMaiss, profintelISS, proFiorilli,
-                   proFisco, proFISSLex, proFuturize, proGeisWeb, progeNFe,
-                   proGestaoISS, proGiap, proGinfes, proGiss, proGovBR,
+                   proAgili, proAspec, proAssessorPublico, proAsten, proBauhaus,
+                   proBetha, proBHISS, proCenti, proCIGA, proCitta, proConam,
+                   proContass, proCoplan, proCTA, proCTAConsult, proDataSmart,
+                   proDBSeller, proDeISS, proDesenvolve, proDigifred, proDSF,
+                   proeGoverneISS, proeISS, proEL, proElmar, proEloTech, proEquiplano,
+                   proeReceita, proEtherium, proFacundo, proFGMaiss, profintelISS,
+                   proFiorilli, proFisco, proFISSLex, proFuturize, proGeisWeb,
+                   progeNFe, proGestaoISS, proGiap, proGinfes, proGiss, proGovBR,
                    proGovDigital, proGoverna, proHorus, proiiBrasil, proInfisc,
                    proIntertec, proIPM, proIsaneto, proISSBarueri, proISSCamacari,
                    proISSCambe, proISSCampinas, proISSCuritiba, proISSDigital,
@@ -142,7 +142,7 @@ type
                    proSiappa, proSiapSistemas, proSiat, proSigCorp, proSigep,
                    proSigISS, proSigISSWeb, proSilTecnologia, proSimple,
                    proSimplISS, proSintese, proSisPMJP, proSistemas4R,
-                   proSmarAPD, proSoftPlan, proSpeedGov, proSSInformatica,
+                   proSmarAPD, proSmart4, proSoftPlan, proSpeedGov, proSSInformatica,
                    proSudoeste, proSysISS, proSystemPro, proTcheInfo, proTecnos,
                    proThema, proTinus, proTiplan, proTributus, proVersaTecnologia,
                    proVirtual, proWebFisco, proWebISS, proXTRTecnologia);
@@ -156,8 +156,6 @@ type
                         ttTribforaMunIsento, ttTribnoMunImune, ttTribforaMunImune,
                         ttTribnoMunSuspensa, ttTribforaMunSuspensa, ttExpServicos,
                         ttSimplesNacional, ttRetidonoMun);
-
-  TLogradouroLocalPrestacaoServico = (llpTomador, llpPrestador);
 
   TTributacao = (ttIsentaISS, ttNaoIncidencianoMunic, ttImune, ttExigibilidadeSusp,
                  ttNaoTributavel, ttTributavel, ttTributavelFixo, ttTributavelSN,
@@ -613,6 +611,26 @@ type
 const
   TLocalPrestacaoArrayStrings: array[TLocalPrestacao] of string = ('1', '2');
 
+type
+  TLogradouroLocalPrestacaoServico = (llpTomador, llpPrestador);
+
+const
+  TLogradouroLocalPrestacaoServicoArrayStrings: array[TLogradouroLocalPrestacaoServico] of string =
+    ('1', '2');
+
+// Reforma Tributária
+type
+  TindCompGov  = (icgNenhum, icgSim, icgNao);
+
+const
+  TindCompGovArrayStrings: array[TindCompGov] of string = ('', '1', '0');
+
+type
+  TmodoPrestServ  = (mpsPresencial, mpsNaoPresencial);
+
+const
+  TmodoPrestServArrayStrings: array[TmodoPrestServ] of string = ('1', '2');
+
 {
   Declaração das funções de conversão
 }
@@ -785,8 +803,21 @@ function NaoNIFToStr(const t: TNaoNIF): string;
 function CodIBGEPaisToSiglaISO2(t: Integer): string;
 function SiglaISO2ToCodIBGEPais(const t: string): Integer;
 
+function CodIBGEPaisToCodISO(t: Integer): Integer;
+function CodISOPaisToCodIBGE(t: Integer): Integer;
+
 function LocalPrestacaoToStr(t: TLocalPrestacao): string;
 function StrToLocalPrestacao(out ok: boolean; const s: string): TLocalPrestacao;
+
+function LogradouroLocalPrestacaoServicoToStr(t: TLogradouroLocalPrestacaoServico): string;
+function StrToLogradouroLocalPrestacaoServico(const s: string): TLogradouroLocalPrestacaoServico;
+
+// Reforma Tributária
+function indCompGovToStr(const t: TindCompGov): string;
+function StrToindCompGov(const s: string): TindCompGov;
+
+function modoPrestServToStr(const t: TmodoPrestServ): string;
+function StrTomodoPrestServ(const s: string): TmodoPrestServ;
 
 const
   SiglaISO2Pais: array[0..247] of string = ('AF', 'AL', 'CW', 'DE', 'BF', 'AD',
@@ -811,6 +842,25 @@ const
         'DJ', 'TD', 'CZ', 'TL', 'TG', 'TK', 'TO', 'TT', 'TN', 'TC', 'TM', 'TR',
         'TV', 'UA', 'UG', 'UY', 'UZ', 'VA', 'VE', 'VN', 'VG', 'VI', 'WF', 'FJ',
         'CD', 'ZM');
+
+  CodigoISOPais: array[0..247] of Integer = (004, 008, 531, 276, 854, 020, 024,
+     660, 010, 028, 682, 012, 032, 051, 533, 036, 040, 031, 044, 048, 050, 052,
+     112, 056, 084, 060, 104, 068, 535, 070, 072, 074, 076, 096, 100, 108, 064,
+     132, 136, 116, 120, 124, 398, 634, 152, 156, 158, 196, 166, 170, 174, 178,
+     184, 408, 410, 384, 191, 188, 414, 192, 204, 208, 212, 218, 818, 232, 784,
+     724, 705, 703, 840, 233, 231, 238, 234, 608, 246, 250, 266, 270, 288, 268,
+     239, 292, 308, 300, 304, 312, 316, 320, 831, 254, 324, 226, 624, 328, 332,
+     334, 340, 344, 348, 887, 833, 356, 360, 368, 364, 372, 352, 376, 380, 388,
+     832, 392, 400, 296, 418, 426, 428, 422, 430, 434, 438, 440, 442, 446, 807,
+     450, 458, 454, 462, 466, 470, 580, 504, 584, 474, 480, 478, 175, 484, 498,
+     492, 496, 499, 583, 500, 508, 516, 520, 162, 524, 558, 562, 566, 570, 574,
+     578, 540, 598, 554, 548, 512, 581, 528, 585, 586, 275, 591, 600, 604, 612,
+     258, 616, 620, 630, 404, 417, 826, 140, 214, 638, 716, 642, 646, 643, 090,
+     732, 222, 882, 016, 652, 659, 534, 674, 663, 666, 670, 654, 662, 678, 686,
+     690, 694, 688, 702, 760, 706, 144, 748, 744, 710, 729, 728, 752, 756, 740,
+     762, 764, 834, 260, 086, 262, 148, 203, 626, 768, 772, 776, 780, 788, 796,
+     795, 792, 798, 804, 800, 858, 860, 336, 862, 704, 092, 850, 876, 242, 180,
+     894);
 
   CodigoIBGEPais: array[0..247] of Integer = (0132, 0175, 0200, 0230, 0310,
     0370, 0400, 0418, 0420, 0434, 0531, 0590, 0639, 0647, 0655, 0698, 0728,
@@ -3481,7 +3531,7 @@ var
       3125200: CodTOM := '4503'; // Fama/MG';
       3125309: CodTOM := '4505'; // Faria Lemos/MG';
       3125408: CodTOM := '4507'; // Felicio Dos Santos/MG';
-      3125507: CodTOM := '5238'; // Sao Goncalo Do Rio Preto/MG';
+      3125507: CodTOM := '4509'; // Sao Goncalo Do Rio Preto/MG';
       3125606: CodTOM := '4511'; // Felisburgo/MG';
       3125705: CodTOM := '4513'; // Felixlandia/MG';
       3125804: CodTOM := '4515'; // Fernandes Tourinho/MG';
@@ -6201,6 +6251,8 @@ var
       5101605: CodTOM := '9031'; // Barao De Melgaco/MT';
       5101704: CodTOM := '9033'; // Barra Do Bugres/MT';
       5101803: CodTOM := '9035'; // Barra Do Garcas/MT';
+      // Falta informar corretamente o código TOM da nova cidade
+      5101837: CodTOM := '0000'; // Boa Esperanca do Norte/MT
       5101852: CodTOM := '1078'; // Bom Jesus Do Araguaia/MT';
       5101902: CodTOM := '9873'; // Brasnorte/MT';
       5102504: CodTOM := '9047'; // Caceres/MT';
@@ -9160,7 +9212,7 @@ begin
     4503: CodIBGE := 3125200; // Fama/MG
     4505: CodIBGE := 3125309; // Faria Lemos/MG
     4507: CodIBGE := 3125408; // Felicio Dos Santos/MG
-    5238: CodIBGE := 3125507; // Sao Goncalo Do Rio Preto/MG
+    4509: CodIBGE := 3125507; // Sao Goncalo Do Rio Preto/MG
     4511: CodIBGE := 3125606; // Felisburgo/MG
     4513: CodIBGE := 3125705; // Felixlandia/MG
     4515: CodIBGE := 3125804; // Fernandes Tourinho/MG
@@ -11832,6 +11884,8 @@ begin
     9031: CodIBGE := 5101605; // Barao De Melgaco/MT
     9033: CodIBGE := 5101704; // Barra Do Bugres/MT
     9035: CodIBGE := 5101803; // Barra Do Garcas/MT
+    // Falta informar corretamente o código TOM da nova cidade
+    0000: CodIBGE := 5101837; // Boa Esperanca do Norte/MT
     1078: CodIBGE := 5101852; // Bom Jesus Do Araguaia/MT
     9873: CodIBGE := 5101902; // Brasnorte/MT
     9047: CodIBGE := 5102504; // Caceres/MT
@@ -13241,6 +13295,38 @@ begin
   end;
 end;
 
+function CodIBGEPaisToCodISO(t: Integer): Integer;
+var
+  i: Integer;
+begin
+  Result := 0;
+
+  for i := Low(CodigoIBGEPais) to High(CodigoIBGEPais) do
+  begin
+    if CodigoIBGEPais[i] = t then
+    begin
+      Result := CodigoISOPais[i];
+      exit;
+    end;
+  end;
+end;
+
+function CodISOPaisToCodIBGE(t: Integer): Integer;
+var
+  i: Integer;
+begin
+  Result := 0;
+
+  for i := Low(CodigoISOPais) to High(CodigoISOPais) do
+  begin
+    if CodigoISOPais[i] = t then
+    begin
+      Result := CodigoIBGEPais[i];
+      exit;
+    end;
+  end;
+end;
+
 function LocalPrestacaoToStr(t: TLocalPrestacao): string;
 begin
   Result := EnumeradoToStr(t, ['1', '2'],
@@ -13253,4 +13339,66 @@ begin
                            ['1', '2'],
                            [lpMunicipio, lpForaMunicipio]);
 end;
+
+function LogradouroLocalPrestacaoServicoToStr(t: TLogradouroLocalPrestacaoServico): string;
+begin
+  Result := TLogradouroLocalPrestacaoServicoArrayStrings[t];
+end;
+
+function StrToLogradouroLocalPrestacaoServico(const s: string): TLogradouroLocalPrestacaoServico;
+var
+  idx: TLogradouroLocalPrestacaoServico;
+begin
+  for idx:= Low(TLogradouroLocalPrestacaoServicoArrayStrings) to High(TLogradouroLocalPrestacaoServicoArrayStrings) do
+  begin
+    if (TLogradouroLocalPrestacaoServicoArrayStrings[idx] = s) then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TLogradouroLocalPrestacaoServico: %s', [s]);
+end;
+
+// Reforma Tributária
+function indCompGovToStr(const t: TindCompGov): string;
+begin
+  Result := TindCompGovArrayStrings[t];
+end;
+
+function StrToindCompGov(const s: string): TindCompGov;
+var
+  idx: TindCompGov;
+begin
+  for idx:= Low(TindCompGovArrayStrings) to High(TindCompGovArrayStrings) do
+  begin
+    if (TindCompGovArrayStrings[idx] = s) then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TindCompGov: %s', [s]);
+end;
+
+function modoPrestServToStr(const t: TmodoPrestServ): string;
+begin
+  Result := TmodoPrestServArrayStrings[t];
+end;
+
+function StrTomodoPrestServ(const s: string): TmodoPrestServ;
+var
+  idx: TmodoPrestServ;
+begin
+  for idx:= Low(TmodoPrestServArrayStrings) to High(TmodoPrestServArrayStrings) do
+  begin
+    if (TmodoPrestServArrayStrings[idx] = s) then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TmodoPrestServ: %s', [s]);
+end;
+
 end.

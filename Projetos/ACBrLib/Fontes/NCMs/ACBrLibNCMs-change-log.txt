@@ -42,6 +42,22 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+27/02/2025
+-- Diversos --
+[+] #TK-4956-7: Implementados programas de exemplo em PHP do NCMs ST e MT.
+  Por: Renato Rubinho
+
+06/03/2025
+-- ACBrLibNCMs.lpi, ACBrLibNCMsDemo.lpi, ACBrLibNCMsConsoleMT.lpi e ACBrLibNCMsConsoleMTDemo.lpi--
+[*] Realizado ajustes nos paths para compilação com os novos scripts do Jenkins.
+    Por: Antonio Carlos Junior
+
+10/02/2025
+-- ACBrLibNCMsConsoleMT.lpi, ACBrLibNCMsConsoleMTDemo.lpi --
+[+] Adicionado novo Projeto, 100% CONSOLE e MT versão Pro e Demonstração.
+[+] Compatível com compilação em Linux 64 e Android 32 e 64
+    Por: Antonio Carlos Junior
+
 13/08/2024
 --- ACBrLibNCMsBase, ACBrLibNCMsST, ACBrLibNCMsMT,
     ACBrLibNCMsStaticImportST, ACBrLibNCMsStaticImportMT, ACBrLibNCMsRespostas ---

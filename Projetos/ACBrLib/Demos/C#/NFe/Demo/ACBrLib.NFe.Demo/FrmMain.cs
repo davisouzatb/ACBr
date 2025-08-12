@@ -121,6 +121,14 @@ namespace ACBrLib.NFe.Demo
             notaFiscal.Identificacao.procEmi = ProcessoEmissao.peAplicativoContribuinte;
             notaFiscal.Identificacao.indIntermed = IndIntermed.iiSemOperacao;
             notaFiscal.Identificacao.verProc = "ACBrNFe";
+            //Reforma tributária
+            //notaFiscal.Identificacao.cMunFGIBS = 3554003;
+            //notaFiscal.Identificacao.tpNFCredito = TipoNFeCredito.tcNenhum;
+            //notaFiscal.Identificacao.tpNFDebito = TipoNFeDebito.tdAnulacao;
+            //notaFiscal.Identificacao.tpEnteGov = TipoEnteGov.tcgEstados;
+            //notaFiscal.Identificacao.pRedutor = 2.5m;
+            //notaFiscal.Identificacao.tpOperGov = TipoOperGov.togFornecimento;
+            //--
 
             // Emitente
             notaFiscal.Emitente.CRT = CRT.crtRegimeNormal;
@@ -146,7 +154,7 @@ namespace ACBrLib.NFe.Demo
 
             // Destinatário
             // Observação ----> Obrigatório o preenchimento para o modelo 55.
-            notaFiscal.Destinatario.CNPJCPF = "99999999999999";
+            notaFiscal.Destinatario.CNPJCPF = "48674547000107";
             notaFiscal.Destinatario.xNome = "Razao Social Destinatário";
             notaFiscal.Destinatario.indIEDest = IndicadorIE.inNaoContribuinte;
             notaFiscal.Destinatario.IE = "111111111111";
@@ -187,6 +195,15 @@ namespace ACBrLib.NFe.Demo
             decimal totalProdutos = produto.vUnCom * produto.qCom;
             produto.vProd = totalProdutos;
 
+            //Reforma tributária
+            //produto.IndBemMovelUsado = IndBemMovelUsado.tieNenhum;
+            //produto.vItem = 100;
+            //--
+            //Reforma tributária
+            //produto.DFeReferenciado.nItem = 100;
+            //produto.DFeReferenciado.chaveAcesso = "35250518760540000139550010000000011374749890";
+            //--
+
             // Tributação
             produto.ICMS.CSOSN = CSOSNIcms.csosnVazio;
             produto.ICMS.CST = CSTIcms.cst00;
@@ -207,12 +224,141 @@ namespace ACBrLib.NFe.Demo
 
             produto.infAdProd = "Informação adicional do produto";
 
+            //Reforma tributária
+            //produto.IS.CSTIS = CSTIS.cstis000;
+            //produto.IS.cClassTribIS = TipoClassTribIS.ctis000001;
+            //produto.IS.vBCIS = 100;
+            //produto.IS.pIS = 5;
+            //produto.IS.pISEspec = 5;
+            //produto.IS.uTrib = "UNIDAD";
+            //produto.IS.qTrib = 10;
+            //produto.IS.vIS = 100;
+
+            //produto.IBSCBS.CST = CSTIBSCBS.cst800;
+            //produto.IBSCBS.cClassTrib = cClassTribIBSCBS.cct800001;
+
+            //produto.IBSCBS.gIBSCBS.vBC = 100;
+
+            //produto.IBSCBS.gIBSCBS.gIBSUF.pIBSUF = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSUF.vIBSUF = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSUF.pDif = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSUF.vDif = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSUF.vDevTrib = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSUF.pRedAliq = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSUF.pAliqEfet = 5;
+
+            //produto.IBSCBS.gIBSCBS.gIBSMun.pIBSMun = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSMun.vIBSMun = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSMun.pDif = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSMun.vDif = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSMun.vDevTrib = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSMun.pRedAliq = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSMun.pAliqEfet = 5;
+
+            //produto.IBSCBS.gIBSCBS.gCBS.pCBS = 5;
+            //produto.IBSCBS.gIBSCBS.gCBS.vCBS = 100;
+            //produto.IBSCBS.gIBSCBS.gCBS.pDif = 5;
+            //produto.IBSCBS.gIBSCBS.gCBS.vDif = 100;
+            //produto.IBSCBS.gIBSCBS.gCBS.vDevTrib = 100;
+            //produto.IBSCBS.gIBSCBS.gCBS.pRedAliq = 5;
+            //produto.IBSCBS.gIBSCBS.gCBS.pAliqEfet = 5;
+
+            //produto.IBSCBS.gIBSCBS.gTribRegular.CSTReg = CSTIBSCBS.cst000;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.cClassTribReg = cClassTribIBSCBS.cct000001;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.pAliqEfetRegIBSUF = 5;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.vTribRegIBSUF = 100;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.pAliqEfetRegIBSMun = 5;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.vTribRegIBSMun = 100;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.pAliqEfetRegCBS = 5;
+            //produto.IBSCBS.gIBSCBS.gTribRegular.vTribRegCBS = 100;
+
+            //produto.IBSCBS.gIBSCBS.gIBSCredPres.cCredPres = TcCredPres.cp01;
+            //produto.IBSCBS.gIBSCBS.gIBSCredPres.pCredPres = 5;
+            //produto.IBSCBS.gIBSCBS.gIBSCredPres.vCredPres = 100;
+            //produto.IBSCBS.gIBSCBS.gIBSCredPres.vCredPresCondSus = 100;
+
+            //produto.IBSCBS.gIBSCBS.gCBSCredPres.cCredPres = TcCredPres.cp01;
+            //produto.IBSCBS.gIBSCBS.gCBSCredPres.pCredPres = 5;
+            //produto.IBSCBS.gIBSCBS.gCBSCredPres.vCredPres = 100;
+            //produto.IBSCBS.gIBSCBS.gCBSCredPres.vCredPresCondSus = 100;
+
+            //produto.IBSCBS.gIBSCBS.gTribCompraGov.pAliqIBSUF = 5;
+            //produto.IBSCBS.gIBSCBS.gTribCompraGov.vTribIBSUF = 50;
+            //produto.IBSCBS.gIBSCBS.gTribCompraGov.pAliqIBSMun = 5;
+            //produto.IBSCBS.gIBSCBS.gTribCompraGov.vTribIBSMun = 50;
+            //produto.IBSCBS.gIBSCBS.gTribCompraGov.pAliqCBS = 5;
+            //produto.IBSCBS.gIBSCBS.gTribCompraGov.vTribCBS = 50;
+
+            //produto.IBSCBS.gIBSCBSMono.qBCMono = 1;
+            //produto.IBSCBS.gIBSCBSMono.adRemIBS = 5;
+            //produto.IBSCBS.gIBSCBSMono.adRemCBS = 5;
+            //produto.IBSCBS.gIBSCBSMono.vIBSMono = 100;
+            //produto.IBSCBS.gIBSCBSMono.vCBSMono = 100;
+
+            //produto.IBSCBS.gIBSCBSMono.qBCMonoReten = 1;
+            //produto.IBSCBS.gIBSCBSMono.adRemCBSReten = 5;
+            //produto.IBSCBS.gIBSCBSMono.vIBSMonoReten = 100;
+            //produto.IBSCBS.gIBSCBSMono.vCBSMonoReten = 100;
+
+            //produto.IBSCBS.gIBSCBSMono.qBCMonoRet = 1;
+            //produto.IBSCBS.gIBSCBSMono.adRemIBSRet = 5;
+            //produto.IBSCBS.gIBSCBSMono.vIBSMonoRet = 100;
+            //produto.IBSCBS.gIBSCBSMono.vCBSMonoRet = 100;
+
+            //produto.IBSCBS.gIBSCBSMono.pDifIBS = 5;
+            //produto.IBSCBS.gIBSCBSMono.vIBSMonoDif = 100;
+            //produto.IBSCBS.gIBSCBSMono.pDifCBS = 5;
+            //produto.IBSCBS.gIBSCBSMono.vCBSMonoDif = 100;
+
+            //produto.IBSCBS.gIBSCBSMono.vTotIBSMonoItem = 100;
+            //produto.IBSCBS.gIBSCBSMono.vTotCBSMonoItem = 100;
+
+            //produto.IBSCBS.gTransfCred.vIBS = 100;
+            //produto.IBSCBS.gTransfCred.vCBS = 100;
+
+            //produto.IBSCBS.gCredPresIBSZFM.tpCredPresIBSZFM = TipoCredPresIBSZFM.tcpBensInformaticaOutros;
+            //produto.IBSCBS.gCredPresIBSZFM.vCredPresIBSZFM = 100;
+            //--
+
             notaFiscal.Produtos.Add(produto);
 
             notaFiscal.Total.vBC = produto.vProd;
             notaFiscal.Total.vICMS = (decimal)produto.ICMS.vICMS;
             notaFiscal.Total.vProd = produto.vProd;
             notaFiscal.Total.vNF = produto.vProd;
+
+            //Reforma tributária
+            //notaFiscal.Total.ISTot.vIS = 100;
+
+            //notaFiscal.Total.IBSCBSTot.vBCIBSCBS = 100;
+
+            //notaFiscal.Total.IBSCBSTot.gIBS.vIBS = 100;
+            //notaFiscal.Total.IBSCBSTot.gIBS.vCredPres = 100;
+            //notaFiscal.Total.IBSCBSTot.gIBS.vCredPresCondSus = 100;
+
+            //notaFiscal.Total.IBSCBSTot.gIBS.gIBSUF.vDif = 100;
+            //notaFiscal.Total.IBSCBSTot.gIBS.gIBSUF.vDevTrib = 100;
+            //notaFiscal.Total.IBSCBSTot.gIBS.gIBSUF.vIBSUF = 100;
+
+            //notaFiscal.Total.IBSCBSTot.gIBS.gIBSMun.vDif = 100;
+            //notaFiscal.Total.IBSCBSTot.gIBS.gIBSMun.vDevTrib = 100;
+            //notaFiscal.Total.IBSCBSTot.gIBS.gIBSMun.vIBSMun = 100;
+
+            //notaFiscal.Total.IBSCBSTot.gCBS.vDif = 100;
+            //notaFiscal.Total.IBSCBSTot.gCBS.vDevTrib = 100;
+            //notaFiscal.Total.IBSCBSTot.gCBS.vCBS = 100;
+            //notaFiscal.Total.IBSCBSTot.gCBS.vCredPres = 100;
+            //notaFiscal.Total.IBSCBSTot.gCBS.vCredPresCondSus = 100;
+
+            //notaFiscal.Total.IBSCBSTot.gMono.vIBSMono = 100;
+            //notaFiscal.Total.IBSCBSTot.gMono.vCBSMono = 100;
+            //notaFiscal.Total.IBSCBSTot.gMono.vIBSMonoReten = 100;
+            //notaFiscal.Total.IBSCBSTot.gMono.vCBSMonoReten = 100;
+            //notaFiscal.Total.IBSCBSTot.gMono.vIBSMonoRet = 100;
+            //notaFiscal.Total.IBSCBSTot.gMono.vCBSMonoRet = 100;
+
+            //notaFiscal.Total.vNFTot = 100;
+            //--
 
             PagamentoNFe pagtoDinheiro = new PagamentoNFe();
             pagtoDinheiro.tpIntegra = TpIntegra.tiNaoInformado;
@@ -328,11 +474,11 @@ namespace ACBrLib.NFe.Demo
                 ACBrNFe.Config.DFe.DadosPFX = txtDadosPFX.Text;
 
                 //Config Arquivos
-                ACBrNFe.Config.SalvarGer = ckbSalvarArqs.Checked;
+                ACBrNFe.Config.SalvarArq = ckbSalvarArqs.Checked;
                 ACBrNFe.Config.SepararPorMes = ckbPastaMensal.Checked;
                 ACBrNFe.Config.AdicionarLiteral = ckbAdicionaLiteral.Checked;
                 ACBrNFe.Config.EmissaoPathNFe = ckbEmissaoPathNFe.Checked;
-                ACBrNFe.Config.SalvarArq = ckbSalvaPathEvento.Checked;
+                ACBrNFe.Config.SalvarEvento = ckbSalvaPathEvento.Checked;
                 ACBrNFe.Config.SepararPorCNPJ = ckbSepararPorCNPJ.Checked;
                 ACBrNFe.Config.SepararPorModelo = ckbSepararPorModelo.Checked;
                 ACBrNFe.Config.PathNFe = txtArqNFe.Text;
@@ -427,11 +573,11 @@ namespace ACBrLib.NFe.Demo
             txtDadosPFX.Text = ACBrNFe.Config.DFe.DadosPFX;
 
             //Config Arquivos
-            ckbSalvarArqs.Checked = ACBrNFe.Config.SalvarGer;
+            ckbSalvarArqs.Checked = ACBrNFe.Config.SalvarArq;
             ckbPastaMensal.Checked = ACBrNFe.Config.SepararPorMes;
             ckbAdicionaLiteral.Checked = ACBrNFe.Config.AdicionarLiteral;
             ckbEmissaoPathNFe.Checked = ACBrNFe.Config.EmissaoPathNFe;
-            ckbSalvaPathEvento.Checked = ACBrNFe.Config.SalvarArq;
+            ckbSalvaPathEvento.Checked = ACBrNFe.Config.SalvarEvento;
             ckbSepararPorCNPJ.Checked = ACBrNFe.Config.SepararPorCNPJ;
             ckbSepararPorModelo.Checked = ACBrNFe.Config.SepararPorModelo;
             txtArqNFe.Text = ACBrNFe.Config.PathNFe;
@@ -1143,7 +1289,6 @@ namespace ACBrLib.NFe.Demo
 
             ACBrNFe.LimparLista();
             ACBrNFe.CarregarINI(nfe);
-
             try
             {
                 var aLote = 1;

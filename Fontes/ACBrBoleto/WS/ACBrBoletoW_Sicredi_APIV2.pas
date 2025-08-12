@@ -78,7 +78,9 @@ type
     procedure RequisicaoBaixa;
     procedure RequisicaoConsulta;
     procedure RequisicaoConsultaDetalhe;
+    procedure RequisicaoConcederAbatimento;
     procedure GerarPagador(AJson: TACBrJSONObject);
+    procedure GerarEnderecoPagador(AJson: TACBrJSONObject);
     procedure GerarBenificiarioFinal(AJson: TACBrJSONObject);
     procedure GerarInfomativo(AJson: TACBrJSONObject);
     procedure GerarMensagem(AJson: TACBrJSONObject);
@@ -122,26 +124,29 @@ procedure TBoletoW_Sicredi_APIV2.DefinirURL;
 var
   LId: String;
 begin
-  FPURL     := IfThen(Boleto.Configuracoes.WebService.Ambiente = tawsProducao,C_URL, C_URL_HOM);
-
+  case Boleto.Configuracoes.WebService.Ambiente of
+    tawsProducao   : FPURL.URLProducao    := C_URL;
+    tawsHomologacao: FPURL.URLHomologacao := C_URL_HOM;
+  end;
   if ATitulo <> nil then
 		LId      := DefinirNossoNumero;
 
   case Boleto.Configuracoes.WebService.Operacao of
-    tpInclui                : FPURL := FPURL + '/boletos' ;
-    tpConsulta              : FPURL := FPURL + '/boletos/liquidados/dia' + '?' + DefinirParametros;
-    tpConsultaDetalhe       : FPURL := FPURL + '/boletos?' + DefinirParametrosDetalhe;
-    tpBaixa                 : FPURL := FPURL + '/boletos/'+ LId + '/baixa';
+    tpInclui                : FPURL.SetPathURI( '/boletos' );
+    tpConsulta              : FPURL.SetPathURI( '/boletos/liquidados/dia' + '?' + DefinirParametros );
+    tpConsultaDetalhe       : FPURL.SetPathURI( '/boletos?' + DefinirParametrosDetalhe );
+    tpBaixa                 : FPURL.SetPathURI( '/boletos/'+ LId + '/baixa' );
     tpAltera                :
     begin
       case ATitulo.OcorrenciaOriginal.Tipo of
-        toRemessaAlterarVencimento : FPURL := FPURL + '/boletos/'+ LId + '/data-vencimento';
-        toRemessaAlterarOutrosDados:
+        toRemessaAlterarVencimento  : FPURL.SetPathURI( '/boletos/'+ LId + '/data-vencimento' );
+        toRemessaConcederAbatimento : FPURL.SetPathURI( '/boletos/'+ LId + '/conceder-abatimento' );
+        toRemessaAlterarOutrosDados :
         begin
           case ATitulo.OcorrenciaOriginal.ComplementoOutrosDados of
-            TCompDesconto : FPURL := FPURL + '/boletos/'+ LId + '/desconto';
-            TCompJurosDia : FPURL := FPURL + '/boletos/'+ LId + '/juros';
-            TCompDataLimiteDesconto : FPURL := FPURL + '/boletos/'+ LId + '/data-desconto';
+            TCompDesconto : FPURL.SetPathURI( '/boletos/'+ LId + '/desconto' );
+            TCompJurosDia : FPURL.SetPathURI( '/boletos/'+ LId + '/juros' );
+            TCompDataLimiteDesconto : FPURL.SetPathURI( '/boletos/'+ LId + '/data-desconto' );
             else
               raise EACBrBoletoWSException.Create(ClassName +
                 ' Não Implementado DefinirURL/Operação/tpAltera para ocorrência 31 - Complemento - '+
@@ -409,6 +414,7 @@ begin
   begin
     case ATitulo.OcorrenciaOriginal.Tipo of
       toRemessaAlterarVencimento  : RequisicaoAlteraVencimento;
+      toRemessaConcederAbatimento : RequisicaoConcederAbatimento;
       toRemessaAlterarOutrosDados :
           Begin
             case ATitulo.OcorrenciaOriginal.ComplementoOutrosDados of
@@ -560,6 +566,22 @@ begin
   end;
 end;
 
+procedure TBoletoW_Sicredi_APIV2.RequisicaoConcederAbatimento;
+var
+  LJsonObject: TACBrJSONObject;
+begin
+  if Assigned(ATitulo) then
+  begin
+    LJsonObject := TACBrJSONObject.Create;
+    try
+      LJsonObject.AddPair('valorAbatimento', ATitulo.ValorAbatimento);
+      FPDadosMsg := LJsonObject.ToJSON;
+    finally
+      LJsonObject.Free;
+    end;
+  end;
+end;
+
 procedure TBoletoW_Sicredi_APIV2.RequisicaoConsulta;
 begin
    //Sem Payload - Define Método GET
@@ -580,18 +602,34 @@ begin
 
     LJsonPagadorObject.AddPair('tipoPessoa', IfThen(Length( OnlyNumber(ATitulo.Sacado.CNPJCPF)) = 11,'PESSOA_FISICA','PESSOA_JURIDICA') );
     LJsonPagadorObject.AddPair('documento', OnlyNumber(ATitulo.Sacado.CNPJCPF));
-    LJsonPagadorObject.AddPair('nome', ATitulo.Sacado.NomeSacado);
-    LJsonPagadorObject.AddPair('endereco', ATitulo.Sacado.Logradouro + ' ' + ATitulo.Sacado.Numero);
-    LJsonPagadorObject.AddPair('cidade', ATitulo.Sacado.Cidade);
-    LJsonPagadorObject.AddPair('uf', ATitulo.Sacado.UF);
-    LJsonPagadorObject.AddPair('cep', OnlyNumber(ATitulo.Sacado.CEP) );
+    LJsonPagadorObject.AddPair('nome', Copy(ATitulo.Sacado.NomeSacado, 1, 40));
+
+    GerarEnderecoPagador(LJsonPagadorObject);
+
     if ATitulo.Sacado.Fone <> '' then
-      LJsonPagadorObject.AddPair('telefone', ATitulo.Sacado.Fone);
+      LJsonPagadorObject.AddPair('telefone', Copy(ATitulo.Sacado.Fone, 1, 11));
     if ATitulo.Sacado.Email <> '' then
-      LJsonPagadorObject.AddPair('email', ATitulo.Sacado.Email);
+      LJsonPagadorObject.AddPair('email', Copy(ATitulo.Sacado.Email, 1, 40));
 
     AJson.AddPair('pagador', LJsonPagadorObject);
   end;
+end;
+
+procedure TBoletoW_Sicredi_APIV2.GerarEnderecoPagador(AJson: TACBrJSONObject);
+var
+  LTamanhoNumero, LTamanhoLogradouro: Integer;
+  LLogradouro: string;
+begin
+  LTamanhoNumero     := Length(trim(ATitulo.Sacado.Numero)) + 1;
+  LTamanhoLogradouro := Length(trim(ATitulo.Sacado.Logradouro)) + LTamanhoNumero;
+
+  LLogradouro :=  ifthen(LTamanhoLogradouro > 40,Copy(trim(ATitulo.Sacado.Logradouro), 1, (40 - LTamanhoNumero)),
+                                                        trim(ATitulo.Sacado.Logradouro));
+
+  AJson.AddPair('endereco', LLogradouro + ',' + trim(ATitulo.Sacado.Numero));
+  AJson.AddPair('cidade', Copy(ATitulo.Sacado.Cidade, 1, 25));
+  AJson.AddPair('uf', Copy(ATitulo.Sacado.UF, 1, 2));
+  AJson.AddPair('cep', Copy(OnlyNumber(ATitulo.Sacado.CEP), 1, 8));
 end;
 
 procedure TBoletoW_Sicredi_APIV2.GerarBenificiarioFinal(AJson: TACBrJSONObject);
@@ -692,10 +730,10 @@ begin
 
   if Assigned(OAuth) then
   begin
-    if OAuth.Ambiente = tawsProducao then
-      OAuth.URL := C_URL_OAUTH_PROD
-    else
-      OAuth.URL := C_URL_OAUTH_HOM;
+    case OAuth.Ambiente of
+      tawsProducao: OAuth.URL.URLProducao := C_URL_OAUTH_PROD;
+      tawsHomologacao: OAuth.URL.URLHomologacao := C_URL_OAUTH_HOM;
+    end;
 
     OAuth.Payload := True;
   end;

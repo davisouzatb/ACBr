@@ -1808,7 +1808,8 @@ function TNF3eConsulta.TratarResposta: Boolean;
 
 procedure SalvarEventos(Retorno: string);
 var
-  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJ: string;
+  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJCPF: string;
+  DhEvt: TDateTime;
   Inicio, Fim: Integer;
   TipoEvento: TpcnTpEvento;
   Ok: Boolean;
@@ -1835,10 +1836,15 @@ begin
       aIDEvento := Copy(aProcEvento, Inicio, Fim);
 
     TipoEvento  := StrToTpEventoNF3e(Ok, SeparaDados(aEvento, 'tpEvento'));
-    sCNPJ       := SeparaDados(aEvento, 'CNPJ');
-    sPathEvento := PathWithDelim(FPConfiguracoesNF3e.Arquivos.GetPathEvento(TipoEvento, sCNPJ));
+    DhEvt       := EncodeDataHora(SeparaDados(aEvento, 'dhEvento'), 'YYYY-MM-DD');
+    sCNPJCPF    := SeparaDados(aEvento, 'CNPJ');
 
-    if (aProcEvento <> '') then
+    if EstaVazio(sCNPJCPF) then
+      sCNPJCPF := SeparaDados(aEvento, 'CPF');   
+
+    sPathEvento := PathWithDelim(FPConfiguracoesNF3e.Arquivos.GetPathEvento(TipoEvento, sCNPJCPF, '', DhEvt));
+
+    if FPConfiguracoesNF3e.Arquivos.SalvarEvento and (aProcEvento <> '') then
       FPDFeOwner.Gravar( aIDEvento + '-procEventoNF3e.xml', aProcEvento, sPathEvento);
   end;
 end;
@@ -2140,7 +2146,7 @@ begin
       end
       else
       begin
-        if ExtrairEventos and FPConfiguracoesNF3e.Arquivos.Salvar and
+        if ExtrairEventos and FPConfiguracoesNF3e.Arquivos.SalvarEvento and
            (NaoEstaVazio(SeparaDados(FPRetWS, 'procEventoNF3e'))) then
         begin
           Inicio := Pos('<procEventoNF3e', FPRetWS);
@@ -2327,6 +2333,7 @@ begin
     {*)}
 
     EventoNF3e.Versao := FPVersaoServico;
+    AjustarOpcoes(EventoNF3e.Opcoes);
     EventoNF3e.GerarXML;
 
     AssinarXML(EventoNF3e.XmlEnvio, 'eventoNF3e', 'infEvento',
@@ -2437,7 +2444,7 @@ begin
                        Texto +
                      '</procEventoNF3e>';
 
-            if FPConfiguracoesNF3e.Arquivos.Salvar then
+            if FPConfiguracoesNF3e.Arquivos.SalvarEvento then
             begin
               NomeArq := OnlyNumber(FEvento.Evento.Items[i].InfEvento.Id) + '-procEventoNF3e.xml';
               PathArq := PathWithDelim(GerarPathEvento(FEvento.Evento.Items[I].InfEvento.CNPJ));

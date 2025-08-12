@@ -42,6 +42,44 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+23/07/2025
+-- ACBrLibNFe --
+[-] Fix #TK-7406 - Corrige ordem no método EnviarEmail. O load do xml ocorria depois do ConfigurarImpressao, por esse motivo o primeiro envio de e-mail nunca ia no padrão DANFECe (mesmo sendo configurado). 
+Veja: https://www.projetoacbr.com.br/forum/topic/83656-libnfe-problema-para-enviar-e-mail-de-nfc-e-a4/#comment-547758
+    Por: Júlio Cavalcanti e Elton Barbosa
+
+-- ACBrLibNFeBase --
+[-] Corrige ordem de validações
+[*] Remoção do owner no Create(TACBrNFe não precisa do owner)
+[*] Remove else desnecessário
+
+-- ACBrLibNFeDataModule --
+[*] Implementa injeção do TACBrNFe por construtor
+[*] Refatora referencias para o objeto recebido
+
+05/06/2025
+-- Diversos --
+[*] #TK-7037 - Implementada classe em c# para leitura do retorno do evento ECONF e Cancelamento do ECONF - https://www.projetoacbr.com.br/forum/topic/83169-atualiza%C3%A7%C3%A3o-fontes-c-nuget-acbrlibnfemt-econf/
+    Por: Renato Rubinho
+
+04/04/2025
+-- ConsultaNFeProcEventoResposta.cs, ConsultaNFeResposta.cs, ConsultaNFeRetEventoResposta.cs --
+[*] #TK-6748 - Implementada classe em c# para leitura dos dados de RetEvento, na consulta de NFe 
+    https://www.projetoacbr.com.br/forum/topic/82222-detalhes-do-evento-da-nfe-n%C3%A3o-vem-na-consulta-classes-c
+    Por: Renato Rubinho
+
+17/03/2025
+-- ACBrLibNFeDataModule.pas --
+[*] #TK-6752 - Homologação NFe CSRT
+    https://www.projetoacbr.com.br/forum/topic/82309-homologa%C3%A7%C3%A3o-nfe-com-csrt/
+    Implementada função B64CryptToString.
+    Por: Antonio Carlos Junior.
+
+03/03/2025
+-- ACBrLibNFeBase.pas --
+[+] #TK-6678: Criado componente de envio em tempo de execução, envia email atraves dos parametros conforme manual. 
+	https://www.projetoacbr.com.br/forum/topic/82072-acbrnfe-erro-enviaremail-com-mais-de-uma-nf-e-urgente	
+	Por: Daniel Morais InfoCodiano
 
 22/01/2025
 -- ACBrLibNFeConsts, ACBrLibNFeConfig --

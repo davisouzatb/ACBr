@@ -38,6 +38,7 @@ interface
 
 uses
   Classes, SysUtils,
+  ACBrBase,
   ACBrTEFComum, ACBrTEFAPI, ACBrTEFAPIComum, ACBrTEFAPIElginComum,
   ACBrJSON;
 
@@ -103,7 +104,7 @@ type
 
 //  procedure ResolverTransacaoPendente(AStatus: TACBrTEFStatusTransacao = tefstsSucessoManual); override;
 //  procedure ExibirMensagemPinPad(const MsgPinPad: String); override;
-    property ConfirmaColeta: boolean read fConfirmaColeta;
+    property ConfirmaColeta: boolean read fConfirmaColeta write fConfirmaColeta;
   end;
 
 implementation
@@ -189,6 +190,7 @@ var
   ddTerm: TACBrTEFAPIDadosTerminal;
   ddAuto: TACBrTEFAPIDadosAutomacao;
   ddEstab: TACBrTEFAPIDadosEstabelecimento;
+  s: String;
 begin
   Result := '';
   if fInFluxoAPI then
@@ -199,6 +201,9 @@ begin
     ddTerm := fpACBrTEFAPI.DadosTerminal;
     ddAuto := fpACBrTEFAPI.DadosAutomacao;
     ddEstab := fpACBrTEFAPI.DadosEstabelecimento;
+    s := ddAuto.MensagemPinPad;
+    if (s = '') then
+      s := ddAuto.NomeAplicacao;
 
     payload.AddPair('aplicacao', ddAuto.NomeAplicacao);
     payload.AddPair('aplicacao_tela', ddAuto.NomeAplicacao);
@@ -207,7 +212,7 @@ begin
     payload.AddPair('loja', ddTerm.codFilial);
     payload.AddPair('terminal', ddTerm.CodTerminal);
     payload.AddPair('nomeAC', ddAuto.NomeSoftwareHouse);
-    payload.AddPair('textoPinpad', ddAuto.NomeAplicacao);
+    payload.AddPair('textoPinpad', s);
     payload.AddPair('versaoAC', ddAuto.VersaoAplicacao);
     payload.AddPair('nomeEstabelecimento', ddEstab.RazaoSocial);
     payload.AddPair('loja', ddTerm.codFilial);

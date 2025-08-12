@@ -47,6 +47,166 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+05/08/2025
+-- ACBrPIXPSPAppLess --
+[*] Alteração para disparar exception caso o PSP AppLess não esteja configurado em ambiente de produção.
+    por: Elias César
+
+31/07/2025
+-- ACBrPIXPSPAppLess --
+[*] Incluída validação do parâmetro E2Eid ao efetuar uma devolução com PSP AppLess.
+    por: Elias César
+
+30/07/2025
+-- ACBrPIXPSPAppLess --
+[*] Alterações para funcionar o endpoint /pix padrão Bacen com PSP AppLess.
+    por: Elias César
+
+30/07/2025
+-- ACBrPIXSchemasCobV --
+[*] Ajuste nas propriedades do devedor que faltavam ao ler as informações do INI.
+    por: Elias César
+
+29/07/2025
+-- ACBrPIXCD --
+[*] Inclusão do parâmetro 'txId' no método de consulta de uma recorrência.
+    por: Elias César
+
+25/07/2025
+-- ACBrPIXPSPAppLess -- 
+[*] Alteração para converter corretamente os pagamentos na consulta da cobrança.
+    por: Elias César 
+
+24/07/2025
+-- ACBrPIXSchemasRecBase, ACBrPIXSchemasRecAtualizacao --
+[-] Correção de AV, caso exista algum objeto 'null' no Json de resposta.
+
+-- ACBrPIXCD --
+[-] Correção da string do scope solicrec.read
+    por: Elias César
+
+15/07/2025
+-- ACBrPIXPSPSantander --
+[-] Correção de problemas na utilização do PSP Santander em ambiente de homologação.
+    por: Elias César
+
+03/07/2025
+-- ACBrPIXPSPPixPDV, ACBrPixSchemasPixPDV --
+[*] Ajustes referentes à migração do PSP Matera para PixNoPDV.
+    por: Elias César
+
+23/06/2025
+-- ACBrPIXCD, ACBrPIXSchemasLocation --
+[+] Adicionado endpoint /locrec para possibilitar a Jornada 2 do Pix Automático
+    por: Elias César
+
+23/06/2025
+-- ACBrPIXCD --
+[+] Criação do método 'SolicitarRetentativa()'
+
+-- ACBrPIXSchemasCobR --
+[-] Ajuste na escrita das propriedades ajusteDiaUtil e valor.original.
+    por: Elias César
+
+18/06/2024
+-- ACBrPIXCD --
+[+] Adicionando endpoints /cobr, /webhook, /webhookrec, /webhookcobr;
+
+-- ACBrPIXBase --
+[+] Inclusão dos enumerados referentes aos novos endpoints;
+
+-- ACBrPIXSchemasCobR, ACBrPIXSchemasCalendario... --
+[+] Inclusão das classes referentes ao endpoint /cobr;
+
+-- ACBrPIXSchemasWebhook --
+[+] Inclusão das classes referentes ao novo endpoint webhook.
+    por: Elias César
+
+18/06/2025
+-- ACBrPIXPSPBancoDoBrasil --
+[-] Removida exceção de '(code <> 0)' na resposta da procedure "SimularPagamento".
+    por: Júlio Cavalcanti e Elias César
+
+13/06/2025
+-- ACBrPIXCD --
+[+] Inclusão dos scopes referentes aos novos endpoints /rec e /solicrec;
+[+] Inclusão das propriedades responsáveis pelos novos endpoints;
+
+-- ACBrPIXSchemasCalendario --
+[-] Correçao no formato das datas esperadas no body do /rec
+
+-- ACBrPIXSchemasRecBase --
+[-] Ajuste no envio dos valores no body do /rec
+    por: Elias Cesar
+
+12/06/2025
+-- ACBrPIXSchemasRecAtualizacao --
+[+] Correção de erro , sobrando um parenteses, quebra de compilacao
+    por: Daniel de morais InfoCotidiano
+
+12/06/2025
+-- ACBrPIXCD --
+[+] Inclusão de arquivos e métodos relacionados aos endpoints /rec e /solicrec
+    por: Elias César
+
+03/06/2025
+-- ACBrPIXPSPAilos --
+[*] Alteração da URL de homologação.
+[*] Ajuste no body da autenticação para incluir o certificado e chave.
+    por: Eduardo Frota Vicentini
+
+21/05/2025
+-- ACBrSchemaMatera --
+[*] #TK-6962: Corrige conversão do tipo mdtUnknown em StringToMateraDocumentType.
+   Por: theiler
+
+13/05/2025
+-- ACBrPixPSPBradesco --
+[-] Ajuste para alterar o ResultCode para o esperado conforme padrão Bacen
+    https://www.projetoacbr.com.br/forum/topic/83201-devolução-pix-bradesco/
+    por: arpa_sistemas
+
+13/05/2025
+-- ACBrPSPAppLess --
+[-] Correção do formato da resposta em caso de erro na requisição.
+    por: Elias César
+
+10/04/2025
+-- ACBrPIXCD --
+[*] Ajuste para preencher o CopiaECola automaticamente, caso o PSP não retorne 
+    no payload de resposta.
+    por: Elias César
+
+27/03/2025
+-- ACBrSchemasAppLess --
+[+] Inclusão de arquivo com mapeamento da API AppLess.
+    por: Júlio Cavalcanti
+	
+-- ACBrPIXPSPAppLess --
+[+] Inclusão do PSP AppLess.
+
+-- ACBrPIXCD --
+[+] Inclusão do PSP AppLess;
+[+] Inclusão de log de certificados PFX.
+[*] Adicionado parâmetro 'NivelLog' no método 'RegistrarLog';
+[*] Alteração para logar arquivos de certificado apenas se forem utilizados;
+    por: Elias César
+
+10/03/2025
+-- ACBrPixPSPBradesco --
+[*] Remoção de inclusão desnecessária da "Authorization" na Autenticação.
+    por: Elias César
+
+28/02/2025
+-- ACBrSchemasMatera --
+[-] Correção de memory-leak
+	por: Tales Mendes de Camargo / Rev.: Alexandre de Paula
+
+05/02/2025
+-- ACBrPIXPSPInter --
+[*] Adicionado endereço Sandbox do PSP Inter
+	por: Paulo Aguiar / Rev.: Alexandre de Paula
+
 03/12/2024
 -- ACBrPIXPSPMatera --
 [-] Correção de MemoryLeak.

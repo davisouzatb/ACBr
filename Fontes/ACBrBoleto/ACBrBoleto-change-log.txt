@@ -48,6 +48,258 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+30/07/2025
+-- ACBrBoletoW_Cora.pas --
+[+] #TK-7437 adicionado tpBaixa Método POST para Baixa
+	https://www.projetoacbr.com.br/forum/topic/84597-cancelamento-boleto-api-banco-cora/
+    Por: Daniel de Morais InfoCotidiano
+
+28/07/2025
+-- ACBrBoletoW_Cresol.pas,ACBrBoletoRet_Cresol.pas --
+[+] #TK-7419 Ajustado tpConsultaDetalhada para executar somente qdo for enviado id boleto. ajustado o retorno para devolver id boleto no nossoNumeroCorrespondente
+	https://www.projetoacbr.com.br/forum/topic/84530-acbrlib-boletoapi-retornos-banco-cresol/
+    Por: Daniel de Morais InfoCotidiano
+
+-- ACBrBancoVortx.pas --
+[*] #TK-7409 Geração da remessa utilizando Agência com DV e correção do cálculo do DV - https://www.projetoacbr.com.br/forum/topic/84480-atualiza%C3%A7%C3%A3o-da-unit-de-boletos-referente-ao-banco-vortx/
+    Por: roberto.fermino
+
+25/07/2025
+-- ACBrBoletoW_Itau_API.pas --
+[+] #TK-7382 Adicionado metodo para alteração do valor nominal.
+    https://www.projetoacbr.com.br/forum/topic/84407-acbrboletow_itau_api-adicionada-a-altera%C3%A7%C3%A3o-do-valor-do-boleto-valor_nominal
+    Por: Fabricio Furtado / Daniel de Morais InfoCotidiano
+
+25/07/2025
+-- ACBrBoletoRet_Santander_API.pas --
+[*] #TK-7416 Ajustes retorno da consultadetalhe para tratar boleto hibrido estava vindo como "baixado" e nao como "Liquidado"
+    https://www.projetoacbr.com.br/forum/topic/84507-recebimento-boleto-santander-via-pix/
+    Por: Magistech / Daniel de Morais InfoCotidiano
+
+25/07/2025
+-- ACBrBancoSantander.pas --
+[*] #TK-7378 Ajustes no banco CNAB400 retorno para gerar o QrCODE/EMV
+    https://www.projetoacbr.com.br/forum/topic/84366-retorno-santander-pix/
+    Por: Daniel de Morais InfoCotidiano
+
+16/07/2025
+-- ACBrBancoSofisaSantander --
+[*] #TK-7255 Ajustes no banco cobBancoSofisaSantander para NumeroDocumento Somente Letras e Números, NomeSacado com 30 bytes e 10 espaços na sequência
+    Por: Daniel de Morais InfoCotidiano
+
+14/07/2025
+-- ACBrBancoBanrisul --
+[+] #TK-6823 Implementada emissão de boleto Híbrido do banco 041-Banrisul CNAB240
+    Por: Mateus Brunelli
+
+04/07/2025
+-- ACBrBancoVortx, ACBrBoleto, ACBr_Boleto, ACBr_Boleto.dpk, ACBr_Boleto.lpk --
+[+] #TK-5773 Implementado banco Vortx
+    Por: tiago.istuque / Roberto rrrFerminoRrrrrerw / Renato Rubinho
+
+30/06/2025
+-- ACBrBoletoW_Itau_API --
+[*] TK-7263 Refatorado as instrções de cobrança conforme documentação da API.
+	https://www.projetoacbr.com.br/forum/topic/83927-acbrlibboleto-ita%C3%BA-erro-ao-registrar-titulos/#comment-544777
+    Por: Daniel de Morais InfoCotidiano / Victor H. Gonzales Pandaaaa
+
+30/06/2025
+-- ACBrBoletoRet_Sicredi_APIV2.pas --
+[+] #TK-7243 Mapeado campo nossonumero sicredi no NossoNumeroCorrespondente tratar a concatenação e deixar somente nossonumero. (LerNossoNumeroCompleto=true devolve com DV)
+	https://www.projetoacbr.com.br/forum/topic/83614-mapear-o-campo-nossonumero-sicredi/
+    Por: Daniel de Morais InfoCotidiano
+
+25/06/2025
+-- ACBrBancoSofisa, ACBrBoleto, ACBr_Boleto, ACBr_Boleto.dpk, ACBr_Boleto.lpk --
+[+] #TK-6590/TK-6973 Implementado banco Sofisa
+    Por: Giovanne Fontenele Trevia / Renato Rubinho
+
+23/06/2025
+-- ACBrBancoBrasil.pas --
+[*] TK-7235 Ajuste conforme manual header posição 077 a 094 header CNAB 400
+	https://www.projetoacbr.com.br/forum/topic/83764-acbrli-boleto-remessa-banco-do-brasil-cnab-400-header-posi%C3%A7%C3%B5es%C2%A0077-a-094/
+    Por: Daniel de Morais
+
+20/06/2025
+-- ACBrBoletoRet_Sicoob_V3 --
+[-] #TK-7248 Mapeado a data da baixa , devido a isso o cliente nao estava encontrando o boleto baixado na consulta movimento
+	https://www.projetoacbr.com.br/forum/topic/83360-resultado-da-consulta-movimenta%C3%A7%C3%A3o-diferente-da-consulta-detalhe-sicoob-api/#comment-544172
+    Por: Daniel de Morais
+	
+-- ACBrBoletoW_Itau_API --
+[-] #TK-7218 Corrigido o metodo toRemessaCancelarDesconto e nao estava enviando um parametro. corrigido tbm enumerados para facilitar a leitura dos fontes.
+	https://www.projetoacbr.com.br/forum/topic/83709-funcionalidade-toremessacancelardesconto-banco-itau/
+    Por: Daniel de Morais
+
+12/06/2025
+-- ACBrBoleto --
+[+] Implementado o parâmetro  sBCC no método: EnviarEmail.
+    Por: Mateus Brunelli / Júlio Cavalcanti
+
+12/06/2025
+-- ACBrBoletoRet_Itau_API.pas --
+[*] TK-7092 Após reunião com JT, decidido nao alimentar os dados. deixar como esta vindo do banco.
+	www.projetoacbr.com.br/forum/topic/83348-retorno-do-banco-itau-boleto-pago-via-pix/page/2/
+	Por: Daniel Morais InfoCotidiano
+
+12/06/2025
+-- ACBrBoletoRet_Itau_API.pas --
+[*] TK-7092 Ajustes no tratamento Retorno BL Bolecode. Como é baixado até a presente data ,nao vem informacoes pagamentos. ajustado p devolver valor documento.
+	Fizemos um reunião ontem com o Consultor Itau, e por enq não é possivel trazer isso nas fracesinhas.
+	www.projetoacbr.com.br/forum/topic/83348-retorno-do-banco-itau-boleto-pago-via-pix/page/2/
+	Por: Daniel Morais InfoCotidiano
+
+11/06/2025
+-- ACBrBoletoRet_Itau_API.pas --
+[*] TK-7092 Ajustes no tratamento da paginação do retorno da consulta
+	www.projetoacbr.com.br/forum/topic/83348-retorno-do-banco-itau-boleto-pago-via-pix/page/2/
+	Por: Daniel Morais InfoCotidiano
+
+11/06/2025
+-- ACBrBoleto --
+[+] Implementa função o para não permitir  IndicadorSituacao.isbNenhum
+[*] Usa função para validar a propriedade IndicadorSituacao
+    Por: Júlio Cavalcanti, Daniel Morais InfoCotidiano e Victor Gonzales Pandaaa
+
+-- ACBrBancoItau --
+[*] Sobrescreve função para permitir IndicadorSituacao.isbNenhum
+    Por: Júlio Cavalcanti, Daniel Morais InfoCotidiano e Victor Gonzales Pandaaa
+
+11/06/2025
+-- ACBrBoletoRet_Itau_API.pas, ACBrBoletoW_Itau_API.pas --
+[*] TK-7092 Ajustes na Tpconsulta bolecode (usar indicadorPIX liquidado bolecode), ajustes no tratamento dos retornos
+	www.projetoacbr.com.br/forum/topic/83348-retorno-do-banco-itau-boleto-pago-via-pix/page/2/
+	Por: Daniel Morais InfoCotidiano
+
+06/06/2025
+-- ACBrBoletoRet_Sicredi_APIV2 --
+[*] TK-6984 Mapeado o EstadoTituloCobranca e CodigoEstadoTituloCobranca
+	https://www.projetoacbr.com.br/forum/topic/82856-retorno-do-sicredi/
+	Por: Daniel Morais InfoCotidiano
+
+06/06/2025
+-- ACBrBoletoW_Santander_API --
+[-] TK-6999 Adicionado a propriedade writeOffQuantityDays para quantidade de dias baixa automatica qdo informado DataBaixa 
+	https://www.projetoacbr.com.br/forum/topic/82157-poss%C3%ADvel-erro-na-api-do-santander/
+	Por: deiviszi
+
+30/05/2025
+-- ACBrBoletoW_Cora --
+[-] TK-6969 Ajustado campos juros "interest" para enviar minusculo conforme suporte e resultou em sucesso. documentacao esta "Interest"
+	https://www.projetoacbr.com.br/forum/topic/82915-banco-cora-dificuldade-no-registro-de-juros-via-api/
+	Por: Daniel Morais InfoCotidiano
+
+29/05/2025
+-- ACBrBoleto.pas --
+[+] TK-7131 Implementada a configuração da tag VersaoDF ao utilizar o método ConfigurarDados. usado no monitor
+	https://www.projetoacbr.com.br/forum/topic/83371-erro-http_code500-no-acbrmonitorplus-ao-enviar-boleto-sicoob-via-api-v3/
+	Por: Júlio Cavalcanti
+
+26/05/2025
+-- ACBrBoleto.pas --
+[*] TK-6783 Mapeado o retorno DataRegistro para ser exibido na lib/monitor; 
+    https://www.projetoacbr.com.br/forum/topic/82408-acbrlibboleto-c-m%C3%A9todo-consultartitulosporperiodo-n%C3%A3o-informa-data-de-registro-dos-boletos/#comment-534372
+    Por: Daniel de Morais InfoCotidiano
+	
+22/05/2025
+--ACBrBoletoW_Sicredi_APIV2--
+[*] TK-6567 - Corrigido tamanho maximo logradouro + numero para 40
+    https://www.projetoacbr.com.br/forum/topic/81573-gerarenderecopagador-no-sicred-acbrboletow_sicredi_apiv2/#comment-529084
+	Por Rodrigo Cardoso da Cruz Silva / Daniel Morais InfoCotidano
+	
+09/04/2025
+--ACBrBoletoW_Itau_API, ACBrBoletoRet_Itau_API--
+[*] TK-6746 - Corrigido Raise da consulta; Mapeado as propriedades do PAGADOR no retorno da consulta isbNenhum (indicadorPix = true)
+    https://www.projetoacbr.com.br/forum/topic/82290-dados-do-sacado-no-retorno-da-consulta-itau/
+	Por RodrigoLopez / Daniel Morais InfoCotidano
+
+09/04/2025
+--ACBrBoletoW_Itau_API, ACBrBoletoRet_Itau_API--
+[-] TK-6888 - Ajustar quando aceitar valor divirgente (TipoPagamento) enviar QtdePagamentoParcial correta.
+    https://www.projetoacbr.com.br/forum/topic/82767-ajuste-boleto-itau-api/
+	Por Ray Hildebrant / Daniel Morais InfoCotidano
+
+08/04/2025
+--ACBrBoletoW_Itau_API, ACBrBoletoRet_Itau_API--
+[*] TK-6698 - Adicionar no envio dados do Avalista/Pagador. Add filtro opcional Carteira na consulta. mapear no retorno datacredito da ocorrencia.
+    https://www.projetoacbr.com.br/forum/topic/82163-contribui%C3%A7%C3%A3o-acbrboletoret_itau_apipas-data-do-cr%C3%A9ditodata-da-compensa%C3%A7%C3%A3o/
+	Por Jaidomini / Daniel Morais InfoCotidano
+
+22/04/2025
+--ACBrBoletoW_Itau_API, ACBrBoletoRet_Itau_API--
+[*] TK-6458, TK-6269, TK-6269-1 Add novo endpoint de consulta Francesinhas boletos liquidados (isbbaixados) e Baixados (isbCancelados)
+	* Consulta Antiga permanece com o indicadorSituacao = isbNenhum *
+	https://www.projetoacbr.com.br/forum/topic/81187-libboletoacbr-n%C3%A3o-esta-mapeando-valor-pago-juros-e-multa-banco-itau/?&_rid=1706#findComment-526410
+	https://www.projetoacbr.com.br/forum/topic/82018-altera%C3%A7%C3%B5es-no-retorno-da-api-do-ita%C3%BA/#comment-532312
+	https://www.projetoacbr.com.br/forum/topic/80777-implementa%C3%A7%C3%A3o-ita%C3%BA-api-v3/#comment-523577 
+  Por: Daniel de Morais InfoCotidano
+
+22/04/2025
+-- ACBrBoletoRet_Santander_API, ACBrBoletoW_Santander_API --
+[*] TK-6322 - Add novo endpont para liquidados, para retornar informações liquidacoes.
+    https://developer.santander.com.br/api/documentacao/emissao-de-boletos-visao-geral#/api/documentacao/emissao-de-boletos-visao-geral/paths/workspaces-workspace_id--bank_slips/get
+	https://www.projetoacbr.com.br/forum/topic/80919-santander-api-liberada-rota-para-consulta-de-liquida%C3%A7%C3%B5es/
+	https://www.projetoacbr.com.br/forum/topic/82090-como-pegar-o-movimento-de-boletos-pagos-via-api-santander/#comment-531991
+  Por: Daniel de Morais InfoCotidano
+
+10/04/2025
+-- ACBrBoleto --
+[*] TK-6517 - Add a propriedade EMV na funcao GravarArqIni.
+  Por: Julio Cavalcanti
+
+10/04/2025
+-- ACBrBoletoW_Cora, ACBrBoletoRet_Cora  --
+[*] TK-6828 - Ajsutes codigo de liquidação e ID boleto.
+  Por:  Daniel de Morais InfoCotidiano
+
+09/04/2025
+-- ACBrBoletoRet_C6.pas  --
+[*] TK-6895 - Mapeado a data do vencimento que nao estava mapeada na inclusao.
+  Por:  Daniel de Morais InfoCotidiano
+
+09/04/2025
+-- ACBrBoletoW_Cora, ACBrBoletoRet_Cora  --
+[*] TK-6828 - Corrigida os retornos da TpConsulta e criado validacoes de datas no definir parametros;
+  https://www.projetoacbr.com.br/forum/topic/82555-boleto-banco-cora-via-api-m%C3%A9todo-n%C3%A3o-implementado/
+  https://www.projetoacbr.com.br/forum/topic/82670-boleto-banco-cora-via-api-classe-e-ini-n%C3%A3o-preenchidos-no-retorno
+  https://discord.com/channels/798697718800318484/809129039159230514/1359502714928758804  
+  Por:  Daniel de Morais InfoCotidiano
+
+07/04/2025
+-- ACBrBancoSicredi.pas --
+[*] TK-6865 - Corrigida geração do tipo de juros literal no Sicredi, quando preenchido CodigoMora numérico
+  https://www.projetoacbr.com.br/forum/topic/82659-acbrlib-boleto-sicredi-c%C3%B3digo-mora-sendo-gerado-incorretamente
+  Por:  Renato Rubinho
+
+19/03/2025
+-- ACBrBoletoFCFortesFr.pas --
+[*] TK-6573 - Corrigida codificação na impressão do nome da Softwarehouse
+  https://www.projetoacbr.com.br/forum/topic/81669-lib-configimpressaosoftwarehouse-n%C3%A3o-esta-aceitando-caracteres-de-acentua%C3%A7%C3%A3o/
+  Por:  Renato Rubinho
+
+13/02/2025
+-- ACBrBoleto.pas --
+[*] TK-6565 - Ajustado exception para ser utilizado da classe de boleto
+  https://www.projetoacbr.com.br/forum/topic/81638-acbrboleto-sugest%C3%A3o-de-melhoria/
+  Por:  samuel.parastchuk, Victor H. Gonzales Pandaaa, Daniel Morais InfoCotidiano
+
+11/02/2025
+-- ACBrBancoSantander.pas --
+[*] TK-6533 - Ajustado para ler NossoNumeroCompleto no CNAB400 
+  https://www.projetoacbr.com.br/forum/topic/81533-retorno-banco-santander/
+  Por: Daniel Morais InfoCotidiano
+
+03/02/2025
+-- ACBrBancoBanrisul.pas --
+[*] TK-6494 - Ajustado nova formatação para CodigoCedente impresso no boleto.
+  https://www.projetoacbr.com.br/forum/topic/81360-rejei%C3%A7%C3%A3o-no-layout-do-boleto-banrisul/
+  Por: Daniel Morais InfoCotidiano
+
+30/01/2025
+-- ACBrBoletoW_Santander_API.pas --
+[-] TK-6122 - Ajustado Ambiente para Producao/Homologacao e Sandbox, ajustado NossoNumero consulta sandbox para 8 carac
+  https://www.projetoacbr.com.br/forum/topic/80208-erro-na-consulta-detalhada-de-um-boleto-via-api-do-santander-em-sandbox/
+  Por: Victor Gonzales Pandaaa / Daniel Morais
 
 23/01/2025
 -- ACBrBoletoRetorno.pas --

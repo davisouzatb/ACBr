@@ -43,6 +43,129 @@ Símbolo : Significado
 [-]     : Correção de Bug (assim esperamos)
 
 
+28/07/2025
+-- ACBrNFComWebServices/ACBrNFComEnvEvento/ACBrNFComRetConsSit/ACBrNFComRetEnvEvento --
+[*] #TK-7412: Ajustes para realizar corretamente a leitura do retorno de evento.
+   Por: Marcelo hgv
+
+26/07/2025
+-- ACBrNFComXmlWriter --
+[*] Ajuste nas condições para gerar o grupo gRed.
+   Por: Italo Giurizzato Junior
+
+24/07/2025
+-- ACBrNFComXmlWriter --
+[*] #TK-7383: Alterado a condição para gerar corretamente a IE do destinatário.
+   Por: jfelipetdsoft
+-- Diversos --
+[*] #TK-7370: Implementado a versão 1.06 da NT da Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+17/06/2025
+-- ACBrNFComWebServices --
+[*] #TK-7205: Melhorias no Consultar visando salvar o XML do evento retornado 
+    levando em consideração da data/hora de emissão do evento.
+  Por: Luiz Alberto da Silva Lope
+
+12/06/2025
+-- ACBrNFComXmlWriter --
+[*] #TK-7209 - Alteração na geração das tags: codDebAuto ou a codBanco e a 
+    codAgencia para deixar de acordo com os Schemas.
+   Por: Victor Werneck
+
+11/06/2025
+-- ACBrNFComXmlWriter --
+[*] Correção no nome da constante e inclusão de uma nova constante.
+   Por: Italo Giurizzato Junior
+
+09/06/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a versão 1.05 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+06/06/2025
+-- ACBrNFComNotasFiscais --
+[+] Implementado os parâmetros: ManterPDFSalvo e sBCC no método: EnviarEmail.
+  Por: Mateus Brunelli/Italo Giurizzato Junior
+
+26/05/2025
+-- Diversos --
+[*] O campo cCredPres que antes era do tipo Integer agora é do tipo TcCredPres.
+  Por: Italo Giurizzato Junior
+
+21/05/2025
+-- Diversos --
+[*] Alteração visando usar a unit ACBrDFe.Conversao que contem os tipos e funções
+    da Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+20/05/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.02 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+29/04/2025
+-- ACBrNFComWebServices --
+[*] #TK-6785 - Adiciona chamada a rotina AjustarOpcoes no envio de eventos da NFCom.
+  Por: Diego Folieni
+
+28/04/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.01a dos Schemas.
+  Por: Italo Giurizzato Junior
+
+16/04/2025
+-- ACBrNFComServicos --
+[*] Alteração na URL do QR-Code da NFCom da SEFAZ-MG.
+   Por: Eduardo Zambiazzi
+
+15/04/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a NT2025/001 versão 1.01.
+  Por: Italo Giurizzato Junior
+
+11/04/2025
+-- Diversos --
+[*] #TK-6836: Ajustes necessários para deixar em conformidade com a NT2025/001.
+  Por: Italo Giurizzato Junior
+
+04/04/2025
+-- Diversos --
+[*] #TK-5814: Implementado as units: ACBrNFComIniReader e ACBrNFComIniWrite que
+    vão ser responsáveis por ler e gerar o arquivo INI.
+    Refatorado a função GetURLQRCode para que a mesma receba a classe TNFCom em 
+    vez de diversos parâmetros de entrada.
+    Implementado a propriedade de configuração: SalvarEvento (valor padrão False)
+    agora ao salvar o XML *-procEventoNFCom o componente vai checar o valor dessa 
+    propriedade.
+  Por: Italo Giurizzato Junior
+
+08/03/2025
+-- ACBrNFComClass/ACBrNFComXmlReader/ACBrNFComXmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+27/02/2025
+-- ACBrNFComXmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+15/02/2025
+-- ACBrNFComClass/ACBrNFComConsts --
+[+] Inclusão de novas contantes e ajustes nas novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+10/02/2025
+-- ACBrNFComClass --
+[+] Inclusão das novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+-- ACBrNFComServicos --
+[+] Incluído as URLs de produção da SEFAZ-MS.
+   Por: Italo Giurizzato Junior
+
+06/02/2025
+-- ACBrNFCom.DAEventoRLRetrato/ACBrNFCom.DANFComRLRetrato --
+[*] Ajustes para compilar/instalar no Delphi 7.
+   Por: Italo Giurizzato Junior
+
 13/01/2025
 -- ACBrNFComServicos --
 [+] Incluído as URLs de homologação da SEFAZ-MS.

@@ -44,6 +44,44 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+11/06/2025
+-- ACBrEFDBloco_C_Class --
+[*] #TK-7210 - EFDICMSIPI - C120 - Permitidos os campos PIS_IMP e COFINS IMP nulos - https://www.projetoacbr.com.br/forum/topic/83697-permitir-gerar-o-arquivo-c120-com-o-campo-vazio/
+    por: Renato Rubinho
+
+09/05/2025
+-- ACBrECFBloco_0, ACBrECFBloco_X, ACBrECFBloco_X_Class, ACBrECFBlocos --
+[+] #TK-6472 - ECF - Implementado Leiaute 0011
+    https://www.projetoacbr.com.br/forum/topic/81303-publicado-leiaute-11-da-escritura%C3%A7%C3%A3o-cont%C3%A1bil-fiscal/
+    por: Renato Rubinho
+
+-- Diversos --
+[+] #TK-6472 - ECF - Implementados programas de exemplo do ECF em Delphi e Lazarus
+    por: Renato Rubinho
+
+08/05/2025
+-- Frm_SPEDFiscal.pas --
+[*] #SEM-TK - EFDICMSIPI - Melhorados controles para versão de acordo com o ano no programa de exemplo
+    por: Renato Rubinho
+
+23/04/2025
+-- ACBrEPCBloco_C_Class, ACBrEPCBloco_D_Class --
+[*] #TK-6923 - EFDContribuições - Consideradas datas de tratamento de alterações utilizando EncodeDate ao invés de StrToDate
+    https://www.projetoacbr.com.br/forum/topic/82867-erro-na-unit-acbrepcbloco_c_classpas
+    por: Anadilson / Renato Rubinho
+
+10/04/2025
+-- ACBrEFDBloco_D_Class --
+[*] #TK-6886 - Alterações revertidas, pois o erro era no validador e já foi corrigido
+    https://www.projetoacbr.com.br/forum/topic/82752-registro-d100-vl_doc/
+    por: Renato Rubinho
+
+09/04/2025
+-- ACBrEFDBloco_D_Class --
+[*] #TK-6886 - Configurados campos do D100 zerados a partir de 2025 ao invés de nulos
+    https://www.projetoacbr.com.br/forum/topic/82752-registro-d100-vl_doc/
+    por: Renato Rubinho
+
 02/12/2024
 -- ACBrEPCBloco_0_Class, ACBrEPCBloco_D, ACBrEPCBloco_D_Class, ACBrEPCBloco_P_Class --
 [+] #TK-6223 - Ajustes da Nota Técnica nº009/2024 do EFD-Contribuições - https://www.projetoacbr.com.br/forum/topic/80612-publicada-nota-t%C3%A9cnica-efd-contribui%C3%A7%C3%B5es-n%C2%BA-009-com-altera%C3%A7%C3%B5es-para-2025/

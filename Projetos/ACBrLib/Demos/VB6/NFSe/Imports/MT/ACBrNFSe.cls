@@ -15,6 +15,14 @@ Option Explicit
 
 Private libHandler As Long
 
+Public Enum ModoEnvio
+    meAutomatico = 0
+    meLoteAssincrono = 1
+    meLoteSincrono = 2
+    meUnitario = 3
+    meTeste = 4
+End Enum
+
 Const BUFFER_LENGTH As Long = 1024
 
 Private Declare Function NFSE_Inicializar _
@@ -82,6 +90,12 @@ Private Declare Function NFSE_CarregarINI _
                                       ByVal eArquivoOuIni As String) As Long
                 
 Private Declare Function NFSE_ObterXml _
+                Lib "ACBrNFSe32.dll" (ByVal libHandler As Long, _
+                                      ByVal AIndex As Long, _
+                                      ByVal buffer As String, _
+                                      ByRef bufferLen As Long) As Long
+                                      
+Private Declare Function NFSE_ObterXmlRps _
                 Lib "ACBrNFSe32.dll" (ByVal libHandler As Long, _
                                       ByVal AIndex As Long, _
                                       ByVal buffer As String, _
@@ -532,6 +546,21 @@ Public Function ObterXml(ByVal AIndex As Long) As String
     ObterXml = processResult(buffer, bufferLen)
 End Function
 
+Public Function ObterXmlRps(ByVal AIndex As Long) As String
+
+    Dim retorno   As Long
+    Dim buffer    As String
+    Dim bufferLen As Long
+
+    bufferLen = BUFFER_LENGTH
+    buffer = String$(bufferLen, " ")
+    
+    retorno = NFSE_ObterXmlRps(libHandler, AIndex, buffer, bufferLen)
+    CheckResult retorno
+    
+    ObterXmlRps = processResult(buffer, bufferLen)
+End Function
+
 Public Sub GravarXml(ByVal AIndex As Long, _
                      Optional ByVal eNomeArquivo As String = "", _
                      Optional ByVal ePathArquivo As String = "")
@@ -583,7 +612,7 @@ Public Function ObterCertificados() As String()
     ObterCertificados = Split(processResult(buffer, bufferLen), vbCrLf)
 End Function
 
-Public Function Emitir(ByVal aLote As String, ByVal aModoEnvio As Long, ByVal aImprimir As Boolean) As String
+Public Function Emitir(ByVal aLote As String, ByVal aModoEnvio As ModoEnvio, ByVal aImprimir As Boolean) As String
 
     Dim retorno   As Long
     Dim buffer    As String
@@ -648,7 +677,7 @@ Public Function LinkNFSE(ByVal aNumeroNFSe As String, ByVal aCodigoVerificacao A
     
 End Function
 
-Public Function GerarLote(ByVal aLote As String, ByVal aQtdMaximaRps As Long, ByVal aModoEnvio As Long) As String
+Public Function GerarLote(ByVal aLote As String, ByVal aQtdMaximaRps As Long, ByVal aModoEnvio As ModoEnvio) As String
 
     Dim retorno   As Long
     Dim buffer    As String
@@ -1092,7 +1121,6 @@ Public Function ConsultarParametros(ByVal aTipoParametroMunicipio As Long, ByVal
 
 End Function
 
-
 Public Function ObterInformacoesProvedor() As String
     
     Dim retorno   As Long
@@ -1107,6 +1135,18 @@ Public Function ObterInformacoesProvedor() As String
     
     ObterInformacoesProvedor = processResult(buffer, bufferLen)
 
+End Function
+
+Public Function ObterUltimoRetorno() As String
+
+    Dim buffer As String
+    Dim bufferLen As Long
+
+    bufferLen = BUFFER_LENGTH
+    buffer = String$(bufferLen, " ")
+    NFSE_UltimoRetorno libHandler, buffer, bufferLen
+    
+    ObterUltimoRetorno = processResult(buffer, bufferLen)
 End Function
 
 Private Sub CheckResult(ByVal Resultado As Long)

@@ -570,6 +570,9 @@ begin
   // chave de acesso 39 caracteres
   Result.AppendChild(AddNode(tcStr, '#1', 'refNF', 1, 39, 1, NFSe.refNF, ''));
 
+  // Formato de impressão tem que ser fixo valor "1".
+  Result.AppendChild(AddNode(tcStr, '#1', 'tpImp', 1, 1, 1, '1', ''));
+
   // N- Normal C- Contigencia
   Result.AppendChild(AddNode(tcStr, '#1', 'tpEmis', 1, 1, 1,
                                        TipoEmissaoToStr(NFSe.TipoEmissao), ''));
@@ -706,6 +709,11 @@ begin
     if (lResultadoSobra > 0) and (lDeOndeIniciaCopia > 0) then
       Result.AppendChild(AddNode(tcStr, '#1', 'infAdic', 1, 100, 1,
                         Copy(lTexto, lIndex * lLimiteLinha, lLimiteLinha), ''));
+
+    if NFSe.infAdicAT = snSim then
+      Result.AppendChild(AddNode(tcStr, '#1', 'infAdicAT', 1, 1, 1, '1', ''))
+    else
+      Result.AppendChild(AddNode(tcStr, '#1', 'infAdicAT', 1, 1, 1, '0', ''));
   end;
 end;
 
@@ -1082,9 +1090,8 @@ begin
   Result.AppendChild(AddNode(tcDe2, '#1', 'vtLiq', 1, 15, 1,
                                     NFSe.Servico.Valores.ValorLiquidoNfse, ''));
 
-  if FPVersao = ve100 then
-    Result.AppendChild(AddNode(tcDe2, '#1', 'totalAproxTrib', 1, 15, 0,
-                                    NFSe.Servico.Valores.totalAproxTrib, ''));
+  Result.AppendChild(AddNode(tcDe2, '#1', 'totalAproxTrib', 1, 15, 0,
+                                      NFSe.Servico.Valores.totalAproxTrib, ''));
 
   if (NFSe.Servico.Valores.ValorIr + NFSe.Servico.Valores.ValorPis +
       NFSe.Servico.Valores.ValorCofins + NFSe.Servico.Valores.ValorCsll +

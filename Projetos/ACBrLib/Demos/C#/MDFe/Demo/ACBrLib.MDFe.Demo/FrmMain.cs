@@ -1379,16 +1379,23 @@ namespace ACBrLib.MDFe.Demo
                 return;
             }
 
-            var codUf = 35;
             var cnpj = "";
             var eNsu = "";
 
-            if (InputBox.Show("WebServices: Distribuição DFe", "Código da UF", ref codUf) != DialogResult.OK) return;
+ 
             if (InputBox.Show("WebServices: Distribuição DFe", "CNPJ do autor", ref cnpj) != DialogResult.OK) return;
             if (InputBox.Show("WebServices: Distribuição DFe", "Número do NSU", ref eNsu) != DialogResult.OK) return;
 
-            var ret = ACBrMDFe.DistribuicaoDFePorNSU(codUf, cnpj, eNsu);
-            rtbRespostas.AppendText(ret.Resposta);
+            try
+            {
+                var ret = ACBrMDFe.DistribuicaoDFePorNSU(cnpj, eNsu);
+                rtbRespostas.AppendText(ret.Resposta);
+            } catch (Exception exception)
+            {
+               // MessageBox.Show(exception.Message, @"Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               ;
+            }
+           
         }
 
         private void btnDFePorUltNSU_Click(object sender, EventArgs e)
@@ -1407,7 +1414,7 @@ namespace ACBrLib.MDFe.Demo
             if (InputBox.Show("WebServices: Distribuição DFe", "CNPJ do autor", ref cnpj) != DialogResult.OK) return;
             if (InputBox.Show("WebServices: Distribuição DFe", "Número do último NSU", ref eNsu) != DialogResult.OK) return;
 
-            var ret = ACBrMDFe.DistribuicaoDFePorNSU(codUf, cnpj, eNsu);
+            var ret = ACBrMDFe.DistribuicaoDFePorNSU(cnpj, eNsu);
             rtbRespostas.AppendText(ret.Resposta);
         }
 
@@ -1547,6 +1554,36 @@ namespace ACBrLib.MDFe.Demo
             }
         }
 
+        private async void btnSalvarPDF_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var arquivoXml = Helpers.OpenFile("Arquivo Xml MDFe (*.xml)|*.xml|Todos os Arquivos (*.*)|*.*");
+                if (string.IsNullOrEmpty(arquivoXml)) return;
+
+                ACBrMDFe.LimparLista();
+                ACBrMDFe.CarregarXML(arquivoXml);
+
+                var nomeArquivo = Helpers.SaveFile("Salvar em PDF (*.pdf)|*.pdf|Todos os Arquivos (*.*)|*.*");
+
+                using (FileStream aStream = File.Create(nomeArquivo))
+                {
+                    ACBrMDFe.ImprimirPDF(aStream);
+                    byte[] buffer = new Byte[aStream.Length];
+                    await aStream.ReadAsync(buffer, 0, buffer.Length);
+                    await aStream.FlushAsync();
+                    aStream.Seek(0, SeekOrigin.End);
+                    await aStream.WriteAsync(buffer, 0, buffer.Length);
+                }
+                rtbRespostas.AppendLine($"PDF Salvo em: {nomeArquivo}");
+
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, @"Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
     }
 
 }

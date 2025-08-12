@@ -246,6 +246,8 @@ begin
         if (ItemListaServico = '00.00') and (ObterConteudo(ANodes[i].Childrens.FindAnyNs('nrServico'), tcStr) <> '') then
           ItemListaServico := PadLeft(ObterConteudo(ANodes[i].Childrens.FindAnyNs('nrServico'), tcStr), 5, '0');
 
+        xItemListaServico := ItemListaServicoDescricao(ItemListaServico);
+
         ValorUnitario := ObterConteudo(ANodes[i].Childrens.FindAnyNs('vlServico'), tcDe2);
         Aliquota := ObterConteudo(ANodes[i].Childrens.FindAnyNs('vlAliquota'), tcDe2);
 
@@ -279,6 +281,7 @@ begin
       if i = 0 then
       begin
         NFSe.Servico.ItemListaServico := NFSe.Servico.ItemServico[i].ItemListaServico;
+        NFSe.Servico.xItemListaServico := ItemListaServicoDescricao(NFSe.Servico.ItemListaServico);
         NFSe.Servico.Valores.Aliquota := NFSe.Servico.ItemServico[i].Aliquota;
       end;
 
@@ -363,7 +366,7 @@ begin
   Document.Clear();
   Document.LoadFromXml(Arquivo);
 
-  if (Pos('nfs', Arquivo) > 0) then
+  if (Pos('<nfse', Arquivo) > 0) then
     tpXML := txmlNFSe
   else
     tpXML := txmlRPS;
@@ -395,12 +398,17 @@ begin
 
   if not Assigned(ANode) then Exit;
 
-  //AuxNode := ANode.Childrens.FindAnyNs('nfse');
-  AuxNode := ANode; //ja esta no node 'nfs'
+  {
+    Quando o XML contem apenas uma nota deve-se ler o grupo <nfse>
+  }
+  AuxNode := ANode.Childrens.FindAnyNs('nfse');
+
+
+//  AuxNode := ANode; //ja esta no node 'nfs'
 
   if AuxNode <> nil then
   begin
-    NFSe.Numero := ObterConteudo(AuxNode.Childrens.FindAnyNs('nrNfs'), tcStr);
+    NFSe.Numero := ObterConteudo(AuxNode.Childrens.FindAnyNs('nrNfse'), tcStr);
     NFSe.CodigoVerificacao := ObterConteudo(AuxNode.Childrens.FindAnyNs('cdAutenticacao'), tcStr);
     NFSe.DataEmissao := ObterConteudo(AuxNode.Childrens.FindAnyNs('dtEmissaoNfs'), tcDatHor);
 
@@ -503,6 +511,7 @@ begin
     LerRetencoes(ANode);
 
     Servico.Valores.DescontoIncondicionado := ObterConteudo(ANode.Childrens.FindAnyNs('vlDesconto'), tcDe2);
+    Servico.Valores.dsImpostos := ObterConteudo(ANode.Childrens.FindAnyNs('dsImpostos'), tcStr);
 
     if Servico.Valores.ValorLiquidoNfse = 0 then
       Servico.Valores.ValorLiquidoNfse := Servico.Valores.ValorServicos -

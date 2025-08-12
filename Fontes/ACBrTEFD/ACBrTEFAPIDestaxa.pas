@@ -66,8 +66,6 @@ type
   private
     fDestaxaClient: TACBrTEFDestaxaClient;
 
-    function DestaxaClient: TACBrTEFDestaxaClient;
-
     function AplicarMascaraData(const aMascara: String; var aResposta: String): String;
 
     procedure QuandoExibirQRCodeAPI(const aDados: String);
@@ -110,6 +108,7 @@ type
       const CodigoFinalizacao: String = ''; const Rede: String = ''): Boolean; override;
 
     function ObterDadoPinPad(TipoDado: TACBrTEFAPIDadoPinPad; TimeOut: Integer = 30000; MinLen: SmallInt = 0; MaxLen: SmallInt = 0): String; override;
+    function DestaxaClient: TACBrTEFDestaxaClient;
   end;
 
 implementation
@@ -205,7 +204,6 @@ begin
   Rede := DestaxaResposta.transacao_rede;
   NSU := DestaxaResposta.transacao_nsu;
   TextoEspecialOperador := DestaxaResposta.mensagem;
-  BIN := DestaxaResposta.transacao_cartao_numero;
   ValorTotal := DestaxaResposta.transacao_valor;
   NSU_TEF := DestaxaResposta.transacao_nsu_rede;
   DataHoraTransacaoLocal := DestaxaResposta.transacao_data;
@@ -216,9 +214,7 @@ begin
   NFCeSAT.Bandeira := DestaxaResposta.transacao_administradora;
   NFCeSAT.Autorizacao := DestaxaResposta.transacao_autorizacao;
   NFCeSAT.CNPJCredenciadora := DestaxaResposta.transacao_rede_cnpj;
-  if NaoEstaVazio(DestaxaResposta.transacao_cartao_numero) and (Length(DestaxaResposta.transacao_cartao_numero) >= 4) then
-    NFCeSAT.UltimosQuatroDigitos := RightStr(DestaxaResposta.transacao_cartao_numero, 4);
-
+  PAN := DestaxaResposta.transacao_cartao_numero;
   CodigoBandeiraPadrao := DestaxaResposta.codigo_bandeira;
   NomeAdministradora := DestaxaResposta.transacao_administradora;
   CodigoAutorizacaoTransacao := DestaxaResposta.transacao_autorizacao;
@@ -261,7 +257,7 @@ begin
     fDestaxaClient.Loja := fpACBrTEFAPI.DadosTerminal.CodEmpresa;
     fDestaxaClient.Terminal := fpACBrTEFAPI.DadosTerminal.CodTerminal;
     fDestaxaClient.Aplicacao := fpACBrTEFAPI.DadosAutomacao.NomeAplicacao;
-    //fDestaxaClient.AplicacaoTela := fpACBrTEFAPI.DadosTerminal.CodEmpresa;
+    fDestaxaClient.AplicacaoTela := fpACBrTEFAPI.DadosAutomacao.NomeAplicacao;
     fDestaxaClient.AplicacaoVersao := fpACBrTEFAPI.DadosAutomacao.VersaoAplicacao;
     fDestaxaClient.Estabelecimento := fpACBrTEFAPI.DadosEstabelecimento.CNPJ;
     fDestaxaClient.OnGravarLog := QuandoGravarLogAPI;
@@ -364,8 +360,11 @@ begin
     Def.MascaraDeCaptura := '**/**'
   else if (aMascara = CDESTAXA_MASCARA_DECIMAL) then
     Def.MascaraDeCaptura := '@,@@'
-  else
-    Def.MascaraDeCaptura := aMascara;
+  else if (Pos('#', aMascara) > 0) then
+  begin
+    Def.TamanhoMaximo := Length(aMascara);
+    Def.MascaraDeCaptura := StringReplace(aMascara, '#', '*', [rfReplaceAll]);
+  end;
 
   case aTipo of
     dctNaoExibivel: Def.TipoDeEntrada := tedApenasLeitura;
@@ -455,22 +454,25 @@ procedure TACBrTEFAPIClassDestaxa.Inicializar;
 var
   wErro: Integer;
 begin
-  inherited;
-  wErro := DestaxaClient.Socket.Conectar;
-  if NaoEstaZerado(wErro) then
-    raise EACBrTEFDestaxaErro.Create(
-      ACBrStr(
-        'Erro ao conectar Destaxa Client' + sLineBreak +
-        'Endereço: ' + DestaxaClient.EnderecoIP + sLineBreak +
-        'Porta: ' + DestaxaClient.Porta + sLineBreak +
-        'Erro: ' + IntToStr(wErro) + '-' + DestaxaClient.Socket.LastErrorDesc));
-  fpInicializado := True;
+  try
+    wErro := DestaxaClient.Socket.Conectar;
+    if NaoEstaZerado(wErro) then
+      raise EACBrTEFDestaxaErro.Create(
+        ACBrStr(
+          'Erro ao conectar Destaxa Client' + sLineBreak +
+          'Endereço: ' + DestaxaClient.EnderecoIP + sLineBreak +
+          'Porta: ' + DestaxaClient.Porta + sLineBreak +
+          'Erro: ' + IntToStr(wErro) + '-' + DestaxaClient.Socket.LastErrorDesc));
+    fpInicializado := True;
+  finally
+    DestaxaClient.Socket.Desconectar;
+  end;
 end;
 
 procedure TACBrTEFAPIClassDestaxa.DesInicializar;
 begin
-  DestaxaClient.Socket.Conectar;
-  inherited DesInicializar;
+  DestaxaClient.Socket.Desconectar;
+  fpInicializado := False;
 end;
 
 function TACBrTEFAPIClassDestaxa.EfetuarPagamento(ValorPagto: Currency; Modalidade: TACBrTEFModalidadePagamento; CartoesAceitos: TACBrTEFTiposCartao;
@@ -538,6 +540,7 @@ begin
   case OperacaoAdm of
     tefopCancelamento: transacao := CDESTAXA_ADM_CANCELAR;
     tefopReimpressao: transacao := CDESTAXA_ADM_REIMPRIMIR;
+    tefopRelatResumido, tefopRelatSintetico, tefopRelatDetalhado: transacao := CDESTAXA_ADM_EXTRATO_TRANSACAO;
     tefopTesteComunicacao:
     begin
       Result := TesteComunicacao;

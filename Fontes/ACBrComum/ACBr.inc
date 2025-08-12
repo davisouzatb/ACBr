@@ -59,7 +59,9 @@
 // Descomente a linha abaixo, se você não deseja adicionar a Dependência da INDY nos seus Projetos
 {.$DEFINE DFE_SEM_INDY}
 // Descomente a linha abaixo, se você deseja que sejam utilizadas as classes baseadas na ACBrXMLDocument
-{.$DEFINE USE_ACBr_XMLDOCUMENT}
+// Utilização do ACBrXMLDocument obrigatória para as tags da Reforma Tributária nos documentos fiscais
+// se estiver comentado, não será gerado nos XML.
+{$DEFINE USE_ACBr_XMLDOCUMENT}
 
 // Descomente essa linha, para usar a carga de DLL tardia, nas Units do OpenSSL  (Apenas Delphi)
 {$DEFINE USE_DELAYED}
@@ -103,6 +105,7 @@
   {$DEFINE HAS_REGEXPR}
   {$DEFINE HAS_INLINE}
   {$DEFINE HAS_STRICTDELIMITER}
+  {$DEFINE HAS_PNG}
   {$H+}
 
   {$UnDef FMX}
@@ -318,7 +321,15 @@
   {$IFDEF DELPHIXE2_UP}
     {$DEFINE USE_NAMESPACES}
   {$ENDIF}
+
+  {$IFDEF DELPHI14_UP}// delphi 2010 pra cima existe
+    {$DEFINE HAS_PNG}
+  {$ENDIF}
 {$ENDIF}
+
+{$IfDef NOGUI}
+  {$UnDef HAS_PNG}
+{$EndIf}
 
 
 {$ENDIF ~ACBr_INC}

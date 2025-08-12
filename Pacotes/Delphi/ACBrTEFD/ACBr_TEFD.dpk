@@ -29,9 +29,14 @@ package ACBr_TEFD;
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
+{$I ACBr.inc}  
+
 requires
   rtl,
   vcl,
+  {$IFDEF HAS_PNG}
+  vclimg,
+  {$ENDIF}
   ACBr_Comum,
   soaprtl,
   ACBr_Diversos,
@@ -80,6 +85,13 @@ contains
   ACBrTEFAPIDestaxa in '..\..\..\Fontes\ACBrTEFD\ACBrTEFAPIDestaxa.pas',
   ACBrTEFDestaxaComum in '..\..\..\Fontes\ACBrTEFD\ACBrTEFDestaxaComum.pas',
   ACBrTEFScopeAPI in '..\..\..\Fontes\ACBrTEFD\ACBrTEFScopeAPI.pas',
-  ACBrTEFAPIScope in '..\..\..\Fontes\ACBrTEFD\ACBrTEFAPIScope.pas';
+  ACBrTEFAPIScope in '..\..\..\Fontes\ACBrTEFD\ACBrTEFAPIScope.pas',
+  ACBrTEFAPITPag in '..\..\..\Fontes\ACBrTEFD\ACBrTEFAPITPag.pas',
+  ACBrTEFTPagAPI in '..\..\..\Fontes\ACBrTEFD\ACBrTEFTPagAPI.pas',
+  ACBrTEFAPIPayKit in '..\..\..\Fontes\ACBrTEFD\ACBrTEFAPIPayKit.pas',
+  ACBrTEFPayKitAPI in '..\..\..\Fontes\ACBrTEFD\ACBrTEFPayKitAPI.pas',
+  ACBrTEFAPIDirectPin in '..\..\..\Fontes\ACBrTEFD\ACBrTEFAPIDirectPin.pas',
+  ACBrTEFDirectPinAPI in '..\..\..\Fontes\ACBrTEFD\ACBrTEFDirectPinAPI.pas';
+
 
 end.

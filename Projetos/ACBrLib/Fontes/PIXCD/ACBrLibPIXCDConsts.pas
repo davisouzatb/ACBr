@@ -213,6 +213,8 @@ const
   CChaveClientSecretBradesco = 'ClientSecret';
   CChaveArqPFXBradesco = 'ArqPFX';
   CChaveSenhaPFXBradesco = 'SenhaPFX';
+  CChaveArqChavePrivadaBradesco = 'ArqChavePrivada';
+  CChaveArqCertificadoBradesco = 'ArqCertificado';
 
   CSessaoPIXCDSicrediConfig = 'Sicredi';
   CChavePIXSicredi = 'ChavePIX';
@@ -247,6 +249,7 @@ const
   CChaveCNPJPixPDV = 'CNPJ';
   CChaveToken = 'Token';
   CChaveSecretKeyPixPDV = 'SecretKey';
+  CChaveAPIVersaoPixPDV = 'PixPDVAPIVersao';
 
   CSessaoPIXCDPagSeguroConfig = 'PagSeguro';
   CChavePIXPagSeguro = 'ChavePIX';
@@ -334,6 +337,11 @@ const
   CChaveClientSecretC6Bank = 'ClientSecret';
   CChaveArqChavePrivadaC6Bank = 'ArqChavePrivada';
   CChaveArqCertificadoC6Bank = 'ArqCertificado';
+
+  CSessaoPIXCDAppLessConfig = 'AppLess';
+  CChaveClientIDAppLess = 'ClientID';
+  CChaveClientSecretAppLess = 'ClientSecret';
+  CChaveSecretKeyHMACAppLess = 'SecretKeyHMAC';
 
 implementation
 

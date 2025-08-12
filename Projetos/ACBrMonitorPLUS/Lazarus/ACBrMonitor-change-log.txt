@@ -1,5 +1,5 @@
 {*******************************************************************************}
-{ Projeto: ACBrMonitor                                                         }
+{ Projeto: ACBrMonitor                                                          }
 {  Executavel multiplataforma que faz uso do conjunto de componentes ACBr para  }
 { criar uma interface de comunicação com equipamentos de automacao comercial.   }
 {                                                                               }
@@ -43,6 +43,84 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+29/05/2025
+-- ACBrMonitorPlus --
+[+] TK-7131 Implementada a configuração da tag VersaoDF ao utilizar o método ConfigurarDados.
+	https://www.projetoacbr.com.br/forum/topic/83371-erro-http_code500-no-acbrmonitorplus-ao-enviar-boleto-sicoob-via-api-v3/
+	Por: Júlio Cavalcanti
+
+21/05/2025
+-- ACBrMonitor1 --
+[+] #TK-7062: Adiciona a versão 3.0 do QrCode na tela de configurações.
+  Por: Diego Folieni 
+
+14/05/2025
+-- DoACBrNFeUnit --
+[*] #TK-7028: Adiciona nome do arquivo no início da resposta conforme padrão para outros documentos.
+  Por: Diego Folieni
+
+07/05/2025
+-- ACBrMonitor1, DoBoletoUnit, ACBrMonitorConfig --
+[*] #TK-7024 Add no monitor LayoutVersaoLote que não estava sendo alimentada.
+  https://www.projetoacbr.com.br/forum/topic/80746-remessa-cobran%C3%A7a-caixa-layout-cnab400/page/2/
+  Por: Daniel de Morais InfoCotidiano
+
+
+05/05/2025
+-- ACBrMonitor1 --
+[*] #TK-6868 Acrescentado as linhas para configurar a propriedade SalvarEvento para os
+    Documentos BP-e, CT-e e MDF-e.
+  Por: Italo Giurizzato Junior
+
+18/03/2025
+-- ACBrMonitor1 --
+[*] #TK-6778 Corrigida visualização do Logo png na aba de conta bancária.
+  Por: Renato Rubinho
+
+17/03/2025
+-- ACBrMonitor1 --
+[*] #TK-6765 Configurado para preencher a última versão do e-Social quando houver um valor inválido no ini.
+  Por: Renato Rubinho
+
+12/03/2025
+-- ACBrMonitorConsts --
+[*] #TK-6745: Altera valor default da versão do e-Social para S01_00_00.
+   Por: Diego Folieni
+-- DoACBreSocialUnit --
+[*] #TK-6455: Adiciona quebra de linha para separar resposta da linha do "OK:"
+   Por: Diego Folieni
+
+24/02/2025
+-- ACBrMonitor1, ACBrMonitorConfig, ACBrMonitorConsts, DoACBrNFSeUnit --
+[*] #TK-6556 Adiciona informações de endereço opcionais para o emitente para usar no DANFSe quando não houver no XML.
+  Por: Diego Folieni 
+
+17/02/2025  
+-- ACBrMonitor.hnd --  
+[*] #TK-6137 Corrigido exemplos de respostas da DistribuicaoDFe adicionando informações para refletir retorno mais recente.  
+    Por: Júlio Cavalcanti e Diego Folieni
+
+10/02/2025
+-- ACBrMonitor.hnd --
+[*] #TK-6521 Incluído observação para as chaves TipoData, tpPer, TipoHora e tpHor. 
+    Por: Júlio Cavalcanti
+
+06/02/2025
+-- DoACBrReinfUnit.pas, ACBrMonitorConsts.pas --
+[*] #TK-6528 Implementado método Reinf.ValidarReinf().
+    Por: Renato Rubinho
+-- ACBrMonitor.hnd --
+[*] #TK-6528 Revisada e atualizada documentação do Reinf.
+    Por: Renato Rubinho
+
+05/02/2025
+-- ACBrMonitor.hnd --
+[*] #TK-6585 Incluído novo valor válido para o Ambiente no ACBrBoleto.
+    Por: Júlio Cavalcanti
+-- DoACBrReinfUnit.pas --
+[*] #TK-6528 Implementado método Reinf.ObterCertificados().
+    Por: Renato Rubinho
+
 14/01/2025
 -- ACBrMonitor1.pas, DoBoletoUnit.pas, ACBrMonitorConfig.pas  --
 [*] #TK-6479 Ajustado para Ler o INI VersaoArquivo utilizado no Boleto.

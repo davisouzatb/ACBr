@@ -50,6 +50,7 @@ uses
      {$ENDIF}
    {$ENDIF}
   {$ENDIF}
+  ACBrBase,
   ACBrDFeConfiguracoes, ACBrIntegrador, ACBrDFe,
   pcnGerador, ACBrXmlWriter;
 
@@ -201,6 +202,7 @@ end;
 function TDFeWebService.Executar: Boolean;
 var
   ErroMsg: String;
+  Tratado: Boolean;
 begin
   { Sobrescrever apenas se realmente necessário }
 
@@ -218,11 +220,26 @@ begin
       EnviarDados;
       try
         Result := TratarResposta;
+
+        if Assigned(FPDFeOwner.OnTransmitted) then
+          FPDFeOwner.OnTransmitted(FPEnvelopeSoap, FPDFeOwner.SSL.HTTPResultCode);
       finally
         FazerLog(GerarMsgLog, True);
         SalvarResposta;
       end;
     except
+      on E: EACBrDFeExceptionTimeOut do
+      begin
+        FPDFeOwner.FazerLog('ERRO: ' + E.Message, Tratado);
+        if not Tratado then raise;
+      end;
+
+      on E: EACBrDFeException do
+      begin
+        FPDFeOwner.FazerLog('ERRO: ' + E.Message, Tratado);
+        if not Tratado then raise;
+      end;
+
       on E: Exception do
       begin
         Result := False;
@@ -433,6 +450,9 @@ begin
         FPDFeOwner.OnTransmitError( HTTPResultCode, InternalErrorCode,
                                     FPURL, FPEnvelopeSoap, FPSoapAction,
                                     Tentar, Tratado) ;
+
+      if InternalErrorCode = 10060 {WSAETIMEDOUT} then
+        raise EACBrDFeExceptionTimeOut.Create('Connection Time Out');
 
       if not (Tentar or Tratado) then
         raise;

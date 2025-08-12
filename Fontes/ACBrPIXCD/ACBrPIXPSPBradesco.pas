@@ -83,8 +83,8 @@ end;
 procedure TACBrPSPBradesco.QuandoReceberRespostaEndPoint(const aEndPoint, AURL,
   aMethod: String; var aResultCode: Integer; var aRespostaHttp: AnsiString);
 begin
-  // Bradesco responde OK ao EndPoint /cobv, de forma diferente da especificada
-  if (UpperCase(AMethod) = ChttpMethodPUT) and (AEndPoint = cEndPointCobV) and (AResultCode = HTTP_OK) then
+  // Bradesco responde OK ao EndPoint /cobv ou /pix, de forma diferente da especificada
+  if (UpperCase(AMethod) = ChttpMethodPUT) and ((AEndPoint = cEndPointCobV) or (aEndPoint = cEndPointPix)) and (AResultCode = HTTP_OK) then
     AResultCode := HTTP_CREATED;
 end;
 
@@ -96,7 +96,7 @@ end;
 
 procedure TACBrPSPBradesco.Autenticar;
 var
-  wURL, BasicAutentication: String;
+  wURL: String;
   qp: TACBrQueryParams;
   wResultCode: Integer;
   wRespostaHttp: AnsiString;
@@ -122,8 +122,6 @@ begin
   Http.Protocol := '1.1';
   Http.UserName := ClientID;
   Http.Password := ClientSecret;
-  BasicAutentication := 'Basic '+EncodeBase64(ClientID + ':' + ClientSecret);
-  Http.Headers.Add(ChttpHeaderAuthorization+' '+BasicAutentication);
   TransmitirHttp(ChttpMethodPOST, wURL, wResultCode, wRespostaHttp);
 
   if (wResultCode = HTTP_OK) then

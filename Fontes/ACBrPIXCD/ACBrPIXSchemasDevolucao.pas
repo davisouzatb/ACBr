@@ -110,7 +110,7 @@ type
     procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
   public
-    constructor Create(const ObjectName: String); override;
+    constructor Create(const ObjectName: String = ''); override;
     destructor Destroy; override;
     procedure Clear; reintroduce;
     function IsEmpty: Boolean; override;
@@ -142,7 +142,7 @@ type
 implementation
 
 uses
-  ACBrPIXUtil, Math, IniFiles,
+  ACBrPIXUtil, IniFiles,
   ACBrUtil.Base,
   ACBrUtil.FilesIO,
   ACBrUtil.Strings,

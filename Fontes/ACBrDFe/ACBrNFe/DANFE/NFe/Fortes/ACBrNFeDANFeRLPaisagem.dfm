@@ -3296,9 +3296,9 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Tag = 10
         Left = 618
         Top = 55
-        Width = 49
+        Width = 63
         Height = 7
-        Caption = 'PESO BRUTO'
+        Caption = 'PESO BRUTO (Kg)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -7
@@ -3544,9 +3544,9 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Tag = 10
         Left = 810
         Top = 55
-        Width = 52
+        Width = 67
         Height = 7
-        Caption = 'PESO L'#205'QUIDO'
+        Caption = 'PESO L'#205'QUIDO (Kg)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -7
@@ -5892,7 +5892,7 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Height = 63
       end
       object rlbQuandoEntregaLinha1Coluna1: TRLDraw
-        Left = 720
+        Left = 647
         Top = 1
         Width = 1
         Height = 29
@@ -5919,7 +5919,7 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
       end
       object rlbQuandoEntregaLinha1Memo2: TRLLabel
         Tag = 10
-        Left = 722
+        Left = 650
         Top = 3
         Width = 42
         Height = 7
@@ -6005,7 +6005,7 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Tag = 703
         Left = 35
         Top = 13
-        Width = 669
+        Width = 606
         Height = 14
         AutoSize = False
         Font.Charset = DEFAULT_CHARSET
@@ -6017,9 +6017,9 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
       end
       object RLLquadroEntregaDocumento: TRLLabel
         Tag = 703
-        Left = 722
+        Left = 650
         Top = 13
-        Width = 80
+        Width = 159
         Height = 14
         AutoSize = False
         Font.Charset = DEFAULT_CHARSET

@@ -92,7 +92,8 @@ uses
   ACBrUtil.Strings,
   ACBrUtil.DateTime,
   ACBrUtil.Base,
-  ACBrUtil.Math;
+  ACBrUtil.Math,
+  ACBrValidador;
 
 { TBoletoW_C6 }
 
@@ -103,14 +104,17 @@ begin
   if Assigned(Atitulo) then
     LNossoNumeroCorrespondente := ATitulo.NossoNumeroCorrespondente;
 
-  FPURL := IfThen(Boleto.Configuracoes.WebService.Ambiente = tawsProducao, C_URL, C_URL_HOM);
+  case Boleto.Configuracoes.WebService.Ambiente of
+    tawsProducao    : FPURL.URLProducao    := C_URL;
+    tawsHomologacao : FPURL.URLHomologacao := C_URL_HOM;
+  end;
 
   case Boleto.Configuracoes.WebService.Operacao of
-    tpInclui           :    FPURL := FPURL + '/';
-    tpAltera           :    FPURL := FPURL + '/' + LNossoNumeroCorrespondente;
-    tpConsultaDetalhe  :    FPURL := FPURL + '/' + LNossoNumeroCorrespondente;
+    tpInclui           :    FPURL.SetPathURI( '/' );
+    tpAltera           :    FPURL.SetPathURI( '/' + LNossoNumeroCorrespondente );
+    tpConsultaDetalhe  :    FPURL.SetPathURI( '/' + LNossoNumeroCorrespondente );
     tpCancelar,
-    tpBaixa            :    FPURL := FPURL + '/' + LNossoNumeroCorrespondente+'/cancel';
+    tpBaixa            :    FPURL.SetPathURI( '/' + LNossoNumeroCorrespondente+'/cancel' );
   end;
 end;
 
@@ -207,14 +211,40 @@ var
   LMensagem : TACBrJSONArray;
   I: Integer;
   LValorMoraJuros : Double;
+  LCNPJCPFPayer, LEmailPayer : string;
 begin
   if Assigned(ATitulo) then
   begin
-    if (Length(ATitulo.SeuNumero) < 1) or (Length(ATitulo.SeuNumero) > 10) then
+    if not ((Length(ATitulo.SeuNumero) >= 1) and
+            (Length(ATitulo.SeuNumero) <= 10) and
+             StrIsAlphaNum(ATitulo.SeuNumero)) then
       raise Exception.Create('Campo SeuNumero [a-zA-Z0-9] é inválido min. 1 max. 10!');
 
-    if not ((ATitulo.NossoNumero = '0') or (ATitulo.NossoNumero = Poem_Zeros('',Boleto.Banco.TamanhoMaximoNossoNum)) ) then
+
+    if ATitulo.NossoNumero = '' then
+      ATitulo.NossoNumero := '0';
+
+    if not ((ATitulo.NossoNumero = '0') or
+            (ATitulo.NossoNumero = Poem_Zeros('',Boleto.Banco.TamanhoMaximoNossoNum)) ) then
       raise Exception.Create('Campo NossoNumero é inválido obrigatóriamente deve ser informado valor 0!');
+
+    if not (ATitulo.Carteira = '15') then
+      raise Exception.Create('Campo Carteira é inválido obrigatóriamente deve ser informado valor 15. Não previsto outra carteira na API!');
+
+
+    LCNPJCPFPayer := OnlyNumber(ATitulo.Sacado.CNPJCPF);
+
+    case Length(LCNPJCPFPayer) of
+      11 : if ValidarCPF(LCNPJCPFPayer) <> '' then
+             raise Exception.Create('Campo CNPJCPF (CPF) do Pagador é inválido!');
+      14 : if ValidarCNPJ(LCNPJCPFPayer) <> '' then
+             raise Exception.Create('Campo CNPJCPF (CNPJ) do Pagador é inválido!');
+    end;
+
+    LEmailPayer := Copy(ATitulo.Sacado.Email,1,200);
+
+    if (LEmailPayer <> '') and (ValidarEmail(LEmailPayer) <> '') then
+      raise Exception.Create('Campo Email do Pagador é inválido!');
 
     try
       LJson := TACBrJSONObject.Create
@@ -228,7 +258,7 @@ begin
         LMensagem := TACBrJSONArray.Create;
         for I := 0 to 3 do
         begin
-          LMensagem.AddElement(Copy(Trim(ATitulo.Mensagem[I]),0,80));
+          LMensagem.AddElement(Trim(Copy(ATitulo.Mensagem[I],0,80)));
           if LMensagem.Count + 1 > I then
             Break;
         end;
@@ -270,13 +300,16 @@ begin
 
       if (ATitulo.ValorMoraJuros > 0) then
       begin
+        //26/05/2025 - https://developers.c6bank.com.br/apis/bankslip#tag/bank_slips/POST/
+        //Valor ou percentual dos juros por atraso.
+        //Se o tipo for "V", esse valor será fixo por dia.
+        //Se for "P", o valor é um percentual do título, e será dividido por 30 para calcular o valor diário.
+        //(quem faz a divisão é a API, o valor enviado é integral)
         case ATitulo.CodigoMoraJuros of
           cjValorDia    : LValorMoraJuros := ATitulo.ValorMoraJuros;
-          cjTaxaDiaria  : LValorMoraJuros := ATitulo.ValorMoraJuros;
-          cjValorMensal : LValorMoraJuros := RoundABNT(ATitulo.ValorMoraJuros / 30, 2);
-          cjTaxaMensal  : LValorMoraJuros := RoundABNT(ATitulo.ValorMoraJuros / 30, 2);
-          else
-            LValorMoraJuros := ATitulo.ValorMoraJuros;
+          cjValorMensal : LValorMoraJuros := ATitulo.ValorMoraJuros / 30;
+          cjTaxaDiaria  : LValorMoraJuros := RoundABNT(ATitulo.ValorMoraJuros * 30,2);
+          cjTaxaMensal  : LValorMoraJuros := ATitulo.ValorMoraJuros;
         end;
 
         LJson.AddPair('interest',
@@ -297,20 +330,20 @@ begin
       end;
       LJson.AddPair('payer',
           TACBrJSONObject.Create
-            .AddPair('name', ATitulo.Sacado.NomeSacado )
-            .AddPair('tax_id', OnlyNumber(ATitulo.Sacado.CNPJCPF) )
+            .AddPair('name', Copy(Trim(ATitulo.Sacado.NomeSacado),1,33) )//na documentação é 40 mas a API valida 33
+            .AddPair('tax_id', LCNPJCPFPayer )
             .AddPair('address',
               TACBrJSONObject.Create
-                .AddPair('street', ATitulo.Sacado.Logradouro )
+                .AddPair('street', Copy(Trim(ATitulo.Sacado.Logradouro),1,40) )
                 .AddPair('number', StrToInt64Def(ATitulo.Sacado.Numero,0) )
-                .AddPair('complement',ATitulo.Sacado.Complemento )
-                .AddPair('city',ATitulo.Sacado.Cidade )
-                .AddPair('state',ATitulo.Sacado.UF )
-                .AddPair('zip_code',OnlyNumber(ATitulo.Sacado.CEP) )
+                .AddPair('complement',Copy(Trim(ATitulo.Sacado.Complemento),1,24) )
+                .AddPair('city',Copy(Trim(ATitulo.Sacado.Cidade),1,40) )
+                .AddPair('state',AnsiUpperCase(Trim(ATitulo.Sacado.UF)) )
+                .AddPair('zip_code',Copy(OnlyNumber(ATitulo.Sacado.CEP),1,8) )
             )
         );
-        if ATitulo.Sacado.Email <> '' then
-          LJson.AsJSONObject['payer'].AddPair('email',  ATitulo.Sacado.Email);
+        if LEmailPayer <> '' then
+          LJson.AsJSONObject['payer'].AddPair('email',  LEmailPayer);
 
       FPDadosMsg := LJson.ToJSON;
     finally
@@ -321,6 +354,7 @@ end;
 
 procedure TBoletoW_C6.RequisicaoAltera;
 var LJson : TACBrJSONObject;
+  LValorMoraJuros : Double;
 begin
   LJson := TACBrJSONObject.Create;
   try
@@ -335,7 +369,7 @@ begin
       end;
     toRemessaAlterarDesconto :
       begin
-        if (ATitulo.ValorDesconto > 0) or (ATitulo.ValorDesconto > 0) or (ATitulo.ValorDesconto > 0) then
+        if (ATitulo.ValorDesconto > 0) or (ATitulo.ValorDesconto2 > 0) or (ATitulo.ValorDesconto3 > 0) then
         begin
           LJson.AddPair('discount',
             TACBrJSONObject.Create
@@ -371,13 +405,17 @@ begin
       begin
         if (ATitulo.ValorMoraJuros > 0) then
         begin
-          if not (ATitulo.CodigoMoraJuros in [cjTaxaMensal,cjValorMensal]) then
-            raise Exception.Create('CodigoMoraJuros Inválido: permitido somente :: cjTaxaMensal,cjValorMensal !');
+          case ATitulo.CodigoMoraJuros of
+            cjValorDia    : LValorMoraJuros := ATitulo.ValorMoraJuros;
+            cjValorMensal : LValorMoraJuros := ATitulo.ValorMoraJuros / 30;
+            cjTaxaDiaria  : LValorMoraJuros := RoundABNT(ATitulo.ValorMoraJuros * 30,2);
+            cjTaxaMensal  : LValorMoraJuros := ATitulo.ValorMoraJuros;
+          end;
 
           LJson.AddPair('interest',
             TACBrJSONObject.Create
-              .AddPair('type',IfThen(ATitulo.CodigoMoraJuros = cjTaxaMensal, 'P', 'V') )
-              .AddPair('value',ATitulo.ValorMoraJuros )
+              .AddPair('type',IfThen(ATitulo.CodigoMoraJuros in [cjTaxaDiaria,cjTaxaMensal], 'P', 'V') )
+              .AddPair('value',LValorMoraJuros )
               .AddPair('dead_line',IfThen(ATitulo.DataMoraJuros > 0,DaysBetween(ATitulo.Vencimento,ATitulo.DataMoraJuros), 1) )
           );
         end;
@@ -409,12 +447,12 @@ begin
 
   if Assigned(OAuth) then
   begin
-    if OAuth.Ambiente = tawsProducao then
-      OAuth.URL := C_URL_OAUTH_PROD
-    else
-      OAuth.URL := C_URL_OAUTH_HOM;
+    case OAuth.Ambiente of
+      tawsProducao    : OAuth.URL.URLProducao    := C_URL_OAUTH_PROD;
+      tawsHomologacao : OAuth.URL.URLHomologacao := C_URL_OAUTH_HOM;
+    end;
 
-    OAuth.Payload := not (OAuth.Ambiente = tawsProducao);
+    OAuth.Payload := True;
   end;
 end;
 

@@ -38,6 +38,7 @@ interface
 
 uses
   Classes, SysUtils,
+  ACBrBase,
   ACBrTEFAPIComum, ACBrJSON, ACBrTEFComum;
 
 const
@@ -395,9 +396,13 @@ begin
   with AACBrTEFResp.NFCeSAT do
   begin
     DonoCartao := '';
-    CNPJCredenciadora := JsonKey('tef.panMascarado');
     Bandeira := JsonKey('tef.nomeBandeira');
+    CNPJCredenciadora := JsonKey('tef.cnpjCredenciadora');
+    UltimosQuatroDigitos := Copy(JsonKey('tef.panMascarado'), Length(JsonKey('tef.panMascarado')) - 3, 4);
+    Autorizacao := JsonKey('tef.codigoAutorizacao');
   end;
+
+  AACBrTEFResp.PAN := JsonKey('tef.panMascarado');
   AACBrTEFResp.Rede := JsonKey('tef.nomeProvedor');
   AACBrTEFResp.NumeroLoteTransacao := JsonKeyint('tef.transacao_codigo_vespague');
   AACBrTEFREsp.ModalidadePagto := JsonKey('tef.transacao_codigo_vespague');

@@ -106,17 +106,25 @@ type
   TStatusACBreSocial      = (stIdle, stEnvLoteEventos, stConsultaLote,
                              stConsultaIdentEvt, stDownloadEvt);
 
-  TTipoEvento             = (teS1000, teS1005, teS1010, teS1020, teS1030, teS1035, teS1040, teS1050,
-                             teS1060, teS1070, teS1080, teS2100, teS1200, teS1202, teS1207, teS1210,
-                             teS1220, teS1250, teS1260, teS1270, teS1280, teS1295, teS1298, teS1299,
-                             teS1300, teS2190, teS2200, teS2205, teS2206, teS2210, teS2220, teS2230,
-                             teS2240, teS2245, teS2250, teS2260, teS2298, teS2299, teS2300, teS2305,
-                             teS2306, teS2399, teS2400, teS3000, teS4000, teS4999, teS2231, teS5002,
-                             teS5003, teS5011, teS5012, teS5013, teS2221, teS2405, teS2410, teS5001,
-                             teS2416, teS2418, teS2420, teS2500, teS2501, teS2555, teS3500, teS5501,
-                             teS5503, teS8299, teConsultaIdentEventos, teConsultaLoteEventos, teDownloadEventos, teEnvioLoteEventos,
-                             teErro, teRetornoEnvioLoteEventos, teRetornoEvento, teRetornoProcessamentoLote,
-                             teInsApo, teAdesao, teCadInicial, teASO, teNaoIdentificado
+  TTipoEvento             = (teS1000, teS1005, teS1010, teS1020, teS1030,
+                             teS1035, teS1040, teS1050, teS1060, teS1070,
+                             teS1080, teS2100, teS1200, teS1202, teS1207,
+                             teS1210, teS1220, teS1250, teS1260, teS1270,
+                             teS1280, teS1295, teS1298, teS1299, teS1300,
+                             teS2190, teS2200, teS2205, teS2206, teS2210,
+                             teS2220, teS2230, teS2240, teS2245, teS2250,
+                             teS2260, teS2298, teS2299, teS2300, teS2305,
+                             teS2306, teS2399, teS2400, teS3000, teS4000,
+                             teS4999, teS2231, teS5002, teS5003, teS5011,
+                             teS5012, teS5013, teS2221, teS2405, teS2410,
+                             teS5001, teS2416, teS2418, teS2420, teS2500,
+                             teS2501, teS2555, teS3500, teS5501, teS5503,
+                             teS8299, teConsultaIdentEventos, teConsultaLoteEventos,
+                             teDownloadEventos, teEnvioLoteEventos,
+                             teErro, teRetornoEnvioLoteEventos,
+                             teRetornoEvento, teRetornoProcessamentoLote,
+                             teInsApo, teAdesao, teCadInicial,
+                             teASO, teNaoIdentificado
                              );
   const
     TTipoEventoString   : array[0..78] of String =('S-1000', 'S-1005', 'S-1010', 'S-1020', 'S-1030',
@@ -128,9 +136,9 @@ type
                                                    'S-2220', 'S-2230', 'S-2240', 'S-2245', 'S-2250',
                                                    'S-2260', 'S-2298', 'S-2299', 'S-2300', 'S-2305',
                                                    'S-2306', 'S-2399', 'S-2400', 'S-3000', 'S-4000',
-                                                   'S-4999', 'S-5001', 'S-5002', 'S-5003', 'S-5011',
+                                                   'S-4999', 'S-2231', 'S-5002', 'S-5003', 'S-5011',
                                                    'S-5012', 'S-5013', 'S-2221', 'S-2405', 'S-2410',
-                                                   'S-2231', 'S-2416', 'S-2418', 'S-2420', 'S-2500',
+                                                   'S-5001', 'S-2416', 'S-2418', 'S-2420', 'S-2500',
                                                    'S-2501', 'S-2555', 'S-3500', 'S-5501', 'S-5503',
                                                    'S-8299', 'S-CONSULTAIDENTEVENTOS', 'S-CONSULTALOTEEVENTOS',
                                                    'S-DOWNLOADEVENTOS', 'S-ENVIOLOTEEVENTOS',
@@ -263,6 +271,9 @@ type
                              ciiIncidenciasuspensajudicialBCIRRFRRA,                             {95}    { Item válido até a versão 2.5 }
                              ciiRendimentoIsentoAuxilioMoradia,                                  {700}   { Item válido a partir da versão simplificada }
                              ciiRendimentoParteNaoTributavelDoValorDeServicoDeTransporte,        {701}   { Item válido a partir da versão simplificada }
+                             ciiRendimentoBolsaMedicoResidenteRemuneracaoMensal,                 {702}
+                             ciiRendimentoBolsaMedicoResidenteDecimoTerceiro,                    {703}
+                             ciiRendimentoJurosMoraRecebidosPeloAtrasoNoPagto,                   {704}
                              ciiRendimentoTributavelExigibilidadeSuspensaRemuneracaoMensal,      {9011}  { Item válido a partir da versão simplificada }
                              ciiRendimentoTributavelExigibilidadeSuspensaDecimoTerceiro,         {9012}  { Item válido a partir da versão simplificada }
                              ciiRendimentoTributavelExigibilidadeSuspensaFerias,                 {9013}  { Item válido a partir da versão simplificada }
@@ -299,7 +310,8 @@ type
                                                               '34',   '35',   '41',   '42',   '43',   '44',   '46',   '47',   '48',   '51',   '52',
                                                               '53',   '54',   '55',   '61',   '62',   '63',   '64',   '65',   '66',   '67',   '68',
                                                               '70',   '71',   '72',   '73',   '74',   '75',   '76',   '77',   '78',   '79',   '81',
-                                                              '82',   '83',   '91',   '92',   '93',   '94',   '95',   '700',  '701',  '9011', '9012',
+                                                              '82',   '83',   '91',   '92',   '93',   '94',   '95',   '700',  '701',  '702',  '703',
+                                                              '704',  '9011', '9012',
                                                               '9013', '9014', '9031', '9032', '9033', '9034', '9831', '9832', '9833', '9834', '9041',
                                                               '9042', '9043', '9046', '9047', '9048', '9051', '9052', '9053', '9054', '9061', '9062',
                                                               '9063', '9064', '9065', '9066', '9067', '9082', '9083'  );
@@ -636,11 +648,11 @@ type
 
   tpNacProf               = (ttpProfissionalBrasileiro, ttpProfissionalEstrangeiro);
 
-  TVersaoeSocial          = (ve02_04_01, ve02_04_02, ve02_05_00, veS01_00_00, veS01_01_00, veS01_02_00, veS01_03_00);
+  TVersaoeSocial          = ({ve02_04_01, ve02_04_02, ve02_05_00, }veS01_00_00, veS01_01_00, veS01_02_00, veS01_03_00);
 const
-  TVersaoeSocialArrayStrings : array[TVersaoeSocial] of string = ('02_04_01', '02_04_02', '02_05_00', 'S01_00_00', 'S01_01_00', 'S01_02_00', 'S01_03_00');
-  TVersaoeSocialSchemasArrayStrings : array[TVersaoeSocial] of string = ('v02_04_01', 'v02_04_02', 'v02_05_00', 'v_S_01_00_00', 'v_S_01_01_00', 'v_S_01_02_00', 'v_S_01_03_00');
-  TVersaoeSocialArrayReals : array[TVersaoeSocial] of Real = (2.0401, 2.0402, 2.0500, 10.0000, 10.1000, 10.2000, 10.3000);
+  TVersaoeSocialArrayStrings : array[TVersaoeSocial] of string = ({'02_04_01', '02_04_02', '02_05_00', }'S01_00_00', 'S01_01_00', 'S01_02_00', 'S01_03_00');
+  TVersaoeSocialSchemasArrayStrings : array[TVersaoeSocial] of string = ({'v02_04_01', 'v02_04_02', 'v02_05_00', }'v_S_01_00_00', 'v_S_01_01_00', 'v_S_01_02_00', 'v_S_01_03_00');
+  TVersaoeSocialArrayReals : array[TVersaoeSocial] of Real = ({2.0401, 2.0402, 2.0500, }10.0000, 10.1000, 10.2000, 10.3000);
 
 type
 
@@ -820,7 +832,7 @@ const
 const
     __LAST_VERSION = High(TVersaoeSocial); // A última versão setada em TVersaoeSocial
 
-    __ARRAY_MATRIX_EVENTO_INFO: array [1 .. 77] of TRecMatrixEventoInfo =
+    __ARRAY_MATRIX_EVENTO_INFO: array [1 .. 63] of TRecMatrixEventoInfo =
     (
     // Eventos a partir do leiaute veS01_00_03 (S-1.3)
     (TipoEvento: teS2555                   ; TipoEventoString: 'S-2555'                    ; VersaoeSocialDe: veS01_03_00; VersaoeSocialAte: __LAST_VERSION; EventoString: 'evtConsolidContProc'        ; Schema: schEvtConsolidContProc     ; StrEventoToTipoEvento: 'evtConsolidContProc'        ; Observacao: ''),
@@ -895,10 +907,10 @@ const
     (TipoEvento: teInsApo                  ; TipoEventoString: 'S-EVTINSAPO'               ; VersaoeSocialDe: veS01_00_00; VersaoeSocialAte: __LAST_VERSION; EventoString: 'evtInsApo'                  ; Schema: schevtInsApo               ; StrEventoToTipoEvento: 'evtInsApo'                  ; Observacao: 'Evento não identificado'),
     (TipoEvento: teRetornoEnvioLoteEventos ; TipoEventoString: 'S-RETORNOENVIOLOTEEVENTOS' ; VersaoeSocialDe: veS01_00_00; VersaoeSocialAte: __LAST_VERSION; EventoString: 'evtRetornoEnvioLoteEventos' ; Schema: schRetornoEnvioLoteEventos ; StrEventoToTipoEvento: 'evtRetornoEnvioLoteEventos' ; Observacao: 'Evento operacional'),
     (TipoEvento: teRetornoEvento           ; TipoEventoString: 'S-RETORNOEVENTO'           ; VersaoeSocialDe: veS01_00_00; VersaoeSocialAte: __LAST_VERSION; EventoString: 'evtRetornoEvento'           ; Schema: schRetornoEvento           ; StrEventoToTipoEvento: 'evtRetornoEvento'           ; Observacao: 'Evento operacional'),
-    (TipoEvento: teRetornoProcessamentoLote; TipoEventoString: 'S-RETORNOPROCESSAMENTOLOTE'; VersaoeSocialDe: veS01_00_00; VersaoeSocialAte: __LAST_VERSION; EventoString: 'evtRetornoProcessamentoLote'; Schema: schRetornoProcessamentoLote; StrEventoToTipoEvento: 'evtRetornoProcessamentoLote'; Observacao: 'Evento operacional'),
+    (TipoEvento: teRetornoProcessamentoLote; TipoEventoString: 'S-RETORNOPROCESSAMENTOLOTE'; VersaoeSocialDe: veS01_00_00; VersaoeSocialAte: __LAST_VERSION; EventoString: 'evtRetornoProcessamentoLote'; Schema: schRetornoProcessamentoLote; StrEventoToTipoEvento: 'evtRetornoProcessamentoLote'; Observacao: 'Evento operacional')
 
     // Eventos exclusivos para o leiaute ve02_05_00
-    (TipoEvento: teS1030                   ; TipoEventoString: 'S-1030'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtTabCargo'                ; Schema: schevtTabCargo             ; StrEventoToTipoEvento: 'evtTabCargo'                ; Observacao: ''),
+    {(TipoEvento: teS1030                   ; TipoEventoString: 'S-1030'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtTabCargo'                ; Schema: schevtTabCargo             ; StrEventoToTipoEvento: 'evtTabCargo'                ; Observacao: ''),
     (TipoEvento: teS1035                   ; TipoEventoString: 'S-1035'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtTabCarreira'             ; Schema: schevtTabCarreira          ; StrEventoToTipoEvento: 'evtTabCarreira'             ; Observacao: ''),
     (TipoEvento: teS1040                   ; TipoEventoString: 'S-1040'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtTabFuncao'               ; Schema: schevtTabFuncao            ; StrEventoToTipoEvento: 'evtTabFuncao'               ; Observacao: ''),
     (TipoEvento: teS1050                   ; TipoEventoString: 'S-1050'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtTabHorTur'               ; Schema: schevtTabHorTur            ; StrEventoToTipoEvento: 'evtTabHorContratual'        ; Observacao: 'TeventoString <> StrEventoToTipoEvento'),
@@ -911,7 +923,7 @@ const
     (TipoEvento: teS2245                   ; TipoEventoString: 'S-2245'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtTreiCap'                 ; Schema: schEvtTreiCap              ; StrEventoToTipoEvento: 'evtTreiCap'                 ; Observacao: ''),
     (TipoEvento: teS2250                   ; TipoEventoString: 'S-2250'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtAvPrevio'                ; Schema: schevtAvPrevio             ; StrEventoToTipoEvento: 'evtAvPrevio'                ; Observacao: ''),
     (TipoEvento: teS2260                   ; TipoEventoString: 'S-2260'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtConvInterm'              ; Schema: schevtConvInterm           ; StrEventoToTipoEvento: 'evtConvInterm'              ; Observacao: ''),
-    (TipoEvento: teS5012                   ; TipoEventoString: 'S-5012'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtIRRF'                    ; Schema: schevtIrrf                 ; StrEventoToTipoEvento: 'S-5012'                     ; Observacao: 'TeventoString <> StrEventoToTipoEvento')
+    (TipoEvento: teS5012                   ; TipoEventoString: 'S-5012'                    ; VersaoeSocialDe: ve02_05_00 ; VersaoeSocialAte: ve02_05_00 ; EventoString: 'evtIRRF'                    ; Schema: schevtIrrf                 ; StrEventoToTipoEvento: 'S-5012'                     ; Observacao: 'TeventoString <> StrEventoToTipoEvento')}
     );
 
 function GetMatrixEventoInfo(AInfoEventoMatrix: TMatrixEventoInfo; ASearchValue: string; AVersaoeSocial: TVersaoeSocial): TRecMatrixEventoInfo;
@@ -2573,9 +2585,9 @@ end;
 function VersaoeSocialToDbl(const t: TVersaoeSocial): Real;
 begin
   case t of
-    ve02_04_01:  result := 2.0401;
-    ve02_04_02:  result := 2.0402;
-    ve02_05_00:  result := 2.0500;
+//    ve02_04_01:  result := 2.0401;
+//    ve02_04_02:  result := 2.0402;
+//    ve02_05_00:  result := 2.0500;
     veS01_00_00: result := 10.0000;
     veS01_01_00: result := 10.1000;
     veS01_02_00: result := 10.2000;
@@ -2589,13 +2601,13 @@ function DblToVersaoeSocial(out ok: Boolean; const d: Real): TVersaoeSocial;
 begin
   ok := True;
 
-  if (d = 2.0401)  then
+  {if (d = 2.0401)  then
     result := ve02_04_01
   else if (d = 2.0402)  then
     result := ve02_04_02
   else if (d = 2.0500)  then
     result := ve02_05_00
-  else if (d = 10.0000)  then
+  else }if (d = 10.0000)  then
     result := veS01_00_00
   else if (d = 10.1000)  then
     result := veS01_01_00

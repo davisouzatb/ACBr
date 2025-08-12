@@ -32,7 +32,7 @@
 
 {$I ACBr.inc}
 
-// https://microtefdocs.stone.com.br/reference/o-que-%C3%A9-o-autotef
+// https://autotef.stone.com.br/docs/o-que-e-microtef
 
 unit ACBrTEFAPIStoneAutoTEF;
 
@@ -50,6 +50,10 @@ const
   CACCTYP_CREDIT = 'Credit';
   CACCTYP_DEBIT = 'Debit';
   CACCTYP_UNDEF = 'Undefined';
+
+  CExpiracaoPIXPadrao = 600;
+  CEsperaConsultaPIX = 5000;
+  CStoneAutoTEFTimeOut = 90000;
 
 resourcestring
   sACBrStoneAutoTEFSemStoneCode = 'StoneCode deve ser informado em "DadosTerminal.CodTerminal"';
@@ -81,10 +85,12 @@ type
 
   TACBrTEFAPIClassStoneAutoTEF = class(TACBrTEFAPIClass)
   private
+    FExpiracaoPIX: Integer;
     FHTTP: THTTPSend;
     FHTTPResponse: AnsiString;
     FHTTPResultCode: Integer;
     FStarted: TDateTime;
+    fTimeOut: Integer;
 
     procedure GravarLog(const AString: AnsiString);
     procedure DoException(const AErrorMsg: String);
@@ -95,6 +101,7 @@ type
     function PartnerName: String;
   protected
     procedure InterpretarRespostaAPI; override;
+    procedure ExibirQRCode(const DadosQRCode: String);
 
   public
     constructor Create(AACBrTEFAPI: TACBrTEFAPIComum);
@@ -110,6 +117,10 @@ type
       Parcelas: Byte = 0;
       DataPreDatado: TDateTime = 0;
       DadosAdicionais: String = ''): Boolean; override;
+
+    procedure EfetuarPix(AValor: Double; ExpiraEm: Integer = 0);
+    procedure ConsultarStatusPIX(const AtransactionId: String);
+    function AguardarPagamentoPIX(const JSonPIX: String): Boolean;
 
     function EfetuarAdministrativa(
       OperacaoAdm: TACBrTEFOperacao = tefopAdministrativo): Boolean; overload; override;
@@ -139,9 +150,12 @@ type
     function MenuPinPad(const Titulo: String; Opcoes: TStrings; TimeOut: Integer = 30000
       ): Integer; override;
 
+    property ExpiracaoPIX: Integer read FExpiracaoPIX write FExpiracaoPIX default CExpiracaoPIXPadrao;
     property Started: TDateTime read FStarted;
     property HTTPResultCode: Integer read FHTTPResultCode;
     property HTTPResponse: AnsiString read FHTTPResponse;
+
+    property TimeOut: Integer read fTimeOut write fTimeOut default CStoneAutoTEFTimeOut;
   end;
 
 
@@ -193,7 +207,7 @@ begin
       end;
 
       QtdParcelas := jsreceipt.AsInteger['totalNumberOfPayments'];
-      BIN := Trim(jsreceipt.AsString['maskedPrimaryAccountNumber']);
+      PAN := Trim(jsreceipt.AsString['maskedPrimaryAccountNumber']);
       //SerialPOS := jsreceipt.AsString['systemSpecifications'];    // estranho ?
       DataHoraTransacaoHost := jsreceipt.AsISODateTime['transactionDateTime'];
       i := jsreceipt.AsInteger['transactionType'];
@@ -236,7 +250,6 @@ begin
       NFCeSAT.CodCredenciadora := '999';  // ??
       NFCeSAT.CNPJCredenciadora := '16.501.555/0001-57';  // Stone
       NFCeSAT.Autorizacao := NSU;
-      NFCeSAT.UltimosQuatroDigitos := BIN;
       NFCeSAT.Bandeira := CodigoBandeiraPadrao;
     end;
 
@@ -310,8 +323,10 @@ end;
 constructor TACBrTEFAPIClassStoneAutoTEF.Create(AACBrTEFAPI: TACBrTEFAPIComum);
 begin
   inherited;
+  fTimeOut := CStoneAutoTEFTimeOut;
   FHTTP := THTTPSend.Create;
   FStarted := 0;
+  FExpiracaoPIX := CExpiracaoPIXPadrao;
   fpTEFRespClass := TACBrTEFRespStoneAutoTEF;
   LimparRespostaHTTP;
 end;
@@ -355,6 +370,7 @@ begin
   end;
 
   try
+    FHTTP.Timeout := fTimeOut;
     FHTTP.HTTPMethod(AMethod, url);
   finally
     FHTTPResultCode := FHTTP.ResultCode;
@@ -514,7 +530,14 @@ var
   sBody, saccountType: String;
   iType: Integer;
 begin
-  // https://microtefdocs.stone.com.br/reference/como-usar-o-autotef-slim-ativa%C3%A7%C3%A3o
+  if (Modalidade in [tefmpCarteiraVirtual]) then
+  begin
+    EfetuarPix(ValorPagto);
+    Result := (FHTTPResultCode = HTTP_OK);
+    if Result then
+      Result := AguardarPagamentoPIX(FHTTPResponse);
+    Exit;
+  end;
 
   LimparRespostaHTTP;
   if not (Modalidade in [tefmpCartao]) then
@@ -574,6 +597,115 @@ begin
 
   TransmitirHttp(cHTTPMethodPOST, 'api/Pay', sBody);
   Result := (FHTTPResultCode = HTTP_OK);
+end;
+
+procedure TACBrTEFAPIClassStoneAutoTEF.EfetuarPix(AValor: Double; ExpiraEm: Integer);
+var
+  js: TACBrJSONObject;
+  sBody: String;
+begin
+  if (ExpiraEm = 0) then
+    ExpiraEm := CExpiracaoPIXPadrao;
+
+  LimparRespostaHTTP;
+  VerificarPresencaPinPad;
+
+  js := TACBrJSONObject.Create;
+  try
+    js.AddPair('amount', AValor);
+    js.AddPair('expiresIn', ExpiraEm);
+    sBody := js.ToJSON;
+  finally
+    js.free;
+  end;
+
+  TransmitirHttp(cHTTPMethodPOST, 'api/Pix/Pay', sBody);
+end;
+
+procedure TACBrTEFAPIClassStoneAutoTEF.ConsultarStatusPIX(const AtransactionId: String);
+var
+  js: TACBrJSONObject;
+  sBody: String;
+begin
+  LimparRespostaHTTP;
+
+  js := TACBrJSONObject.Create;
+  try
+    js.AddPair('transactionId', AtransactionId);
+    sBody := js.ToJSON;
+  finally
+    js.free;
+  end;
+
+  TransmitirHttp(cHTTPMethodPOST, 'api/Pix/Status', sBody);
+end;
+
+function TACBrTEFAPIClassStoneAutoTEF.AguardarPagamentoPIX(const JSonPIX: String
+  ): Boolean;
+var
+  Ok, isExpired, Cancelar: Boolean;
+  js: TACBrJSONObject;
+  AtransactionId, QRCode: String;
+  statusPaymentPix, Espera: Integer;
+begin
+  if (Trim(JSonPIX) = '') then
+    Exit;
+
+  js := TACBrJSONObject.Parse(JSonPIX);
+  try
+    AtransactionId := js.AsString['transactionId'];
+    QRCode := js.AsString['qrCodeContent'];
+  finally
+    js.Free;
+  end;
+
+  statusPaymentPix := 0;
+  isExpired := False;
+  Cancelar := False;
+  Espera := Trunc(CEsperaConsultaPIX/2);
+  ExibirQRCode(QRCode);
+  try
+    while (statusPaymentPix <> 1) and (not isExpired) and (not Cancelar) do
+    begin
+      Sleep(Espera);
+
+      ConsultarStatusPIX(AtransactionId);
+      Ok := (FHTTPResultCode = HTTP_OK);
+      if Ok then
+      begin
+        js := TACBrJSONObject.Parse(FHTTPResponse);
+        try
+          statusPaymentPix := js.AsInteger['statusPaymentPix'];
+          isExpired := js.AsBoolean['isExpired'];
+        finally
+          js.Free;
+        end;
+      end
+      else
+        TratarRetornoComErro;
+
+      with TACBrTEFAPI(fpACBrTEFAPI) do
+      begin
+        if Assigned(QuandoEsperarOperacao) then
+          QuandoEsperarOperacao( opapiLeituraQRCode, Cancelar);
+      end;
+
+      Espera := CEsperaConsultaPIX;
+    end;
+  finally
+    ExibirQRCode('');
+  end;
+
+  Result := (not isExpired) and (statusPaymentPix = 1);
+end;
+
+procedure TACBrTEFAPIClassStoneAutoTEF.ExibirQRCode(const DadosQRCode: String);
+begin
+  with TACBrTEFAPI(fpACBrTEFAPI) do
+  begin
+    if Assigned(QuandoExibirQRCode) then
+      QuandoExibirQRCode(DadosQRCode);
+  end;
 end;
 
 function TACBrTEFAPIClassStoneAutoTEF.EfetuarAdministrativa(

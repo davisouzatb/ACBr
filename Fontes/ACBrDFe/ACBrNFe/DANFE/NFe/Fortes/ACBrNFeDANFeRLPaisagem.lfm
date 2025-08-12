@@ -1,6 +1,6 @@
 inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
-  Left = 204
-  Top = 207
+  Left = 266
+  Top = 118
   Caption = 'frlDANFeRLPaisagem'
   inherited RLNFe: TRLReport
     Left = -8
@@ -2992,8 +2992,8 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Left = 618
         Height = 7
         Top = 55
-        Width = 49
-        Caption = 'PESO BRUTO'
+        Width = 63
+        Caption = 'PESO BRUTO (Kg)'
         Font.Color = clBlack
         Font.Height = -7
         Font.Name = 'Arial'
@@ -3224,8 +3224,8 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Left = 810
         Height = 7
         Top = 55
-        Width = 52
-        Caption = 'PESO LÍQUIDO'
+        Width = 67
+        Caption = 'PESO LÍQUIDO (Kg)'
         Font.Color = clBlack
         Font.Height = -7
         Font.Name = 'Arial'
@@ -5396,7 +5396,7 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Width = 998
       end
       object rlbQuandoEntregaLinha1Coluna1: TRLDraw
-        Left = 720
+        Left = 647
         Height = 29
         Top = 1
         Width = 1
@@ -5423,7 +5423,7 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
       end
       object rlbQuandoEntregaLinha1Memo2: TRLLabel
         Tag = 10
-        Left = 722
+        Left = 650
         Height = 7
         Top = 3
         Width = 42
@@ -5500,7 +5500,7 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
         Left = 35
         Height = 14
         Top = 13
-        Width = 669
+        Width = 606
         AutoSize = False
         Font.Color = clBlack
         Font.Height = -9
@@ -5510,10 +5510,10 @@ inherited frlDANFeRLPaisagem: TfrlDANFeRLPaisagem
       end
       object RLLquadroEntregaDocumento: TRLLabel
         Tag = 703
-        Left = 722
+        Left = 650
         Height = 14
         Top = 13
-        Width = 80
+        Width = 159
         AutoSize = False
         Font.Color = clBlack
         Font.Height = -9

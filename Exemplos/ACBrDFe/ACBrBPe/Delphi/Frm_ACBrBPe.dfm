@@ -1514,7 +1514,7 @@ object frmACBrBPe: TfrmACBrBPe
     TabOrder = 1
     object pgcBotoes: TPageControl
       Left = 1
-      Top = 1
+      Top = 41
       Width = 567
       Height = 165
       ActivePage = tsEnvios
@@ -1721,12 +1721,34 @@ object frmACBrBPe: TfrmACBrBPe
           OnClick = btnExcessoBagagemClick
         end
       end
+      object tsOutros: TTabSheet
+        Caption = 'Outros'
+        ImageIndex = 3
+        object btnLerArqINI: TButton
+          Left = 3
+          Top = 3
+          Width = 177
+          Height = 25
+          Caption = 'Ler Arquivo INI/Gerar XML'
+          TabOrder = 0
+          OnClick = btnLerArqINIClick
+        end
+        object btnGerarArqINI: TButton
+          Left = 186
+          Top = 3
+          Width = 177
+          Height = 25
+          Caption = 'Gerar Arquivo INI'
+          TabOrder = 1
+          OnClick = btnGerarArqINIClick
+        end
+      end
     end
     object pgRespostas: TPageControl
       Left = 1
-      Top = 166
+      Top = 206
       Width = 567
-      Height = 445
+      Height = 405
       ActivePage = Dados
       Align = alClient
       TabOrder = 1
@@ -1736,7 +1758,7 @@ object frmACBrBPe: TfrmACBrBPe
           Left = 0
           Top = 0
           Width = 559
-          Height = 417
+          Height = 377
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1749,11 +1771,11 @@ object frmACBrBPe: TfrmACBrBPe
           Left = 0
           Top = 0
           Width = 559
-          Height = 417
+          Height = 377
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000C6390000192B00000000000000000000000000000000000000000000
+            4C000000C6390000F72600000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1767,7 +1789,7 @@ object frmACBrBPe: TfrmACBrBPe
           Left = 0
           Top = 0
           Width = 559
-          Height = 417
+          Height = 377
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1780,7 +1802,7 @@ object frmACBrBPe: TfrmACBrBPe
           Left = 0
           Top = 0
           Width = 559
-          Height = 417
+          Height = 377
           Align = alClient
           Indent = 19
           TabOrder = 0
@@ -1793,7 +1815,7 @@ object frmACBrBPe: TfrmACBrBPe
           Left = 0
           Top = 0
           Width = 559
-          Height = 417
+          Height = 377
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1806,7 +1828,7 @@ object frmACBrBPe: TfrmACBrBPe
           Left = 0
           Top = 0
           Width = 559
-          Height = 417
+          Height = 377
           Align = alClient
           Lines.Strings = (
             '')
@@ -1814,6 +1836,26 @@ object frmACBrBPe: TfrmACBrBPe
           TabOrder = 0
         end
       end
+    end
+    object rgReformaTributaria: TRadioGroup
+      Left = 1
+      Top = 1
+      Width = 567
+      Height = 40
+      Align = alTop
+      Caption = 'Gera os campos da ReformaTributaria'
+      Columns = 2
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ItemIndex = 1
+      Items.Strings = (
+        'Sim'
+        'N'#227'o')
+      ParentFont = False
+      TabOrder = 2
     end
   end
   object ACBrBPe1: TACBrBPe

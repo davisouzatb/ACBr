@@ -1,38 +1,38 @@
 {******************************************************************************}
 { Projeto: Componentes ACBr                                                    }
-{  Biblioteca multiplataforma de componentes Delphi para interaÁ„o com equipa- }
-{ mentos de AutomaÁ„o Comercial utilizados no Brasil                           }
+{  Biblioteca multiplataforma de componentes Delphi para intera√ß√£o com equipa- }
+{ mentos de Automa√ß√£o Comercial utilizados no Brasil                           }
 {                                                                              }
 { Direitos Autorais Reservados (c) 2021 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
-{  VocÍ pode obter a ˙ltima vers„o desse arquivo na pagina do  Projeto ACBr    }
+{  Voc√™ pode obter a √∫ltima vers√£o desse arquivo na pagina do  Projeto ACBr    }
 { Componentes localizado em      http://www.sourceforge.net/projects/acbr      }
 {                                                                              }
-{  Esta biblioteca È software livre; vocÍ pode redistribuÌ-la e/ou modific·-la }
-{ sob os termos da LicenÁa P˙blica Geral Menor do GNU conforme publicada pela  }
-{ Free Software Foundation; tanto a vers„o 2.1 da LicenÁa, ou (a seu critÈrio) }
-{ qualquer vers„o posterior.                                                   }
+{  Esta biblioteca √© software livre; voc√™ pode redistribu√≠-la e/ou modific√°-la }
+{ sob os termos da Licen√ßa P√∫blica Geral Menor do GNU conforme publicada pela  }
+{ Free Software Foundation; tanto a vers√£o 2.1 da Licen√ßa, ou (a seu crit√©rio) }
+{ qualquer vers√£o posterior.                                                   }
 {                                                                              }
-{  Esta biblioteca È distribuÌda na expectativa de que seja ˙til, porÈm, SEM   }
-{ NENHUMA GARANTIA; nem mesmo a garantia implÌcita de COMERCIABILIDADE OU      }
-{ ADEQUA«√O A UMA FINALIDADE ESPECÕFICA. Consulte a LicenÁa P˙blica Geral Menor}
-{ do GNU para mais detalhes. (Arquivo LICEN«A.TXT ou LICENSE.TXT)              }
+{  Esta biblioteca √© distribu√≠da na expectativa de que seja √∫til, por√©m, SEM   }
+{ NENHUMA GARANTIA; nem mesmo a garantia impl√≠cita de COMERCIABILIDADE OU      }
+{ ADEQUA√á√ÉO A UMA FINALIDADE ESPEC√çFICA. Consulte a Licen√ßa P√∫blica Geral Menor}
+{ do GNU para mais detalhes. (Arquivo LICEN√áA.TXT ou LICENSE.TXT)              }
 {                                                                              }
-{  VocÍ deve ter recebido uma cÛpia da LicenÁa P˙blica Geral Menor do GNU junto}
-{ com esta biblioteca; se n„o, escreva para a Free Software Foundation, Inc.,  }
-{ no endereÁo 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.          }
-{ VocÍ tambÈm pode obter uma copia da licenÁa em:                              }
+{  Voc√™ deve ter recebido uma c√≥pia da Licen√ßa P√∫blica Geral Menor do GNU junto}
+{ com esta biblioteca; se n√£o, escreva para a Free Software Foundation, Inc.,  }
+{ no endere√ßo 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.          }
+{ Voc√™ tamb√©m pode obter uma copia da licen√ßa em:                              }
 { http://www.opensource.org/licenses/lgpl-license.php                          }
 {                                                                              }
-{ Daniel Simıes de Almeida - daniel@projetoacbr.com.br - www.projetoacbr.com.br}
-{       Rua Coronel Aureliano de Camargo, 963 - TatuÌ - SP - 18270-170         }
+{ Daniel Sim√µes de Almeida - daniel@projetoacbr.com.br - www.projetoacbr.com.br}
+{       Rua Coronel Aureliano de Camargo, 963 - Tatu√≠ - SP - 18270-170         }
 {******************************************************************************}
 
 (*
 
-  DocumentaÁ„o:
+  Documenta√ß√£o:
   https://github.com/bacen/pix-api
 
 *)
@@ -56,6 +56,7 @@ type
     fapresentacao_Bias: Integer;
     fcriacao: TDateTime;
     fcriacao_Bias: Integer;
+    fdataDeVencimento: TDateTime;
     fexpiracao: Integer;
   protected
     property criacao: TDateTime read fcriacao write fcriacao;
@@ -63,6 +64,7 @@ type
     property apresentacao: TDateTime read fapresentacao write fapresentacao;
     property apresentacao_Bias: Integer read fapresentacao_Bias write fapresentacao_Bias;
     property expiracao: Integer read fexpiracao write fexpiracao;
+    property dataDeVencimento: TDateTime read fdataDeVencimento write fdataDeVencimento;
 
     procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
@@ -89,6 +91,54 @@ type
     property expiracao;
   end;
 
+  { TACBrPIXCalendarioCobR }
+
+  TACBrPIXCalendarioCobR = class(TACBrPIXCalendarioCobBase)
+  public
+    property criacao;
+    property criacao_Bias;
+    property dataDeVencimento;
+  end;
+
+  { TACBrPIXCalendarioRecBase }
+
+  TACBrPIXCalendarioRecBase = class(TACBrPIXSchema)
+  private
+    fdataFinal: TDateTime;
+    fdataInicial: TDateTime;
+    fperiodicidade: TACBrPIXPeriodicidade;
+    fdataExpiracaoSolicitacao: TDateTime;
+  protected
+    procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
+    procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
+
+    property dataInicial: TDateTime read fdataInicial write fdataInicial;
+    property dataFinal: TDateTime read fdataFinal write fdataFinal;
+    property periodicidade: TACBrPIXPeriodicidade read fperiodicidade write fperiodicidade;
+    property dataExpiracaoSolicitacao: TDateTime read fdataExpiracaoSolicitacao write fdataExpiracaoSolicitacao;
+  public
+    constructor Create(const ObjectName: String); override;
+    procedure Clear; override;
+    function IsEmpty: Boolean; override;
+    procedure Assign(Source: TACBrPIXCalendarioRecBase);
+  end;
+
+  { TACBrPIXCalendarioRec }
+
+  TACBrPIXCalendarioRec = class(TACBrPIXCalendarioRecBase)
+  public
+    property dataInicial;
+    property dataFinal;
+    property periodicidade;
+  end;
+
+  { TACBrPIXCalendarioRecSolic }
+
+  TACBrPIXCalendarioRecSolic = class(TACBrPIXCalendarioRecBase)
+  public
+    property dataExpiracaoSolicitacao;
+  end;
+
 implementation
 
 uses
@@ -109,12 +159,17 @@ begin
   fcriacao := 0;
   fcriacao_Bias := 0;
   fexpiracao := 0;
+  fdataDeVencimento := 0;
 end;
 
 function TACBrPIXCalendarioCobBase.IsEmpty: Boolean;
 begin
-  Result := (fcriacao = 0) and (fcriacao_Bias = 0) and (fapresentacao = 0) and
-            (fapresentacao_Bias = 0) and (fexpiracao = 0);
+  Result := EstaZerado(fcriacao) and
+            EstaZerado(fcriacao_Bias) and
+            EstaZerado(fapresentacao) and
+            EstaZerado(fapresentacao_Bias) and
+            EstaZerado(fexpiracao) and
+            EstaZerado(fdataDeVencimento);
 end;
 
 procedure TACBrPIXCalendarioCobBase.Assign(Source: TACBrPIXCalendarioCobBase);
@@ -124,29 +179,34 @@ begin
   fapresentacao := Source.apresentacao;
   fapresentacao_Bias := Source.apresentacao_Bias;
   fexpiracao := Source.expiracao;
+  fdataDeVencimento := Source.dataDeVencimento;
 end;
 
 procedure TACBrPIXCalendarioCobBase.DoWriteToJSon(AJSon: TACBrJSONObject);
 begin
-  if (fcriacao <> 0) then
+  if NaoEstaZerado(fcriacao) then
     AJSon.AddPair('criacao', DateTimeToIso8601(fcriacao, BiasToTimeZone(fcriacao_Bias)));
-  if (fapresentacao <> 0) then
+  if NaoEstaZerado(fapresentacao) then
     AJSon.AddPair('apresentacao', DateTimeToIso8601(fapresentacao, BiasToTimeZone(fapresentacao_Bias)));
+  if NaoEstaZerado(fdataDeVencimento) then
+    AJSon.AddPair('dataDeVencimento', Copy(DateTimeToIso8601(fdataDeVencimento), 1, 10));
   AJSon.AddPair('expiracao', fexpiracao, False);
 end;
 
 procedure TACBrPIXCalendarioCobBase.DoReadFromJSon(AJSon: TACBrJSONObject);
 var
-  s1, s2: String;
+  s1, s2, s3: String;
 begin
   {$IfDef FPC}
   s1 := EmptyStr;
   s2 := EmptyStr;
+  s3 := EmptyStr;
   {$EndIf}
 
   AJSon
     .Value('criacao', s1)
     .Value('apresentacao', s2)
+    .Value('dataDeVencimento', s3)
     .Value('expiracao', fexpiracao);
 
   if NaoEstaVazio(s1) then
@@ -160,6 +220,84 @@ begin
     fapresentacao := Iso8601ToDateTime(s2);
     fapresentacao_Bias := TimeZoneToBias(s2);
   end;
+
+  if NaoEstaVazio(s3) then
+    fdataDeVencimento := Iso8601ToDateTime(s3);
+end;
+
+{ TACBrPIXCalendarioRecBase }
+
+constructor TACBrPIXCalendarioRecBase.Create(const ObjectName: String);
+begin
+  inherited Create(ObjectName);
+  Clear;
+end;
+
+procedure TACBrPIXCalendarioRecBase.Clear;
+begin
+  fdataInicial := 0;
+  fdataFinal := 0;
+  fperiodicidade := perNENHUM;
+  fdataExpiracaoSolicitacao := 0;
+end;
+
+function TACBrPIXCalendarioRecBase.IsEmpty: Boolean;
+begin
+  Result := EstaZerado(fdataInicial) and
+            EstaZerado(fdataFinal) and
+            (fperiodicidade = perNENHUM) and
+            EstaZerado(fdataExpiracaoSolicitacao);
+end;
+
+procedure TACBrPIXCalendarioRecBase.Assign(Source: TACBrPIXCalendarioRecBase);
+begin
+  Clear;
+  if not Assigned(Source) then
+    Exit;
+  fdataInicial := Source.dataInicial;
+  fdataFinal := Source.dataFinal;
+  fperiodicidade := Source.periodicidade;
+  fdataExpiracaoSolicitacao := Source.dataExpiracaoSolicitacao;
+end;
+
+procedure TACBrPIXCalendarioRecBase.DoWriteToJSon(AJSon: TACBrJSONObject);
+begin
+  AJSon.AddPair('periodicidade', PIXPeriodicidadeToString(fperiodicidade), False);
+  if NaoEstaZerado(fdataInicial) then
+    AJSon.AddPair('dataInicial', Copy(DateTimeToISO8601(fdataInicial), 1, 10));
+  if NaoEstaZerado(fdataFinal) then
+    AJSon.AddPair('dataFinal', Copy(DateTimeToISO8601(fdataFinal), 1, 10));
+  if NaoEstaZerado(fdataExpiracaoSolicitacao) then
+    AJSon.AddPair('dataExpiracaoSolicitacao', DateTimeToISO8601(fdataExpiracaoSolicitacao));
+end;
+
+procedure TACBrPIXCalendarioRecBase.DoReadFromJSon(AJSon: TACBrJSONObject);
+var
+  wDataInicial, wDataFinal, wPeriodicidade, wDataExpiracaoSolicitacao: String;
+begin
+  {$IFDEF FPC}
+  wDataFinal := EmptyStr;
+  wDataInicial := EmptyStr;
+  wPeriodicidade := EmptyStr;
+  wDataExpiracaoSolicitacao := EmptyStr;
+  {$ENDIF}
+  AJSon
+    .Value('dataInicial', wDataInicial)
+    .Value('dataFinal', wDataFinal)
+    .Value('periodicidade', wPeriodicidade)
+    .Value('dataExpiracaoSolicitacao', wDataExpiracaoSolicitacao);
+
+  if NaoEstaVazio(wDataInicial) then
+    fdataInicial := ISO8601ToDateTime(wDataInicial);
+
+  if NaoEstaVazio(wDataFinal) then
+    fdataFinal := ISO8601ToDateTime(wDataFinal);
+
+  if NaoEstaVazio(wPeriodicidade) then
+    fperiodicidade := StringToPIXPeriodicidade(wPeriodicidade);
+
+  if NaoEstaVazio(wDataExpiracaoSolicitacao) then
+    fdataExpiracaoSolicitacao := ISO8601ToDateTime(wDataExpiracaoSolicitacao);
 end;
 
 end.

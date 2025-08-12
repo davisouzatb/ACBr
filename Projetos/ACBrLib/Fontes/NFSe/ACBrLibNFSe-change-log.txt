@@ -42,6 +42,37 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+14/07/2025
+-- ACBrNFSeBase.php,ACBrNFSeMT.h,ACBrNFSeMT.php,ACBrNFSeServicosMT.php,ACBrNFSeST.h,ACBrNFSeST.php --
+[*] #TK-7345 - Corrigida assinatura do método NFSE_Emitir alterando o parâmetro aImprimir de char para long.
+    Por: Renato Rubinho
+
+10/07/2025
+-- ACBrLibNFSeBase, ACBrLibNFSeConsts --
+[*] #TK-7323 - Não carrega as RPS - função NFSE_CarregarLoteXML
+    Por: Antonio Carlos Junior
+
+17/06/2025
+-- ACBrLibNFSeRespostas --
+[*] #TK-7204: Adiciona no retorno do ConsultarNFSePorRps os campos: NumeroNota e Data (Data de emissão da nota).
+   Por: Italo Giurizzato Junior
+
+08/05/2025
+-- ACBrLibNFSe.lpr, ACBrLibNFSeBase, ACBrLibNFSeMT, ACBrLibNFSeST, ACBrLibNFSeStaticImport, ACBrLibNFSeStaticImportMT --
+[+] #TK-7027: Adiciona novo método NFSE_ObterXMLRps
+   Por: Diego Folieni
+
+05/03/2025
+-- ACBrLibNFSe.lpi, ACBrLibNFSeDemo.lpi, ACBrLibNFSeConsoleMT.lpi e ACBrLibNFSeConsoleMTDemo.lpi--
+[*] Realizado ajustes nos paths para compilação com os novos scripts do Jenkins.
+    Por: Antonio Carlos Junior
+
+25/02/2025
+-- ACBrLibNFSeConsoleMT.lpi, ACBrLibNFSeConsoleMTDemo.lpi --
+[+] Adicionado novo Projeto, 100% CONSOLE e MT versão Pro e Demonstração.
+[+] Compatível com compilação em Linux 64 e Android 32 e 64
+    Por: Antonio Carlos Junior / Elton Barbosa / Victor Gonzales
+
 16/10/2024
 -- Diversos --
 [+] #TK-4956-2: Implementados programas de exemplo em PHP da NFSe ST e MT.

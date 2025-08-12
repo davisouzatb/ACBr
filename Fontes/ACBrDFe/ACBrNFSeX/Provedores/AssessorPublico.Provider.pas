@@ -38,7 +38,7 @@ interface
 
 uses
   SysUtils, Classes, Variants,
-  ACBrDFeSSL,
+  ACBrBase, ACBrDFeSSL,
   ACBrXmlBase, ACBrXmlDocument,
   ACBrNFSeXNotasFiscais,
   ACBrNFSeXClass, ACBrNFSeXConversao,
@@ -95,6 +95,7 @@ implementation
 
 uses
   SynaCode,
+  ACBrDFe.Conversao,
   ACBrUtil.Base, ACBrUtil.XMLHTML, ACBrUtil.Math, ACBrUtil.Strings,
   ACBrDFeException,
   ACBrNFSeX, ACBrNFSeXConfiguracoes, ACBrNFSeXConsts,
@@ -200,10 +201,15 @@ procedure TACBrNFSeProviderAssessorPublico.GerarMsgDadosEmitir(
   Response: TNFSeEmiteResponse; Params: TNFSeParamsResponse);
 var
   Emitente: TEmitenteConfNFSe;
-  xData: string;
+  xData, CodigoImobiliario: string;
   Mes, Ano: Integer;
 begin
   Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
+
+  CodigoImobiliario := Emitente.CodigoImobiliario;
+
+  if CodigoImobiliario = '' then
+    CodigoImobiliario := Emitente.InscMun;
 
   xData := SeparaDados(Params.Xml, 'DATAEMISSAO', False);
 
@@ -221,7 +227,7 @@ begin
                                     FormatFloat('0000', Ano) +
                                  '</ANOCOMP>' +
                                  '<INSCRICAO>' +
-                                    Emitente.InscMun +
+                                    CodigoImobiliario +
                                  '</INSCRICAO>' +
                                  '<VERSAO>1.00</VERSAO>' +
                                '</IDENTIFICACAO>' +
@@ -285,6 +291,7 @@ procedure TACBrNFSeProviderAssessorPublico.PrepararConsultaLoteRps(
 var
   AErro: TNFSeEventoCollectionItem;
   Emitente: TEmitenteConfNFSe;
+  CodigoImobiliario: string;
 begin
   if EstaVazio(Response.NumeroLote) then
   begin
@@ -296,10 +303,15 @@ begin
 
   Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
 
+  CodigoImobiliario := Emitente.CodigoImobiliario;
+
+  if CodigoImobiliario = '' then
+    CodigoImobiliario := Emitente.InscMun;
+
   Response.ArquivoEnvio := '<NFSE>' +
                              '<IDENTIFICACAO>' +
                                '<INSCRICAO>' +
-                                  Emitente.InscMun +
+                                  CodigoImobiliario +
                                '</INSCRICAO>' +
                                '<LOTE>' +
                                   Response.NumeroLote +
@@ -390,6 +402,7 @@ procedure TACBrNFSeProviderAssessorPublico.PrepararConsultaNFSeporNumero(
 var
   AErro: TNFSeEventoCollectionItem;
   Emitente: TEmitenteConfNFSe;
+  CodigoImobiliario: string;
 begin
   if EstaVazio(Response.InfConsultaNFSe.NumeroLote) then
   begin
@@ -409,12 +422,17 @@ begin
 
   Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
 
+  CodigoImobiliario := Emitente.CodigoImobiliario;
+
+  if CodigoImobiliario = '' then
+    CodigoImobiliario := Emitente.InscMun;
+
   Response.Metodo := tmConsultarNFSe;
 
   Response.ArquivoEnvio := '<NFSE>' +
                              '<IDENTIFICACAO>' +
                                '<INSCRICAO>' +
-                                  Emitente.InscMun +
+                                  CodigoImobiliario +
                                '</INSCRICAO>' +
                                '<LOTE>' +
                                   Response.InfConsultaNFSe.NumeroLote +
@@ -508,6 +526,7 @@ procedure TACBrNFSeProviderAssessorPublico.PrepararCancelaNFSe(
 var
   AErro: TNFSeEventoCollectionItem;
   Emitente: TEmitenteConfNFSe;
+  CodigoImobiliario: string;
 begin
   if Response.InfCancelamento.NumeroRps = 0 then
   begin
@@ -535,16 +554,20 @@ begin
 
   Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
 
+  CodigoImobiliario := Emitente.CodigoImobiliario;
+
+  if CodigoImobiliario = '' then
+    CodigoImobiliario := Emitente.InscMun;
+
   Response.ArquivoEnvio := '<NFSE>' +
                              '<IDENTIFICACAO>' +
                                '<INSCRICAO>' +
-                                  Emitente.InscMun +
+                                  CodigoImobiliario +
                                '</INSCRICAO>' +
                                '<LOTE>' +
                                   Response.InfCancelamento.NumeroLote +
                                '</LOTE>' +
                                '<SEQUENCIA>' +
-    //                              Response.InfCancelamento.NumeroNFSe +
                                   IntToStr(Response.InfCancelamento.NumeroRps) +
                                '</SEQUENCIA>' +
                                '<OBSERVACAO>' +

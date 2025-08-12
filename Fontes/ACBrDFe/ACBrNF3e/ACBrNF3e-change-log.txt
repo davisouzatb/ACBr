@@ -42,6 +42,105 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+26/07/2025
+-- ACBrNF3eXmlWriter --
+[*] Ajuste nas condições para gerar o grupo gRed.
+   Por: Italo Giurizzato Junior
+
+24/07/2025
+-- Diversos --
+[*] #TK-7370: Implementado a versão 1.06 da NT da Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+18/07/2025
+-- ACBrNF3eXmlWriter --
+[*] Correção no tamanho mínimo e máximo da tag idCSRT.
+   Por: Italo Giurizzato Junior
+
+17/06/2025
+-- ACBrNF3eWebServices --
+[*] #TK-7205: Melhorias no Consultar visando salvar o XML do evento retornado 
+    levando em consideração da data/hora de emissão do evento.
+  Por: Luiz Alberto da Silva Lope
+
+11/06/2025
+-- ACBrNF3eXmlWriter --
+[*] Correção no nome da constante e inclusão de uma nova constante.
+   Por: Italo Giurizzato Junior
+
+09/06/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a versão 1.05 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+06/06/2025
+-- ACBrNF3eNotasFiscais --
+[+] Implementado os parâmetros: ManterPDFSalvo e sBCC no método: EnviarEmail.
+  Por: Mateus Brunelli/Italo Giurizzato Junior
+
+26/05/2025
+-- Diversos --
+[*] O campo cCredPres que antes era do tipo Integer agora é do tipo TcCredPres.
+  Por: Italo Giurizzato Junior
+
+21/05/2025
+-- Diversos --
+[*] Alteração visando usar a unit ACBrDFe.Conversao que contem os tipos e funções
+    da Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+20/05/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.02 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+29/04/2025
+-- ACBrNF3eWebServices --
+[*] #TK-6785 - Adiciona chamada a rotina AjustarOpcoes no envio de eventos da NF3e.
+  Por: Diego Folieni
+
+28/04/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.01a dos Schemas.
+  Por: Italo Giurizzato Junior
+
+15/04/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a NT2025/001 versão 1.01.
+  Por: Italo Giurizzato Junior
+-- Diversos --
+[*] #TK-6833: Ajustes necessários para deixar em conformidade com a NT2025/001.
+  Por: Italo Giurizzato Junior
+
+07/04/2025
+-- Diversos --
+[*] #TK-5814: Implementado as units: ACBrNF3eIniReader e ACBrNF3eIniWrite que
+    vão ser responsáveis por ler e gerar o arquivo INI.
+    Refatorado a função GetURLQRCode para que a mesma receba a classe TNF3e em 
+    vez de diversos parâmetros de entrada.
+    Implementado a propriedade de configuração: SalvarEvento (valor padrão False)
+    agora ao salvar o XML *-procEventoNF3e o componente vai checar o valor dessa 
+    propriedade.
+  Por: Italo Giurizzato Junior
+
+08/03/2025
+-- ACBrNF3eClass/ACBrNF3eXmlReader/ACBrNF3eXmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+27/02/2025
+-- ACBrNF3eXmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+15/02/2025
+-- ACBrNF3eClass/ACBrNF3eConsts --
+[+] Inclusão de novas contantes e ajustes nas novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+10/02/2025
+-- ACBrNF3eClass --
+[+] Inclusão das novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
 08/01/2025
 -- Diversos --
 [*] #TK-6437: Ajustes na geração do XML de eventos para usar o ACBrXmlDocument.

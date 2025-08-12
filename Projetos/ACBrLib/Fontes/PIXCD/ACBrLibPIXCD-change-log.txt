@@ -42,6 +42,63 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+10/07/2025
+-- ACBrLibPIXCDDataModule, ACBrLibPIXCDConsts, ACBrLibPIXCDConfig --
+[+] ACBrLibPIXCD - Migração Matera -> PIXNoPDV
+    Por: Antonio Carlos Junior
+
+30/06/2025
+-- ACBrLibPIXCDBase --
+[-] Correção na validação de sucesso também na criação de uma cobrança imediata
+    por: Elias César
+
+10/06/2025
+-- ACBrLibPIXCDBase --
+[-] Correção na validação de sucesso da requisição
+    por: Júlio Cavalcanti
+
+10/04/2025
+-- ACBrLibPIXCDDataModule, ACBrLibPIXCDConsts, ACBrLibPIXCDConfig --
+[+] Inclusão PSP AppLess - #TK-6880.
+[*] Implementado evento ACBrPSPSicoob1QuandoReceberRespostaHttp para retornar informações do Pagador (Nome, CPF/CNPJ) utilizado apenas no PSP Sicoob - #TK-6844.
+    Por: Antonio Carlos Junior / Júlio Cavalcanti
+
+08/04/2025
+-- ACBrLibPIXCDBase --
+[*] Ajustes nos métodos PIXCD_CriarCobrancaImediata e PIXCD_CriarCobranca para retornar o PixCopiaECola utilizando a função GerarQRCodeDinamico caso o PSP retorne com a informação vazia.
+    Por: Antonio Carlos Junior
+
+07/04/2025
+-- ACBrLibPIXCDDataModule.pas --
+[*] Ajustes na propriedade ArquivoPFX para o PSP Santander
+    Por: Antonio Carlos Junior
+
+19/03/2025
+-- ACBrLibPIXCDMateraRespostas --
+[*] #TK-6665: Ajuste na classe TLibPIXCDMateraAlias para retornar o texto ao invés do índice.
+    Por: Júlio Cavalcanti
+
+10/03/2025
+-- ACBrLibPIXCDConsts, ACBrLibPIXCDConfig, ACBrLibPIXCDDataModule --
+[*] #TK-6732: Adiciona config para definir ChavePrivada e Certificado para o PSP Bradesco
+    Por: Diego Folieni
+
+06/03/2025
+-- ACBrLibPIXCDDataModule.pas --
+[*] Adicionado propriedade Scopes para PSP Banrisul e C6Bank.
+    Por: Antonio Carlos Junior
+
+05/03/2025
+-- ACBrLibPIXCD.lpi, ACBrLibPIXCDDemo.lpi, ACBrLibPIXCDConsoleMT.lpi e ACBrLibPIXCDConsoleMTDemo.lpi--
+[*] Realizado ajustes nos paths para compilação com os novos scripts do Jenkins.
+    Por: Antonio Carlos Junior
+
+24/02/2025
+-- ACBrLibPIXCDDataModule.pas --
+[*] Implementado evento ACBrPSPBancoDoBrasil1QuandoReceberRespostaHttp para retornar informações do Pagador (Nome, CPF/CNPJ) utilizado apenas no PSP Banco do Brasil.
+#TK-6644 - AcbrpixCD.dll não retorna informações do pagador.
+  Por: Antonio Carlos Junior
+
 31/12/2024
 -- ACBrLibPIXCDBase --
 [*] Mapeando exceção EACBrPixHttpException no método MateraIncluirChavePix para exibir o 

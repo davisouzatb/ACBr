@@ -565,6 +565,8 @@ var
   ANode: TACBrXmlNode;
   ANodeArray: TACBrXmlNodeArray;
   AErro: TNFSeEventoCollectionItem;
+  Texto: String;
+  SR: TSplitResult;
 begin
   ANode := RootNode.Childrens.FindAnyNs(AListTag);
 
@@ -577,14 +579,34 @@ begin
 
   for I := Low(ANodeArray) to High(ANodeArray) do
   begin
-    AErro := Response.Erros.New;
-    AErro.Codigo := '';
-    AErro.Descricao := ObterConteudoTag(ANodeArray[I].Childrens.FindAnyNs('mensagens'), tcStr);
+    Texto := ObterConteudoTag(ANodeArray[I].Childrens.FindAnyNs('mensagens'), tcStr);
+    if Trim(Texto) = '' then
+      Texto := ANodeArray[I].AsString;
 
-    if AErro.Descricao = '' then
-      AErro.Descricao := ANodeArray[I].AsString;
+    if Pos(' - ', Texto) > 0 then
+    begin
+      Texto := StringReplace(Texto, ' - ', '|', [rfReplaceAll]);
+      SR := Split('|', Texto);
 
-    AErro.Correcao := '';
+      AErro := Response.Erros.New;
+      if Length(SR) = 3 then
+      begin
+        AErro.Codigo := SR[0];
+        AErro.Descricao := SR[1];
+        AErro.Correcao := SR[2];
+      end else
+      begin
+        AErro.Codigo := SR[0];
+        AErro.Descricao := SR[1];
+        AErro.Correcao := '';
+      end;
+    end else
+    begin
+      AErro := Response.Erros.New;
+      AErro.Codigo := '';
+      AErro.Descricao := Texto;
+      AErro.Correcao := '';
+    end;
   end;
 end;
 
@@ -1084,23 +1106,24 @@ begin
                 aXmlRetorno := AuxNode.OuterXml;
 
                 if AResumo.NumeroNota <> '' then
+                begin
                   ANota := TACBrNFSeX(FAOwner).NotasFiscais.FindByNFSe(AResumo.NumeroNota);
 
-                if not Assigned(ANota) then
-                  ANota := TACBrNFSeX(FAOwner).NotasFiscais.FindByRps(AResumo.NumeroRps);
+                  if not Assigned(ANota) then
+                    ANota := TACBrNFSeX(FAOwner).NotasFiscais.FindByRps(AResumo.NumeroRps);
 
-                if Assigned(ANota) then
-                begin
-                  if ANota.XmlRps = '' then
-                    aXmlNota := GerarXmlNota(ANota.XmlNfse, aXmlRetorno)
-                  else
-                    aXmlNota := GerarXmlNota(ANota.XmlRps, aXmlRetorno);
+                  if Assigned(ANota) then
+                  begin
+                    if ANota.XmlRps = '' then
+                      aXmlNota := GerarXmlNota(ANota.XmlNfse, aXmlRetorno)
+                    else
+                      aXmlNota := GerarXmlNota(ANota.XmlRps, aXmlRetorno);
 
-                  ANota.XmlNfse := aXmlNota;
+                    ANota.XmlNfse := aXmlNota;
 
-                  SalvarXmlNfse(ANota);
+                    SalvarXmlNfse(ANota);
+                  end;
                 end;
-
               end
               else
               begin

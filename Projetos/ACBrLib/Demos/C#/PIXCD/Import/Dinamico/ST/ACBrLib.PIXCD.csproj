@@ -15,9 +15,9 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AssemblyVersion>1.0.6.0</AssemblyVersion>
-    <FileVersion>1.0.6.0</FileVersion>
-    <Version>1.0.6.0</Version>
+    <AssemblyVersion>1.0.11.0</AssemblyVersion>
+    <FileVersion>1.0.11.0</FileVersion>
+    <Version>1.0.11.0</Version>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
@@ -65,6 +65,8 @@
 		<Compile Include="..\Shared\BradescoConfig.cs" Link="BradescoConfig.cs" />
 		<Compile Include="..\Shared\BancoBrasilConfig.cs" Link="BancoBrasilConfig.cs" />
 		<Compile Include="..\Shared\AilosConfig.cs" Link="AilosConfig.cs" />
+		<Compile Include="..\Shared\C6BankConfig.cs" Link="C6BankConfig.cs" />
+		<Compile Include="..\Shared\AppLessConfig.cs" Link="AppLessConfig.cs" />
 		<Compile Include="..\Shared\ACBrPIXCDConfig.cs" Link="ACBrPIXCDConfig.cs" />
 	</ItemGroup>
 	

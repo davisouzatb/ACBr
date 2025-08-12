@@ -51,7 +51,7 @@ uses
 
 type
   /// Versão do Leiaute do arquivo - TRegistro0000
-  TACBrCodVer = (
+  TACBrVersaoLeiauteSPEDContribuicoes = (
                  vlVersao100,  // Código 001 - Versão 100 ADE Cofis nº 31/2010 de 01/01/2011
                  vlVersao101,  // Código 002 - Versão 101 ADE Cofis nº 34/2010 de 01/01/2011
                  vlVersao200,  // Código 002 - Versão 200 ADE Cofis nº 20/2012
@@ -60,7 +60,11 @@ type
                  vlVersao310,  // Código 005 - ADE Cofis nº 82/2018 - Apuração em 01/01/2019
                  vlVersao320   // Código 006 - ADE Cofis ??? - Apuração em 01/01/2020
                 );
-  TACBrVersaoLeiaute = TACBrCodVer;
+
+  TACBrVersaoLeiaute = TACBrVersaoLeiauteSPEDContribuicoes {$IfDef DELPHI2009_UP} deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Esse tipo é obsoleto: Use o tipo TACBrVersaoLeiauteSPEDContribuicoes'{$EndIf}{$EndIf};
+  TACBrCodVer = TACBrVersaoLeiauteSPEDContribuicoes {$IfDef DELPHI2009_UP} deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Esse tipo é obsoleto: Use o tipo TACBrVersaoLeiauteSPEDContribuicoes'{$EndIf}{$EndIf};
+
+
 
   /// Indicador de movimento - TOpenBlocos
   TACBrIndMov = (
@@ -1051,7 +1055,8 @@ type
    TACBrTabCodAjBaseCalcContrib = (tcaVendasCanceladas,      // 01 - Vendas canceladas de receitas tributadas em períodos anteriores
                                    tcaDevolucoesVendas,      // 02 - Devoluções de vendas tributadas em períodos anteriores
                                    tcaICMSaRecolher,         // 21 - ICMS a recolher sobre Operações próprias
-                                   tcaOutrVlrsDecJudicial,   // 41 - Outros valores a excluir, vinculados a decisão judicial
+                                   tcaICMSDestacado,         // 25 - ICMS destacado em documento fiscal complementar, referente a receitas tributadas em períodos anteriores 
+								   tcaOutrVlrsDecJudicial,   // 41 - Outros valores a excluir, vinculados a decisão judicial
                                    tcaOutrVlrsSemDecJudicial // 42 - Outros valores a excluir, não vinculados a decisão judicial
                                    );
 
@@ -2203,6 +2208,8 @@ begin
     Result := '02'
   else if AValue = tcaICMSaRecolher then
     Result := '21'
+  else if AValue = tcaICMSDestacado then
+    Result := '25'  
   else if AValue = tcaOutrVlrsDecJudicial then
     Result := '41'
   else if AValue = tcaOutrVlrsSemDecJudicial then
@@ -2518,12 +2525,14 @@ begin
     Result :=  tcaDevolucoesVendas
   else if AValue = '21' then
     Result := tcaICMSaRecolher
+  else if AValue = '25' then
+    Result := tcaICMSDestacado
   else if AValue = '41' then
     Result := tcaOutrVlrsDecJudicial
   else if AValue = '42' then
     Result := tcaOutrVlrsSemDecJudicial
   else
-    raise Exception.Create(format('Valor informado [%s] deve estar entre (01,02,21,41 e 42)', [AValue]));
+    raise Exception.Create(format('Valor informado [%s] deve estar entre (01,02,21,25,41 e 42)', [AValue]));
 end;
 
 

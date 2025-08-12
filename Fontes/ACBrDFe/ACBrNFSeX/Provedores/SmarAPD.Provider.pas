@@ -38,7 +38,7 @@ interface
 
 uses
   SysUtils, Classes,
-  ACBrXmlBase, ACBrXmlDocument, ACBrNFSeXClass, ACBrNFSeXConversao,
+  ACBrBase, ACBrXmlBase, ACBrXmlDocument, ACBrNFSeXClass, ACBrNFSeXConversao,
   ACBrNFSeXGravarXml, ACBrNFSeXLerXml,
   ACBrNFSeXProviderProprio, ACBrNFSeXProviderABRASFv2,
   ACBrNFSeXWebserviceBase, ACBrNFSeXWebservicesResponse;
@@ -737,6 +737,13 @@ begin
   Result := inherited TratarXmlRetornado(aXML);
 
   Result := RemoverCaracteresDesnecessarios(Result);
+
+  if Pos('tag &lt;', Result) > 0 then
+  begin
+    Result := StringReplace(Result, 'tag &lt;', 'tag [', [rfReplaceAll]);
+    Result := StringReplace(Result, '&gt;', ']', [rfReplaceAll]);
+  end;
+
   Result := ParseText(Result);
   Result := RemoverDeclaracaoXML(Result);
   Result := RemoverIdentacao(Result);

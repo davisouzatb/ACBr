@@ -278,7 +278,7 @@ begin
 
   wNCM := TACBrNCM.Create;
   try
-    wNCM.DescricaoNcm := aDescricaoNCM;
+    wNCM.DescricaoNcm := AnsiUpperCase(aDescricaoNCM);
     {$IfDef HAS_SYSTEM_GENERICS}
     I := FindObject(wNCM, TComparer<TObject>.Construct(CompNCMDescAsc), (not Exact));
     {$Else}
@@ -512,9 +512,17 @@ begin
         xData := TratarCampoData(wJsonNCM.AsString['Data_Fim']);
         DataFim := StringToDateTimeDef(xData, 0, 'dd/mm/yyyy');
 
-        TipoAto := wJsonNCM.AsString['Tipo_Ato'];
-        NumeroAto := wJsonNCM.AsString['Numero_Ato'];
-        AnoAto := wJsonNCM.AsInteger['Ano_Ato'];
+        TipoAto := wJsonNCM.AsString['Tipo_Ato_Ini'];
+        NumeroAto := wJsonNCM.AsString['Numero_Ato_Ini'];
+        AnoAto := wJsonNCM.AsInteger['Ano_Ato_Ini'];
+        if (TipoAto = '') and (NumeroAto = '') and (AnoAto = 0) then
+        begin
+          //Deve estar usando uma versão anterior do JSON. Tentar ler essa versão.
+          //Veja: https://www.projetoacbr.com.br/forum/topic/81662-corre%C3%A7%C3%A3o-campos-do-arquivo-de-download-do-ncm/
+          TipoAto := wJsonNCM.AsString['Tipo_Ato'];
+          NumeroAto := wJsonNCM.AsString['Numero_Ato'];
+          AnoAto := wJsonNCM.AsInteger['Ano_Ato'];
+        end;
       end;
     end;
   finally
@@ -736,42 +744,44 @@ function TACBrNCMs.BuscarPorDescricao(const aDescricao: String;
 
   procedure FiltrarIniciaCom;
   var
-    I, wTam: Integer;
+    I,LTam: Integer;
   begin
     I := NCMs.FindDesc(aDescricao, False);
-    wTam := Length(aDescricao);
-    if (I >= 0) then
-    begin
-      while (I < NCMs.Count) do
-      begin
-        if (UpperCase(aDescricao) = UpperCase(LeftStrNativeString(NCMs[I].DescricaoNcm, wTam))) then
-          NCMsFiltrados.Copy(NCMs[I])
-        else
-          Break;
-           
-        Inc(I);
-      end;
-    end;
+    if I = 0 then
+      Exit;
+    LTam := Length(aDescricao);
+    for I := 0 to Pred(NCMs.Count) do
+      if AnsiUpperCase(aDescricao) = Copy(AnsiUpperCase(NCMs[I].DescricaoNcm),0,LTam) then
+        NCMsFiltrados.Copy(NCMs[I])
   end;
 
   procedure FiltrarContem;
   var
     I: Integer;
   begin
+    I := NCMs.FindDesc(aDescricao, False);
+    if I = 0 then
+      Exit;
     for I := 0 to Pred(NCMs.Count) do
-      if (Pos(UpperCase(aDescricao), UpperCase(NCMs[I].DescricaoNcm)) > 0) then
+      if (Pos(AnsiUpperCase(aDescricao), AnsiUpperCase(NCMs[I].DescricaoNcm)) > 0) then
         NCMsFiltrados.Copy(NCMs[I]);
   end;
 
   procedure FiltrarFinalizaCom;
   var
     I: Integer;
-    wTam: Integer;
+    LTam, LFim: Integer;
   begin
-    wTam := Length(aDescricao);
+    I := NCMs.FindDesc(aDescricao, False);
+    if I = 0 then
+      Exit;
+    LTam := Length(aDescricao);
     for I := 0 to Pred(NCMs.Count) do
-      if (UpperCase(aDescricao) = UpperCase(RightStrNativeString(NCMs[I].DescricaoNcm, wTam))) then
+    begin
+      LFim := Length(NCMs[I].DescricaoNcm) + 1 - LTam;
+      if AnsiUpperCase(aDescricao) = Copy(AnsiUpperCase(NCMs[I].DescricaoNcm), LFim ,LTam) then
         NCMsFiltrados.Copy(NCMs[I]);
+    end;
   end;
 
 begin
@@ -811,13 +821,15 @@ end;
 function CompNCMDescAsc(const pNCM1, pNCM2: {$IfDef HAS_SYSTEM_GENERICS}TObject{$Else}Pointer{$EndIf}): Integer;
 var
   aNCM1, aNCM2: TACBrNCM;
+  LNCM1, LNCM2 : AnsiString;
 begin
   aNCM1 := TACBrNCM(pNCM1);
   aNCM2 := TACBrNCM(pNCM2);
-
-  if aNCM1.DescricaoNcm > aNCM2.DescricaoNcm then
+  LNCM1 := AnsiUpperCase(aNCM1.DescricaoNcm);
+  LNCM2 := AnsiUpperCase(aNCM2.DescricaoNcm);
+  if LNCM1 > LNCM2 then
     Result := 1
-  else if aNCM1.DescricaoNcm < aNCM2.DescricaoNcm then
+  else if LNCM1 < LNCM2 then
     Result := -1
   else
     Result := 0;

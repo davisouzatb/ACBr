@@ -79,6 +79,7 @@ type
 implementation
 
 uses
+  ACBrDFe.Conversao,
   ACBrUtil.XMLHTML,
   ACBrDFeException, ACBrNFSeX, ACBrNFSeXConfiguracoes,
   ACBrNFSeXNotasFiscais, DeISS.GravarXml, DeISS.LerXml;
@@ -330,7 +331,10 @@ end;
 function TACBrNFSeXWebserviceDeISS203.TratarXmlRetornado(
   const aXML: string): string;
 begin
-  Result := inherited TratarXmlRetornado(aXML);
+  Result := ConverteANSItoUTF8(aXML);
+  Result := RemoverDeclaracaoXML(Result);
+
+  Result := inherited TratarXmlRetornado(Result);
 
   Result := ParseText(Result);
   Result := RemoverDeclaracaoXML(Result);

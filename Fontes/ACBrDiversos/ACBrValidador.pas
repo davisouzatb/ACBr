@@ -434,14 +434,13 @@ var
   S: String;
 begin
   S := OnlyAlphaNum(AValue);
-  if Length(S) = 0 then
-     Result := S
-  else
-  begin
-    if Length(S) = 14 then
-      Result := FormatarCNPJ(S)
+  case Length(S) of
+    11 : Result := FormatarCPF(S);
+    14 : Result := FormatarCNPJ(S);
     else
-      Result := FormatarCPF(S);
+      // Devolve o [AValue] de entrada sem processamentos, pois não
+      // encontrou no case um tamanho válido para CPF 11 ou CNPJ 14.
+      Result := AValue;
   end;
 end;
 
@@ -1305,7 +1304,7 @@ begin
   begin
      Tamanho  := 9 ;
      vDigitos := VarArrayOf(
-        [ 'DVX',c0_9,c0_9,c0_9,c0_9,c0_9,c0_9,'5','1,7','','','','',''] ) ;
+        [ 'DVX',c0_9,c0_9,c0_9,c0_9,c0_9,c0_9,'5,6,7,8,9','1,7','','','','',''] ) ;
   end ;
 
   if fsComplemento = 'PB' then

@@ -123,7 +123,7 @@ type
     RLLabel4: TRLLabel;
     RLDraw20: TRLDraw;
     RLLabel15: TRLLabel;
-    RLLabel5: TRLLabel;
+    lbIdentificacao: TRLLabel;
     RLLabel17: TRLLabel;
     RLLabel19: TRLLabel;
     RLLabel10: TRLLabel;
@@ -388,6 +388,25 @@ begin
 
   TDFeReportFortes.CarregarLogo(rliLogo, fpDANFSe.Logo);
 
+  if (fpDANFSe.TamanhoLogoHeight = 0) and (fpDANFSe.TamanhoLogoWidth = 0) then
+  begin
+    // Expande a logomarca
+    if fpDANFSe.ExpandeLogoMarca then
+    begin
+      rlmPrefeitura.Visible := False;
+
+      with rliLogo do
+      begin
+        Height := 60;
+        Width := 580;
+        Top := 15;
+        Left := 9;
+
+        TDFeReportFortes.AjustarLogo(rliLogo, fpDANFSe.ExpandeLogoMarcaConfig);
+      end;
+    end;
+  end;
+
   rlmPrefeitura.Lines.Clear;
   rlmPrefeitura.Lines.Add(StringReplace(fpDANFSe.Prefeitura,
                                        FQuebradeLinha, #13#10, [rfReplaceAll]));
@@ -398,7 +417,10 @@ begin
     rllEmissao.Caption := FormatDateTime('dd/mm/yyyy hh:nn', DataEmissao);
     rllCodVerificacao.Caption := CodigoVerificacao;
 
-    rllCompetencia.Caption := IfThen(Competencia > 0, FormatDateTime('mm/yyyy', Competencia), '');
+    if fpDANFSe.DataCompetenciaCompleta then
+      rllCompetencia.Caption := IfThen(Competencia > 0, FormatDateTime('dd/mm/yyyy', Competencia), '')
+    else
+      rllCompetencia.Caption := IfThen(Competencia > 0, FormatDateTime('mm/yyyy', Competencia), '');
 
     rllNumeroRPS.Caption := IdentificacaoRps.Numero;
     rllNumNFSeSubstituida.Caption := NfseSubstituida;
@@ -617,20 +639,23 @@ procedure TfrlXDANFSeRLSimplISS.rlbTomadorBeforePrint(Sender: TObject;
 begin
   inherited;
 
+  fpDANFSe.SetDadosTomador(fpNFSe);
+
   with fpNFSe.Tomador do
   begin
     rllTomaNome.Caption := RazaoSocial;
 
-    if Length(IdentificacaoTomador.CpfCnpj)<=11 then
-      rllTomaCNPJ.Caption := FormatarCPF(IdentificacaoTomador.CpfCnpj)
+    lbIdentificacao.Caption := 'CPF/CNPJ:';
+    if (Length(IdentificacaoTomador.Nif) > 0) then
+    begin
+      lbIdentificacao.Caption := 'NIF:';
+      rllTomaCNPJ.Caption := IdentificacaoTomador.Nif;
+    end
     else
-      rllTomaCNPJ.Caption := FormatarCNPJ(IdentificacaoTomador.CpfCnpj);
+      rllTomaCNPJ.Caption := FormatarCNPJouCPF(IdentificacaoTomador.CpfCnpj);
 
-    rllTomaInscMunicipal.Caption := IfThen(IdentificacaoTomador.InscricaoMunicipal <> '' ,
-      IdentificacaoTomador.InscricaoMunicipal , fpDANFSe.Tomador.InscricaoMunicipal);
-
-    rllTomaInscEstadual.Caption := IfThen(IdentificacaoTomador.InscricaoEstadual <> '',
-      IdentificacaoTomador.InscricaoEstadual, fpDANFSe.Tomador.InscricaoEstadual);
+    rllTomaInscMunicipal.Caption := fpDANFSe.Tomador.InscricaoMunicipal;
+    rllTomaInscEstadual.Caption := fpDANFSe.Tomador.InscricaoEstadual;
 
     if Endereco.Endereco <> '' then
     begin
@@ -643,17 +668,14 @@ begin
      rllTomaEndereco.Caption := Trim(fpDANFSe.Tomador.Endereco) + ' - CEP: ' +
                                 FormatarCEP(Endereco.CEP);
 
-    rllTomaComplemento.Caption := IfThen(Endereco.Complemento <> '' ,
-      Endereco.Complemento , fpDANFSe.Tomador.Complemento);
+    rllTomaComplemento.Caption := fpDANFSe.Tomador.Complemento;
 
     rllTomaMunicipio.Caption := Endereco.xMunicipio;
 
     rllTomaUF.Caption := Endereco.UF;
 
-    rllTomaTelefone.Caption := IfThen(Contato.Telefone <> '' ,
-      FormatarFone(Contato.Telefone) , FormatarFone(fpDANFSe.Tomador.Fone));
-    rllTomaEmail.Caption    := IfThen(Contato.Email    <> '' ,
-      Contato.Email , fpDANFSe.Tomador.Email);
+    rllTomaTelefone.Caption := FormatarFone(fpDANFSe.Tomador.Fone);
+    rllTomaEmail.Caption    := fpDANFSe.Tomador.Email;
   end;
 end;
 

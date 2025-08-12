@@ -29,7 +29,6 @@ Agradecimentos:
 
 * Administradores:
 - Daniel Simões de Almeida
-- André Ferreira de Moraes
 
 * Desenvolvedores:
 - Daniel Simões de Almeida - Doação do componente ao projeto ACBr
@@ -45,6 +44,361 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+
+06/08/2025
+-- ACBrTEFScopeAPI --
+[*] Ajustes para gravação de Logs com métodos mais atuais
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=84716
+    (por: gbrlfr e DSA)
+
+22/07/2025
+-- ACBrTEFAPIDirectPin, ACBrTEFDirectPinAPI, ACBrTEFTPagAPI --
+[*] Ajuste no Payload para correto funcionamento da chamada do DirectPin
+[*] Ajustes no tratamento do retorno, e na Data em UnixTime
+	(por: DSA)
+	
+14/07/2025
+-- ACBrTEFAPI, ACBrTEFAPIDirectPin, ACBrTEFDirectPinAPI --
+[+] Adicionado novo modelo de TEF - DirectPin Transire
+
+20/06/2025
+-- ACBrTEFAPIComum --
+[+] Adicionada a propriedade:
+    'TACBrTEFAPIDadosAutomacao.MensagemPinPad: String'
+    Permite que a Automação defina qual a mensagem que deve ficar no PinPad
+    após o termino de cada transação
+
+-- ACBrTEFAPIAditum, ACBrTEFAPIElgin, ACBrTEFAPIScope --
+[+] Adicionado suporte a propriedade 'DadosAutomacao.MensagemPinPad'
+
+-- ACBrTEFAPIPayGoWeb, ACBrTEFPayGoWebComum --
+[+] Implementado novos métodos disponíveis na biblioteca PGWebLib 4.1.44.0
+    CarregarImagemPinPad, ExibirImagemPinPad, ObterListaImagensPinPad,
+    ApagarImagemPinPad, MenuPinPad
+[+] Adicionado suporte a propriedade 'DadosAutomacao.MensagemPinPad'
+    (por: DSA)
+
+17/06/2025
+-- ACBrTEFComum --
+[+] Adicionada a propriedade TACBrTEFResp.PAN
+[*] Quando atribui algum valor a PAN, calcula o BIN e NFCeSAT.UltimosQuatroDigitos,
+    caso essas propriedades sejam vazias
+
+-- ACBrTEFAPIComum --
+[-] Removida Limpeza de Backup de Transações em 'TACBrTEFAPIComum.FinalizarVenda'
+    Isso limpava as Transações, quando a Confirmação automática, estava ligada
+
+-- ACBrTEFAPIAditum, ACBrTEFAPICliSiTef, ACBrTEFAPIDestaxa, ACBrTEFAPIElginComum,
+   ACBrTEFAPIPayKit, ACBrTEFAPIScope, ACBrTEFAPIStoneAutoTEF, ACBrTEFAPITPag,
+   ACBrTEFCliSiTefComum, ACBrTEFPayGoComum --
+[*] Modificado para atribuição correta da informação do PAN
+
+-- ACBrTEFAPIPayGoWeb --
+[*] Atribuindo na inicialização as propriedades:
+  TEFPayGoAPI.PontoCaptura, TEFPayGoAPI.PortaPinPad, TEFPayGoAPI.CNPJEstabelecimento
+  (por: DSA)
+
+06/06/2025
+-- ACBrTEFAPI, ACBrTEFAPIAditum, ACBrTEFAPICliSiTef, ACBrTEFCliSiTefComum,
+  ACBrTEFAPIPayGoWeb, ACBrTEFAPIPayKit, ACBrTEFAPIScope, --
+[+] Implementação do método "VersaoAPI: String"
+    retornando a Versão da DLL, API do TEF utilizado
+    https://www.projetoacbr.com.br/forum/topic/83622-acbrtefapi-contribui%C3%A7%C3%A3o/
+    (por: DSA e  antoniojmsjr)
+
+30/05/2025
+-- ACBrTEFPayKitAPI --
+[-] Correção no CallBack 'TACBrTEFPayKitCallBackSelecionaOpcao' para retornar
+    corretamente, a opção selecionada
+    (por: DSA)
+
+29/05/2025
+-- ACBrTEFMSitefAndroidAPI --
+[-] Correções para tratativas em 'TACBrTEFSIWebAndroid.OnActivityResult',
+    para chamar 'OnDepoisTerminarTransacao' e atribuir o erro 'cErroNoIntent'
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=83475
+    (por: Dércio Luis Zanatta e DSA)
+
+26/05/2025
+-- ACBrTEFPayKitAPI --
+[-] Correção da exibição do título no Callback 'CallBackSolicitaConfirmacao'
+[-] Correção de A.V. na cópia da resposta nos CallBacks 'CallBackEntraCartao',
+    'CallBackEntraDataValidade', 'CallBackEntraData', 'CallBackEntraCodigoSeguranca',
+    'CallBackEntraValor', 'CallBackEntraNumero', 'CallBackEntraString',
+    'CallBackEntraCodigoBarras', 'CallBackEntraCodigoBarrasLido',
+    'CallBackEntraValorEspecial'
+[*] Método 'CalcPayKitPath', modificado com Flag para saber se valida a
+    existência das pastas
+[-] Correção em 'VerificarEAjustarConf', para conseguir criar diretórios da PayKit
+
+-- ACBrTEFAPIPayKit --
+[*] Ajuste em 'TACBrTEFAPIClassPayKit.QuandoPerguntarCampoAPI',  para retornar
+    Resposta do Campo, considerando a mascara de entrada
+    (por: DSA)
+
+25/05/2025
+-- ACBrTEFAPIPayKit --
+[*] Melhoria em 'QuandoExibirQRCodeAPI' para respeitar parâmetros de configuração
+    do componente, quanto a exibição do QRCode na Tela
+[*] Ajustes em 'TACBrTEFAPIClassPayKit.EfetuarPagamento',
+    - Enviar o parâmetro Tipo Operação como String
+    - usar o método 'TransacaoCartaoDebitoCompleta', para transações de Débito
+    - correção na chamada de TransacaoCartaoFrota
+[-] Correção em 'TACBrTEFRespPayKit.ConteudoToProperty' para não tentar "Confirmar"
+    transações de Reimpressão
+[-] Correção em 'TACBrTEFAPIClassPayKit.InterpretarRespostaAPI' para processar
+    corretamente, transação de Reimpressão
+[-] Correção para CallBack 'QuandoPerguntarCampoAPI', para zerar valores default
+[-] Correções no fluxo do Menu Administrativo
+
+-- ACBrTEFPayKitAPI --
+[*] Remoção do tipo 'TACBrTEFPayKitTipoOperacao' (parâmetro modificado para String)
+[*] Melhoria no controle do Flag 'EmTransacao', e limpeza de variáveis de trabalho
+[+] Inclusão do método 'TransacaoCartaoDebitoCompleta'
+[*] Callback 'DisplayErro' modificado para exibir msg com botão OK
+[*] CallBack 'SolicitaConfirmacao', modificado para ignorar chamadas com parâmetro
+    'Mensagem' vazio
+[-] Correção em CallBack 'Comandos', na captura da String do QRCode, desprezava
+    o primeiro caractere
+[-] Correção em 'TransacaoCartaoCreditoCompleta', para não ocorrer A.V.
+[-] Correções para processar corretamente Transação Administrativa de Reimpressao
+[*] M[etodo 'TACBrTEFPayKitAPI.ObtemComprovanteTransacao' modificado para
+    recuperar, cupom de Transação Administrativa de Reimpressao
+    (por: DSA)
+
+14/05/2025
+-- ACBrTEFAPI, ACBrTEFAPIPayKit, ACBrTEFPayKitAPI --
+[+] Novo modelo de TEF suportado "PayKit" (D-TEF Linx)"
+    https://paykitlinx.github.io/PaykitApiDesktop/
+
+-- ACBrTEFAPI --
+[+] Adicionado método para Normatizar o Nome da Imagem, que é enviada ao PinPad
+    'TratarNomeImagemPinPad'
+
+-- ACBrTEFAPIComum --
+[+] Adicionado o método 'TACBrTEFAPIComumClass.FinalizarVenda' e
+    'TACBrTEFAPIComum.FinalizarVenda'.
+    Permite que a Classe de TEF execute uma operação final quando todos os arquivos
+    de Backup forem removidos.
+    Será chamado em'CancelarOuEstornarTransacoesDiretorioTrabalho' e
+    'FinalizarTransacoesPendentes'
+
+-- ACBrTEFPayGoWebComum --
+[+] Adicionado o método "TACBrTEFPGWebAPI.ExibirImagemPinPad", para exibir imagem
+    no PinPad, usando a PGWebLib
+    (por: DSA)
+
+03/05/2025
+-- ACBrTEFAPIScope, ACBrTEFScopeAPI --
+[+] Adicionada a propriedade para controlar a gravação de Log da DLL no 'scope.ini'
+    "TACBrTEFScopeAPI.GravarLogScope: Boolean default False"
+    - Só irá modificar o arquivo 'scope.ini', se as chaves de Log ainda não
+      existirem nele
+    - Será ativada (True) por 'TACBrTEFAPIClassScope' se a mesma detectar que o
+      evento 'TACBrTEFAPI.QuandoGravarLog' está atribuido
+
+-- ACBrTEFAPIAditum --
+[*] Ajuste para tratamento de solicitaçào de reimpressão de transação não existente
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=82885
+    (por: DSA e  EasySoft Sistemas)
+
+02/05/2025
+-- ACBrTEFScopeAPI, ACBrTEFAPIScope --
+[*] Registrador MASK2_Codigo_IF, modificado para MASK2_BIN
+[*] Ajuste no método ConteudoToProperty, para salvar corretamente o BIN
+[*] correção nas nomeclaturas dos métodos nos Logs
+[*] Melhoria para diretório de Trabalho ser considerado com ou sem o Path
+    Delimitador no final
+    (por: Ricardo Bosco de Souza e DSA)
+30/04/2025
+-- ACBrTEFAPIDestaxa --
+[*] Ajuste para possibilitar a geração do extrato de transações.
+    por: Innovae Brasil Engenharia
+
+15/04/2025
+-- ACBrTEFDestaxaComum --
+[-] Correção para armazenar corretamento o campo transacao_data como DateTime.
+    por: Elias César
+
+10/04/2025
+-- ACBrTEFAPIAditum --
+[*] Ajuste para reter mensagem na tela por 3 segundos, quando ocorrer falha
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=82622
+    (por: EasySoft Sistemas e DSA)
+[-] Correção para abortar corretamente a transação, quando cancelada pelo Operador
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=82616
+    (por: EasySoft Sistemas)
+
+-- ACBrTEFAPICliSiTef --
+[*] Ajuste em 'ObterDadoPinPad', para converter valor de milisegundos para segundos
+    https://www.projetoacbr.com.br/forum/topic/82792-erro-tempo-de-espera-inv%C3%A1lido-ao-obter-dados-pinpad
+    (por: DSA)
+
+06/04/2025
+-- ACBrTEFAPIScope, ACBrTEFScopeAPI --
+[*] Ajuste para permitir validação de Parcelas, no fluxo do TEF
+    (por: GPlus e DSA)
+
+04/04/2025
+-- ACBrTEDAPIDestaxa --
+[*] Alteração para preencher propriedade AplicacaoTela do DestaxaClient;
+[*] Alteração para permitir acesso ao DestaxaClient através do TACBrTEFAPI.
+    por: Elias César
+
+31/03/2025
+-- ACBrTEFAPIAditum --
+[*] Exibição de msg "Transação já Cancelada" na Tela do Operador
+[*] Tradução dos Status VALIDATING_NSU e WAITING_CARD_EVENT
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=82582
+    (por: EasySoft Sistemas e DSA)
+
+[-] Correção em 'TACBrTEFRespAditum.ConteudoToProperty', para considerar o Raiz
+    do Json, se não achar o objeto 'charge' dentro do JSon
+[-] Correção em 'TACBrTEFAPIClassAditum.RecuperarTransacao', para considerar
+    os chaves 'success' ou 'isApproved'
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=82589
+    (por: EasySoft Sistemas e DSA)
+
+26/03/2025
+-- ACBrTEFScopeAPI --
+[-] Correção para não tentar cancelar a transação, enquando o estado for
+    RCS_TRN_EM_ANDAMENTO
+    (por: DSA)
+
+24/03/2025
+-- ACBrTEFAPIScope --
+[-] Correção no tratamento do retorno do registrador MASK1_Data_local_transacao
+    (por: DSA)
+
+20/03/2025
+-- ACBrTEFScopeAPI --
+[-] Correção no método 'AssignColetaToColetaEx', para Delphi Unicode
+    (por: DSA)
+-- ACBrTEFAPIScope, ACBrTEFScopeAPI --
+[-] Correção no método 'TACBrTEFAPIClassScope.FinalizarTransacao', para
+    conseguir Finalizar Transaçoes (sessões), quando estiver inicializando e
+    precisar confirmar/desfazer Transações pendentes/
+    https://www.projetoacbr.com.br/forum/topic/82433-tef-scope-problema-com-desfazimento-por-queda-de-energia/
+    (por: DSA)
+
+18/03/2025
+-- ACBrTEFDestaxaComum --
+[-] Ajuste para correção de erro por resposta muito rápida do componente.
+    por: Elias César
+
+17/03/2025
+-- ACBrTEFScopeAPI --
+[-] Possível correção, para coleta de Bandeira durante a transação
+    (por: DSA)
+
+13/03/2025
+-- ACBrTEFScopeAPI --
+[-] Correção de Bug de A.V. quando 'ControleConexao' estava ativo
+[*] Propriedade 'ControleConexao' passa a ser True por default
+
+-- ACBrTEFAPIScope --
+[-] Correção em 'TACBrTEFAPIClassScope.EfetuarPagamento', para aplicar
+    corretamente os parâmetros informados em
+    Financiamento = (tefmfParceladoEmissor, tefmfParceladoEstabelecimento)
+    (por: DSA)
+
+07/03/2025
+-- ACBrTEFAPIDestaxa --
+[*] Ajuste na máscara de números sem casa decimal.
+    por: Elias César
+
+27/02/2025
+-- ACBrTEFAPI --
+[-] Ajustes para compilar em Delphi FMX
+
+-- ACBrTEFMSitefAndroidAPI, ACBrTEFMSitefComum --
+[-] Correção de erro de compilação em Delphi Android FMX
+
+-- ACBrTEFScopeAPI --
+[*] Adicionada verificação se TEF foi inicializado em vários métodos
+    (por: DSA)
+
+26/02/2025
+-- ACBrTEFAPIScope --
+[-] Ajustes para apagar respostas da transação anterior em EfetuarAdministrativa
+    (por: DSA)
+
+24/02/2025
+-- ACBrTEFAPI, ACBrTEFTPagAPI, ACBrTEFAPITPag --
+[+] Adicionado novo modelo de TEF "TPag", do Grupo Transire
+    (por: DSA)
+
+19/02/2025
+-- ACBrTEFDestaxaComum --
+[*] Suporte da Destaxa solicitou que fosse adicionado sleep antes de enviar o comando de coleta, 
+    pois o client V$Pague não está recebendo o comando quando ele acontece no mesmo instante.
+
+14/02/2025
+-- ACBrTEFScopeAPI --
+[*] Ajuste para o caso da rotina 'ScopeConsultaPP' retornar 'RCS_PP_NAO_ENCONTRADO'
+    https://www.projetoacbr.com.br/forum/topic/81846-tef-scope-problema-ao-comunicar-com-pinpad/
+[*] Ajuste em 'TACBrTEFScopeAPI.VerificarEAjustarScopeINI', para remover chaves
+    exclusivas de PIX, quando configuração não for específica para PIX
+
+-- ACBrTEFAPIScope --
+[*] Correção no nome de Método 'QuandoTransacaoEmAndamentoAPI'
+[*] Informando 'PathDLL'  em 'TACBrTEFAPIClassScope.Inicializar'
+    (por: DSA)
+
+12/02/2025
+-- ACBrTEFScopeAPI --
+[*] Ajustes para evitar A.V. em Delphi 10.2.x
+    (por: DSA)
+
+05/02/2025
+-- ACBrTEFAPICliSiTef --
+[+] Adicionado a Propriedade 'TACBrTEFAPIClassCliSiTef.FinalizarTransacaoIndividual'
+    que permite que o comando 'FinalizarTransacao', seja específico para apenas
+    uma Transação e não para todas Transações da Venda
+    https://dev.softwareexpress.com.br/en/docs/clisitef/clisitef_documento_principal#completion-of-individual-payments-in-the-same-tax-coupon
+    https://www.projetoacbr.com.br/forum/topic/81482-problema-ao-cancelar-pagamento-tef-sitef/
+    (por: Smaili Amorim e DSA)
+
+-- ACBrTEFDestaxaComum --
+[*] Alteração para abrir/fechar a conexão TCP a cada fluxo de pagamento.
+
+-- ACBrTEFAPIDestaxa --
+[-] Correção para desconectar a conexão TCP ao DesInicializar o componente;
+[*] Ajuste não manter a conexão TCP aberta após Inicializar o componente.
+
+27/01/2025
+-- ACBrTEFScopeAPI --
+[+] Adicionado os métodos:
+    procedure ObterListaImagensPinPad(ALista: TStrings);
+    procedure CarregarImagemPinPad(const NomeImagem: String; const Arquivo: String);
+    procedure ExibirImagemPinPad(const NomeImagem: String);
+    procedure ApagarImagemPinPad(const NomeImagem: String);
+    function ObterInformacoesPinPad: String;
+    procedure ObterDimensoesVisorPinPad(out Width: Word; out Height: Word);
+
+-- ACBrTEFAPI, ACBrTEFAPIScope --
+[+] Adicionado os métodos em 'TACBrTEFAPIClass'
+    procedure ObterListaImagensPinPad(ALista: TStrings); virtual;
+    procedure ObterDimensoesVisorPinPad(out Width: Word; out Height: Word); virtual;
+
+    procedure ExibirImagemPinPad(const NomeImagem: String); virtual;
+    procedure ApagarImagemPinPad(const NomeImagem: String); virtual;
+    procedure CarregarImagemPinPad(const NomeImagem: String; AStream: TStream;
+      TipoImagem: TACBrTEFAPIImagemPinPad); virtual;
+
+-- ACBrTEFAPI --
+[+] Adicionado os métodos em 'TACBrTEFAPI'
+    procedure ObterListaImagensPinPad(ALista: TStrings);
+    procedure ObterDimensoesVisorPinPad(out Width: Word; out Height: Word);
+
+    procedure ExibirImagemPinPad(const NomeImagem: String);
+    procedure ExibirQRCodePinPad(const DadosQRCode: String; const NomeImg: String;
+      Tamanho: Integer = 0);
+    procedure ApagarImagemPinPad(const NomeImagem: String);
+    procedure CarregarImagemPinPad(const NomeImagem: String; AStream: TStream;
+      TipoImagem: TACBrTEFAPIImagemPinPad ); overload;
+    procedure CarregarImagemPinPad(const NomeImagem: String; const Arquivo: String); overload;
+    (por: DSA)
 
 26/01/2025
 -- ACBrTEFScopeAPI, ACBrTEFAPIScope --

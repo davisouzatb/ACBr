@@ -905,11 +905,11 @@ var
   NaoExiste: String;
 begin
   if not FIni.SectionExists(ASessao) then
-    raise EACBrLibException.Create(ErrConfigLer, SErrConfSessaoNaoExiste);
+    raise EACBrLibException.Create(ErrConfigLer, Format(SErrConfSessaoNaoExiste, [ASessao]));
 
   NaoExiste := '*NaoExiste*';
   if (FIni.ReadString(ASessao, AChave, NaoExiste) = NaoExiste) then
-    raise EACBrLibException.Create(ErrConfigLer, SErrConfChaveNaoExiste);
+    raise EACBrLibException.Create(ErrConfigLer, Format(SErrConfChaveNaoExiste, [AChave, ASessao]));
 end;
 
 function TLibConfig.AtualizarArquivoConfiguracao: Boolean;
@@ -988,7 +988,48 @@ begin
 end;
 
 procedure TLibConfig.INIParaClasse;
+var
+  listaOpcoes: array of Integer;
+
+  procedure ValorPadraoChavesDesativadas(ASecao, AChave: string; APadrao: Integer; AValoresDesativados: array of Integer);
+  var
+    valorChave: Integer;
+    i: Integer;
+  begin
+    valorChave := FIni.ReadInteger(ASecao, AChave, -1);
+    if valorChave < 0 then
+      exit;
+
+    for i := Low(AValoresDesativados) to High(AValoresDesativados) do
+    begin
+      if valorChave = AValoresDesativados[i] then
+      begin
+        FIni.WriteInteger(ASecao, AChave, APadrao);
+        exit;
+      end;
+    end;
+  end;
 begin
+  ValorPadraoChavesDesativadas(CSessaoDFe, CChaveSSLXmlSignLib, 0, [1,2,3]); // xsXmlSec, xsMsXml, xsMsXmlCapicom
+
+  {$IfNDef MSWINDOWS}
+   SetLength(listaOpcoes,3);
+   listaOpcoes[0] := 1; // httpWinINet
+   listaOpcoes[1] := 2; // httpWinHttp
+  {$Else}
+   SetLength(listaOpcoes,1);
+  {$EndIf}
+  listaOpcoes[Length(listaOpcoes)-1] := 4; // httpIndy
+  ValorPadraoChavesDesativadas(CSessaoDFe, CChaveSSLHttpLib, 0, listaOpcoes);
+
+  {$IfNDef MSWINDOWS}
+   SetLength(listaOpcoes,2);
+   listaOpcoes[0] := 3; // cryWinCrypt
+  {$Else}
+   SetLength(listaOpcoes,1);
+  {$EndIf}
+  listaOpcoes[Length(listaOpcoes)-1] := 2; // cryCapicom
+  ValorPadraoChavesDesativadas(CSessaoDFe, CChaveSSLCryptLib, 0, listaOpcoes);
 
   FTipoResposta := TACBrLibRespostaTipo(FIni.ReadInteger(CSessaoPrincipal, CChaveTipoResposta, Integer(FTipoResposta)));
   FCodificaoResposta := TACBrLibCodificacao(FIni.ReadInteger(CSessaoPrincipal, CChaveCodificacaoResposta, Integer(FCodificaoResposta)));
@@ -1107,13 +1148,18 @@ begin
       GravarLog(ClassName + '.PrecisaCriptografar(' + ASessao + ',' + AChave + ')', logParanoico);
 
     Result := (AChave = CChaveSenha) and
-              ( (ASessao = CSessaoProxy) or
-                (ASessao = CSessaoEmail) or
-                (ASessao = CSessaoDFe)
-
-              ) or (
-              (ASessao = CSessaoConsultaCNPJ) and ((AChave = CChaveSenha) or (AChave = CChaveUsuario))
-              );
+              ((ASessao = CSessaoProxy) or
+               (ASessao = CSessaoEmail) or
+               (ASessao = CSessaoDFe)) or
+              ((ASessao = CSessaoConsultaCNPJ) and
+               ((AChave = CChaveSenha) or
+                (AChave = CChaveUsuario))) or
+              ((ASessao = CSessaoNFe) and
+               (AChave = CChaveCSRT)) or
+              ((ASessao = CSessaoCTe) and
+               (AChave = CChaveCSRT)) or
+              ((ASessao = CSessaoMDFe) and
+               (AChave = CChaveCSRT));
 
     if (Config.Log.Nivel > logCompleto) then
       GravarLog(ClassName + '.PrecisaCriptografar - Feito Result: ' + BoolToStr(Result, True), logParanoico);

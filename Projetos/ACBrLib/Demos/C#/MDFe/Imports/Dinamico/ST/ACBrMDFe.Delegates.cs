@@ -130,7 +130,7 @@ namespace ACBrLib.MDFe
         public delegate int MDFE_DistribuicaoDFePorUltNSU(int acUFAutor, string eCnpjcpf, string eultNsu, StringBuilder buffer, ref int bufferSize);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int MDFE_DistribuicaoDFePorNSU(int acUFAutor, string eCnpjcpf, string eNsu, StringBuilder buffer, ref int bufferSize);
+        public delegate int MDFE_DistribuicaoDFePorNSU(string eCnpjcpf, string eNsu, StringBuilder buffer, ref int bufferSize);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int MDFE_DistribuicaoDFePorChave(int acUFAutor, string eCnpjcpf, string echCTe, StringBuilder buffer, ref int bufferSize);
@@ -146,6 +146,9 @@ namespace ACBrLib.MDFe
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int MDFE_ImprimirPDF();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int MDFE_SalvarPDF(StringBuilder buffer, ref int bufferSize);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int MDFE_ImprimirEvento(string eArquivoXmlNFe, string eArquivoXmlEvento);
@@ -200,6 +203,7 @@ namespace ACBrLib.MDFe
             AddMethod<MDFE_EnviarEmailEvento>("MDFE_EnviarEmailEvento");
             AddMethod<MDFE_Imprimir>("MDFE_Imprimir");
             AddMethod<MDFE_ImprimirPDF>("MDFE_ImprimirPDF");
+            AddMethod<MDFE_SalvarPDF>("MDFE_SalvarPDF");
             AddMethod<MDFE_ImprimirEvento>("MDFE_ImprimirEvento");
             AddMethod<MDFE_ImprimirEventoPDF>("MDFE_ImprimirEventoPDF");
         }

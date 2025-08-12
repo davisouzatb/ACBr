@@ -67,6 +67,7 @@ var
   LRetorno : String;
   I, LCodigoRetorno : Integer;
   LURL : String;
+  LValor: String;
 begin
   Result := False;
 
@@ -94,7 +95,15 @@ begin
       FResposta.CNPJ           := LJsonObject.AsString['cnpj'];
       FResposta.Fantasia       := LJsonObject.AsString['nome_fantasia'];
       FResposta.Abertura       := StringToDateTimeDef(LJsonObject.AsString['data_inicio_atividade'],0,'yyyy/mm/dd');
-      FResposta.Endereco       := LJsonObject.AsString['tipo_logradouro'] + ' ' +LJsonObject.AsString['logradouro'];
+
+      FResposta.Endereco       := LJsonObject.AsString['logradouro'];
+      LValor := Trim(LJsonObject.AsString['tipo_logradouro']);
+      if LValor <> '' then
+      begin
+        if AnsiUpperCase(Copy(FResposta.Endereco, 1, Length(LValor))) <> AnsiUpperCase(LValor) then
+          FResposta.Endereco := LValor + ' ' + FResposta.Endereco;
+      end;
+
       FResposta.Numero         := LJsonObject.AsString['numero'];
       FResposta.Complemento    := LJsonObject.AsString['complemento'];
       FResposta.CEP            := OnlyNumber( LJsonObject.AsString['cep']);
@@ -113,6 +122,13 @@ begin
 
       FResposta.EFR                  := '';
       FResposta.CapitalSocial        := StrToFloatDef(StringReplace(LJson.AsString['capital_social'],'.',',',[rfReplaceAll]),0);
+
+      FResposta.Simples              := LJson.AsJSONObject['simples'].AsString['simples'] = 'Sim';
+      FResposta.DataOpcaoSimples     := StringToDateTimeDef(LJson.AsJSONObject['simples'].AsString['data_opcao_simples'],0,'yyyy/mm/dd');
+      FResposta.DataExclusaoSimples  := StringToDateTimeDef(LJson.AsJSONObject['simples'].AsString['data_exclusao_simples'],0,'yyyy/mm/dd');
+      FResposta.Mei                  := LJson.AsJSONObject['simples'].AsString['mei']= 'Sim';
+      FResposta.DataOpcaoMei         := StringToDateTimeDef(LJson.AsJSONObject['simples'].AsString['data_opcao_mei'],0,'yyyy/mm/dd');
+      FResposta.DataExclusaoMei      := StringToDateTimeDef(LJson.AsJSONObject['simples'].AsString['data_exclusao_mei'],0,'yyyy/mm/dd');
 
       FResposta.CNAE1 := LJsonObject.AsJSONObject['atividade_principal'].AsString['id'] + ' ' +
                          LJsonObject.AsJSONObject['atividade_principal'].AsString['descricao'];

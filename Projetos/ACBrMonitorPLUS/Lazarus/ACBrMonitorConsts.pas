@@ -579,6 +579,7 @@ const
   CMetodoSetIDContribuinteReinf =    'setidcontribuinte';
   CMetodoSetIDTransmissorReinf =     'setidtransmissor';
   CMetodoConsultarReciboReinf =      'consultarreciboreinf';
+  CMetodoValidarReinf =              'validarreinf';
 
   CMetodoConfigurarDados =           'configurardados';
   CMetodoLimparLista =               'limparlista';
@@ -1423,7 +1424,7 @@ const
 
   CValueTipoEmpregador =                    'tePessoaJuridica';
   CValueTipoContribuinte =                  'tcPessoaJuridica';
-  CvalueVersaoeSocial =                     '02_04_02';
+  CvalueVersaoeSocial =                     'S01_00_00';
   CvalueVersaoReinf =                       '1_03_02';
   CvalueVersaoQRCode =                      '0';
 
@@ -1450,6 +1451,16 @@ const
   CKeyNFSeNomePrefeitura =                  'NomePrefeitura';
   CKeyNFSeCNPJPrefeitura =                  'CNPJPrefeitura';
   CKeyNFSeNomeLongoNFSe =                   'NomeLongoNFSe';
+  CKeyNFSeIEEmitente =                      'IEEmitente';
+  CKeyNFSeEnderecoEmitente =                'EnderecoEmitente';
+  CKeyNFSeNumeroEmitente =                  'NumeroEmitente';
+  CKeyNFSeBairroEmitente =                  'BairroEmitente';
+  CKeyNFSeComplementoEmitente =             'ComplementoEmitente';
+  CKeyNFSeCEPEmitente =                     'CEPEmitente';
+  CKeyNFSeEmailEmitente =                   'EmailEmitente';
+  CKeyNFSeFoneEmitente =                    'FoneEmitente';
+
+
 
 
 implementation

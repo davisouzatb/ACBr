@@ -166,15 +166,17 @@ type
   TTipoDesconto = (tdNenhum, tdTarifaPromocional, tdIdoso, tdCrianca, tdDeficiente,
                    tdEstudante, tdAnimalDomestico, tdAcordoColetivo,
                    tdProfissionalemDeslocamento, tdProfissionaldaEmpresa,
-                   tdJovem, tdOutrosDesc);
+                   tdJovem, tdIdoso50, tdAcompanhantePCD, tdPessoaObesa,
+                   tdOutrosDesc);
 
 const
   TTipoDescontoArrayStrings: array[TTipoDesconto] of string = ('', '01', '02',
-    '03', '04', '05', '06', '07', '08', '09', '10', '99');
+    '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '99');
   TTipoDescontoDescArrayStrings: array[TTipoDesconto] of string = ('',
     'Tarifa Promocional', 'Idoso', 'Criança', 'Deficiente', 'Estudante',
     'Animal Domestico', 'Acordo Coletivo', 'Profissional em Deslocamento',
-    'Profissional da Empresa', 'Jovem', 'Outros');
+    'Profissional da Empresa', 'Jovem', 'Idoso 50%', 'Acompanhante PCD',
+    'Pessoa Obesa', 'Outros');
 
 type
   TTipoComponente = (tcTarifa, tcPedagio, tcTaxaEmbarque, tcSeguro, tcTRM,
@@ -333,7 +335,8 @@ function StrTotpIntegra(out ok: Boolean; const s: string): TtpIntegra;
 implementation
 
 uses
-  typinfo;
+  typinfo,
+  ACBrBase;
 
 function StrToTpEventoBPe(out ok: boolean; const s: string): TpcnTpEvento;
 begin
@@ -627,22 +630,24 @@ function tpDescontoToStr(const t: TTipoDesconto): String;
 begin
   result := EnumeradoToStr(t,
                            ['', '01', '02', '03', '04', '05', '06', '07', '08',
-                            '09', '10', '99'],
+                            '09', '10', '11', '12', '13', '99'],
                            [tdNenhum, tdTarifaPromocional, tdIdoso, tdCrianca,
                             tdDeficiente, tdEstudante, tdAnimalDomestico,
                             tdAcordoColetivo, tdProfissionalemDeslocamento,
-                            tdProfissionaldaEmpresa, tdJovem, tdOutrosDesc]);
+                            tdProfissionaldaEmpresa, tdJovem, tdIdoso50,
+                            tdAcompanhantePCD, tdPessoaObesa, tdOutrosDesc]);
 end;
 
 function StrTotpDesconto(out ok: Boolean; const s: String): TTipoDesconto;
 begin
   result := StrToEnumerado(ok, s,
                            ['', '01', '02', '03', '04', '05', '06', '07', '08',
-                            '09', '10', '99'],
+                            '09', '10', '11', '12', '13', '99'],
                            [tdNenhum, tdTarifaPromocional, tdIdoso, tdCrianca,
                             tdDeficiente, tdEstudante, tdAnimalDomestico,
                             tdAcordoColetivo, tdProfissionalemDeslocamento,
-                            tdProfissionaldaEmpresa, tdJovem, tdOutrosDesc]);
+                            tdProfissionaldaEmpresa, tdJovem, tdIdoso50,
+                            tdAcompanhantePCD, tdPessoaObesa, tdOutrosDesc]);
 end;
 
 function tpDescontoToDesc(const t: TTipoDesconto): String;
@@ -651,11 +656,13 @@ begin
                            ['', 'Tarifa Promocional', 'Idoso', 'Criança',
                             'Deficiente', 'Estudante', 'Animal Domestico',
                             'Acordo Coletivo', 'Profissional em Deslocamento',
-                            'Profissional da Empresa', 'Jovem', 'Outros'],
+                            'Profissional da Empresa', 'Jovem', 'Idoso 50%',
+                            'Acompanhante PCD', 'Pessoa Obesa', 'Outros'],
                            [tdNenhum, tdTarifaPromocional, tdIdoso, tdCrianca,
                             tdDeficiente, tdEstudante, tdAnimalDomestico,
                             tdAcordoColetivo, tdProfissionalemDeslocamento,
-                            tdProfissionaldaEmpresa, tdJovem, tdOutrosDesc]);
+                            tdProfissionaldaEmpresa, tdJovem, tdIdoso50,
+                            tdAcompanhantePCD, tdPessoaObesa, tdOutrosDesc]);
 end;
 
 function tpComponenteToStr(const t: TTipoComponente): String;

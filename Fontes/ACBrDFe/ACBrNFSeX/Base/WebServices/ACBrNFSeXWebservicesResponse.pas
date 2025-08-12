@@ -38,7 +38,8 @@ interface
 
 uses
   classes,
-  {$IF DEFINED(NEXTGEN)}
+  {$IF DEFINED(HAS_SYSTEM_GENERICS)}
+//  {$IF DEFINED(NEXTGEN)}
    System.Generics.Collections, System.Generics.Defaults,
   {$ELSEIF DEFINED(DELPHICOMPILER16_UP)}
    System.Contnrs,
@@ -85,6 +86,7 @@ type
     FNSU: Integer;
     FChaveDFe: string;
     FTipoDoc: string;
+    FTipoEvento: string;
     FidNota: string;
     FidRps: string;
     FNomeArq: string;
@@ -102,6 +104,7 @@ type
     property NSU: Integer read FNSU write FNSU;
     property ChaveDFe: string read FChaveDFe write FChaveDFe;
     property TipoDoc: string read FTipoDoc write FTipoDoc;
+    property TipoEvento: string read FTipoEvento write FTipoEvento;
     property idNota: string read FidNota write FidNota;
     property idRps: string read FidRps write FidRps;
     property NomeArq: string read FNomeArq write FNomeArq;
@@ -229,6 +232,7 @@ type
     FArquivoEnvio: string;
     FArquivoRetorno: string;
     FHtmlRetorno: string;
+    FPathNome: string;
 
     function GetXmlEnvio: string;
     procedure SetXmlEnvio(const Value: string);
@@ -260,6 +264,7 @@ type
     property tpEvento: TtpEvento read FtpEvento write FtpEvento;
     property nSeqEvento: Integer read FnSeqEvento write FnSeqEvento;
     property NumNotaSubstituidora: string read FNumNotaSubstituidora write FNumNotaSubstituidora;
+    property PathNome: string read FPathNome write FPathNome;
 
     property Alertas: TNFSeEventoCollection read FAlertas;
     property Erros: TNFSeEventoCollection read FErros;
@@ -338,6 +343,7 @@ type
     FCodigoVerificacao: string;
     FCancelamento: TNFSeCancelamento;
     FCNPJCPFTomador: string;
+    FInfConsultaNFSe: TInfConsultaNFSe;
   public
     constructor Create;
     destructor Destroy; override;
@@ -350,6 +356,7 @@ type
     property CodigoVerificacao: string read FCodigoVerificacao write FCodigoVerificacao;
     property Cancelamento: TNFSeCancelamento read FCancelamento write FCancelamento;
     property CNPJCPFTomador: string read FCNPJCPFTomador write FCNPJCPFTomador;
+    property InfConsultaNFSe: TInfConsultaNFSe read FInfConsultaNFSe write FInfConsultaNFSe;
   end;
 
   TNFSeConsultaNFSeResponse = class(TNFSeWebserviceResponse)
@@ -632,6 +639,7 @@ begin
   tpEvento := teCancelamento;
   nSeqEvento := 0;
   HtmlRetorno := '';
+  PathNome := '';
 
   if Assigned(FErros) then
   begin
@@ -873,6 +881,11 @@ begin
     FCancelamento.Free;
 
   FCancelamento := TNFSeCancelamento.Create;
+
+  if Assigned(FInfConsultaNFSe) then
+    FInfConsultaNFSe.Free;
+
+  FInfConsultaNFSe := TInfConsultaNFSe.Create;
 end;
 
 constructor TNFSeConsultaNFSeporRpsResponse.Create;
@@ -886,6 +899,9 @@ destructor TNFSeConsultaNFSeporRpsResponse.Destroy;
 begin
   if Assigned(FCancelamento) then
     FCancelamento.Free;
+
+  if Assigned(FInfConsultaNFSe) then
+    FInfConsultaNFSe.Free;
 
   inherited Destroy;
 end;

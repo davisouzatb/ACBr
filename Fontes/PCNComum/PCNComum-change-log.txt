@@ -38,6 +38,31 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+08/08/2025
+-- pcnRetDistDFeInt --
+[*] #TK-7484: Alteração visando a leitura do grupo itensAverbados.
+  Por: M & M INFORMATICA LTDA
+
+26/02/2025
+-- pcnLeitor --
+[*] #TK-6581: Altera uso da ReverterFiltroTextoXML pela DecodeHTMLEntities
+  Por: Diego Folieni
+
+23/02/2025
+-- pcnRetDistDFeInt --
+[*] Ajustes para identificar o CT-e Simplificado.
+   Por: galegoga
+
+10/02/2025
+-- pcnConversao --
+[+] acrescentado o enumerador: schprocCTeSimp ao tipo TSchemaDFe.
+   Por: Italo Giurizzato Junior
+
+07/02/2024
+-- pcnAuxiliar --
+[*] #Tk-6581: Ajuste visando sanar problema na leitura de caracteres escapados em Hex-Code.
+  Por: Diego Folieni 
+
 21/10/2024
 -- pcnConversao --
 [+] acrescentado o enumerador: teRegistroPassagemMDFe.

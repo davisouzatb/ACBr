@@ -1273,7 +1273,7 @@ object frmACBrNFCom: TfrmACBrNFCom
     TabOrder = 1
     object pgcBotoes: TPageControl
       Left = 1
-      Top = 1
+      Top = 41
       Width = 567
       Height = 163
       ActivePage = tsEnvios
@@ -1443,12 +1443,34 @@ object frmACBrNFCom: TfrmACBrNFCom
           OnClick = btnEnviarEventoEmailClick
         end
       end
+      object tsOutros: TTabSheet
+        Caption = 'Outros'
+        ImageIndex = 3
+        object btnLerArqINI: TButton
+          Left = 3
+          Top = 3
+          Width = 177
+          Height = 25
+          Caption = 'Ler Arquivo INI/Gerar XML'
+          TabOrder = 0
+          OnClick = btnLerArqINIClick
+        end
+        object btnGerarArqINI: TButton
+          Left = 186
+          Top = 3
+          Width = 177
+          Height = 25
+          Caption = 'Gerar Arquivo INI'
+          TabOrder = 1
+          OnClick = btnGerarArqINIClick
+        end
+      end
     end
     object pgRespostas: TPageControl
       Left = 1
-      Top = 164
+      Top = 204
       Width = 567
-      Height = 447
+      Height = 407
       ActivePage = TabSheet8
       Align = alClient
       TabOrder = 1
@@ -1459,7 +1481,7 @@ object frmACBrNFCom: TfrmACBrNFCom
           Left = 0
           Top = 0
           Width = 559
-          Height = 419
+          Height = 379
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1472,11 +1494,11 @@ object frmACBrNFCom: TfrmACBrNFCom
           Left = 0
           Top = 0
           Width = 559
-          Height = 419
+          Height = 379
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000C63900004E2B00000000000000000000000000000000000000000000
+            4C000000C63900002C2700000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1490,11 +1512,11 @@ object frmACBrNFCom: TfrmACBrNFCom
           Left = 0
           Top = 0
           Width = 559
-          Height = 419
+          Height = 379
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000C63900004E2B00000000000000000000000000000000000000000000
+            4C000000C63900002C2700000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1508,12 +1530,32 @@ object frmACBrNFCom: TfrmACBrNFCom
           Left = 0
           Top = 0
           Width = 559
-          Height = 419
+          Height = 379
           Align = alClient
           Indent = 19
           TabOrder = 0
         end
       end
+    end
+    object rgReformaTributaria: TRadioGroup
+      Left = 1
+      Top = 1
+      Width = 567
+      Height = 40
+      Align = alTop
+      Caption = 'Gera os campos da ReformaTributaria'
+      Columns = 2
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ItemIndex = 1
+      Items.Strings = (
+        'Sim'
+        'N'#227'o')
+      ParentFont = False
+      TabOrder = 2
     end
   end
   object ACBrMail1: TACBrMail
@@ -1524,8 +1566,8 @@ object frmACBrNFCom: TfrmACBrNFCom
     Attempts = 3
     DefaultCharset = UTF_8
     IDECharset = CP1252
-    Left = 334
-    Top = 295
+    Left = 350
+    Top = 311
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = '*-nfe.XML'
@@ -1533,8 +1575,8 @@ object frmACBrNFCom: TfrmACBrNFCom
       'Arquivos NFE (*-nfe.XML)|*-nfe.XML|Arquivos XML (*.XML)|*.XML|To' +
       'dos os Arquivos (*.*)|*.*'
     Title = 'Selecione a NFe'
-    Left = 459
-    Top = 295
+    Left = 475
+    Top = 311
   end
   object ACBrNFCom1: TACBrNFCom
     MAIL = ACBrMail1
@@ -1552,8 +1594,8 @@ object frmACBrNFCom: TfrmACBrNFCom
     Configuracoes.WebServices.QuebradeLinha = '|'
     Configuracoes.RespTec.IdCSRT = 0
     DANFCom = ACBrNFComDANFComRL1
-    Left = 334
-    Top = 228
+    Left = 350
+    Top = 244
   end
   object ACBrNFComDANFComRL1: TACBrNFComDANFComRL
     Sistema = 'Projeto ACBr - www.projetoacbr.com.br'
@@ -1580,7 +1622,7 @@ object frmACBrNFCom: TfrmACBrNFCom
     ViaConsumidor = True
     ImprimeNomeFantasia = False
     PrintDialog = True
-    Left = 462
-    Top = 228
+    Left = 478
+    Top = 244
   end
 end

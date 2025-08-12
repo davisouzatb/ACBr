@@ -205,42 +205,52 @@ begin
             end;
 
             case LJSonObject.AsInteger['tipoMulta'] of
-             1 : begin // Multa Valor Fixo
-              ARetornoWS.DadosRet.TituloRet.CodigoMulta      := cmValorFixo;
-              ARetornoWS.DadosRet.TituloRet.PercentualMulta  := LJSonObject.AsCurrency['valorMulta'];
-              ARetornoWS.DadosRet.TituloRet.MultaValorFixo   := True;
-              ARetornoWS.DadosRet.TituloRet.DataMulta        := DateBancoobToDateTime(LJSonObject.AsString['dataMulta']);
-             end;
-             2 : begin // Multa com Valor em Percentual
-              ARetornoWS.DadosRet.TituloRet.CodigoMulta      := cmPercentual;
-              ARetornoWS.DadosRet.TituloRet.PercentualMulta  := LJSonObject.AsCurrency['valorMulta'];
-              ARetornoWS.DadosRet.TituloRet.MultaValorFixo   := False;
-              ARetornoWS.DadosRet.TituloRet.DataMulta        := DateBancoobToDateTime(LJSonObject.AsString['dataMulta']);
-             end;
-             3 : begin // Sem Multa
-               ARetornoWS.DadosRet.TituloRet.CodigoMulta     := cmIsento;
-               ARetornoWS.DadosRet.TituloRet.PercentualMulta := 0;
-             end;
+              1 : begin // Multa Valor Fixo
+                ARetornoWS.DadosRet.TituloRet.CodigoMulta      := cmValorFixo;
+                ARetornoWS.DadosRet.TituloRet.PercentualMulta  := LJSonObject.AsCurrency['valorMulta'];
+                ARetornoWS.DadosRet.TituloRet.MultaValorFixo   := True;
+                ARetornoWS.DadosRet.TituloRet.DataMulta        := DateBancoobToDateTime(LJSonObject.AsString['dataMulta']);
+              end;
+              2 : begin // Multa com Valor em Percentual
+                ARetornoWS.DadosRet.TituloRet.CodigoMulta      := cmPercentual;
+                ARetornoWS.DadosRet.TituloRet.PercentualMulta  := LJSonObject.AsCurrency['valorMulta'];
+                ARetornoWS.DadosRet.TituloRet.MultaValorFixo   := False;
+                ARetornoWS.DadosRet.TituloRet.DataMulta        := DateBancoobToDateTime(LJSonObject.AsString['dataMulta']);
+              end;
+              3 : begin // Sem Multa
+                ARetornoWS.DadosRet.TituloRet.CodigoMulta     := cmIsento;
+                ARetornoWS.DadosRet.TituloRet.PercentualMulta := 0;
+              end;
             end;
 
             ARetornoWS.DadosRet.TituloRet.ValorMulta := ARetornoWS.DadosRet.TituloRet.PercentualMulta;
 
             case LJSonObject.AsInteger['tipoJurosMora'] of
-             1 : begin // Valor Dia
-               ARetornoWS.DadosRet.TituloRet.CodigoMoraJuros := cjValorDia;
-               ARetornoWS.DadosRet.TituloRet.ValorMoraJuros  := LJSonObject.AsCurrency['valorJurosMora'];
-               ARetornoWS.DadosRet.TituloRet.DataMoraJuros   := DateBancoobToDateTime(LJSonObject.AsString['dataJurosMora']);
-             end;
-             2 : begin // Taxa Mensal
-               ARetornoWS.DadosRet.TituloRet.CodigoMoraJuros := cjTaxaMensal;
-               ARetornoWS.DadosRet.TituloRet.ValorMoraJuros  := LJSonObject.AsCurrency['valorJurosMora'];
-               ARetornoWS.DadosRet.TituloRet.DataMoraJuros   := DateBancoobToDateTime(LJSonObject.AsString['dataJurosMora']);
-             end;
-             3 : begin // Isento
-               ARetornoWS.DadosRet.TituloRet.CodigoMoraJuros := cjIsento;
-               ARetornoWS.DadosRet.TituloRet.ValorMoraJuros  := LJSonObject.AsCurrency['valorJurosMora'];
-             end;
+              1 : begin // Valor Dia
+                ARetornoWS.DadosRet.TituloRet.CodigoMoraJuros := cjValorDia;
+                ARetornoWS.DadosRet.TituloRet.ValorMoraJuros  := LJSonObject.AsCurrency['valorJurosMora'];
+                ARetornoWS.DadosRet.TituloRet.DataMoraJuros   := DateBancoobToDateTime(LJSonObject.AsString['dataJurosMora']);
+              end;
+              2 : begin // Taxa Mensal
+                ARetornoWS.DadosRet.TituloRet.CodigoMoraJuros := cjTaxaMensal;
+                ARetornoWS.DadosRet.TituloRet.ValorMoraJuros  := LJSonObject.AsCurrency['valorJurosMora'];
+                ARetornoWS.DadosRet.TituloRet.DataMoraJuros   := DateBancoobToDateTime(LJSonObject.AsString['dataJurosMora']);
+              end;
+              3 : begin // Isento
+                ARetornoWS.DadosRet.TituloRet.CodigoMoraJuros := cjIsento;
+                ARetornoWS.DadosRet.TituloRet.ValorMoraJuros  := LJSonObject.AsCurrency['valorJurosMora'];
+              end;
             end;
+
+            ARetornoWS.DadosRet.TituloRet.ValorAbatimento := LJSonObject.AsCurrency['valorAbatimento'];
+            ARetornoWS.DadosRet.TituloRet.ValorDesconto   := LJSonObject.AsCurrency['valorPrimeiroDesconto'];
+            ARetornoWS.DadosRet.TituloRet.DataDesconto    := DateBancoobToDateTime(LJSonObject.AsString['dataPrimeiroDesconto']);
+
+            ARetornoWS.DadosRet.TituloRet.ValorDesconto2  := LJSonObject.AsCurrency['valorSegundoDesconto'];
+            ARetornoWS.DadosRet.TituloRet.DataDesconto2   := DateBancoobToDateTime(LJSonObject.AsString['dataSegundoDesconto']);
+
+            ARetornoWS.DadosRet.TituloRet.ValorDesconto3  := LJSonObject.AsCurrency['valorTerceiroDesconto'];
+            ARetornoWS.DadosRet.TituloRet.DataDesconto3   := DateBancoobToDateTime(LJSonObject.AsString['dataTerceiroDesconto']);
 
             ARetornoWS.DadosRet.TituloRet.CodBarras       := ARetornoWS.DadosRet.IDBoleto.CodBarras;
             ARetornoWS.DadosRet.TituloRet.LinhaDig        := ARetornoWS.DadosRet.IDBoleto.LinhaDig;
@@ -279,17 +289,14 @@ begin
               ARetornoWS.DadosRet.TituloRet.Sacado.CNPJCPF        := LJSonObject.AsJSONObject['pagador'].asString['numeroCpfCnpj'];
             end;
 
-            if(LJSonObject.asString['situacaoBoleto'] = C_PAGO) then
+            if(LJSonObject.asString['situacaoBoleto'] = C_PAGO) or (AnsiUpperCase(LJSonObject.asString['situacaoBoleto']) = C_BAIXADO) then
             begin
              // WorkAround para pegar DataPagamento e Valor de Pagamento
-
              LJsonListaHistoricoArray :=  LJSonObject.AsJSONArray['listaHistorico'];
-
-              for i := 0 to Pred(LJsonListaHistoricoArray.Count) do
+             for i := 0 to Pred(LJsonListaHistoricoArray.Count) do
               begin
                 LJsonListaHistoricoObject := LJsonListaHistoricoArray.ItemAsJSONObject[i];
-
-                if LJsonListaHistoricoObject.AsInteger['tipoHistorico'] = 6 then // 1 = Entrada, 4 = Tarifa Liquidação, 6 = Liquidação
+                if LJsonListaHistoricoObject.AsInteger['tipoHistorico'] = 6 then // 1 = Entrada, 4 = Tarifa Liquidação, 6 = Liquidação/Baixado (mesmo codigo liquidado)
                 begin
                  ARetornoWS.DadosRet.TituloRet.DataBaixa := DateBancoobToDateTime(LJsonListaHistoricoObject.AsString['dataHistorico']);
                  vPos := Pos('R$', LJsonListaHistoricoObject.AsString['descricaoHistorico']);
@@ -299,7 +306,6 @@ begin
                 end;
               end;
             end;
-
           end
           else if (TipoOperacao = tpBaixa) then
           begin
@@ -433,6 +439,7 @@ begin
                     ListaRetorno.Header.Operacao := tpConsulta;
 
                     AJSonObject  := AJsonBoletosArray.ItemAsJSONObject[I];
+                    ListaRetorno.Header.ContaCorrente                    := AJSonObject.AsString['numeroContaCorrente'];
 
                     ListaRetorno.DadosRet.IDBoleto.CodBarras             := AJSonObject.AsString['codigoBarras'];
                     ListaRetorno.indicadorContinuidade                   := false;

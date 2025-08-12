@@ -40,7 +40,8 @@ uses
   ACBrJSON,
   ACBrBoleto,
   ACBrBoletoWS,
-  ACBrBoletoWS.Rest;
+  ACBrBoletoWS.Rest,
+  ACBrUtil.Base;
 
 type
 
@@ -90,13 +91,8 @@ const
   C_URL_OAUTH_PROD = 'https://trust-open.api.santander.com.br/auth/oauth/v2/token';
 
   {URL Sandbox - nao devolve todas as informações necessárias no retorno}
-  C_URL_HOM = 'https://trust-sandbox.api.santander.com.br/collection_bill_management/v2';
-  C_URL_OAUTH_HOM = 'https://trust-sandbox.api.santander.com.br/auth/oauth/v2/token';
-
-  {URL Homologação open-h removido no manual 2.6 do banco santander}
-  //C_URL_HOM = 'https://trust-open-h.api.santander.com.br/collection_bill_management/v2';
-  //C_URL_OAUTH_HOM = 'https://trust-open-h.api.santander.com.br/auth/oauth/v2/token';
-
+  C_URL_SANDBOX = 'https://trust-sandbox.api.santander.com.br/collection_bill_management/v2';
+  C_URL_OAUTH_SANDBOX = 'https://trust-sandbox.api.santander.com.br/auth/oauth/v2/token';
 
 implementation
 
@@ -113,13 +109,18 @@ uses
 
 procedure TBoletoW_Santander_API.DefinirURL;
 begin
-  FPURL := IfThen(Boleto.Configuracoes.WebService.Ambiente = tawsProducao, C_URL, C_URL_HOM);
+  case Boleto.Configuracoes.WebService.Ambiente of
+    tawsProducao    : FPURL.URLProducao    := C_URL;
+    tawsHomologacao : FPURL.URLHomologacao := C_URL; //mesma url de produção, pagina 22
+    tawsSandBox     : FPURL.URLSandBox     := C_URL_SANDBOX;
+  end;
+
   case Boleto.Configuracoes.WebService.Operacao of
-     tpInclui         : FPURL := FPURL + '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips';
-     tpAltera         : FPURL := FPURL + '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips';
-     tpConsulta       : FPURL := FPURL + '/bills?' +  DefinirParametros;
-     tpConsultaDetalhe: FPURL := FPURL + '/bills' +  DefinirParametros;
-     tpBaixa          : FPURL := FPURL + '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips';
+     tpInclui         : FPURL.SetPathURI( '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips' );
+     tpAltera         : FPURL.SetPathURI( '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips' );
+     tpConsulta       : FPURL.SetPathURI( '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips' +  DefinirParametros );
+     tpConsultaDetalhe: FPURL.SetPathURI( '/bills' +  DefinirParametros );
+     tpBaixa          : FPURL.SetPathURI( '/workspaces/' + Boleto.Cedente.CedenteWS.KeyUser + '/bank_slips' );
   end;
 end;
 
@@ -130,8 +131,8 @@ end;
 
 procedure TBoletoW_Santander_API.DefinirIdentificador;
 begin
-  if Assigned(ATitulo) then
-    FPIdentificador := 'X-Application-Key: ' + ATitulo.ACBrBoleto.Cedente.CedenteWS.ClientID;
+  //if Assigned(ATitulo) then
+  FPIdentificador := 'X-Application-Key: ' + Boleto.Cedente.CedenteWS.ClientID;
 end;
 
 procedure TBoletoW_Santander_API.GerarHeader;
@@ -173,7 +174,10 @@ begin
     end;
   end else
   if Boleto.Configuracoes.WebService.Operacao = tpConsulta then
-    RequisicaoConsulta;
+    begin
+     FMetodoHTTP := htGET; // Define Método GET conforme manual do banco
+     RequisicaoConsulta;
+    end;
 end;
 
 procedure TBoletoW_Santander_API.DefinirAuthorization;
@@ -190,9 +194,9 @@ end;
 function TBoletoW_Santander_API.GetNsu: string;
 begin
   Result := ATitulo.NossoNumero;
-  {so utilizar se for sandbox}
-//  if Boleto.Configuracoes.WebService.Ambiente = taHomologacao then
-//     Result := 'TST' + Result;
+
+  if Boleto.Configuracoes.WebService.Ambiente = tawsHomologacao then
+    Result := 'TST' + Result;
 end;
 
 function TBoletoW_Santander_API.DefinirParametros: String;
@@ -210,32 +214,64 @@ begin
     5. registry: Pesquisa de informações de cartório do boleto
     }
     if Assigned(ATitulo) then
+    begin
       LNossoNumero := ATitulo.NossoNumero;
+      if Boleto.Configuracoes.WebService.Ambiente = tawsSandBox then
+        LNossoNumero := PadLeft(RemoveZerosEsquerda(LNossoNumero),8,'0');
+    end;
 
     LConsultaList := TStringList.Create;
+
     try
-    //bankslip: Pesquisa para informações do boleto
-    // nao retorna juros
-    if Boleto.Cedente.CedenteWS.IndicadorPix then
-    begin
-      LConsultaList.Add('/'+Boleto.Cedente.Convenio + '.' + LNossoNumero);
-      LConsultaList.Add('tipoConsulta=bankslip');  // 2 via
-      LConsultaList.Delimiter := '?';
-    end else
-    begin
-      if Boleto.Configuracoes.WebService.Filtro.indicadorSituacao = isbBaixado then
-      begin
-        LConsultaList.Add('/'+Boleto.Cedente.Convenio + '.' + LNossoNumero);
-        LConsultaList.Add('tipoConsulta=settlement');    // data pgto
-        LConsultaList.Delimiter := '?';
-      end else
-      begin
-        //Consulta Nosso Numero
-        LConsultaList.Add('?beneficiaryCode='+ Boleto.Cedente.Convenio);
-        LConsultaList.Add('bankNumber='+ LNossoNumero); // juros
-        LConsultaList.Delimiter := '&';
+
+      case Boleto.Configuracoes.WebService.Operacao of
+        tpConsultaDetalhe:
+          begin
+            //bankslip: Pesquisa para informações do boleto
+            // nao retorna juros
+            if Boleto.Cedente.CedenteWS.IndicadorPix then
+            begin
+              LConsultaList.Add('/'+Boleto.Cedente.Convenio + '.' + RemoveZerosEsquerda(LNossoNumero));
+              LConsultaList.Add('tipoConsulta=bankslip');  // 2 via
+              LConsultaList.Delimiter := '?';
+            end else
+            begin
+              if Boleto.Configuracoes.WebService.Filtro.indicadorSituacao = isbBaixado then
+              begin
+                LConsultaList.Add('/'+Boleto.Cedente.Convenio + '.' + LNossoNumero);
+                LConsultaList.Add('tipoConsulta=settlement');    // data pgto
+                LConsultaList.Delimiter := '?';
+              end else
+              begin
+                //Consulta Nosso Numero
+                LConsultaList.Add('?beneficiaryCode='+ Boleto.Cedente.Convenio);
+                LConsultaList.Add('bankNumber='+ LNossoNumero); // juros
+                LConsultaList.Delimiter := '&';
+              end;
+            end;
+          end;
+        tpConsulta:
+          begin
+
+            LConsultaList.Add('?'+'_limit='+'1000' );
+
+            if Boleto.Configuracoes.WebService.Filtro.indiceContinuidade > 0 then
+              LConsultaList.Add('_offset='+ FloatToStr((Boleto.Configuracoes.WebService.Filtro.indiceContinuidade*1000)));
+
+            // consulta devolve apenas boletos liquidados
+            if Boleto.Configuracoes.WebService.Filtro.indicadorSituacao <> isbBaixado then
+              raise EACBrBoletoWSException.Create(ClassName + ACBrStr('Consulta e Lista apenas para situação isbBaixado(Liquidados)'));
+            if (Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataInicio = 0) or
+               (Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataFinal = 0)then
+              raise EACBrBoletoWSException.Create(ClassName + ACBrStr('Informe a data inicial e final do MOVIMENTO'));
+
+            LConsultaList.Add('paymentDateInitial='   + FormatDateTime('yyyy-mm-dd', Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataInicio));
+            LConsultaList.Add('paymentDateFinal=' + FormatDateTime('yyyy-mm-dd', Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataFinal));
+            LConsultaList.Add('status=LIQUIDADO');
+            LConsultaList.Delimiter := '&';
+            //LConsultaList.QuoteChar := '';
+          end;
       end;
-    end;
     finally
       Result := LConsultaList.DelimitedText;
       LConsultaList.Free;
@@ -253,12 +289,10 @@ end;
 
 function TBoletoW_Santander_API.ValidaAmbiente: string;
 begin
-   {Deixado apenas como produção, orientado pelo SUPORTECONECTIVIDADE
-    Data: 08/01/2024, 12:57 anexado na TK 4804 }
-//  if Boleto.Configuracoes.WebService.Ambiente = taProducao then
-    Result := 'PRODUCAO'
-//  else
-//    Result :=  'TESTE';
+  if Boleto.Configuracoes.WebService.Ambiente in [tawsHomologacao] then
+    Result :=  'TESTE'
+  else
+    Result := 'PRODUCAO';
 end;
 
 procedure TBoletoW_Santander_API.RequisicaoAltera;
@@ -307,7 +341,7 @@ begin
           end;
         toRemessaAlterarSeuNumero :
           begin
-            LJsonObject.AddPair('clientNumber', ATitulo.NumeroDocumento); // seu número ou numero documento
+            LJsonObject.AddPair('clientNumber', IfThen(NaoEstaVazio(ATitulo.SeuNumero),ATitulo.SeuNumero,ATitulo.NumeroDocumento)); // seu número ou numero documento
           end;
         toRemessaAlterarNumeroDiasProtesto:
           begin
@@ -364,7 +398,8 @@ end;
 
 procedure TBoletoW_Santander_API.RequisicaoConsulta;
 begin
-  raise EACBrBoletoWSException.Create(ACBrStr(ClassName + Format( S_METODO_NAO_IMPLEMENTADO, [C_LER_LISTA_RETORNO] )));
+  // Sem Payload - Define Método GET
+  //raise EACBrBoletoWSException.Create(ACBrStr(ClassName + Format( S_METODO_NAO_IMPLEMENTADO, [C_LER_LISTA_RETORNO] )));
 end;
 
 procedure TBoletoW_Santander_API.RequisicaoConsultaDetalhe;
@@ -397,10 +432,12 @@ begin
       LJsonObject.AddPair('nsuDate', FormatDateTime('yyyy-mm-dd', Now));
       LJsonObject.AddPair('covenantCode', Boleto.Cedente.Convenio);
       LJsonObject.AddPair('bankNumber', ATitulo.NossoNumero);
-      LJsonObject.AddPair('clientNumber', ATitulo.NumeroDocumento);
+      LJsonObject.AddPair('clientNumber', IfThen(NaoEstaVazio(ATitulo.SeuNumero),ATitulo.SeuNumero,ATitulo.NumeroDocumento));
       LJsonObject.AddPair('dueDate', FormatDateTime('yyyy-mm-dd', ATitulo.Vencimento));
       LJsonObject.AddPair('issueDate', FormatDateTime('yyyy-mm-dd', Now));
       LJsonObject.AddPair('nominalValue', StringReplace(FormatFloat('0.00', ATitulo.ValorDocumento), ',', '.', [rfReplaceAll]));
+      if (ATitulo.DataBaixa <> 0) and ((ATitulo.DataBaixa - ATitulo.Vencimento) > 0) then
+        LJsonObject.AddPair('writeOffQuantityDays', IntToStr(trunc(ATitulo.DataBaixa - ATitulo.Vencimento)));
 
       GerarPagador(LJsonObject);
       GerarSacadorAvalista(LJsonObject);
@@ -775,10 +812,11 @@ begin
 
   if Assigned(OAuth) then
   begin
-    if OAuth.Ambiente = tawsProducao then
-      OAuth.URL := C_URL_OAUTH_PROD
-    else
-      OAuth.URL := C_URL_OAUTH_HOM;
+    case OAuth.Ambiente of
+      tawsProducao    : OAuth.URL.URLProducao    := C_URL_OAUTH_PROD;
+      tawsHomologacao : OAuth.URL.URLHomologacao := C_URL_OAUTH_PROD;  //mesma url de produção, página 22
+      tawsSandBox     : OAuth.URL.URLSandBox     := C_URL_OAUTH_SANDBOX;
+    end;
 
     OAuth.Payload := True;
   end;
@@ -794,38 +832,49 @@ var
   LEnvioPrincipal, LEnvioAuxiliar, LEnvioComplementar : String;
 begin
   //Feito assim consulta subsequentes, pois conversado com o banco
-  //onde os endpoints estão incompetos, precisando pegar informações em 3 lugares
+  //onde os endpoints estão incompletos, precisando pegar informações em 3 lugares
   //por exemplo o valor do pagamento só vem na consulta nosso numero
   //consulta do emv só vem na consulta bankslip e a data pagamento vem settlement
 
   Result := inherited Enviar;
+
   LEnvioPrincipal := FRetornoWS;
 
-  if Boleto.Cedente.CedenteWS.IndicadorPix and (Boleto.Configuracoes.WebService.Operacao = tpConsultaDetalhe) then
+  if Boleto.Cedente.CedenteWS.IndicadorPix and
+    (Boleto.Configuracoes.WebService.Operacao = tpConsultaDetalhe) then
   begin
     try
       Boleto.Cedente.CedenteWS.IndicadorPix := False;
       Boleto.Configuracoes.WebService.Filtro.indicadorSituacao := isbNenhum;
       inherited Enviar;
-      LEnvioAuxiliar := ',' + FRetornoWS;
+      if NaoEstaVazio(LEnvioPrincipal) then
+        LEnvioAuxiliar := ',';
+        LEnvioAuxiliar := LEnvioAuxiliar + FRetornoWS;
     finally
       Boleto.Cedente.CedenteWS.IndicadorPix := True;
     end;
   end;
 
-  if (pos('LIQUIDADO',AnsiUpperCase(LEnvioPrincipal) ) > 0) or
-     (pos('LIQUIDADO',AnsiUpperCase(LEnvioComplementar) ) > 0) or
-     (pos('BAIXADO'  ,AnsiUpperCase(LEnvioPrincipal) ) > 0) or
-     (pos('BAIXADO'  ,AnsiUpperCase(LEnvioComplementar) ) > 0)  then
-  begin
-    Boleto.Cedente.CedenteWS.IndicadorPix := False;
-    Boleto.Configuracoes.WebService.Filtro.indicadorSituacao := isbBaixado;
-    Result := inherited Enviar;
-    LEnvioComplementar := ',' + FRetornoWS;
-    Boleto.Cedente.CedenteWS.IndicadorPix := true;
-    Boleto.Configuracoes.WebService.Filtro.indicadorSituacao := isbNenhum;
-  end;
+  if Boleto.Configuracoes.WebService.Operacao <> tpConsulta then
+    if (pos('LIQUIDADO',AnsiUpperCase(LEnvioPrincipal) ) > 0) or
+       (pos('LIQUIDADO',AnsiUpperCase(LEnvioComplementar) ) > 0) or
+       (pos('BAIXADO'  ,AnsiUpperCase(LEnvioPrincipal) ) > 0) or
+       (pos('BAIXADO'  ,AnsiUpperCase(LEnvioComplementar) ) > 0)  then
+    begin
+      Boleto.Cedente.CedenteWS.IndicadorPix := False;
+      Boleto.Configuracoes.WebService.Filtro.indicadorSituacao := isbBaixado;
+      Result := inherited Enviar;
+      if NaoEstaVazio(LEnvioPrincipal) or NaoEstaVazio(LEnvioAuxiliar) then
+         LEnvioComplementar := ',';
+      LEnvioComplementar := LEnvioComplementar + FRetornoWS;
+      Boleto.Cedente.CedenteWS.IndicadorPix := true;
+      Boleto.Configuracoes.WebService.Filtro.indicadorSituacao := isbNenhum;
+    end;
 
-  FRetornoWS := '[ ' + LEnvioPrincipal + LEnvioAuxiliar + LEnvioComplementar + '  ]';
+  if Boleto.Configuracoes.WebService.Operacao = tpConsulta then
+    FRetornoWS := LEnvioPrincipal
+  else
+    FRetornoWS := '[ ' + LEnvioPrincipal + LEnvioAuxiliar + LEnvioComplementar + '  ]';
+
 end;
 end.

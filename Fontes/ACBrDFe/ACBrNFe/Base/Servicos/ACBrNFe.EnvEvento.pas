@@ -637,6 +637,9 @@ begin
 
   Result.AppendChild(AddNode(tcStr, 'HP19', 'descEvento', 4, 60, 1,
                                             Evento[Idx].FInfEvento.DescEvento));
+
+  Result.AppendChild(AddNode(tcStr, 'HP20', 'xJust', 15, 255, 0,
+                                       Evento[Idx].FInfEvento.detEvento.xJust));
 end;
 
 function TEventoNFe.Gerar_Evento_ManifDestOperNaoRealizada(
@@ -1047,8 +1050,11 @@ begin
 
       for i := 0 to RetEventoNFe.InfEvento.detEvento.itemPedido.Count -1 do
       begin
-        InfEvento.detEvento.itemPedido[i].numItem := RetEventoNFe.InfEvento.detEvento.itemPedido[i].numItem;
-        InfEvento.detEvento.itemPedido[i].qtdeItem := RetEventoNFe.InfEvento.detEvento.itemPedido[i].qtdeItem;
+        with InfEvento.detEvento.itemPedido.New do //ALTERADO
+        begin
+           InfEvento.detEvento.itemPedido[i].numItem := RetEventoNFe.InfEvento.detEvento.itemPedido[i].numItem;
+           InfEvento.detEvento.itemPedido[i].qtdeItem := RetEventoNFe.InfEvento.detEvento.itemPedido[i].qtdeItem;
+        end;
       end;
 
       infEvento.detEvento.idPedidoCancelado := RetEventoNFe.InfEvento.detEvento.idPedidoCancelado;
@@ -1082,18 +1088,21 @@ begin
 
       for i := 0 to RetEventoNFe.InfEvento.detEvento.detPag.Count -1 do
       begin
-        InfEvento.detEvento.detPag[i].indPag := RetEventoNFe.InfEvento.detEvento.detPag[i].indPag;
-        InfEvento.detEvento.detPag[i].tPag := RetEventoNFe.InfEvento.detEvento.detPag[i].tPag;
-        InfEvento.detEvento.detPag[i].xPag := RetEventoNFe.InfEvento.detEvento.detPag[i].xPag;
-        InfEvento.detEvento.detPag[i].vPag := RetEventoNFe.InfEvento.detEvento.detPag[i].vPag;
-        InfEvento.detEvento.detPag[i].dPag := RetEventoNFe.InfEvento.detEvento.detPag[i].dPag;
-        InfEvento.detEvento.detPag[i].CNPJPag := RetEventoNFe.InfEvento.detEvento.detPag[i].CNPJPag;
-        InfEvento.detEvento.detPag[i].UFPag := RetEventoNFe.InfEvento.detEvento.detPag[i].UFPag;
-        InfEvento.detEvento.detPag[i].CNPJIF := RetEventoNFe.InfEvento.detEvento.detPag[i].CNPJIF;
-        InfEvento.detEvento.detPag[i].tBand := RetEventoNFe.InfEvento.detEvento.detPag[i].tBand;
-        InfEvento.detEvento.detPag[i].cAut := RetEventoNFe.InfEvento.detEvento.detPag[i].cAut;
-        InfEvento.detEvento.detPag[i].CNPJReceb := RetEventoNFe.InfEvento.detEvento.detPag[i].CNPJReceb;
-        InfEvento.detEvento.detPag[i].UFReceb := RetEventoNFe.InfEvento.detEvento.detPag[i].UFReceb;
+        with InfEvento.detEvento.detPag.New do //ALTERADO
+        begin
+           InfEvento.detEvento.detPag[i].indPag := RetEventoNFe.InfEvento.detEvento.detPag[i].indPag;
+           InfEvento.detEvento.detPag[i].tPag := RetEventoNFe.InfEvento.detEvento.detPag[i].tPag;
+           InfEvento.detEvento.detPag[i].xPag := RetEventoNFe.InfEvento.detEvento.detPag[i].xPag;
+           InfEvento.detEvento.detPag[i].vPag := RetEventoNFe.InfEvento.detEvento.detPag[i].vPag;
+           InfEvento.detEvento.detPag[i].dPag := RetEventoNFe.InfEvento.detEvento.detPag[i].dPag;
+           InfEvento.detEvento.detPag[i].CNPJPag := RetEventoNFe.InfEvento.detEvento.detPag[i].CNPJPag;
+           InfEvento.detEvento.detPag[i].UFPag := RetEventoNFe.InfEvento.detEvento.detPag[i].UFPag;
+           InfEvento.detEvento.detPag[i].CNPJIF := RetEventoNFe.InfEvento.detEvento.detPag[i].CNPJIF;
+           InfEvento.detEvento.detPag[i].tBand := RetEventoNFe.InfEvento.detEvento.detPag[i].tBand;
+           InfEvento.detEvento.detPag[i].cAut := RetEventoNFe.InfEvento.detEvento.detPag[i].cAut;
+           InfEvento.detEvento.detPag[i].CNPJReceb := RetEventoNFe.InfEvento.detEvento.detPag[i].CNPJReceb;
+           InfEvento.detEvento.detPag[i].UFReceb := RetEventoNFe.InfEvento.detEvento.detPag[i].UFReceb;
+        end;
       end;
 
       signature.URI := RetEventoNFe.signature.URI;
@@ -1292,9 +1301,9 @@ begin
               while true do
               begin
                 sSecao := 'detPag' + IntToStrZero(J, 3);
-                sFim := OnlyNumber(INIRec.ReadString(sSecao,'vPag', 'FIM'));
+                sFim := INIRec.ReadString(sSecao,'vPag', 'FIM');
 
-                if (sFim = 'FIM') or (Length(sFim) <= 0) then
+                if (sFim = 'FIM') or (Length(OnlyNumber(sFim)) <= 0) then
                   break;
 
                 ItemDetPag := infEvento.detEvento.detPag.New;

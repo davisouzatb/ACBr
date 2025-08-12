@@ -52,7 +52,7 @@ namespace ACBrLibNFSe.Demo
                 cmbCrypt.EnumDataSource(SSLCryptLib.cryWinCrypt);
                 cmbHttp.EnumDataSource(SSLHttpLib.httpWinHttp);
                 cmbXmlSign.EnumDataSource(SSLXmlSignLib.xsLibXml2);
-                ACBrNFSe.Config.IniServicos = "";
+                //ACBrNFSe.Config.IniServicos = "";
 
                 // Altera as config de log
                 ACBrNFSe.Config.Principal.LogNivel = NivelLog.logParanoico;
@@ -622,7 +622,18 @@ namespace ACBrLibNFSe.Demo
         {
             try
             {
-                var ret = ACBrNFSe.ObterXml(0);
+                var tipoXML = '1';
+                if (InputBox.Show("Escolha o tipo de XML", "1-RPS|2-NFSe", ref tipoXML) != DialogResult.OK) return;
+
+                string ret;
+                if (tipoXML == '1')
+                {
+                    ret = ACBrNFSe.ObterXmlRps(0);
+                }
+                else
+                {
+                    ret = ACBrNFSe.ObterXml(0);
+                }                
                 rtbRespostas.AppendText(ret);
             }
             catch (Exception exception)

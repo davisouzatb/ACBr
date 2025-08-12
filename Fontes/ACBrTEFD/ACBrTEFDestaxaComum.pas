@@ -1281,6 +1281,7 @@ begin
   TX := aComando;
   fDestaxaClient.GravarLog('TACBrTEFDestaxaSocket.Transmitir - TX: ' + sLineBreak + TX);
   SendString(TX);
+  Sleep(100);
   Erro := LastError;
   fDestaxaClient.GravarLog(' - Transmitido ' + GetErrorDesc(Erro));
   if NaoEstaZerado(Erro) then
@@ -1379,6 +1380,7 @@ begin
   ColetaResposta.Clear;
 
   try
+    Sleep(100);
     Transmitir(ColetaRequisicao.AsString);
   except
     // 10054-Connection reset by peer; 10057-Socket is not connected
@@ -1420,9 +1422,7 @@ function TACBrTEFDestaxaSocket.Desconectar: Integer;
 begin
   CloseSocket;
   Result := LastError;
-
-  fDestaxaClient.GravarLog('TACBrTEFDestaxaSocket.Desconectar - Result: ' +
-    IntToStr(Result));
+  fDestaxaClient.GravarLog('TACBrTEFDestaxaSocket.Desconectar - Result: ' + IntToStr(Result));
 end;
 
 function TACBrTEFDestaxaSocket.Iniciar(aSequencial: Integer): Boolean;
@@ -1875,7 +1875,17 @@ begin
 end;
 
 function TACBrTEFDestaxaClient.IniciarRequisicao: Boolean;
+var
+  wErro: Integer;
 begin
+  wErro := Socket.Conectar;
+  if NaoEstaZerado(wErro) then
+    raise EACBrTEFDestaxaErro.Create(
+      ACBrStr(
+        'Erro ao conectar Destaxa Client' + sLineBreak +
+        'Endereço: ' + EnderecoIP + sLineBreak +
+        'Porta: ' + Porta + sLineBreak +
+        'Erro: ' + IntToStr(wErro) + '-' + Socket.LastErrorDesc));
   Result := Socket.Iniciar(UltimoSequencial+1);
 end;
 
@@ -1883,6 +1893,7 @@ function TACBrTEFDestaxaClient.FinalizarRequisicao: Boolean;
 begin
   Requisicao.sequencial := UltimoSequencial+1;
   Result := Socket.Finalizar;
+  Socket.Desconectar;
 end;
 
 function TACBrTEFDestaxaClient.CartaoVender: Boolean;
@@ -2040,7 +2051,7 @@ begin
   if not Assigned(aStrList) or (aConteudo <= 0) then
     Exit;
 
-  aStrList.Values[aCampo] := '"' + FormatDateTime('dd/MM/yyyy', aConteudo) + '"';
+  aStrList.Values[aCampo] := '"' + FormatDateTime('dd/mm/yyyy hh:nn:ss', aConteudo) + '"';
 end;
 
 procedure TACBrTEFDestaxaTransacaoClass.PreencherCampo(const aStrList: TStringList; const aCampo, aConteudo: AnsiString;PreencherVazio: Boolean);

@@ -37,6 +37,50 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+22/07/2025
+-- ACBrUtil.DateTime --
+[*] Ajuste em 'UnixMillisecondsToDateTime', para informar se o parâmetro já está 
+	com UTC incluso no valor de entrada
+
+30/05/2025
+-- ACBrBase --
+[*] Ajustes em métodos de TACBrInformacao: GetAsDate, GetAsTime, GetAsTimeStamp,
+    GetAsTimeStampSQL, para evitar Exception silenciosa.
+    (por: DSA)
+
+14/05/2025
+-- ACBrUtil.XMLHTML, ACBrNFSeXWebserviceBase --
+[+] #SemTK - Movida função ConverteANSIparaUTF8() da unit ACBrNFSeXWebserviceBase para a ACBrUtil.XMLHTML renomeada para ConverteANSItoUTF8()
+    por: Renato Rubinho
+
+28/03/2025
+-- ACBrUtil.DateTime --
+[*] Ajuste referente à UTC no método DateTimeToUnixMilliseconds
+    por: Elias César
+
+27/02/2025
+-- ACBrImage --
+[-] Correção em 'PintarQRCode', para funcionar em FMX
+    (por: DSA)
+
+26/02/2025
+-- ACBrUtil.XMLHTML --
+[+] #TK-6581: Adiciona funções GetNamedEntitie e DecodeHTMLEntities
+  Por: André Ferreira de Moraes
+
+24/02/2025
+-- ACBrUtil.DateTime --
+[+] Adicionado os métodos:
+  function UnixDateTimeBase: TDateTime;
+  function DateTimeToUnixMilliseconds(const AValue: TDateTime): Int64;
+  function UnixMillisecondsToDateTime(const AValue: Int64): TDateTime;
+  (por: DSA)
+
+05/02/2025
+-- ACBrUtil.Math --
+[*] Revert na rotina HexToAscii para evitar resultados inexperados.
+  Por: Diego Folieni
+
 27/12/2024
 -- ACBrUtil.Base --
 [+] Adicionado os métodos:

@@ -42,6 +42,48 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+31/07/2025
+-- ACBrPagForClass/CNAB240.LerTxtRetorno/PagFor.Bradesco.LerTxtRetorno --
+[*] TK-7439: Alterações visando a leitura correta do Segmento Z.
+  Por: Italo Giurizzato Junior
+
+24/07/2025
+-- ACBrPagForConversao.pas --
+[+] TK-7401: Adicionado STARK BANK S.A.
+  Por: Roberto Krug
+
+11/07/2025
+-- ACBrPagForConversao.pas --
+[+] Adicionado BANCO QI SCD S.A
+  Por: Alexandre de Paula
+
+28/05/2025
+-- PagFor.Sicoob.GravarTxtRemessa --
+[*] TK-7126: Incluído o enumerado flLiquidacaoTitulosProprioBanco no case da
+    procedure GerarRegistro1.
+  Por: Vinício Rocha
+
+22/05/2025
+-- PagFor.Sicoob.GravarTxtRemessa --
+[*] TK-7090: Alteração visando gerar o numero do convênio com zeros a esquerda.
+  Por: Vinício Rocha
+
+17/04/2025
+-- PagFor.Itau.GravarTxtRemessa --
+[*] TK-6926: Comentado as linhas que incrementam o numero sequencial do registro
+    no lote dos segmentos B, J52 e W.
+  Por: Marcelo Grando
+
+22/02/2025
+-- Diversos --
+[*] TK-6636: Implementado o Segmento 5 utilizado pelo Banco Bradesco.
+  Por: Italo Giurizzato Junior
+
+03/02/2025
+-- PagFor.Sicredi.GravarTxtRemessa --
+[*] TK-6570: Ajustes para gerar o Segmento J52 com a chave PIX e TX ID.
+  Por: Italo Giurizzato Junior
+
 07/01/2025
 -- ACBrPagForConversao --
 [+] TK-6451: Acrescentado a função de conversão: FmLancamentoToDesc para converter

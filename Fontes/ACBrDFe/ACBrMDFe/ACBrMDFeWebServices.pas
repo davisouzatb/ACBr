@@ -51,6 +51,7 @@ uses
   ACBrDFeComum.RetEnvio,
   pcnDistDFeInt,
   pcnRetDistDFeInt,
+  ACBrXmlBase,
   ACBrMDFeManifestos, ACBrMDFeConfiguracoes;
 
 type
@@ -83,7 +84,7 @@ type
   TMDFeStatusServico = class(TMDFeWebService)
   private
     Fversao: String;
-    FtpAmb: TpcnTipoAmbiente;
+    FtpAmb: TACBrTipoAmbiente;
     FverAplic: String;
     FcStat: Integer;
     FxMotivo: String;
@@ -103,7 +104,7 @@ type
     procedure Clear; override;
 
     property versao: String read Fversao;
-    property tpAmb: TpcnTipoAmbiente read FtpAmb;
+    property tpAmb: TACBrTipoAmbiente read FtpAmb;
     property verAplic: String read FverAplic;
     property cStat: Integer read FcStat;
     property xMotivo: String read FxMotivo;
@@ -122,7 +123,7 @@ type
     FRecibo: String;
     FManifestos: TManifestos;
     Fversao: String;
-    FTpAmb: TpcnTipoAmbiente;
+    FTpAmb: TACBrTipoAmbiente;
     FverAplic: String;
     FcStat: Integer;
     FcUF: Integer;
@@ -156,7 +157,7 @@ type
 
     property Recibo: String read GetRecibo;
     property versao: String read Fversao;
-    property TpAmb: TpcnTipoAmbiente read FTpAmb;
+    property TpAmb: TACBrTipoAmbiente read FTpAmb;
     property verAplic: String read FverAplic;
     property cStat: Integer read FcStat;
     property cUF: Integer read FcUF;
@@ -179,7 +180,7 @@ type
     FChaveMDFe: String;
     FManifestos: TManifestos;
     Fversao: String;
-    FTpAmb: TpcnTipoAmbiente;
+    FTpAmb: TACBrTipoAmbiente;
     FverAplic: String;
     FcStat: Integer;
     FcUF: Integer;
@@ -211,7 +212,7 @@ type
     function Executar: Boolean; override;
 
     property versao: String read Fversao;
-    property TpAmb: TpcnTipoAmbiente read FTpAmb;
+    property TpAmb: TACBrTipoAmbiente read FTpAmb;
     property verAplic: String read FverAplic;
     property cStat: Integer read FcStat;
     property cUF: Integer read FcUF;
@@ -281,7 +282,7 @@ type
     FDhRecbto: TDateTime;
     FXMotivo: String;
     Fversao: String;
-    FTpAmb: TpcnTipoAmbiente;
+    FTpAmb: TACBrTipoAmbiente;
     FverAplic: String;
     FcStat: Integer;
     FcUF: Integer;
@@ -313,7 +314,7 @@ type
     property DhRecbto: TDateTime read FDhRecbto;
     property XMotivo: String read FXMotivo;
     property versao: String read Fversao;
-    property TpAmb: TpcnTipoAmbiente read FTpAmb;
+    property TpAmb: TACBrTipoAmbiente read FTpAmb;
     property verAplic: String read FverAplic;
     property cStat: Integer read FcStat;
     property cUF: Integer read FcUF;
@@ -332,7 +333,8 @@ type
     FEvento: TEventoMDFe;
     FcStat: Integer;
     FxMotivo: String;
-    FTpAmb: TpcnTipoAmbiente;
+//    FTpAmb: TpcnTipoAmbiente;
+    FTpAmb: TACBrTipoAmbiente;
     FCNPJ: String;
 
     FEventoRetorno: TRetEventoMDFe;
@@ -355,7 +357,8 @@ type
     property idLote: Int64 read FidLote write FidLote;
     property cStat: Integer read FcStat;
     property xMotivo: String read FxMotivo;
-    property TpAmb: TpcnTipoAmbiente read FTpAmb;
+//    property TpAmb: TpcnTipoAmbiente read FTpAmb;
+    property TpAmb: TACBrTipoAmbiente read FTpAmb;
 
     property EventoRetorno: TRetEventoMDFe read FEventoRetorno;
   end;
@@ -367,7 +370,7 @@ type
     FOwner: TACBrDFe;
     FCNPJCPF: String;
     Fversao: String;
-    FtpAmb: TpcnTipoAmbiente;
+    FtpAmb: TACBrTipoAmbiente;
     FverAplic: String;
     FcStat: Integer;
     FxMotivo: String;
@@ -390,7 +393,7 @@ type
 
     property CNPJCPF: String                read FCNPJCPF write FCNPJCPF;
     property versao: String                 read Fversao;
-    property tpAmb: TpcnTipoAmbiente        read FtpAmb;
+    property tpAmb: TACBrTipoAmbiente       read FtpAmb;
     property verAplic: String               read FverAplic;
     property cStat: Integer                 read FcStat;
     property xMotivo: String                read FxMotivo;
@@ -504,7 +507,6 @@ uses
   StrUtils, Math,
   ACBrDFeConsts,
   ACBrDFeUtil,
-  ACBrXmlBase,
   ACBrUtil.Base,
   ACBrUtil.XMLHTML,
   ACBrUtil.Strings,
@@ -604,7 +606,7 @@ begin
 
   if Assigned(FPConfiguracoesMDFe) then
   begin
-    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FtpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
     FcUF := FPConfiguracoesMDFe.WebServices.UFCodigo;
   end
 end;
@@ -642,7 +644,7 @@ begin
     MDFeRetorno.LerXml;
 
     Fversao := MDFeRetorno.versao;
-    FtpAmb := TpcnTipoAmbiente(MDFeRetorno.tpAmb);
+    FtpAmb := MDFeRetorno.tpAmb;
     FverAplic := MDFeRetorno.verAplic;
     FcStat := MDFeRetorno.cStat;
     FxMotivo := MDFeRetorno.xMotivo;
@@ -675,7 +677,7 @@ begin
                            'Tempo Médio: %s' + LineBreak +
                            'Retorno: %s' + LineBreak +
                            'Observação: %s' + LineBreak),
-                   [Fversao, TpAmbToStr(FtpAmb), FverAplic, IntToStr(FcStat),
+                   [Fversao, TipoAmbienteToStr(FtpAmb), FverAplic, IntToStr(FcStat),
                     FxMotivo, CodigoUFparaUF(FcUF),
                     IfThen(FdhRecbto = 0, '', FormatDateTimeBr(FdhRecbto)),
                     IntToStr(FTMed),
@@ -726,7 +728,7 @@ begin
 
   if Assigned(FPConfiguracoesMDFe) then
   begin
-    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FtpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
     FcUF := FPConfiguracoesMDFe.WebServices.UFCodigo;
   end;
 
@@ -791,14 +793,14 @@ begin
 
   VerServ := VersaoMDFeToDbl(FVersaoDF);
   Modelo := 'MDFe';
-  FTpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+  FTpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
   FPVersaoServico := '';
   FPURL := '';
 
   TACBrMDFe(FPDFeOwner).LerServicoDeParams(
     Modelo,
     CUFtoUF(FcUF),
-    FTpAmb,
+    TpcnTipoAmbiente(FTpAmb),
     LayOutToServico(FPLayout),
     VerServ,
     FPURL
@@ -934,7 +936,7 @@ begin
             MDFe.procMDFe.cStat := FMDFeRetornoSincrono.protMDFe.cStat;
             MDFe.procMDFe.tpAmb := FMDFeRetornoSincrono.tpAmb;
             MDFe.procMDFe.verAplic := FMDFeRetornoSincrono.verAplic;
-            MDFe.procMDFe.chMDFe := FMDFeRetornoSincrono.protMDFe.chDFe;
+            MDFe.procMDFe.chDFe := FMDFeRetornoSincrono.protMDFe.chDFe;
             MDFe.procMDFe.dhRecbto := FMDFeRetornoSincrono.protMDFe.dhRecbto;
             MDFe.procMDFe.nProt := FMDFeRetornoSincrono.protMDFe.nProt;
             MDFe.procMDFe.digVal := FMDFeRetornoSincrono.protMDFe.digVal;
@@ -982,7 +984,7 @@ begin
     FMDFeRetorno.LerXml;
 
     Fversao := FMDFeRetorno.versao;
-    FTpAmb := TpcnTipoAmbiente(FMDFeRetorno.TpAmb);
+    FTpAmb := FMDFeRetorno.TpAmb;
     FverAplic := FMDFeRetorno.verAplic;
     FcStat := FMDFeRetorno.cStat;
     FxMotivo := FMDFeRetorno.xMotivo;
@@ -1009,7 +1011,7 @@ begin
                            'dhRecbto: %s ' + sLineBreak +
                            'chMDFe: %s ' + LineBreak),
                      [FMDFeRetornoSincrono.versao,
-                      TpAmbToStr(FMDFeRetornoSincrono.TpAmb),
+                      TipoAmbienteToStr(FMDFeRetornoSincrono.TpAmb),
                       FMDFeRetornoSincrono.verAplic,
                       IntToStr(FMDFeRetornoSincrono.cStat),
                       FMDFeRetornoSincrono.xMotivo,
@@ -1108,7 +1110,7 @@ begin
 
   if Assigned(FPConfiguracoesMDFe) then
   begin
-    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FtpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
     FcUF := FPConfiguracoesMDFe.WebServices.UFCodigo;
   end;
 
@@ -1122,7 +1124,7 @@ begin
         if OnlyNumber(FMDFeRetorno.ProtDFe.Items[i].chDFe) = FManifestos.Items[J].NumID then
         begin
           FManifestos.Items[j].MDFe.procMDFe.verAplic := '';
-          FManifestos.Items[j].MDFe.procMDFe.chMDFe   := '';
+          FManifestos.Items[j].MDFe.procMDFe.chDFe   := '';
           FManifestos.Items[j].MDFe.procMDFe.dhRecbto := 0;
           FManifestos.Items[j].MDFe.procMDFe.nProt    := '';
           FManifestos.Items[j].MDFe.procMDFe.digVal   := '';
@@ -1191,14 +1193,14 @@ begin
 
   VerServ := VersaoMDFeToDbl(FVersaoDF);
   Modelo := 'MDFe';
-  FTpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+  FTpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
   FPVersaoServico := '';
   FPURL := '';
 
   TACBrMDFe(FPDFeOwner).LerServicoDeParams(
     Modelo,
     CUFtoUF(FcUF),
-    FTpAmb,
+    TpcnTipoAmbiente(FTpAmb),
     LayOutToServico(FPLayout),
     VerServ,
     FPURL
@@ -1234,6 +1236,8 @@ end;
 
 function TMDFeRetRecepcao.TratarResposta: Boolean;
 begin
+  Result := False;
+  {
   FPRetWS := SeparaDados(FPRetornoWS, 'mdfeRetRecepcaoResult');
 
   //A função UTF8ToNativeString deve ser removida quando for refatorado para usar ACBrXmlDocument
@@ -1251,6 +1255,7 @@ begin
   FxMsg := FMDFeRetorno.xMsg;
 
   Result := (FMDFeRetorno.CStat = 105); // Lote em Processamento
+  }
 end;
 
 function TMDFeRetRecepcao.TratarRespostaFinal: Boolean;
@@ -1288,9 +1293,9 @@ begin
 
         with FManifestos.Items[J] do
         begin
-          MDFe.procMDFe.tpAmb := AInfProt.Items[I].tpAmb;
+          MDFe.procMDFe.tpAmb := TACBrTipoAmbiente(AInfProt.Items[I].tpAmb);
           MDFe.procMDFe.verAplic := AInfProt.Items[I].verAplic;
-          MDFe.procMDFe.chMDFe := AInfProt.Items[I].chDFe;
+          MDFe.procMDFe.chDFe := AInfProt.Items[I].chDFe;
           MDFe.procMDFe.dhRecbto := AInfProt.Items[I].dhRecbto;
           MDFe.procMDFe.nProt := AInfProt.Items[I].nProt;
           MDFe.procMDFe.digVal := AInfProt.Items[I].digVal;
@@ -1598,7 +1603,7 @@ begin
 
   if Assigned(FPConfiguracoesMDFe) then
   begin
-    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FtpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
     FcUF := FPConfiguracoesMDFe.WebServices.UFCodigo;
   end;
 
@@ -1642,14 +1647,14 @@ begin
   VerServ := VersaoMDFeToDbl(FPConfiguracoesMDFe.Geral.VersaoDF);
 
   if FManifestos.Count > 0 then
-    FTpAmb := FManifestos.Items[0].MDFe.Ide.tpAmb
+    FTpAmb := TACBrTipoAmbiente(FManifestos.Items[0].MDFe.Ide.tpAmb)
   else
-    FTpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FTpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
 
   TACBrMDFe(FPDFeOwner).LerServicoDeParams(
     Modelo,
     CUFtoUF(FcUF),
-    FTpAmb,
+    TpcnTipoAmbiente(FTpAmb),
     LayOutToServico(FPLayout),
     VerServ,
     FPURL
@@ -1689,7 +1694,8 @@ function TMDFeConsulta.TratarResposta: Boolean;
 
 procedure SalvarEventos(Retorno: string);
 var
-  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJ: string;
+  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJCPF: string;
+  DhEvt: TDateTime;
   Inicio, Fim: Integer;
   TipoEvento: TpcnTpEvento;
   Ok: Boolean;
@@ -1716,10 +1722,15 @@ begin
       aIDEvento := Copy(aProcEvento, Inicio, Fim);
 
     TipoEvento  := StrToTpEventoMDFe(Ok, SeparaDados(aEvento, 'tpEvento'));
-    sCNPJ       := SeparaDados(aEvento, 'CNPJ');
-    sPathEvento := PathWithDelim(FPConfiguracoesMDFe.Arquivos.GetPathEvento(TipoEvento, sCNPJ));
+    DhEvt       := EncodeDataHora(SeparaDados(aEvento, 'dhEvento'), 'YYYY-MM-DD');
+    sCNPJCPF    := SeparaDados(aEvento, 'CNPJ');
 
-    if (aProcEvento <> '') then
+    if EstaVazio(sCNPJCPF) then
+      sCNPJCPF := SeparaDados(aEvento, 'CPF');
+
+    sPathEvento := PathWithDelim(FPConfiguracoesMDFe.Arquivos.GetPathEvento(TipoEvento, sCNPJCPF, '', DhEvt));
+
+    if FPConfiguracoesMDFe.Arquivos.SalvarEvento and (aProcEvento <> '') then
       FPDFeOwner.Gravar( aIDEvento + '-procEventoMDFe.xml', aProcEvento, sPathEvento);
   end;
 end;
@@ -1927,7 +1938,7 @@ begin
               begin
                 MDFe.procMDFe.tpAmb := MDFeRetorno.tpAmb;
                 MDFe.procMDFe.verAplic := MDFeRetorno.verAplic;
-                MDFe.procMDFe.chMDFe := MDFeRetorno.chMDFe;
+                MDFe.procMDFe.chDFe := MDFeRetorno.chMDFe;
                 MDFe.procMDFe.dhRecbto := FDhRecbto;
                 MDFe.procMDFe.nProt := FProtocolo;
                 MDFe.procMDFe.digVal := MDFeRetorno.protMDFe.digVal;
@@ -2005,7 +2016,7 @@ begin
       end
       else
       begin
-        if ExtrairEventos and FPConfiguracoesMDFe.Arquivos.Salvar and
+        if ExtrairEventos and FPConfiguracoesMDFe.Arquivos.SalvarEvento and
            (NaoEstaVazio(SeparaDados(FPRetWS, 'procEventoMDFe'))) then
         begin
           Inicio := Pos('<procEventoMDFe', FPRetWS);
@@ -2036,7 +2047,7 @@ begin
                            'Recebimento: %s ' + LineBreak +
                            'Protocolo: %s ' + LineBreak +
                            'Digest Value: %s ' + LineBreak),
-                   [Fversao, FMDFeChave, TpAmbToStr(FTpAmb), FverAplic,
+                   [Fversao, FMDFeChave, TipoAmbienteToStr(FTpAmb), FverAplic,
                     IntToStr(FcStat), FXMotivo, CodigoUFparaUF(FcUF), FMDFeChave,
                     FormatDateTimeBr(FDhRecbto), FProtocolo, FprotMDFe.digVal]);
 end;
@@ -2077,7 +2088,8 @@ begin
   FCNPJ := '';
 
   if Assigned(FPConfiguracoesMDFe) then
-    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FTpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
+//    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
 
   if Assigned(FEventoRetorno) then
     FEventoRetorno.Free;
@@ -2114,7 +2126,8 @@ begin
   TACBrMDFe(FPDFeOwner).LerServicoDeParams(
     Modelo,
     UF,
-    FTpAmb,
+    TpcnTipoAmbiente(FTpAmb),
+//    FTpAmb,
     LayOutToServico(FPLayout),
     VerServ,
     FPURL
@@ -2309,6 +2322,7 @@ begin
 
     EventoMDFe.Versao := FPVersaoServico;
 
+    AjustarOpcoes(EventoMDFe.Opcoes);
     EventoMDFe.GerarXML;
 
     Eventos := NativeStringToUTF8( EventoMDFe.XmlEnvio );
@@ -2476,7 +2490,7 @@ begin
                      Texto +
                    '</procEventoMDFe>';
 
-          if FPConfiguracoesMDFe.Arquivos.Salvar then
+          if FPConfiguracoesMDFe.Arquivos.SalvarEvento then
           begin
             NomeArq := OnlyNumber(FEvento.Evento.Items[I].InfEvento.Id) + '-procEventoMDFe.xml';
             PathArq := PathWithDelim(GerarPathEvento(FEvento.Evento.Items[I].InfEvento.CNPJCPF));
@@ -2506,7 +2520,7 @@ begin
                          'Versão Aplicativo: %s ' + LineBreak +
                          'Status Código: %s ' + LineBreak +
                          'Status Descrição: %s ' + LineBreak),
-                 [FEventoRetorno.versao, TpAmbToStr(FEventoRetorno.tpAmb),
+                 [FEventoRetorno.versao, TipoAmbienteToStr(FEventoRetorno.tpAmb),
                   FEventoRetorno.verAplic, IntToStr(FEventoRetorno.cStat),
                   FEventoRetorno.xMotivo]);
 
@@ -2552,7 +2566,7 @@ begin
 
   if Assigned(FPConfiguracoesMDFe) then
   begin
-    FtpAmb := FPConfiguracoesMDFe.WebServices.Ambiente;
+    FtpAmb := TACBrTipoAmbiente(FPConfiguracoesMDFe.WebServices.Ambiente);
     FcUF := FPConfiguracoesMDFe.WebServices.UFCodigo;
   end;
 
@@ -2644,7 +2658,7 @@ begin
                            'Status Código: %s ' + LineBreak +
                            'Status Descrição: %s ' + LineBreak +
                            'UF: %s ' + LineBreak),
-                   [FRetConsMDFeNaoEnc.versao, TpAmbToStr(FRetConsMDFeNaoEnc.tpAmb),
+                   [FRetConsMDFeNaoEnc.versao, TipoAmbienteToStr(FRetConsMDFeNaoEnc.tpAmb),
                     FRetConsMDFeNaoEnc.verAplic, IntToStr(FRetConsMDFeNaoEnc.cStat),
                     FRetConsMDFeNaoEnc.xMotivo,
                     CodigoUFparaUF(FRetConsMDFeNaoEnc.cUF)]);
@@ -2769,8 +2783,9 @@ begin
 
       if (FPConfiguracoesMDFe.Arquivos.Salvar) and NaoEstaVazio(FNomeArq) then
       begin
-        if (FretDistDFeInt.docZip.Items[I].schema in [schprocEventoMDFe]) then
-          FPDFeOwner.Gravar(FNomeArq, AXML, aPath);
+        if FPConfiguracoesMDFe.Arquivos.SalvarEvento then
+          if (FretDistDFeInt.docZip.Items[I].schema in [schprocEventoMDFe]) then
+            FPDFeOwner.Gravar(FNomeArq, AXML, aPath);
 
         if (FretDistDFeInt.docZip.Items[I].schema in [schprocMDFe]) then
           FPDFeOwner.Gravar(FNomeArq, AXML, aPath);

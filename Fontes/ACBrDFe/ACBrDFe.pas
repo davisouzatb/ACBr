@@ -51,6 +51,8 @@ type
   TACBrDFeOnTransmitError = procedure(const HttpError, InternalError: Integer;
     const URL, DadosEnviados, SoapAction: String; var Retentar: Boolean; var Tratado: Boolean) of object ;
 
+  TACBrDFeOnTransmitted = procedure(const XML: AnsiString; HTTPResultCode: Integer) of object;
+
   { TACBrDFe }
   {$IFDEF RTL230_UP}
   [ComponentPlatformsAttribute(piacbrAllPlatforms)]
@@ -61,6 +63,7 @@ type
     FIntegrador: TACBrIntegrador;
     FOnTransmit: TACBrDFeOnTransmit;
     FOnTransmitError: TACBrDFeOnTransmitError;
+    FOnTransmitted: TACBrDFeOnTransmitted;
     FSSL: TDFeSSL;
     FListaDeSchemas: TStringList;
     FPathSchemas: String;
@@ -127,9 +130,10 @@ type
   published
     property MAIL: TACBrMail read FMAIL write SetMAIL;
     property Integrador: TACBrIntegrador read FIntegrador write SetIntegrador;
-    property OnTransmit : TACBrDFeOnTransmit read FOnTransmit write FOnTransmit;
-    property OnTransmitError : TACBrDFeOnTransmitError read FOnTransmitError
+    property OnTransmit: TACBrDFeOnTransmit read FOnTransmit write FOnTransmit;
+    property OnTransmitError: TACBrDFeOnTransmitError read FOnTransmitError
        write FOnTransmitError;
+    property OnTransmitted: TACBrDFeOnTransmitted read FOnTransmitted write FOnTransmitted;
     property OnStatusChange: TNotifyEvent read FOnStatusChange write FOnStatusChange;
 
     property OnGerarLog: TACBrGravarLog read FOnGerarLog write FOnGerarLog;
@@ -192,6 +196,7 @@ begin
   FOnGerarLog := nil;
   FOnTransmit := nil;
   FOnTransmitError := nil;
+  FOnTransmitted := nil;
 
   FPIniParams := TMemIniFile.Create(Configuracoes.Arquivos.IniServicos);
   FPIniParamsCarregado := False;
@@ -237,6 +242,7 @@ function TACBrDFe.Gravar(NomeArquivo: String; ConteudoXML: String;
   const aPath: String; ConteudoEhUTF8: Boolean): Boolean;
 var
   UTF8Str, SoNome, SoPath: String;
+  Tratado: Boolean;
 begin
   Result := False;
   try
@@ -268,6 +274,13 @@ begin
     WriteToTXT(NomeArquivo, UTF8Str, False, False);
     Result := True;
   except
+    on E: EACBrDFeException do
+    begin
+      Tratado := False;
+      FazerLog('ERRO: ' + E.Message, Tratado);
+      if not Tratado then raise;
+    end;
+
     on E: Exception do
       GerarException('Erro ao salvar.', E);
   end;
@@ -625,8 +638,14 @@ var
   MsgErro: String;
 begin
   MsgErro := Msg;
+
   if Assigned(E) then
-    MsgErro := MsgErro + sLineBreak + E.Message;
+    begin
+      if EstaVazio(MsgErro) then
+        MsgErro := E.Message
+      else
+        MsgErro := MsgErro + sLineBreak + E.Message;
+    end;
 
   Tratado := False;
   FazerLog('ERRO: ' + MsgErro, Tratado);

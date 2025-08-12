@@ -378,6 +378,40 @@ resourcestring
   DSC_SERIEGUIA = 'Série da Guia';
   DSC_NGUIA = 'Número da Guia';
 
+  // Reforma Tributária
+  DSC_CMUNFGIBS = 'Código do Município de consumo, fato gerador do IBS / CBS';
+  DSC_TPNFDEBITO = 'Tipo de Nota de Débito';
+  DSC_TPNFCREDITO = 'Tipo de Nota de Crédito';
+  DSC_VITEM = 'Valor total do Item';
+  DSC_VNFTOT = 'Valor Total da NF considerando os impostos por fora IBS, CBS e IS';
+  DSC_VBCIMPSEL = 'Valor da Base de Cálculo do Imposto Seletivo';
+  DSC_PIMPSEL = 'Alíquota do Imposto Seletivo';
+  DSC_PIMPSELESPEC = 'Alíquota específica por unidade de medida apropriada';
+  DSC_VIMPSEL = 'Valor do Imposto Seletivo';
+  DSC_ADREMIBS = 'Alíquota ad rem do IBS';
+  DSC_ADREMCBS = 'Alíqutoa ad rem da CBS';
+  DSC_VIBSMONO = 'Valor do IBS monofásico';
+  DSC_VCBSMONO = 'Valor da CBS monofásica';
+  DSC_ADREMIBSRETEN = 'Alíquota ad rem do imposto sujeito a retenção';
+  DSC_VIBSMONORETEN = 'Valor do IBS monofásico sujeito a retenção';
+  DSC_PDIFIBS = 'Percentual do diferimento do imposto monofásico';
+  DSC_VIBSMONODIF = 'Valor do IBS mono diferido.';
+  DSC_PDIFCBS = 'Percentual do diferimento do imposto monofásico';
+  DSC_VCBSMONODIF = 'Valor do CBS Mono diferido.';
+  DSC_VTOTIBSMONO = 'Total de IBS Monofásico.';
+  DSC_VTOTCBSMONO = 'Total da CBS Monofásica';
+  DSC_CHAVEACESSO = 'Chave de acesso do DF-e referenciado';
+  DSC_VIS = 'Valor Total do Imposto Seletivo';
+  DSC_VBCIBSCBS = 'Valor total da BC do IBS e da CBS';
+  DSC_VBCSEL = 'Total da base de cálculo do imposto seletivo';
+  DSC_VCRESPRES = 'Valor total do crédito presumido';
+  DSC_VCBSMONORETEN = 'Valor total da CBS monofásica sujeita a retenção';
+  DSC_VIBSMONORET = 'Valor do IBS monofásico retido anteriormente';
+  DSC_VCBSMONORET = 'Valor da CBS monofásica retida anteriormente';
+  DSC_TPCREDPRESIBSZFM = 'Classificação de acordo com o art. 450, § 1º, da LC 214/25 para o cálculo do crédito presumido na ZFM';
+  DSC_VCREDPRESIBSZFM = 'Valor do crédito presumido calculado sobre o saldo devedor apurado';
+  DSC_INDBEMMOVELUSADO = 'Indicador de fornecimento de bem móvel usado';
+
 implementation
 
 end.

@@ -49,10 +49,12 @@ type
   TACBrBancoPenseBank = class(TACBrBancoBrasil)
   private
     function FormataNossoNumero(const ACBrTitulo :TACBrTitulo): String; reintroduce;
+    function MontarCampoNossoNumero(const ACBrTitulo: TACBrTitulo) :string; override;
   public
    Constructor create(AOwner: TACBrBanco);
    function MontarCodigoBarras(const ACBrTitulo : TACBrTitulo): String; override;
    function MontarCampoCodigoCedente(const ACBrTitulo: TACBrTitulo): String; override;
+   function MontarCampoCarteira(const ACBrTitulo: TACBrTitulo): String; override;
 
   end;
 
@@ -72,16 +74,13 @@ begin
    fpTamanhoConta          := 12;
    fpTamanhoAgencia        := 4;
    fpTamanhoCarteira       := 2;
-   fpCodigosMoraAceitos    := '123';
+   fpCodigosMoraAceitos    := '0123';
 
 end;
 
 function TACBrBancoPenseBank.FormataNossoNumero(const ACBrTitulo: TACBrTitulo): String;
 begin
-  Result:= inherited FormataNossoNumero(ACBrTitulo);
-  if (ACBrTitulo.ACBrBoleto.Banco.TipoCobranca = cobBancoDoBrasilAPI) then
-     Result :=  '000' + Result;
-
+  Result:= '000' + inherited FormataNossoNumero(ACBrTitulo);
 end;
 
 function TACBrBancoPenseBank.MontarCodigoBarras(const ACBrTitulo: TACBrTitulo): String;
@@ -131,12 +130,20 @@ begin
    Result:= copy( CodigoBarras, 1, 4) + DigitoCodBarras + copy( CodigoBarras, 5, 44) ;
 end;
 
-function TACBrBancoPenseBank.MontarCampoCodigoCedente(
-  const ACBrTitulo: TACBrTitulo): String;
+function TACBrBancoPenseBank.MontarCampoCarteira(const ACBrTitulo: TACBrTitulo): String;
 begin
-    Result := ACBrTitulo.ACBrBoleto.Cedente.Agencia+'/'+
-             IntToStr(StrToIntDef(ACBrTitulo.ACBrBoleto.Cedente.Conta,0));
+  Result := ACBrTitulo.Carteira;
 end;
 
+function TACBrBancoPenseBank.MontarCampoCodigoCedente(const ACBrTitulo: TACBrTitulo): String;
+begin
+  Result := Trim(ACBrTitulo.ACBrBoleto.Cedente.Agencia)+'/'+
+             IntToStr(StrToIntDef(ACBrTitulo.ACBrBoleto.Cedente.Conta,0)); // mesmo padrão de impressão do pense bank
+end;
+
+function TACBrBancoPenseBank.MontarCampoNossoNumero(const ACBrTitulo: TACBrTitulo): string;
+begin
+  Result:= '000' + inherited MontarCampoNossoNumero(ACBrTitulo);
+end;
 
 end.

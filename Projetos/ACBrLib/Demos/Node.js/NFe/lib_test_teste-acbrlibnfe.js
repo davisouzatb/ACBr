@@ -34,175 +34,141 @@
 // {******************************************************************************}
 
 const path = require('path');
+const koffi = require('koffi');
+const os = require('os');
+const TAMANHO_BUFFER = 1024;
 
-const ffi = require('ffi-napi');
-const ref = require('ref-napi');
-
-var pathDllACBrLibNFe = path.join(__dirname, 'ACBrNFe64.dll');
+var pathDllACBrLibNFe = path.join(__dirname, os.platform() === 'win32' ? 'ACBrNFe64.dll' : 'libacbrnfe64.so');
 var pathXML = path.join(__dirname, 'chave-nfe.xml');
 
 var eArqConfig = path.join(__dirname, 'acbrlib.ini');
 var eChaveCrypt = '';
+const acbrnfe = koffi.load(pathDllACBrLibNFe);
+const libm = {
+  NFE_Inicializar: acbrnfe.func('NFE_Inicializar', 'int', ['void **', 'string', 'string']),
+  NFE_Finalizar: acbrnfe.func('NFE_Finalizar', 'int', ['void *']),
+  NFE_UltimoRetorno: acbrnfe.func('NFE_UltimoRetorno', 'int', ['void *', 'char*', 'int*']),
+  NFE_Nome: acbrnfe.func('NFE_Nome', 'int', ['void *', 'char*', 'int*']),
+  NFE_Versao: acbrnfe.func('NFE_Versao', 'int', ['void *', 'char*', 'int*']),
+  NFE_OpenSSLInfo: acbrnfe.func('NFE_OpenSSLInfo', 'int', ['void *', 'char *', 'int *']),
 
-async function getNFe() {
-  var libm = ffi.Library(pathDllACBrLibNFe, {
+  NFE_ConfigLer: acbrnfe.func('NFE_ConfigLer', 'int', ['void *', 'string']),
+  NFE_ConfigGravar: acbrnfe.func('NFE_ConfigGravar', 'int', ['void *', 'string']),
+  NFE_ConfigLerValor: acbrnfe.func('NFE_ConfigLerValor', 'int', ['void *', 'string', 'string', 'char*', 'int*']),
+  NFE_ConfigGravarValor: acbrnfe.func('NFE_ConfigGravarValor', 'int', ['void *', 'string', 'string', 'string']),
+  NFE_ConfigImportar: acbrnfe.func('NFE_ConfigImportar', 'int', ['void *', 'string']),
+  NFE_ConfigExportar: acbrnfe.func('NFE_ConfigExportar', 'int', ['void *', 'char*', 'int*']),
+  NFE_CarregarXML: acbrnfe.func('NFE_CarregarXML', 'int', ['void *', 'string']),
+  NFE_CarregarINI: acbrnfe.func('NFE_CarregarINI', 'int', ['void *', 'string']),
+  NFE_ObterXml: acbrnfe.func('NFE_ObterXml', 'int', ['void *', 'int', 'char*', 'int*']),
+  NFE_GravarXml: acbrnfe.func('NFE_GravarXml', 'int', ['void *', 'int', 'string', 'string']),
+  NFE_ObterIni: acbrnfe.func('NFE_ObterIni', 'int', ['void *', 'int', 'char*', 'int*']),
+  NFE_GravarIni: acbrnfe.func('NFE_GravarIni', 'int', ['void *', 'int', 'string', 'string']),
+  NFE_CarregarEventoXML: acbrnfe.func('NFE_CarregarEventoXML', 'int', ['void *', 'string']),
+  NFE_CarregarEventoINI: acbrnfe.func('NFE_CarregarEventoINI', 'int', ['void *', 'string']),
+  NFE_LimparLista: acbrnfe.func('NFE_LimparLista', 'int', ['void *']),
+  NFE_LimparListaEventos: acbrnfe.func('NFE_LimparListaEventos', 'int', ['void *']),
+  NFE_Assinar: acbrnfe.func('NFE_Assinar', 'int', ['void *']),
+  NFE_Validar: acbrnfe.func('NFE_Validar', 'int', ['void *']),
+  NFE_ValidarRegrasdeNegocios: acbrnfe.func('NFE_ValidarRegrasdeNegocios', 'int', ['void *', 'char*', 'int*']),
+  NFE_VerificarAssinatura: acbrnfe.func('NFE_VerificarAssinatura', 'int', ['void *', 'char*', 'int*']),
+  NFE_GerarChave: acbrnfe.func('NFE_GerarChave', 'int', ['void *', 'int', 'int', 'int', 'int', 'int', 'int', 'string', 'string', 'char*', 'int*']),
+  NFE_ObterCertificados: acbrnfe.func('NFE_ObterCertificados', 'int', ['void *', 'char*', 'int*']),
+  NFE_GetPath: acbrnfe.func('NFE_GetPath', 'int', ['void *', 'int', 'char*', 'int*']),
+  NFE_GetPathEvento: acbrnfe.func('NFE_GetPathEvento', 'int', ['void *', 'int', 'char*', 'int*']),
 
-    //Métodos da Biblioteca
+  NFE_StatusServico: acbrnfe.func('NFE_StatusServico', 'int', ['void *', 'char*', 'int*']),
+  NFE_Consultar: acbrnfe.func('NFE_Consultar', 'int', ['void *', 'string', 'bool', 'char*', 'int*']),
+  NFE_ConsultarRecibo: acbrnfe.func('NFE_ConsultarRecibo', 'int', ['void *', 'string', 'char*', 'int*']),
+  NFE_ConsultaCadastro: acbrnfe.func('NFE_ConsultaCadastro', 'int', ['void *', 'string', 'string', 'bool', 'char*', 'int*']),
 
-    // NFE_Inicializar([eArqConfig, eChaveCrypt]);
-    NFE_Inicializar: ['int', ['string', 'string']],
-    // NFE_Finalizar();
-    NFE_Finalizar: ['int', []],
-    // NFE_UltimoRetorno(sMensagem, ref esTamanho);
-    NFE_UltimoRetorno: ['int', ['string', 'string']],
-    // NFE_Nome(sNome, ref esTamanho);
-    NFE_Nome: ['int',['string','string']],
-    // NFE_Versao(sVersao, ref esTamanho);
-    NFE_Versao: ['int', ['string','string']],
+  NFE_Inutilizar: acbrnfe.func('NFE_Inutilizar', 'int', ['void *', 'string', 'string', 'int', 'int', 'int', 'int', 'int', 'char*', 'int*']),
+  NFE_Enviar: acbrnfe.func('NFE_Enviar', 'int', ['void *', 'int', 'bool', 'bool', 'bool', 'char*', 'int*']),
+  NFE_Cancelar: acbrnfe.func('NFE_Cancelar', 'int', ['void *', 'string', 'string', 'string', 'int', 'char*', 'int*']),
+  NFE_EnviarEvento: acbrnfe.func('NFE_EnviarEvento', 'int', ['void *', 'int', 'char*', 'int*']),
 
-    //Métodos de Configuração
+  NFE_DistribuicaoDFePorUltNSU: acbrnfe.func('NFE_DistribuicaoDFePorUltNSU', 'int', ['void *', 'int', 'string', 'string', 'char*', 'int*']),
+  NFE_DistribuicaoDFePorNSU: acbrnfe.func('NFE_DistribuicaoDFePorNSU', 'int', ['void *', 'int', 'string', 'string', 'char*', 'int*']),
+  NFE_DistribuicaoDFePorChave: acbrnfe.func('NFE_DistribuicaoDFePorChave', 'int', ['void *', 'int', 'string', 'string', 'char*', 'int*']),
+  NFE_EnviarEmail: acbrnfe.func('NFE_EnviarEmail', 'int', ['void *', 'string', 'string', 'bool', 'string', 'string', 'string', 'string']),
+  NFE_EnviarEmailEvento: acbrnfe.func('NFE_EnviarEmailEvento', 'int', ['void *', 'string', 'string', 'string', 'bool', 'string', 'string', 'string', 'string']),
 
-    // NFE_ConfigLer([eArqConfig]);
-    NFE_ConfigLer: ['int', ['string']],
-    // NFE_ConfigGravar([eArqConfig]);
-    NFE_ConfigGravar: ['int', ['string']],
-    // NFE_ConfigLerValor(eSessao, eChave, sValor, esTamanho);
-    NFE_ConfigLerValor: ['int',['string','string','string','string']],
-    // NFE_ConfigGravarValor(eSessao, eChave, sValor);
-    NFE_ConfigGravarValor: ['int', ['string', 'string', 'string']],
-    // NFE_ConfigImportar([eArqConfig]);
-    NFE_ConfigImportar: ['int',['string']],
-    // NFE_ConfigExportar(sMensagem, ref esTamanho);
-    NFE_ConfigExportar: ['int',['string','string']],
+  NFE_Imprimir: acbrnfe.func('NFE_Imprimir', 'int', ['void *', 'string', 'int', 'string', 'string', 'string', 'string', 'string']),
+  NFE_ImprimirPDF: acbrnfe.func('NFE_ImprimirPDF', 'int', ['void *']),
+  NFE_SalvarPDF: acbrnfe.func('NFE_SalvarPDF', 'int', ['void *', 'char*', 'int*']),
+  NFE_ImprimirEvento: acbrnfe.func('NFE_ImprimirEvento', 'int', ['void *', 'string', 'string']),
+  NFE_ImprimirEventoPDF: acbrnfe.func('NFE_ImprimirEventoPDF', 'int', ['void *', 'string', 'string']),
+  NFE_ImprimirInutilizacao: acbrnfe.func('NFE_ImprimirInutilizacao', 'int', ['void *', 'string']),
+  NFE_SalvarEventoPDF: acbrnfe.func('NFE_SalvarEventoPDF', 'int', ['void *', 'string', 'string']),
+  NFE_ImprimirInutilizacaoPDF: acbrnfe.func('NFE_ImprimirInutilizacaoPDF', 'int', ['void *', 'string']),
+  NFE_SalvarInutilizacaoPDF: acbrnfe.func('NFE_SalvarInutilizacaoPDF', 'int', ['void *', 'string'])
+}
 
-    //Métodos NFe
+function getNFe() {
 
-    // NFE_CarregarXML(eArquivoOuXML);
-    NFE_CarregarXML: ['int', ['string']], 
-    // NFE_CarregarINI(eArquivoOuINI);
-    NFE_CarregarINI: ['int', ['string']],
-    // NFE_ObterXml(AIndex, sResposta, esTamanho);
-    NFE_ObterXml: ['int',['int', 'string', 'string']],
-    // NFE_GravarXml(AIndex, [eNomeArquivo], [ePathArquivo]);
-    NFE_GravarXml: ['int', ['int','string','string']],
-    // NFE_ObterIni(AIndex, sResposta, esTamanho);
-    NFE_ObterIni: ['int', ['int','string','string']],
-    // NFE_GravarIni(AIndex, eNomeArquivo, [ePathArquivo]);
-    NFE_GravarIni: ['int',['int', 'string', 'string']],
-    // NFE_CarregarEventoXML(eArquivoOuXML);
-    NFE_CarregarEventoXML: ['int',['string']],
-    // NFE_CarregarEventoINI(eArquivoOuINI);
-    NFE_CarregarEventoINI: ['int',['string']],
-    // NFE_LimparLista();
-    NFE_LimparLista: ['int',[]],
-    // NFE_LimparListaEventos();
-    NFE_LimparListaEventos: ['int',[]],
-    // NFE_Assinar();
-    NFE_Assinar: ['int', []],
-    // NFE_Validar();
-    NFE_Validar: ['int', []],
-    // NFE_ValidarRegrasdeNegocios(sResposta, esTamanho);
-    NFE_ValidarRegrasdeNegocios: ['int',['string','string']],
-    // NFE_VerificarAssinatura(sResposta, esTamanho);
-    NFE_VerificarAssinatura: ['int',['string','string']],
-    // NFE_GerarChave(ACodigoUF, ACodigoNumerico, AModelo, ASerie, ANumero, ATpEmi, AEmissao, ACNPJCPF, sResposta, esTamanho);
-    NFE_GerarChave: ['int',['int','int','int','int','int','int','string','string','string','string']],
-    // NFE_ObterCertificados(sResposta, esTamanho);
-    NFE_ObterCertificados: ['int',['string','string']],
-    // NFE_GetPath(ATipo, sResposta, esTamanho);
-    NFE_GetPath: ['int',['int','string','string']],
-    // NFE_GetPathEvento(ACodEvento, sResposta, esTamanho);
-    NFE_GetPathEvento: ['int',['int','string','string']],
-    // NFE_StatusServico(sResposta, esTamanho);
-    NFE_StatusServico: ['int', ['status','string']],
-    // NFE_Consultar( eChaveOuNFe, AExtrairEventos, sResposta, esTamanho);
-    NFE_Consultar: ['int',['string','bool','string','string']],
-    // NFE_ConsultarRecibo(ARecibo, sResposta, esTamanho);
-    NFE_ConsultarRecibo: ['int',['string','string','string']],
-    // NFE_ConsultaCadastro(cUF, nDocumento, nIE, sResposta, esTamanho);
-    NFE_ConsultaCadastro: ['int',['string','string','bool','string','string']],
-    // NFE_Inutilizar(ACNPJ, AJustificativa, Ano, Modelo, Serie, NumeroInicial, NumeroFinal, sResposta, esTamanho);
-    NFE_Inutilizar: ['int',['string','string','int','int','int','int','int','string','string']],
-    // NFE_Enviar( (ALote, AImprimir, ASincrono, AZipado, sResposta, esTamanho);
-    NFE_Enviar: ['int', ['int','bool','bool','bool','string','string']],
-    // NFE_Cancelar(eChave, eJustificativa, eCNPJ, ALote, sResposta, esTamanho);
-    NFE_Cancelar: ['int',['string','string','string','int','string','string']],
-    // NFE_EnviarEvento(idLote, sResposta, esTamanho);
-    NFE_EnviarEvento: ['int',['int','string','string']],
-    // NFE_DistribuicaoDFePorUltNSU(AcUFAutor, eCNPJCPF, eultNSU, sResposta, esTamanho);
-    NFE_DistribuicaoDFePorUltNSU: ['int',['int','string','string','string','string']],
-    // NFE_DistribuicaoDFePorNSU(AcUFAutor, eCNPJCPF, eNSU, sResposta, esTamanho);
-    NFE_DistribuicaoDFePorNSU: ['int',['int','string','string','string','string']],
-    // NFE_DistribuicaoDFePorChave(AcUFAutor, eCNPJCPF, eChave, sResposta, esTamanho);
-    NFE_DistribuicaoDFePorChave: ['int',['int','string','string','string','string']],
-    // NFE_EnviarEmail(ePara, eXMLNFe, AEnviaPDF, eAssunto, eCC, eAnexos, eMensagem);
-    NFE_EnviarEmail: ['int',['string','string','bool','string','string','string','string']],
-    // NFE_EnviarEmailEvento(ePara, eChaveEvento, eChaveNFe, AEnviaPDF, eAssunto, eCC, eAnexos, eMensagem);
-    NFE_EnviarEmailEvento: ['int',['string','string','string','bool','string','string','string','string']],
-    // NFE_Imprimir([cImpressora], [nNumCopias], [cProtocolo], [bMostrarPreview], [cMarcaDagua], [bViaConsumidor], [bSimplificado]);
-    NFE_Imprimir: ['int',['string','int','string','string','string','string','string',]],
-    // NFE_ImprimirPDF();
-    NFE_ImprimirPDF: ['int', []],
-    // NFE_SalvarPDF(sResposta, esTamanho);
-    NFE_SalvarPDF: ['int',['string','string']],
-    // NFE_ImprimirEvento(eArquivoXmlNFe, eArquivoXmlEvento);
-    NFE_ImprimirEvento: ['int',['string','string']],
-    // NFE_ImprimirEventoPDF(eArquivoXmlNFe, eArquivoXmlEvento);
-    NFE_ImprimirEventoPDF: ['int',['string','string']],
-    // NFE_SalvarEventoPDF(eArquivoXmlNFe, eArquivoXmlEvento);
-    NFE_SalvarEventoPDF: ['int',['string','string']],
-    // NFE_ImprimirInutilizacao(eArquivoXml);
-    NFE_ImprimirInutilizacao: ['int', ['string']],
-    // NFE_ImprimirInutilizacaoPDF(eArquivoXml);
-    NFE_ImprimirInutilizacaoPDF: ['int',['string']],
-    // NFE_SalvarInutilizacaoPDF(eArquivoXml);
-    NFE_SalvarInutilizacaoPDF: ['int',['string']],     
-  });
 
-  var inicio = 2;
-  const buflength = 256;
 
-  let aloc_sResposta = Buffer.alloc(buflength);
-  let aloc_esTamanho = ref.alloc('int', buflength);
+  let inicio = 2;
 
-  inicio = libm.NFE_Inicializar(eArqConfig, eChaveCrypt);
+  let handle = koffi.alloc("void *",1)
+
+  let aloc_sResposta = Buffer.alloc(TAMANHO_BUFFER);
+
+  //aloca ponteiro para o tamanho do buffer
+  let aloc_esTamanho = koffi.alloc('int', 1);
+  // configura o tamanho do buffer
+
+  koffi.encode(aloc_esTamanho, "int", TAMANHO_BUFFER)
+
+  inicio = libm.NFE_Inicializar(handle, eArqConfig, eChaveCrypt);
   console.log(`iniciou >>>>>>> ${inicio}`);
 
-  inicio = libm.NFE_ConfigGravarValor('DFe', 'ArquivoPFX', path.join(path.resolve(__dirname, 'certificado'), 'nome_do_certificado.pfx'));
-  inicio = libm.NFE_ConfigGravarValor('DFe', 'Senha', '1234');
-  inicio = libm.NFE_ConfigGravarValor('NFe', 'PathSchemas', path.resolve(__dirname, 'Schemas', 'NFe'));
+  inicio = libm.NFE_ConfigGravarValor(koffi.decode(handle,'void *'),'DFe', 'ArquivoPFX', path.join(path.resolve(__dirname, 'certificado'), 'nome_do_certificado.pfx'));
+  inicio = libm.NFE_ConfigGravarValor(koffi.decode(handle,'void *'),'DFe', 'Senha', '1234');
+  inicio = libm.NFE_ConfigGravarValor(koffi.decode(handle,'void *'),'NFe', 'PathSchemas', path.resolve(__dirname, 'Schemas', 'NFe'));
+  inicio = libm.NFE_ConfigGravarValor(koffi.decode(handle,'void *'),'Principal', 'LogPath', __dirname)
+  inicio = libm.NFE_ConfigGravarValor(koffi.decode(handle,'void *'),'Principal', 'LogNivel', '4')
+
+  libm.NFE_ConfigGravar(koffi.decode(handle,'void *'),eArqConfig)
+
   console.log(`Set Configurações ${inicio}`);
 
-  inicio = libm.NFE_CarregarXML(pathXML);
+  inicio = libm.NFE_CarregarXML(koffi.decode(handle,'void *'),pathXML);
   console.log(`carregar xml >>>>>>> ${inicio}`);
 
-  inicio = libm.NFE_UltimoRetorno(aloc_sResposta, aloc_esTamanho);
+  inicio = libm.NFE_UltimoRetorno(koffi.decode(handle,'void *'),aloc_sResposta, aloc_esTamanho);
   console.log(`ultmio retorno >>>>>>>> ${inicio}`);
   console.log(`Mensagem Ultimo Retorno: `, aloc_sResposta.toString());
 
-  inicio = libm.NFE_Assinar();
+  inicio = libm.NFE_Assinar(koffi.decode(handle,'void *'));
   console.log(`assinar xml >>>>>>> ${inicio}`);
 
-  aloc_sResposta = Buffer.alloc(buflength);
-  aloc_esTamanho = ref.alloc('int', buflength);
+  aloc_sResposta = Buffer.alloc(TAMANHO_BUFFER);
+  aloc_esTamanho = koffi.alloc('int', 1);
+  koffi.encode(aloc_esTamanho, 'int', TAMANHO_BUFFER)
 
-  inicio = libm.NFE_UltimoRetorno(aloc_sResposta, aloc_esTamanho);
+  inicio = libm.NFE_UltimoRetorno(koffi.decode(handle,'void *'),aloc_sResposta, aloc_esTamanho);
   console.log(`ultimo retorno apos assinar >>>>>>>> ${inicio}`);
   console.log(`Mensagem: `, aloc_sResposta.toString('ascii'));
 
-  inicio = libm.NFE_Validar();
+  inicio = libm.NFE_Validar(koffi.decode(handle,'void *'));
   console.log(`validar xml >>>>>>> ${inicio}`);
 
 
-  aloc_sResposta = Buffer.alloc(buflength);
-  aloc_esTamanho = ref.alloc('int', buflength);
+  aloc_sResposta = Buffer.alloc(TAMANHO_BUFFER);
+  aloc_esTamanho = koffi.alloc("int", 1)
+  koffi.encode(aloc_esTamanho, 'int', TAMANHO_BUFFER)
 
-  inicio = libm.NFE_UltimoRetorno(aloc_sResposta, aloc_esTamanho);
+  inicio = libm.NFE_UltimoRetorno(koffi.decode(handle,'void *'),aloc_sResposta, aloc_esTamanho);
   console.log(`ultmio retorno apos validar >>>>>>>> ${inicio}`);
   console.log(`Mensagem: `, aloc_sResposta.toString());
 
-  inicio = libm.NFE_Finalizar();
+  inicio = libm.NFE_Finalizar(koffi.decode(handle,'void *'));
   console.log(`finalizar >>>>>>>> ${inicio}`);
+
+  //recupera o tamanho do buffer
+  let tamanho = koffi.decode(aloc_esTamanho, 'int');
+  console.log(`tamanho do buffer: ${tamanho}`);
 }
 
 getNFe();

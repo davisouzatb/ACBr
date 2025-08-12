@@ -133,25 +133,28 @@ begin
   if (ATitulo <> nil) then
     LNossoNumeroCorrespondente := ATitulo.NossoNumeroCorrespondente;
 
-  FPURL := IfThen(Boleto.Configuracoes.WebService.Ambiente = tawsProducao, C_URL,C_URL_HOM);
+  case Boleto.Configuracoes.WebService.Ambiente of
+    tawsProducao    : FPURL.URLProducao    := C_URL;
+    tawsHomologacao : FPURL.URLHomologacao := C_URL_HOM;
+  end;
 
   case Boleto.Configuracoes.WebService.Operacao of
     tpInclui:
-      FPURL := FPURL + '/invoices';
+      FPURL.SetPathURI( '/invoices' );
     tpConsulta:
-      FPURL := FPURL + '/invoices?' + DefinirParametros;
+      FPURL.SetPathURI( '/invoices?' + DefinirParametros );
     tpBaixa,tpCancelar:
       begin
         if (LNossoNumeroCorrespondente <> '') then
         begin
-          FPURL := FPURL + '/invoices/' + LNossoNumeroCorrespondente;
+          FPURL.SetPathURI( '/invoices/' + LNossoNumeroCorrespondente );
         end;
       end;
     tpConsultaDetalhe:
       begin
         if (LNossoNumeroCorrespondente <> '') then
         begin
-          FPURL := FPURL + '/invoices/' + LNossoNumeroCorrespondente;
+          FPURL.SetPathURI( '/invoices/' + LNossoNumeroCorrespondente );
         end;
       end;
   end;
@@ -187,7 +190,7 @@ begin
           (ClassName + Format(S_OPERACAO_NAO_IMPLEMENTADO,
           [TipoOperacaoToStr(Boleto.Configuracoes.WebService.Operacao)]));
       end;
-    tpCancelar:
+    tpCancelar, tpBaixa:
       begin
         FMetodoHTTP := htDELETE; // Define Método POST para Baixa
         RequisicaoCancelar;
@@ -270,21 +273,44 @@ begin
       case Boleto.Configuracoes.WebService.Filtro.indicadorSituacao of
         isbBaixado:
           begin
-            // possivel apenas um estado por vez.
+            if (Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataInicio = 0) or
+               (Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataFinal = 0) then
+             raise EACBrBoletoWSException.Create
+             ('Para consulta isbBaixado, utilizar no filtro:'+sLineBreak+
+             'dataMovimento.DataInicio e dataMovimento.DataFinal');
 
+            // possivel apenas um estado por vez.
             Consulta.Add('start=' + DateTimeToDateCora
-              (Boleto.Configuracoes.WebService.Filtro.dataMovimento.
-              DataInicio));
+              (Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataInicio));
             Consulta.Add('end=' + DateTimeToDateCora
               (Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataFinal));
             Consulta.Add('state=PAID');
           end;
+        isbCancelado:
+          begin
+            if (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataInicio = 0) or
+               (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataFinal = 0) then
+             raise EACBrBoletoWSException.Create
+             ('Para consulta isbCancelado, utilizar no filtro:'+sLineBreak+
+             'dataVencimento.DataInicio e dataVencimento.DataFinal');
+
+            // possivel apenas um estado por vez.
+            Consulta.Add('start=' + DateTimeToDateCora
+              (Boleto.Configuracoes.WebService.Filtro.dataVencimento.
+              DataInicio));
+            Consulta.Add('end=' + DateTimeToDateCora
+              (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataFinal));
+            Consulta.Add('state=CANCELLED');
+          end;
         isbAberto:
           begin
+            if (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataInicio = 0) or
+               (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataFinal = 0) then
+             raise EACBrBoletoWSException.Create
+             ('Para consulta isbAberto, utilizar no filtro:'+sLineBreak+
+             'dataVencimento.DataInicio e dataVencimento.DataFinal');
+
             // possivel apenas por datavencimento
-            if Boleto.Configuracoes.WebService.Filtro.dataVencimento.
-              DataInicio > 0 then
-            begin
 
               Consulta.Add('start=' + DateTimeToDateCora
                 (Boleto.Configuracoes.WebService.Filtro.dataVencimento.
@@ -293,11 +319,17 @@ begin
                 (Boleto.Configuracoes.WebService.Filtro.dataVencimento.
                 DataFinal));
               Consulta.Add('state=OPEN');
-            end;
 
           end;
         isbNenhum:
           begin
+            if (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataInicio <= 0) or
+               (Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataFinal <= 0) then
+             raise EACBrBoletoWSException.Create
+             ('Para consulta isbNenhum, utilizar no filtro:'+sLineBreak+
+             'dataVencimento.DataInicio e dataVencimento.DataFinal');
+
+
             // caso queira tudo, não indicar o estado
             Consulta.Add('start=' + DateTimeToDateCora
               (Boleto.Configuracoes.WebService.Filtro.dataVencimento.
@@ -522,7 +554,7 @@ begin
         2: LJSON.AddPair('rate', ATitulo.ValorMoraJuros);
       end;
       if LJSON <> nil then
-        AJson.AddPair('Interest', LJSON);
+        AJson.AddPair('interest', LJSON);
     end;
   end;
 end;
@@ -673,10 +705,10 @@ begin
 
   if Assigned(OAuth) then
   begin
-    if OAuth.Ambiente = tawsProducao then
-      OAuth.URL := C_URL_OAUTH_PROD
-    else
-      OAuth.URL := C_URL_OAUTH_HOM;
+    case OAuth.Ambiente of
+      tawsProducao: OAuth.URL.URLProducao := C_URL_OAUTH_PROD;
+      tawsHomologacao: OAuth.URL.URLHomologacao := C_URL_OAUTH_HOM;
+    end;
 
     OAuth.Payload := True;
   end;

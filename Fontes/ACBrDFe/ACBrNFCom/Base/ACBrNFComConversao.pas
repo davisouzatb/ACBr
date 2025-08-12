@@ -187,6 +187,8 @@ const
 {
   Declaração das funções de conversão
 }
+function StrToTpEventoNFCom(out ok: boolean; const s: string): TpcnTpEvento;
+
 function VersaoNFComToStr(const t: TVersaoNFCom): string;
 function StrToVersaoNFCom(const s: string): TVersaoNFCom;
 
@@ -251,13 +253,19 @@ function StrTotpRessarc(const s: string): TtpRessarc;
 function CRTToStr(const t: TCRT): string;
 function StrToCRT(const s: string): TCRT;
 
-function StrToTpEventoNFCom(out ok: boolean; const s: string): TpcnTpEvento;
-
 implementation
 
 uses
   typinfo,
   ACBrBase;
+
+function StrToTpEventoNFCom(out ok: boolean; const s: string): TpcnTpEvento;
+begin
+  Result := StrToEnumerado(ok, s,
+            ['-99999', '110111', '240140', '240150', '240170'],
+            [teNaoMapeado, teCancelamento, teAutorizadoSubstituicao,
+             teAutorizadoAjuste, teLiberacaoPrazoCancelado]);
+end;
 
 function VersaoNFComToStr(const t: TVersaoNFCom): string;
 begin
@@ -713,14 +721,6 @@ begin
   end;
 
   raise EACBrException.CreateFmt('Valor string inválido para TCRT: %s', [s]);
-end;
-
-function StrToTpEventoNFCom(out ok: boolean; const s: string): TpcnTpEvento;
-begin
-  Result := StrToEnumerado(ok, s,
-            ['-99999', '110111', '240140', '240150', '240170'],
-            [teNaoMapeado, teCancelamento, teAutorizadoSubstituicao,
-             teAutorizadoAjuste, teLiberacaoPrazoCancelado]);
 end;
 
 initialization

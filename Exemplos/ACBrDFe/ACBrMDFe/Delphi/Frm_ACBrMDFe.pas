@@ -159,7 +159,7 @@ type
     cbxPastaMensal: TCheckBox;
     cbxAdicionaLiteral: TCheckBox;
     cbxEmissaoPathMDFe: TCheckBox;
-    cbxSalvaPathEvento: TCheckBox;
+    cbxSalvarEvento: TCheckBox;
     cbxSepararPorCNPJ: TCheckBox;
     edtPathMDFe: TEdit;
     edtPathEvento: TEdit;
@@ -235,6 +235,9 @@ type
     btnPagOperacaoTransp: TButton;
     ACBrMDFeDAMDFeRL1: TACBrMDFeDAMDFeRL;
     btnEnviarEventoEmail: TButton;
+    tsoutros: TTabSheet;
+    btnLerArqINI: TButton;
+    btnGerarArqINI: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btnSalvarConfigClick(Sender: TObject);
     procedure sbPathMDFeClick(Sender: TObject);
@@ -292,6 +295,8 @@ type
     procedure btnInclusaoDFeClick(Sender: TObject);
     procedure btnPagOperacaoTranspClick(Sender: TObject);
     procedure btnEnviarEventoEmailClick(Sender: TObject);
+    procedure btnLerArqINIClick(Sender: TObject);
+    procedure btnGerarArqINIClick(Sender: TObject);
   private
     { Private declarations }
     procedure GravarConfiguracao;
@@ -314,6 +319,7 @@ implementation
 uses
   strutils, math, TypInfo, DateUtils, synacode, blcksock, FileCtrl, Grids,
   IniFiles, Printers,
+  ACBrXmlBase,
   pcnAuxiliar, ACBrMDFe.Classes, pcnConversao, pmdfeConversaoMDFe, pcnRetConsReciDFe,
   ACBrDFeConfiguracoes, ACBrDFeSSL, ACBrDFeOpenSSL, ACBrDFeUtil,
   ACBrMDFeManifestos, ACBrMDFeConfiguracoes,
@@ -928,10 +934,10 @@ begin
     MemoDados.Lines.Add('-----------------------------------------');
     MemoDados.Lines.Add('Retorno do Envio do MDFe em modo Síncrono');
     MemoDados.Lines.Add('');
-    MemoDados.Lines.Add('Chave    : ' + ACBrMDFe1.Manifestos[0].MDFe.procMDFe.chMDFe);
+    MemoDados.Lines.Add('Chave    : ' + ACBrMDFe1.Manifestos[0].MDFe.procMDFe.chDFe);
     MemoDados.Lines.Add('Protocolo: ' + ACBrMDFe1.Manifestos[0].MDFe.procMDFe.nProt);
     MemoDados.Lines.Add('');
-    MemoDados.Lines.Add('tpAmb   : ' + TpAmbToStr(ACBrMDFe1.WebServices.Enviar.tpAmb));
+    MemoDados.Lines.Add('tpAmb   : ' + TipoAmbienteToStr(ACBrMDFe1.WebServices.Enviar.tpAmb));
     MemoDados.Lines.Add('verAplic: ' + ACBrMDFe1.WebServices.Enviar.verAplic);
     MemoDados.Lines.Add('cStat   : ' + IntToStr(ACBrMDFe1.WebServices.Enviar.cStat));
     MemoDados.Lines.Add('xMotivo : ' + ACBrMDFe1.WebServices.Enviar.xMotivo);
@@ -1107,10 +1113,10 @@ begin
     Lines.Add('-----------------------------------------');
     Lines.Add('Retorno do Envio do MDFe em modo Síncrono');
     Lines.Add('');
-    Lines.Add('Chave    : ' + ACBrMDFe1.Manifestos[0].MDFe.procMDFe.chMDFe);
+    Lines.Add('Chave    : ' + ACBrMDFe1.Manifestos[0].MDFe.procMDFe.chDFe);
     Lines.Add('Protocolo: ' + ACBrMDFe1.Manifestos[0].MDFe.procMDFe.nProt);
     Lines.Add('');
-    Lines.Add('tpAmb   : ' + TpAmbToStr(ACBrMDFe1.WebServices.Enviar.tpAmb));
+    Lines.Add('tpAmb   : ' + TipoAmbienteToStr(ACBrMDFe1.WebServices.Enviar.tpAmb));
     Lines.Add('verAplic: ' + ACBrMDFe1.WebServices.Enviar.verAplic);
     Lines.Add('cStat   : ' + IntToStr(ACBrMDFe1.WebServices.Enviar.cStat));
     Lines.Add('xMotivo : ' + ACBrMDFe1.WebServices.Enviar.xMotivo);
@@ -1243,6 +1249,39 @@ begin
     Evento.Free;
   end;
 
+end;
+
+procedure TfrmACBrMDFe.btnGerarArqINIClick(Sender: TObject);
+var
+  vAux: string;
+  SaveDlg: TSaveDialog;
+  ArqINI: TStringList;
+begin
+  vAux := '1';
+  if not(InputQuery('Gerar Arquivo INI', 'Numero do Manifesto', vAux)) then
+    exit;
+
+  ACBrMDFe1.Manifestos.Clear;
+  AlimentarComponente(vAux);
+  ACBrMDFe1.Manifestos.GerarMDFe;
+
+  ArqINI := TStringList.Create;
+  SaveDlg := TSaveDialog.Create(nil);
+  try
+    ArqINI.Text := ACBrMDFe1.Manifestos.GerarIni;
+
+    SaveDlg.Title := 'Escolha o local onde salvar o INI';
+    SaveDlg.DefaultExt := '*.INI';
+    SaveDlg.Filter := 'Arquivo INI(*.INI)|*.INI|Arquivo ini(*.ini)|*.ini|Todos os arquivos(*.*)|*.*';
+
+    if SaveDlg.Execute then
+      ArqINI.SaveToFile(SaveDlg.FileName);
+
+    memoLog.Lines.Add('Arquivo Salvo: ' + SaveDlg.FileName);
+  finally
+    SaveDlg.Free;
+    ArqINI.Free;
+  end;
 end;
 
 procedure TfrmACBrMDFe.btnGerarPDFClick(Sender: TObject);
@@ -1660,6 +1699,42 @@ begin
   end;
 end;
 
+procedure TfrmACBrMDFe.btnLerArqINIClick(Sender: TObject);
+begin
+  OpenDialog1.Title := 'Selecione o Arquivo INI';
+  OpenDialog1.DefaultExt := '*.ini';
+  OpenDialog1.Filter :=
+    'Arquivos INI (*.ini)|*.ini|Todos os Arquivos (*.*)|*.*';
+  OpenDialog1.InitialDir := ACBrMDFe1.Configuracoes.Arquivos.PathSalvar;
+
+  if OpenDialog1.Execute then
+  begin
+    ACBrMDFe1.Manifestos.Clear;
+    ACBrMDFe1.Manifestos.LoadFromIni(OpenDialog1.FileName);
+    ACBrMDFe1.Manifestos.Assinar;
+    ACBrMDFe1.Manifestos.GravarXML();
+
+    memoLog.Lines.Add('Arquivo gerado em: ' + ACBrMDFe1.Manifestos[0].NomeArq);
+
+    try
+      ACBrMDFe1.Manifestos.Validar;
+
+      if ACBrMDFe1.Manifestos[0].Alertas <> '' then
+        MemoDados.Lines.Add('Alertas: '+ACBrMDFe1.Manifestos[0].Alertas);
+
+      ShowMessage('Manifesto de Documentos Fiscais Eletrônicos Valido');
+    except
+      on E: Exception do
+      begin
+        pgRespostas.ActivePage := Dados;
+        MemoDados.Lines.Add('Exception: ' + E.Message);
+        MemoDados.Lines.Add('Erro: ' + ACBrMDFe1.Manifestos[0].ErroValidacao);
+        MemoDados.Lines.Add('Erro Completo: ' + ACBrMDFe1.Manifestos[0].ErroValidacaoCompleto);
+      end;
+    end;
+  end;
+end;
+
 procedure TfrmACBrMDFe.btnNumSerieClick(Sender: TObject);
 begin
   ShowMessage(ACBrMDFe1.SSL.CertNumeroSerie);
@@ -1692,7 +1767,7 @@ begin
   MemoDados.Lines.Add('----------------------------');
   MemoDados.Lines.Add('Retorno do Status de Serviço');
   MemoDados.Lines.Add(' ');
-  MemoDados.Lines.Add('tpAmb    : ' + TpAmbToStr(ACBrMDFe1.WebServices.StatusServico.tpAmb));
+  MemoDados.Lines.Add('tpAmb    : ' + TipoAmbienteToStr(ACBrMDFe1.WebServices.StatusServico.tpAmb));
   MemoDados.Lines.Add('verAplic : ' + ACBrMDFe1.WebServices.StatusServico.verAplic);
   MemoDados.Lines.Add('cStat    : ' + IntToStr(ACBrMDFe1.WebServices.StatusServico.cStat));
   MemoDados.Lines.Add('xMotivo  : ' + ACBrMDFe1.WebServices.StatusServico.xMotivo);
@@ -1953,7 +2028,7 @@ begin
     Ini.WriteBool(  'Arquivos', 'PastaMensal',      cbxPastaMensal.Checked);
     Ini.WriteBool(  'Arquivos', 'AddLiteral',       cbxAdicionaLiteral.Checked);
     Ini.WriteBool(  'Arquivos', 'EmissaoPathMDFe',  cbxEmissaoPathMDFe.Checked);
-    Ini.WriteBool(  'Arquivos', 'SalvarPathEvento', cbxSalvaPathEvento.Checked);
+    Ini.WriteBool(  'Arquivos', 'SalvarEvento',     cbxSalvarEvento.Checked);
     Ini.WriteBool(  'Arquivos', 'SepararPorCNPJ',   cbxSepararPorCNPJ.Checked);
     Ini.WriteBool(  'Arquivos', 'SepararPorModelo', cbxSepararPorModelo.Checked);
     Ini.WriteString('Arquivos', 'PathMDFe',         edtPathMDFe.Text);
@@ -2079,7 +2154,7 @@ begin
     cbxPastaMensal.Checked      := Ini.ReadBool(  'Arquivos', 'PastaMensal',      false);
     cbxAdicionaLiteral.Checked  := Ini.ReadBool(  'Arquivos', 'AddLiteral',       false);
     cbxEmissaoPathMDFe.Checked  := Ini.ReadBool(  'Arquivos', 'EmissaoPathMDFe',   false);
-    cbxSalvaPathEvento.Checked  := Ini.ReadBool(  'Arquivos', 'SalvarPathEvento', false);
+    cbxSalvarEvento.Checked     := Ini.ReadBool(  'Arquivos', 'SalvarEvento',     false);
     cbxSepararPorCNPJ.Checked   := Ini.ReadBool(  'Arquivos', 'SepararPorCNPJ',   false);
     cbxSepararPorModelo.Checked := Ini.ReadBool(  'Arquivos', 'SepararPorModelo', false);
     edtPathMDFe.Text            := Ini.ReadString('Arquivos', 'PathMDFe',          '');
@@ -2188,6 +2263,7 @@ begin
     SepararPorMes    := cbxPastaMensal.Checked;
     AdicionarLiteral := cbxAdicionaLiteral.Checked;
     EmissaoPathMDFe  := cbxEmissaoPathMDFe.Checked;
+    SalvarEvento     := cbxSalvarEvento.Checked;
     SepararPorCNPJ   := cbxSepararPorCNPJ.Checked;
     SepararPorModelo := cbxSepararPorModelo.Checked;
     PathSchemas      := edtPathSchemas.Text;

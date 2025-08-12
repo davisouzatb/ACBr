@@ -46,6 +46,9 @@ type
   [ComponentPlatformsAttribute(piacbrAllPlatforms)]
   {$ENDIF RTL230_UP}
   TACBrNFSeXDANFSeRL = class(TACBrNFSeXDANFSeClass)
+  private
+    FTamanhoLogoWidth: Integer;
+    FTamanhoLogoHeight: Integer;
   protected
     FDetalharServico: Boolean;
 
@@ -59,6 +62,8 @@ type
 
   published
     property DetalharServico: Boolean read FDetalharServico write FDetalharServico default False;
+    property TamanhoLogoHeight: Integer read FTamanhoLogoHeight write FTamanhoLogoHeight default 0;
+    property TamanhoLogoWidth: Integer read FTamanhoLogoWidth write FTamanhoLogoWidth default 0;
   end;
 
 implementation
@@ -73,6 +78,8 @@ begin
   inherited Create(AOwner);
 
   FDetalharServico := False;
+  FTamanhoLogoHeight := 0;
+  FTamanhoLogoWidth := 0;
 end;
 
 destructor TACBrNFSeXDANFSeRL.Destroy;
@@ -105,10 +112,14 @@ begin
     SetLength(Notas, TACBrNFSeX(ACBrNFSe).NotasFiscais.Count);
 
     for i := 0 to (TACBrNFSeX(ACBrNFSe).NotasFiscais.Count - 1) do
+    begin
+//      SetDadosTomador(i);
       Notas[i] := TACBrNFSeX(ACBrNFSe).NotasFiscais.Items[i].NFSe;
+    end;
   end
   else
   begin
+    SetDadosTomador(0);
     SetLength(Notas, 1);
     Notas[0] := NFSe;
   end;
@@ -141,6 +152,7 @@ begin
   begin
     for i := 0 to TACBrNFSeX(ACBrNFSe).NotasFiscais.Count - 1 do
     begin
+      SetDadosTomador(i);
       FPArquivoPDF := DefinirNomeArquivo(Self.PathPDF,
        TACBrNFSeX(ACBrNFSe).NumID[TACBrNFSeX(ACBrNFSe).NotasFiscais.Items[i].NFSe] + '-nfse.pdf',
        self.NomeDocumento);
@@ -150,6 +162,7 @@ begin
   end
   else
   begin
+    SetDadosTomador(0);
     FPArquivoPDF := DefinirNomeArquivo(Self.PathPDF,
      TACBrNFSeX(ACBrNFSe).NumID[NFSe] + '-nfse.pdf', self.NomeDocumento);
 
@@ -181,10 +194,14 @@ begin
   if NFSe = nil then
   begin
     for i := 0 to TACBrNFSeX(ACBrNFSe).NotasFiscais.Count - 1 do
+    begin
+      SetDadosTomador(i);
       fqrXDANFSeRLRetrato.SalvarPDF(Self, TACBrNFSeX(ACBrNFSe).NotasFiscais.Items[i].NFSe, AStream);
+    end;
   end
   else
   begin
+    SetDadosTomador(0);
     fqrXDANFSeRLRetrato.SalvarPDF(Self, NFSe, AStream);
   end;
 

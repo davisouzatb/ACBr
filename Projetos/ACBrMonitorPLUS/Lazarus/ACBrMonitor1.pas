@@ -520,6 +520,14 @@ type
     edEntTXT: TEdit;
     edIBGECodNome: TEdit;
     edConsultarGTIN: TEdit;
+    edtEnderecoEmitenteNFSe: TEdit;
+    edtNumeroEmitenteNFSe: TEdit;
+    edtBairroEmitenteNFSe: TEdit;
+    edtComplementoEmitenteNFSe: TEdit;
+    edtCEPEmitenteNFSE: TEdit;
+    edtEmailEmitenteNFSe: TEdit;
+    edtFoneEmitenteNFSe: TEdit;
+    edtIEEmitenteNFSe: TEdit;
     edtBoletoKeySoftwareHouse: TEdit;
     edtQuebraDeLinha: TEdit;
     edtConsCNPJ: TEdit;
@@ -767,6 +775,7 @@ type
     grbWsConfig: TGroupBox;
     grbMargem: TGroupBox;
     gbConsCNPJ: TGroupBox;
+    gbxOpcoesNFSe: TGroupBox;
     GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
@@ -845,6 +854,8 @@ type
     Label118: TLabel;
     Label152: TLabel;
     Label189: TLabel;
+    Label196: TLabel;
+    Label197: TLabel;
     Label260: TLabel;
     Label261: TLabel;
     Label262: TLabel;
@@ -875,6 +886,12 @@ type
     Label287: TLabel;
     Label288: TLabel;
     Label289: TLabel;
+    Label290: TLabel;
+    Label291: TLabel;
+    Label292: TLabel;
+    Label293: TLabel;
+    Label294: TLabel;
+    Label295: TLabel;
     lblConsCNPJ: TLabel;
     lblConsCNPJProvedor: TLabel;
     lblConCNPJSenha: TLabel;
@@ -1817,6 +1834,7 @@ type
     procedure TreeViewMenuClick(Sender: TObject);
     procedure tsACBrBoletoShow(Sender: TObject);
     procedure tsCadastroShow(Sender: TObject);
+    procedure tsContaBancariaShow(Sender: TObject);
     procedure tsDadosSATContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
     procedure tsDFeShow(Sender: TObject);
@@ -5956,6 +5974,14 @@ begin
     edtNomePrefeitura.Text             := NomePrefeitura;
     edtCNPJPrefeitura.Text             := CNPJPrefeitura;
     cbxNomeLongoNFSe.Checked           := NomeLongoNFSe;
+    edtIEEmitenteNFSe.Text             := IEEmitente;
+    edtEnderecoEmitenteNFSe.Text       := EnderecoEmitente;
+    edtNumeroEmitenteNFSe.Text         := NumeroEmitente;
+    edtBairroEmitenteNFSe.Text         := BairroEmitente;
+    edtComplementoEmitenteNFSe.Text    := ComplementoEmitente;
+    edtCEPEmitenteNFSE.Text            := CEPEmitente;
+    edtEmailEmitenteNFSe.Text          := EmailEmitente;
+    edtFoneEmitenteNFSe.Text           := FoneEmitente;
   end;
 
   {Parametro DFe}
@@ -6034,6 +6060,8 @@ begin
       cbVersaoWSBPe.ItemIndex          := cbVersaoWSBPe.Items.IndexOf(VersaoBPe);
       cbVersaoWSGNRE.ItemIndex         := cbVersaoWSGNRE.Items.IndexOf(VersaoGNRe);
       cbVersaoWSeSocial.ItemIndex      := cbVersaoWSeSocial.Items.IndexOf(VersaoeSocial);
+      if cbVersaoWSeSocial.ItemIndex < 0 then
+        cbVersaoWSeSocial.ItemIndex := cbVersaoWSeSocial.Items.Count - 1;
       cbVersaoWsReinf.ItemIndex        := cbVersaoWSReinf.Items.IndexOf(VersaoReinf);
       cbVersaoWSQRCode.ItemIndex       := cbVersaoWSQRCode.Items.IndexOf(VersaoQRCode);
       ckCamposFatObrigatorio.Checked   := CamposFatObrig;
@@ -6784,6 +6812,8 @@ begin
     else
       LayoutRemessa := c400;
     Banco.LayoutVersaoArquivo := StrToIntDef(edtVersaoArquivo.text,0);
+    Banco.LayoutVersaoLote    := StrToIntDef(edtVersaoLote.text,0);
+
     KeySoftwareHouse:= edtBoletoKeySoftwareHouse.text;
     DirArqRemessa   := PathWithDelim(deBolDirRemessa.Text);
     DirArqRetorno   := PathWithDelim(deBolDirRetorno.Text);
@@ -7255,6 +7285,14 @@ begin
       NomePrefeitura         := edtNomePrefeitura.Text;
       CNPJPrefeitura         := edtCNPJPrefeitura.Text;
       NomeLongoNFSe          := cbxNomeLongoNFSe.Checked;
+      IEEmitente             := edtIEEmitenteNFSe.Text;
+      EnderecoEmitente       := edtEnderecoEmitenteNFSe.Text;
+      NumeroEmitente         := edtNumeroEmitenteNFSe.Text;
+      BairroEmitente         := edtBairroEmitenteNFSe.Text;
+      ComplementoEmitente    := edtComplementoEmitenteNFSe.Text;
+      CEPEmitente            := edtCEPEmitenteNFSE.Text;
+      EmailEmitente          := edtEmailEmitenteNFSe.Text;
+      FoneEmitente           := edtFoneEmitenteNFSe.Text;
     end;
 
     { Parametros DFe }
@@ -7312,7 +7350,7 @@ begin
         VersaoMDFe               := cbVersaoWSMDFe.Text;
         VersaoBPe                := cbVersaoWSBPe.Text;
         VersaoGNRe               := cbVersaoWSGNRE.Text;
-        VersaoeSocial            := cbVersaoWSeSocial.Text;
+        VersaoeSocial          := cbVersaoWSeSocial.Text;
         VersaoReinf              := cbVersaoWSReinf.Text;
         VersaoQRCode             := cbVersaoWSQRCode.Text;
         AjustarAut               := cbxAjustarAut.Checked;
@@ -9403,6 +9441,11 @@ end;
 procedure TFrmACBrMonitor.tsCadastroShow(Sender: TObject);
 begin
   pgCadastro.ActivePageIndex := 0;
+end;
+
+procedure TFrmACBrMonitor.tsContaBancariaShow(Sender: TObject);
+begin
+  MostraLogoBanco;
 end;
 
 procedure TFrmACBrMonitor.tsDadosSATContextPopup(Sender: TObject;
@@ -12052,6 +12095,7 @@ begin
 
     TConfiguracoesCTe(Configuracoes).Arquivos.IniServicos    := edtArquivoWebServicesCTe.Text;
     TConfiguracoesCTe(Configuracoes).Arquivos.EmissaoPathCTe := cbxEmissaoPathNFe.Checked;
+    TConfiguracoesCTe(Configuracoes).Arquivos.SalvarEvento   := cbxSalvaPathEvento.Checked;
     TConfiguracoesCTe(Configuracoes).Arquivos.PathCTe        := edtPathNFe.Text;
     TConfiguracoesCTe(Configuracoes).Arquivos.PathInu        := edtPathInu.Text;
     TConfiguracoesCTe(Configuracoes).Arquivos.PathEvento     := edtPathEvento.Text;
@@ -12073,6 +12117,7 @@ begin
 
     TConfiguracoesMDFe(Configuracoes).Arquivos.IniServicos     := edtArquivoWebServicesMDFe.Text;
     TConfiguracoesMDFe(Configuracoes).Arquivos.EmissaoPathMDFe := cbxEmissaoPathNFe.Checked;
+    TConfiguracoesMDFe(Configuracoes).Arquivos.SalvarEvento    := cbxSalvaPathEvento.Checked;
     TConfiguracoesMDFe(Configuracoes).Arquivos.PathMDFe        := edtPathNFe.Text;
     TConfiguracoesMDFe(Configuracoes).Arquivos.PathEvento      := edtPathEvento.Text;
     TConfiguracoesMDFe(Configuracoes).Arquivos.DownloadDFe.PathDownload:= edtPathDownload.Text;
@@ -12093,6 +12138,7 @@ begin
 
     TConfiguracoesBPe(Configuracoes).Arquivos.IniServicos    := edtArquivoWebServicesBPe.Text;
     TConfiguracoesBPe(Configuracoes).Arquivos.EmissaoPathBPe := cbxEmissaoPathNFe.Checked;
+    TConfiguracoesBPe(Configuracoes).Arquivos.SalvarEvento   := cbxSalvaPathEvento.Checked;
     TConfiguracoesBPe(Configuracoes).Arquivos.PathBPe        := edtPathNFe.Text;
     TConfiguracoesBPe(Configuracoes).Arquivos.PathEvento     := edtPathEvento.Text;
     TConfiguracoesBPe(Configuracoes).Arquivos.DownloadDFe.PathDownload:= edtPathDownload.Text;
@@ -12123,6 +12169,16 @@ begin
     TConfiguracoesNFSe(Configuracoes).Geral.Emitente.WSChaveAcesso := edtChaveAcessoNFSe.Text;
     TConfiguracoesNFSe(Configuracoes).Geral.Emitente.WSChaveAutoriz := edtChaveAutenticacaoNFSe.Text;
     TConfiguracoesNFSe(Configuracoes).Geral.Emitente.WSFraseSecr := edtFraseSecretaNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.InscricaoEstadual := edtIEEmitenteNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Endereco := edtEnderecoEmitenteNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Numero := edtNumeroEmitenteNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Bairro := edtBairroEmitenteNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Complemento := edtComplementoEmitenteNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.CEP := edtCEPEmitenteNFSE.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.UF := edtUFCidade.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Municipio := edtNomeCidade.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Email := edtEmailEmitenteNFSe.Text;
+    TConfiguracoesNFSe(Configuracoes).Geral.Emitente.DadosEmitente.Telefone := edtFoneEmitenteNFSe.Text;
 
     with TConfiguracoesNFSe(Configuracoes).Arquivos do
     begin
@@ -12161,7 +12217,13 @@ begin
     TConfiguracoeseSocial(Configuracoes).Arquivos.IniServicos       := edtArquivoWebServiceseSocial.Text;
     TConfiguracoeseSocial(Configuracoes).Arquivos.PatheSocial       := edtPathNFe.Text;
     TConfiguracoeseSocial(Configuracoes).Arquivos.EmissaoPatheSocial:= cbxEmissaoPathNFe.Checked;
-    TConfiguracoeseSocial(Configuracoes).Geral.VersaoDF             := StrToVersaoeSocialEX(cbVersaoWSeSocial.Text);
+
+    try
+      TConfiguracoeseSocial(Configuracoes).Geral.VersaoDF := StrToVersaoeSocialEX(cbVersaoWSeSocial.Text);
+    except
+      TConfiguracoeseSocial(Configuracoes).Geral.VersaoDF := TVersaoeSocial(High(TVersaoeSocialArrayStrings));
+    end;
+
     TConfiguracoeseSocial(Configuracoes).Geral.TipoEmpregador       := TEmpregador(cbTipoEmpregador.ItemIndex);
     TConfiguracoeseSocial(Configuracoes).Geral.IdEmpregador         := edtIDEmpregador.Text;
     TConfiguracoeseSocial(Configuracoes).Geral.IdTransmissor        := edtIDTransmissor.Text;
@@ -12797,8 +12859,11 @@ begin
       Banco.TipoCobranca := TACBrTipoCobranca(cbxBOLBanco.ItemIndex);
 
       pnLogoBanco.Caption := '';
-      imgLogoBanco.Picture.LoadFromFile(deBOLDirLogo.Text + PathDelim +
-        IntToStrZero(Banco.Numero, 3)+'.bmp');
+
+      if FileExists(deBOLDirLogo.Text + PathDelim + IntToStrZero(Banco.Numero, 3)+'.bmp') then
+        imgLogoBanco.Picture.LoadFromFile(deBOLDirLogo.Text + PathDelim + IntToStrZero(Banco.Numero, 3)+'.bmp')
+      else
+        imgLogoBanco.Picture.LoadFromFile(deBOLDirLogo.Text + PathDelim + IntToStrZero(Banco.Numero, 3)+'.png');
     except
       pnLogoBanco.Caption := 'Sem logo';
       imgLogoBanco.Picture.Clear;

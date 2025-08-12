@@ -83,7 +83,7 @@ type
     FnDue: string;
     FnItem: Integer;
     FnItemDue: Integer;
-    FqItem: Integer;
+    FqItem: Double;
     FmotAlteracao: Integer;
 
   public
@@ -92,7 +92,7 @@ type
     property nDue: string           read FnDue         write FnDue;
     property nItem: Integer         read FnItem        write FnItem;
     property nItemDue: Integer      read FnItemDue     write FnItemDue;
-    property qItem: Integer         read FqItem        write FqItem;
+    property qItem: Double          read FqItem        write FqItem;
     property motAlteracao: Integer  read FmotAlteracao write FmotAlteracao;
   end;
 
@@ -698,7 +698,7 @@ begin
     docZip.Items[Indice].procEvento.detEvento.itensAverbados[i].nDue := ObterConteudoTag(ANodes[i].Childrens.FindAnyNs('nDue'), tcStr);
     docZip.Items[Indice].procEvento.detEvento.itensAverbados[i].nItem := ObterConteudoTag(ANodes[i].Childrens.FindAnyNs('nItem'), tcInt);
     docZip.Items[Indice].procEvento.detEvento.itensAverbados[i].nItemDue := ObterConteudoTag(ANodes[i].Childrens.FindAnyNs('nItemDue'), tcInt);
-    docZip.Items[Indice].procEvento.detEvento.itensAverbados[i].qItem := ObterConteudoTag(ANodes[i].Childrens.FindAnyNs('qItem'), tcInt);
+    docZip.Items[Indice].procEvento.detEvento.itensAverbados[i].qItem := ObterConteudoTag(ANodes[i].Childrens.FindAnyNs('qItem'), tcDe4);
     docZip.Items[Indice].procEvento.detEvento.itensAverbados[i].motAlteracao := ObterConteudoTag(ANodes[i].Childrens.FindAnyNs('motAlteracao'), tcInt);
   end;
 end;
@@ -806,6 +806,9 @@ begin
       if ANode.Name = LowerCase(FptpDFe) + 'OSProc' then
         LerDocumento(ANode, Indice);
 
+      if ANode.Name = LowerCase(FptpDFe) + 'SimpProc' then
+        LerDocumento(ANode, Indice);
+
       if ANode.Name = 'GTVeProc' then
         LerDocumento(ANode, Indice);
 
@@ -910,6 +913,7 @@ function TRetDistDFeInt.LerXMLFromFile(Const CaminhoArquivo: string;
 var
   ArqDist: TStringList;
   xml: string;
+  I: Integer;
 begin
   ArqDist := TStringList.Create;
   try
@@ -920,6 +924,19 @@ begin
     XmlRetorno := ArqDist.Text;
 
     Result := LerXml;
+
+    for I := 0 to docZip.Count - 1 do
+    begin
+      xml := docZip[I].XML;
+
+      if (xml <> '') then
+      begin
+        if (FOwner.Configuracoes.Arquivos.Salvar) then
+        begin
+          FOwner.Gravar(docZip[I].NomeArq, xml);
+        end;
+      end;
+    end;
   finally
     ArqDist.Free;
   end;

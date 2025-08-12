@@ -44,6 +44,173 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+31/07/2025
+-- ACBrCTe.XmlWriter --
+[-] #TK-7440: Corrigido a nomenclatura da tag chCTe do grupo infProt que estava como
+    chBPe.
+   Por: Claudio Visky
+
+28/07/2025
+-- ACBrCTe.XmlReader/ACBrCTe.XmlWriter --
+[*] #TK-7425: Alterado tanto a geração quanto a leitura do campo pAliqEfet para 4
+    casas decimais.
+   Por: Simons/Italo Giurizzato Junior
+
+26/07/2025
+-- ACBrCTe.XmlWriter --
+[*] Ajuste nas condições para gerar o grupo gRed.
+   Por: Italo Giurizzato Junior
+
+24/07/2025
+-- Diversos --
+[*] #TK-7370: Implementado a versão 1.06 da NT da Reforma Tributária.
+   Por: Italo Giurizzato Junior
+-- ACBrCTe.IniReader --
+[-] #TK-7391: Ajuste para leitura de InfCteNormal quando CTe de Substituição
+   Por: Diego Folieni / Italo Giurizzato Junior
+
+18/07/2025
+-- ACBrCTe.XmlWriter --
+[*] Correção no tamanho mínimo e máximo da tag idCSRT.
+   Por: Italo Giurizzato Junior
+
+11/07/2025
+-- ACBrCTeWebServices --
+[-] #TK-7306: Correção para leitura do ID do evento para versão 3 e 4 do CT-e.
+  Por: Italo Giurizzato Junior
+
+23/06/2025
+-- ACBrCTe.XmlReader --
+[-] #TK-7249: Correção para realizar a leitura correta do grupo infCTeSub
+  Por: Italo Giurizzato Junior
+
+17/06/2025
+-- ACBrCTeWebServices --
+[*] #TK-7205: Melhorias no Consultar visando salvar o XML do evento retornado 
+    levando em consideração da data/hora de emissão do evento.
+  Por: Luiz Alberto da Silva Lope
+
+11/06/2025
+-- ACBrCTe.XmlWriter --
+[*] Correção no nome da constante e inclusão de uma nova constante.
+   Por: Italo Giurizzato Junior
+
+10/06/2025
+-- ACBrCTe.XmlReader --
+[-] Correção para evitar AV na leitura do XML.
+  Por: Juliomar Marchetti/Italo Giurizzato Junior
+
+09/06/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a versão 1.05 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+06/06/2025
+-- ACBrCTeConhecimentos --
+[+] Implementado os parâmetros: ManterPDFSalvo e sBCC no método: EnviarEmail.
+  Por: Mateus Brunelli/Italo Giurizzato Junior
+
+05/06/2025
+-- ACBrCTe.XmlWriter --
+[*] #TK-7173: Ajustes na escrita do XML para gerar corretamente o código do pais.  
+  Por: Datacamp/Italo Giurizzato Junior
+
+26/05/2025
+-- Diversos --
+[*] O campo cCredPres que antes era do tipo Integer passou a ser do tipo TcCredPres
+-- ACBrCTe.XmlReader
+[*] #TK-7109: Ajustes na leitura dos elementos: Comp, InfCarga, Rodo, Aereo e Aquav,
+    InfNFe e InfDocAnt.  
+  Por: Italo Giurizzato Junior
+
+23/05/2025
+-- ACBrCTe.IniReader, ACBrCTeIniWriter --
+[*] #TK-7103: Ajuste visando a correta geração das informações do veículo e do proprietário quando preenchido NroRegEstadual ao invés do TAF para CTeOS.
+  Por: Diego Folieni
+
+21/05/2025
+-- Diversos --
+[*] Alteração visando usar a unit ACBrDFe.Conversao que contem os tipos e funções
+    da Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+20/05/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.02 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+15/05/2025
+-- ACBrCTe.EnvEvento --
+[*] Removido as linhas que checavam a série de emissão do CT-e no envio do evento.
+  Por: Túlio de Pádua
+
+28/04/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.01a dos Schemas.
+  Por: Italo Giurizzato Junior
+
+22/04/2025
+-- ACBrCTe.XmlWriter --
+[-] Correção, não estava pegando a quantidade de percursos da lista correta.
+  Por: Italo Giurizzato Junior
+
+15/04/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a NT2025/001 versão 1.01.
+  Por: Italo Giurizzato Junior
+
+10/04/2025
+-- Diversos --
+[*] #TK-6832: Ajustes necessários para deixar em conformidade com a NT2025/001.
+  Por: Italo Giurizzato Junior
+
+01/04/2025
+-- Diversos --
+[*] #TK-5814: Implementado as units: ACBrCTe.IniReader e ACBrCTe.IniWrite que
+    vão ser responsáveis por ler e gerar o arquivo INI.
+    Refatorado a função GetURLQRCode para que a mesma receba a classe TCTe em 
+    vez de diversos parâmetros de entrada.
+    Implementado a propriedade de configuração: SalvarEvento (valor padrão False)
+    agora ao salvar o XML *-procEventoCTe o componente vai checar o valor dessa 
+    propriedade.
+    Alterado a URL do QR-Code de MG.
+  Por: Italo Giurizzato Junior
+
+08/03/2025
+-- ACBrCTe.Classes/ACBrCTe.XmlReader/ACBrCTe.XmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+27/02/2025
+-- ACBrCTe.XmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+23/02/2025
+-- ACBrCTeWebServices --
+[*] #TK-6647: Ajustes para identificar o CT-e Simplificado no DistribuicaoDFe.
+   Por: galegoga
+
+14/02/2025
+-- ACBrCTe.Classes/ACBrCTe.Consts --
+[+] Inclusão de novas contantes e ajustes nas novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+10/02/2025
+-- ACBrCTe.Classes --
+[+] Inclusão das novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+31/01/2025
+-- ACBrCTe.XmlWriter --
+[*] Correção para alguns campos do ICMS que são opcionais e estavam como obrigatórios.
+   Por: devFortes/Italo Giurizzato Junior
+-- ACBrCTeConhecimentos, pcteConversaoCTe --
+[*] #Tk-6521 - Altera o tipo dos enumerados TpcteTipoDataPeriodo e TpcteTipoHorarioIntervalo de não preenchido e N para -1
+  Por: Diego Folieni
+
+27/01/2025
+-- ACBrCTe.XmlHandler --
+[*] Correção na procedure LerToma4, não estava lendo o CNPJ/CPF do nó correto.
+   Por: devFortes
 
 24/01/2025
 -- ACBrCTeConhecimentos --

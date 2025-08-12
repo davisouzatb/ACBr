@@ -99,7 +99,8 @@ type
       const ANumLote: String = '');
 
     procedure ConsultarNFSePorRps(const ANumRPS, ASerie, ATipo: String;
-      const ACodVerificacao: string = ''; const ACNPJTomador: string = '');
+      const ACodVerificacao: string = ''; const ACNPJTomador: string = '';
+      const ANumLote: string = '');
 
     // Usado pelos provedores que seguem a versão 1 do layout da ABRASF.
     procedure ConsultarNFSePorNumero(const aNumero: string; aPagina: Integer = 1);
@@ -360,6 +361,7 @@ begin
 
   Configuracoes.Geral.Particularidades.PermiteTagOutrasInformacoes := FProvider.ConfigGeral.Particularidades.PermiteTagOutrasInformacoes;
   Configuracoes.Geral.Particularidades.PermiteMaisDeUmServico := FProvider.ConfigGeral.Particularidades.PermiteMaisDeUmServico;
+  Configuracoes.Geral.Particularidades.AtendeReformaTributaria := FProvider.ConfigGeral.Particularidades.AtendeReformaTributaria;
 end;
 
 function TACBrNFSeX.GetNomeModeloDFe: String;
@@ -715,6 +717,8 @@ begin
     tpRetorno := aInfConsultaNFSe.tpRetorno;
     ChaveNFSe := aInfConsultaNFSe.ChaveNFSe;
     Pagina := aInfConsultaNFSe.Pagina;
+    NumeroRps := aInfConsultaNFSe.NumeroRps;
+    DataRecibo := aInfConsultaNFSe.DataRecibo;
   end;
 
   ConsultarNFSe;
@@ -791,7 +795,7 @@ begin
 end;
 
 procedure TACBrNFSeX.ConsultarNFSePorRps(const ANumRPS, ASerie, ATipo,
-  ACodVerificacao, ACNPJTomador: String);
+  ACodVerificacao, ACNPJTomador, ANumLote: string);
 begin
   if not Assigned(FProvider) then
     raise EACBrNFSeException.Create(ERR_SEM_PROVEDOR);
@@ -802,6 +806,7 @@ begin
   FWebService.ConsultaNFSeporRps.TipoRps := ATipo;
   FWebService.ConsultaNFSeporRps.CodigoVerificacao := ACodVerificacao;
   FWebService.ConsultaNFSeporRps.CNPJCPFTomador := ACNPJTomador;
+  FWebService.ConsultaNFSeporRps.NumeroLote := ANumLote;
 
   FProvider.ConsultaNFSeporRps;
 end;

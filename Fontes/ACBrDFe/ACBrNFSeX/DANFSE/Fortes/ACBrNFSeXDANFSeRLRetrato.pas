@@ -375,6 +375,25 @@ begin
 
   TDFeReportFortes.CarregarLogo(rliLogo, fpDANFSe.Logo);
 
+  if (fpDANFSe.TamanhoLogoHeight = 0) and (fpDANFSe.TamanhoLogoWidth = 0) then
+  begin
+    // Expande a logomarca
+    if fpDANFSe.ExpandeLogoMarca then
+    begin
+      rlmPrefeitura.Visible := False;
+
+      with rliLogo do
+      begin
+        Height := 130;
+        Width := 580;
+        Top := 9;
+        Left := 9;
+
+        TDFeReportFortes.AjustarLogo(rliLogo, fpDANFSe.ExpandeLogoMarcaConfig);
+      end;
+    end;
+  end;
+
   rlmPrefeitura.Lines.Clear;
   rlmPrefeitura.Lines.Add(StringReplace(fpDANFSe.Prefeitura,
                                        FQuebradeLinha, #13#10, [rfReplaceAll]));
@@ -395,7 +414,10 @@ begin
 
     rllCodVerificacao.Caption := ACBrStr(CodigoVerificacao);
 
-    rllCompetencia.Caption := IfThen(Competencia > 0, FormatDateTime('mm/yyyy', Competencia), '');
+    if fpDANFSe.DataCompetenciaCompleta then
+      rllCompetencia.Caption := IfThen(Competencia > 0, FormatDateTime('dd/mm/yyyy', Competencia), '')
+    else
+      rllCompetencia.Caption := IfThen(Competencia > 0, FormatDateTime('mm/yyyy', Competencia), '');
 
     rllNumeroRps.Caption := IdentificacaoRps.Numero;
 
@@ -435,36 +457,49 @@ procedure TfrlXDANFSeRLRetrato.rbCodServicoBeforePrint(Sender: TObject;
 var
   i: Integer;
   xItemLista: string;
+  LServicoPossuiItemLista: Boolean;
 begin
   inherited;
 
-  With fpNFSe do
+  with fpNFSe do
   begin
     rlmCodServico.Lines.Clear;
     xItemLista := '';
+    LServicoPossuiItemLista := False;
 
     if Servico.ItemServico.Count > 0 then
     begin
-      rlmCodServico.Lines.Append(ACBrStr('Código Serviço:'));
-
-      for i := 0 to Servico.ItemServico.Count -1 do
+      for i := 0 to Servico.ItemServico.Count - 1 do
       begin
-        if Pos(Servico.ItemServico.Items[i].ItemListaServico, xItemLista) = 0 then
+        if (Trim(Servico.ItemServico.Items[i].ItemListaServico) <> '') or
+           (Trim(Servico.ItemServico.Items[i].xItemListaServico) <> '') then
         begin
-          rlmCodServico.Lines.Append('   ' + Servico.ItemServico.Items[i].ItemListaServico +
-            ' - ' + ACBrStr(Servico.ItemServico.Items[i].xItemListaServico));
+          LServicoPossuiItemLista := True;
+          Break;
+        end;
+      end;
 
-          xItemLista := xItemLista + Servico.ItemServico.Items[i].ItemListaServico + '/';
+      if LServicoPossuiItemLista then
+      begin
+        rlmCodServico.Lines.Append(ACBrStr('Código Serviço:'));
+        for i := 0 to Servico.ItemServico.Count - 1 do
+        begin
+          if (Trim(Servico.ItemServico.Items[i].ItemListaServico) <> '') and
+             (Pos(Servico.ItemServico.Items[i].ItemListaServico, xItemLista) = 0) then
+          begin
+            rlmCodServico.Lines.Append('   ' + Servico.ItemServico.Items[i].ItemListaServico +
+              ' - ' + ACBrStr(Servico.ItemServico.Items[i].xItemListaServico));
+            xItemLista := xItemLista + Servico.ItemServico.Items[i].ItemListaServico + '/';
+          end;
         end;
       end;
     end;
 
-    if (Servico.xItemListaServico <> '') and (Servico.ItemServico.Count = 0) then
+    if (not LServicoPossuiItemLista) and (Servico.xItemListaServico <> '') then
     begin
       rlmCodServico.Lines.Append(ACBrStr('Código Serviço:'));
-
       rlmCodServico.Lines.Append('   ' + Servico.ItemListaServico + ' - ' +
-      ACBrStr(Servico.xItemListaServico));
+        ACBrStr(Servico.xItemListaServico));
     end;
 
     if fpDANFSe.Atividade <> '' then
@@ -619,6 +654,8 @@ procedure TfrlXDANFSeRLRetrato.rlbTomadorBeforePrint(Sender: TObject;
 begin
   inherited;
 
+  fpDANFSe.SetDadosTomador(fpNFSe);
+
   with fpNFSe.Tomador do
   begin
     rllTomaNome.Caption := RazaoSocial;
@@ -632,11 +669,9 @@ begin
     else
       rllTomaCNPJ.Caption := FormatarCNPJouCPF(IdentificacaoTomador.CpfCnpj);
 
-    rllTomaInscMunicipal.Caption := IfThen(IdentificacaoTomador.InscricaoMunicipal <> '',
-      IdentificacaoTomador.InscricaoMunicipal, fpDANFSe.Tomador.InscricaoMunicipal);
+    rllTomaInscMunicipal.Caption := fpDANFSe.Tomador.InscricaoMunicipal;
 
-    rllTomaInscEstadual.Caption := IfThen(IdentificacaoTomador.InscricaoEstadual <> '',
-      IdentificacaoTomador.InscricaoEstadual, fpDANFSe.Tomador.InscricaoEstadual);
+    rllTomaInscEstadual.Caption := fpDANFSe.Tomador.InscricaoEstadual;
 
     if Endereco.Endereco <> '' then
     begin
@@ -655,17 +690,14 @@ begin
       rllTomaEndereco.Caption := Trim(fpDANFSe.Tomador.Endereco) + ' - CEP: ' +
         FormatarCEP(Endereco.CEP);
 
-    rllTomaComplemento.Caption := IfThen(Endereco.Complemento <> '',
-      Endereco.Complemento, fpDANFSe.Tomador.Complemento);
+    rllTomaComplemento.Caption := fpDANFSe.Tomador.Complemento;
 
     rllTomaMunicipio.Caption := Endereco.xMunicipio;
 
     rllTomaUF.Caption := Endereco.UF;
 
-    rllTomaTelefone.Caption := IfThen(Contato.Telefone <> '',
-      FormatarFone(Contato.Telefone), FormatarFone(fpDANFSe.Tomador.Fone));
-    rllTomaEmail.Caption := IfThen(Contato.Email <> '',
-      Contato.Email, fpDANFSe.Tomador.Email);
+    rllTomaTelefone.Caption := FormatarFone(fpDANFSe.Tomador.Fone);
+    rllTomaEmail.Caption := fpDANFSe.Tomador.Email;
   end;
 
   rllMsgTeste.Visible := (fpDANFSe.Producao = snNao);

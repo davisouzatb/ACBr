@@ -851,22 +851,33 @@ begin
 end;
 
 procedure TNFeW.GerarAgropecuario;
+var
+  i: Integer;
 begin
-  if Trim(NFe.agropecuario.defensivo.nReceituario) <> '' then
+  if NFe.agropecuario.defensivo.Count > 0 then
   begin
     Gerador.wGrupo('agropecuario', 'ZF01');
-    Gerador.wGrupo('defensivo', 'ZF02');
-    Gerador.wCampo(tcStr, 'ZF03', 'nReceituario', 01, 20, 1, NFe.agropecuario.defensivo.nReceituario, DSC_NRECEITUARIO);
-    Gerador.wCampo(tcStr, 'ZF03a', 'CPFRespTec', 01, 11, 1, NFe.agropecuario.defensivo.CPFRespTec, DSC_CPFRESPTEC);
-    Gerador.wGrupo('/defensivo');
+
+    for i := 0 to NFe.agropecuario.defensivo.Count -1 do
+    begin
+      Gerador.wGrupo('defensivo', 'ZF02');
+      Gerador.wCampo(tcStr, 'ZF03', 'nReceituario', 01, 30, 1, NFe.agropecuario.defensivo[i].nReceituario, DSC_NRECEITUARIO);
+      Gerador.wCampo(tcStr, 'ZF03a', 'CPFRespTec', 01, 11, 1, NFe.agropecuario.defensivo[i].CPFRespTec, DSC_CPFRESPTEC);
+      Gerador.wGrupo('/defensivo');
+    end;
+
+    if NFe.agropecuario.defensivo.Count > 20 then
+      Gerador.wAlerta('ZF02', 'defensivo', '', ERR_MSG_MAIOR_MAXIMO + '20');
+
     Gerador.wGrupo('/agropecuario');
-  end else
+  end
+  else
   if NFe.agropecuario.guiaTransito.tpGuia <> tpgNenhum then
   begin
     Gerador.wGrupo('agropecuario', 'ZF01');
     Gerador.wGrupo('guiaTransito', 'ZF04');
     Gerador.wCampo(tcStr, 'ZF06', 'tpGuia', 00, 01, 1, TtpGuiaToStr(NFe.agropecuario.guiaTransito.tpGuia), DSC_TPGUIA);
-    Gerador.wCampo(tcStr, 'ZF05', 'UFGuia', 00, 02, 0, NFe.agropecuario.guiaTransito.UFGuia, DSC_UFGUIA);
+    Gerador.wCampo(tcStr, 'ZF05', 'UFGuia', 00, 02, 1, NFe.agropecuario.guiaTransito.UFGuia, DSC_UFGUIA);
     Gerador.wCampo(tcStr, 'ZF07', 'serieGuia', 01, 09, 0, NFe.agropecuario.guiaTransito.serieGuia, DSC_SERIEGUIA);
     Gerador.wCampo(tcStr, 'ZF08', 'nGuia', 01, 09, 1, NFe.agropecuario.guiaTransito.nGuia, DSC_NGUIA);
     Gerador.wGrupo('/guiaTransito');
@@ -1925,7 +1936,7 @@ begin
                         end;
                       end;
 
-                      if (NFe.Det[i].Imposto.ICMS.vBCST > 0) or (NFe.Det[i].Imposto.ICMS.vICMSST > 0) then
+                      if (NFe.Det[i].Imposto.ICMS.vBCST > 0) or (NFe.Det[i].Imposto.ICMS.vICMSST > 0) or (NFe.Det[i].Imposto.ICMS.pICMSST > 0) then
                       begin
                         Gerador.wCampo(tcStr, 'N18', 'modBCST ', 01, 01, 1, modBCSTToStr(NFe.Det[i].Imposto.ICMS.modBCST), DSC_MODBCST);
                         Gerador.wCampo(tcDe2, 'N19', 'pMVAST  ', 01, 05, 0, NFe.Det[i].Imposto.ICMS.pMVAST, DSC_PMVAST);

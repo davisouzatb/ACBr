@@ -328,9 +328,11 @@ begin
               Space(9)                                          + // 009-017 / Campo sem Preenchimento
               IfThen(TipoInscricao = pFisica, '1', '2')         + // 018-018 / Tipo de Inscrição da Empresa
               PadLeft(Trim(OnlyNumber(CNPJCPF)), 14, '0')       + // 019-032 / Número de Inscrição da Empresa
-              PadLeft(CodigoCedente, 20, ' ')                   + // 033-052 / Código do Convênio no Banco
+              Space(20) +
+              //PadLeft(CodigoCedente, 20, ' ')                   + // 033-052 / Código do Convênio no Banco
               PadRight(Agencia, 5, '0')                         + // 053-057 / Agência Mantenedora da Conta
-              PadLeft(AgenciaDigito, 1)                         + // 058-058 / Dígito Verificador da Agência
+              Space(1) +
+              //PadLeft(AgenciaDigito, 1)                       + // 058-058 / Dígito Verificador da Agência
               PadLeft(Conta, 12, '0')                           + // 059-070 / Número da Conta Corrente
               PadLeft(ContaDigito, 1)                           + // 071-071 / Dígito Verificador da Conta
               ' '                                               + // 072-072 / Dígito Verificador da Ag/Conta
@@ -355,15 +357,17 @@ begin
                '01'                                                             + // 010-011 / Tipo de Serviço
                Space(2)                                                         + // 012-013 / Campo sem Preenchimento
                PadLeft(IntToStr(fpLayoutVersaoLote), 3, '0')                    + // 014-016 / Nº da versão do layout do Lote
-               ' '                                                              + // 017-017 / Campo sem preenchimento
+               Space(1)                                                         + // 017-017 / Campo sem preenchimento
                IfThen(TipoInscricao = pFisica, '1', '2')                        + // 018-018 / Tipo de Inscrição da Empresa
                PadLeft(Trim(OnlyNumber(CNPJCPF)), 15, '0')                      + // 019-033 / Número de Inscrição da Empresa
-               PadLeft(CodigoCedente, 20, ' ')                                  + // 034-053 / Código do Convênio no Banco
+               Space(20)+
+               //PadLeft(CodigoCedente, 20, ' ')                                  + // 034-053 / Código do Convênio no Banco
                PadRight(Agencia, 5, '0')                                        + // 054-058 / Agência Mantenedora da Conta
-               PadLeft(AgenciaDigito, 1)                                        + // 059-059 / Dígito Verificador da Agência
+               Space(1)+
+               //PadLeft(AgenciaDigito, 1)                                        + // 059-059 / Dígito Verificador da Agência
                PadLeft(Conta, 12, '0')                                          + // 060-071 / Número da Conta Corrente
                PadLeft(ContaDigito, 1)                                          + // 072-072 / Dígito Verificador da Conta
-               ' '                                                              + // 073-073 / Dígito Verificador da Ag/Conta
+               Space(1)                                                         + // 073-073 / Dígito Verificador da Ag/Conta
                PadRight(Nome, 30)                                               + // 074-103 / Nome da Empresa
                Space(40)                                                        + // 104-143 / Mensagem 1
                Space(40)                                                        + // 144-183 / Mensagem 2
@@ -881,6 +885,7 @@ var
   wLinha, tipoInscricao, aAgencia, aConta: String;
   Ocorrencia, aEspecie, aAceite, aInstrucao2: String;
   aTipoSacado, sDataDesconto:String;
+  LDiasBaixa, LTipoDesconto1 : String;
 begin
   with ACBrTitulo do
   begin
@@ -946,6 +951,19 @@ begin
       sDataDesconto := '000000'
     else
       sDataDesconto := FormatDateTime('ddmmyy', DataDesconto);
+    if DataBaixa > Vencimento then
+      LDiasBaixa := IntToStr(trunc(DataBaixa) - trunc(Vencimento))
+    else
+      LDiasBaixa := '000';
+
+    case TipoDesconto of
+      tdValorFixoAteDataInformada             : LTipoDesconto1 := '1'; //DESCONTO EM VALOR (R$)
+      tdPercentualAteDataInformada            : LTipoDesconto1 := '2'; //DESCONTO EM PERCENTUAL (%)
+      tdValorAntecipacaoDiaCorrido            : LTipoDesconto1 := '3'; //DESCONTO EM VALOR POR ANTECIPAÇÃO DIA CORRIDO (R$)
+      tdPercentualSobreValorNominalDiaCorrido : LTipoDesconto1 := '5'; //DESCONTO EM PERCENTUAL POR ANTECIPAÇÃO DIA CORRIDO (%)
+      else
+        LTipoDesconto1 := '0'; //SEM DESCONTO
+    end;
 
     wLinha := '1'                                                                            + //   1 a   1 - Identificação do Registro de Transação
               tipoInscricao                                                                  + //   2 a   3 - Tipo de Inscrição da Empresa
@@ -998,7 +1016,9 @@ begin
               PadRight(Sacado.Cidade, 15)                                                    + // 335 a 349 - Cidade do Sacado
               PadRight(Sacado.UF, 2)                                                         + // 350 a 351 - UF do Sacado
               PadRight(Sacado.SacadoAvalista.NomeAvalista, 30)                               + // 352 a 381 - Nome do Sacador Avalista / Mensagem específica vide nota 6.1.9 conforme manual do banco
-              Space(7)                                                                       + // 382 a 388 - "Brancos"
+              PadLeft(LDiasBaixa,3, '0')                                                     + // 382 a 384 - Quantidade de Dias para Baixa
+              Space(3)                                                                       + // 385 a 387 - "Brancos"
+              PadLeft(LTipoDesconto1,1,'0')                                                  + // 388 a 388 - Tipo de Desconto 1
               '422'                                                                          + // 389 a 391 - Banco Emitente do Boleto
               IntToStrZero(FNumeroRemessa, 3)                                                + // 392 a 394 - Numero Seqüencial Geração Arquivo Remessa
               IntToStrZero(ARemessa.Count + 1, 6);                                             // 395 a 400 - Número Sequencial De Registro De Arquivo

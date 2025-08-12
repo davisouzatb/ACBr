@@ -37,6 +37,7 @@ interface
 uses
    SysUtils,
    StrUtils,
+   Classes,
    ACBrBoleto,
    ACBrJSON,
    ACBrBoletoConversao,
@@ -62,6 +63,7 @@ type
       procedure RequisicaoJson;
       procedure RequisicaoAltera;
       procedure RequisicaoConsultaDetalhe;
+      function RequisicaoConsulta :string;
       procedure GerarJuros(AJson: TACBrJSONObject);
       procedure GerarMulta(AJson: TACBrJSONObject);
       procedure AlteraDataVencimento(AJson: TACBrJSONObject);
@@ -86,6 +88,7 @@ const
 implementation
 
 uses
+
    ACBrUtil.Strings,
    ACBrUtil.DateTime;
 
@@ -95,24 +98,82 @@ procedure TBoletoW_Cresol.DefinirURL;
 var
    LNossoNumero: string;
 begin
-   if( aTitulo <> nil ) then
-      LNossoNumero := OnlyNumber(aTitulo.NossoNumeroCorrespondente);
-   FPURL := IfThen(Boleto.Configuracoes.WebService.Ambiente = tawsProducao, C_URL,C_URL_HOM);
-   case Boleto.Configuracoes.WebService.Operacao of
-      tpInclui:  FPURL := FPURL + 'titulos/';
-      tpAltera:
-      begin
-         if ATitulo.OcorrenciaOriginal.Tipo = ACBrBoleto.toRemessaAlterarVencimento then
-            FPURL := FPURL + 'titulos/' + LNossoNumero;// Feito um Put com a DtVencimento para alterar o vencimento.
+  if( aTitulo <> nil ) then
+    LNossoNumero := OnlyNumber(aTitulo.NossoNumeroCorrespondente);
+
+  case Boleto.Configuracoes.WebService.Ambiente of
+    tawsProducao    : FPURL.URLProducao    := C_URL;
+    tawsHomologacao : FPURL.URLHomologacao := C_URL_HOM;
+  end;
+
+  case Boleto.Configuracoes.WebService.Operacao of
+    tpInclui:  FPURL.SetPathURI(  'titulos/' );
+    tpAltera:
+    begin
+       if ATitulo.OcorrenciaOriginal.Tipo = ACBrBoleto.toRemessaAlterarVencimento then
+          FPURL.SetPathURI(  'titulos/' + LNossoNumero );// Feito um Put com a DtVencimento para alterar o vencimento.
+    end;
+    tpConsultaDetalhe:
+    begin
+      if trim(LNossoNumero)=''  then
+        raise EACBrBoletoWSException.Create('Não foi informado o ID do Boleto em Titulo.NossoNumeroCorrespondente');
+      FPURL.SetPathURI(  'titulos/' + LNossoNumero );//Se não tiver IDBolApi, vai pela URL que traz todos os boletos
+    end;
+    tpConsulta:  FPURL.SetPathURI(  'titulos?' + RequisicaoConsulta );
+    tpBaixa:  FPURL.SetPathURI(  'titulos/' + LNossoNumero + '/operacao/baixar' );
+  end;
+end;
+
+function TBoletoW_Cresol.RequisicaoConsulta:string;
+var
+	LParameters : TStringList;
+begin
+	LParameters:= TStringList.Create;
+  try
+  	LParameters.Values['page'] := IntToStr(Trunc( Boleto.Configuracoes.WebService.Filtro.indiceContinuidade));
+    LParameters.Values['size'] := '10';
+
+    //BAIXADO_MANUALMENTE,
+    //BAIXADO_PROTESTADO,
+    //LIQUIDACAO_EM_PROCESSAMENTO,
+    //EM_ABERTO,
+    //EM_PROCESSAMENTO,
+    //LIQUIDADO,
+    //BAIXADO_DECURSO_DE_PRAZO,
+    //REJEITADO
+    case Boleto.Configuracoes.WebService.Filtro.indicadorSituacao of
+			isbAberto    : begin
+         LParameters.Add('status=EM_ABERTO');
+         //LParameters.AddPair('status','EM_PROCESSAMENTO');
+         //LParameters.AddPair('status','LIQUIDACAO_EM_PROCESSAMENTO');
       end;
-      tpConsultaDetalhe:  FPURL := FPURL + 'titulos/' + LNossoNumero;//Se não tiver IDBolApi, vai pela URL que traz todos os boletos
-      tpConsulta:  FPURL := FPURL + 'titulos/' ;
-      tpBaixa:  FPURL := FPURL + 'titulos/' + LNossoNumero + '/operacao/baixar';
-   end;
-//Exemplo de Consultas por status:
-//FPURL := 'https://cresolapi.governarti.com.br/titulos?status=LIQUIDADO';
-//FPURL := 'https://cresolapi.governarti.com.br/titulos?status=BAIXADO_MANUALMENTE';
-//FPURL := 'https://cresolapi.governarti.com.br/titulos?status=EM_ABERTO';
+      isbBaixado   : begin
+         LParameters.Add('status=LIQUIDADO');
+      end;
+      isbCancelado : begin
+//         LParameters.AddPair('status', 'REJEITADO');
+         LParameters.Add('status=BAIXADO_MANUALMENTE');
+         //LParameters.AddPair('status', 'BAIXADO_PROTESTADO');
+         //LParameters.AddPair('status', 'BAIXADO_DECURSO_DE_PRAZO');
+      end;
+    end;
+    if Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataInicio > 0 then
+    begin
+    	LParameters.Values['dt_vencimento_ini'] := FormatDateBr(Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataInicio, 'YYYY-MM-DD');
+      LParameters.Values['dt_vencimento_fim'] := FormatDateBr(Boleto.Configuracoes.WebService.Filtro.dataVencimento.DataFinal, 'YYYY-MM-DD');
+    end;
+
+    if Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataInicio > 0 then
+    begin
+    	LParameters.Values['dt_processamento_ini'] := FormatDateBr(Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataInicio, 'YYYY-MM-DD');
+      LParameters.Values['dt_processamento_fim'] := FormatDateBr(Boleto.Configuracoes.WebService.Filtro.dataMovimento.DataFinal, 'YYYY-MM-DD');
+    end;
+
+    LParameters.Delimiter:= '&';
+		Result := LParameters.DelimitedText;
+  finally
+  	LParameters.free;
+  end;
 end;
 
 procedure TBoletoW_Cresol.DefinirContentType;
@@ -133,7 +194,8 @@ begin
    if Assigned(Boleto) then
       DefinirURL;
    case Boleto.Configuracoes.WebService.Operacao of
-      tpInclui: begin
+      tpInclui:
+      begin
          FMetodoHTTP := htPOST;//Define Método POST para Incluir
          RequisicaoJson;
       end;
@@ -141,14 +203,20 @@ begin
          FMetodoHTTP := htPUT;//Define Método PUT para Alterar;
          RequisicaoAltera;
       end;
-      tpBaixa: begin
+      tpBaixa:
+      begin
          FMetodoHTTP := htPUT;//Define Método PUT para Baixa
          //Na baixa não precisa enviar o Body, vai enviar o ID do boleto na URL.
       end;
-      tpConsultaDetalhe: begin
+      tpConsultaDetalhe:
+      begin
          FMetodoHTTP := htGET;//Define Método GET Consulta Detalhe
          RequisicaoConsultaDetalhe;
       end;
+      tpConsulta:
+      begin
+        FMetodoHTTP := htGET;//Define Método GET Consulta
+      end
    else
       raise EACBrBoletoWSException.Create
       (ClassName + Format(S_OPERACAO_NAO_IMPLEMENTADO,
@@ -330,17 +398,17 @@ end;
 
 constructor TBoletoW_Cresol.Create(ABoletoWS: TBoletoWS);
 begin
-   inherited Create(ABoletoWS);
-   FPAccept := C_ACCEPT;
-   if Assigned(OAuth) then
-   begin
-      if OAuth.Ambiente = tawsProducao then
-         OAuth.URL := C_URL_TOKEN
-      else
-         OAuth.URL := C_URL_TOKEN_HOM;
+  inherited Create(ABoletoWS);
+  FPAccept := C_ACCEPT;
+  if Assigned(OAuth) then
+  begin
+    case OAuth.Ambiente of
+      tawsProducao: OAuth.URL.URLProducao := C_URL_TOKEN;
+      tawsHomologacao: OAuth.URL.URLHomologacao := C_URL_TOKEN_HOM;
+    end;
 
-      OAuth.Payload := True;
-   end;
+    OAuth.Payload := True;
+  end;
 end;
 
 function TBoletoW_Cresol.GerarRemessa: string;

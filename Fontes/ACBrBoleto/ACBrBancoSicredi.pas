@@ -48,6 +48,8 @@ type
 
   TACBrBancoSicredi = class(TACBrBancoClass)
   private
+    // tratamento para quando agencia tem letras deve retornadar "00"
+    function DigitoAgencia(const ACedente : TACBrCedente) :string;
     function ObtemCodigoMoraJuros(const ACBrTitulo: TACBrTitulo): String;
     function ConverterJurosDiario(const ACBrTitulo: TACBrTitulo): Double;
     function ConverterMultaPercentual(const ACBrTitulo: TACBrTitulo): Double;
@@ -114,17 +116,11 @@ begin
 end;
 
 function TACBrBancoSicredi.CalcularDigitoVerificador(const ACBrTitulo: TACBrTitulo ): String;
-var 
-   LAgenciaDigito :string;
 begin
    Modulo.CalculoPadrao;
 
-   LAgenciaDigito := ACBrTitulo.ACBrBoleto.Cedente.AgenciaDigito;
-   if OnlyAlpha(LAgenciaDigito) <> EmptyStr then
-      LAgenciaDigito :='00';
-
    Modulo.Documento := ACBrTitulo.ACBrBoleto.Cedente.Agencia +
-                       PadLeft(OnlyNumber(LAgenciaDigito), 2, '0') +
+                       PadLeft(OnlyNumber(DigitoAgencia( ACBrTitulo.ACBrBoleto.Cedente)), 2, '0') +
                        PadLeft(ACBrTitulo.ACBrBoleto.Cedente.CodigoCedente, 5, '0');
 
   if ( (ACBrBanco.ACBrBoleto.Cedente.ResponEmissao = tbBancoEmite) and (Length(ACBrTitulo.CodigoGeracao) = 3)) then
@@ -162,7 +158,7 @@ begin
                       '1'                                             + { 1-Carteira simples }
                       OnlyNumber(MontarCampoNossoNumero(ACBrTitulo))  +
                       PadLeft(OnlyNumber(Cedente.Agencia),4,'0')      + { Código agência (cooperativa) }
-                      PadLeft(OnlyNumber(Cedente.AgenciaDigito),2,'0')+ { Dígito da agência (posto da cooperativa) }
+                      PadLeft(OnlyNumber(DigitoAgencia( Cedente)),2,'0')+ { Dígito da agência (posto da cooperativa) }
                       PadLeft(OnlyNumber(Cedente.CodigoCedente),5,'0')+ { Código cedente }  //  Ver manual página 86 - CNAB240 ou 51 - CNAB400
                       '1'                                             + { Filler - zero. Obs: Será 1 quando o valor do documento for diferente se zero }
                       '0';                                              { Filler - zero }
@@ -246,11 +242,18 @@ end;
 
 
 function TACBrBancoSicredi.ObtemCodigoMoraJuros(const ACBrTitulo: TACBrTitulo): String;
+var
+  codMora: String;
 begin
   with ACBrTitulo do
   begin
-    if (CodigoMora <> '') then
-      Result := CodigoMora
+    if (Pos(CodigoMora,'12') > 0) then
+      codMora := Chr(StrToIntDef(CodigoMora,1) + 64)
+    else
+      codMora := CodigoMora;
+
+    if (Pos(codMora,'AB') > 0) then
+      Result := codMora
     else
     begin
       case CodigoMoraJuros of
@@ -946,6 +949,13 @@ begin
   Result := 48;
 end;
 
+function TACBrBancoSicredi.DigitoAgencia(const ACedente : TACBrCedente): string;
+begin
+  Result := ACedente.AgenciaDigito;
+  if OnlyAlpha(Result) <> EmptyStr then
+    Result :='00';
+end;
+
 function TACBrBancoSicredi.CodMotivoRejeicaoToDescricao(
   const TipoOcorrencia: TACBrTipoOcorrencia; const CodMotivo: String): String;
 begin
@@ -1571,7 +1581,7 @@ end;
 function TACBrBancoSicredi.CalcularNomeArquivoRemessa: String;
 var
   Sequencia, wMes :Integer;
-  NomeFixo, NomeArq: String;
+  NomeFixo, NomeArq, Extensao: String;
   codMesSicredi : String;
 begin
 
@@ -1596,21 +1606,22 @@ begin
 
          NomeArq := NomeFixo + '.crm';
 
-         Sequencia := 1;
+         Sequencia := 0;
+
          while FilesExists(NomeArq) do
          begin
            Inc(Sequencia);
 
-           if Sequencia > 9 then
-           begin
-             if Sequencia = 10 then
-               NomeArq := NomeFixo +'.rm0'
-             else
-               raise Exception.Create(ACBrStr('Número máximo de 10 arquivos '+
-                                              'de remessa alcançado'));
-           end
-           else
-             NomeArq := NomeFixo +'.rm'+IntToStr(Sequencia);
+           if (Sequencia >= 1) and (Sequencia < 10) then
+            Extensao := '.rm'
+          else if (Sequencia >= 100) then
+            Extensao := '.'
+          else if (Sequencia >= 10) then
+            Extensao := '.m'
+          else
+            Extensao := '.crm';
+
+           NomeArq := NomeFixo +Extensao+IntToStr(Sequencia);
 
          end;
 
@@ -2242,6 +2253,13 @@ begin
                                        '" não é um arquivo de retorno do(a) '+ UpperCase(Nome)));
 
    rCedente       := Trim(Copy(ARetorno[0],73,30));
+   if ACBrBanco.ACBrBoleto.LeCedenteRetorno then
+   begin
+     if (StrToIntDef(copy(ARetorno[0], 18, 1), 0) = 1) then
+       ACBrBanco.ACBrBoleto.Cedente.TipoInscricao := pFisica
+     else
+       ACBrBanco.ACBrBoleto.Cedente.TipoInscricao := pJuridica;
+   end;
 
    if ACBrBanco.ACBrBoleto.Cedente.TipoInscricao = pJuridica then
     rCNPJCPF       := Copy(ARetorno[0],19,14)

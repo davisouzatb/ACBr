@@ -762,7 +762,11 @@ begin
           BPe.procBPe.digVal   := FBPeRetorno.protBPe.digVal;
           BPe.procBPe.xMotivo  := FBPeRetorno.protBPe.xMotivo;
 
-          AProcBPe := TProcDFe.Create(FPVersaoServico, NAME_SPACE_BPE, 'bpeProc', 'BPe');
+          if FPConfiguracoesBPe.Geral.ModeloDF = moBPeTM then
+            AProcBPe := TProcDFe.Create(FPVersaoServico, NAME_SPACE_BPE, 'bpeTMProc', 'BPeTM')
+          else
+            AProcBPe := TProcDFe.Create(FPVersaoServico, NAME_SPACE_BPE, 'bpeProc', 'BPe');
+
           try
             // Processando em UTF8, para poder gravar arquivo corretamente //
             AProcBPe.XML_DFe := RemoverDeclaracaoXML(XMLAssinado);
@@ -965,7 +969,8 @@ function TBPeConsulta.TratarResposta: Boolean;
 
 procedure SalvarEventos(Retorno: string);
 var
-  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJ: string;
+  aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJCPF: string;
+  DhEvt: TDateTime;
   Inicio, Fim: Integer;
   TipoEvento: TpcnTpEvento;
   Ok: Boolean;
@@ -991,11 +996,16 @@ begin
     else
       aIDEvento := Copy(aProcEvento, Inicio, Fim);
 
-    TipoEvento  := StrToTpEventoBPe(Ok, SeparaDados(aEvento, 'tpEvento'));
-    sCNPJ       := SeparaDados(aEvento, 'CNPJ');
-    sPathEvento := PathWithDelim(FPConfiguracoesBPe.Arquivos.GetPathEvento(TipoEvento, sCNPJ));
+    TipoEvento := StrToTpEventoBPe(Ok, SeparaDados(aEvento, 'tpEvento'));
+    DhEvt      := EncodeDataHora(SeparaDados(aEvento, 'dhEvento'), 'YYYY-MM-DD');
+    sCNPJCPF   := SeparaDados(aEvento, 'CNPJ');
 
-    if (aProcEvento <> '') then
+    if EstaVazio(sCNPJCPF) then
+      sCNPJCPF := SeparaDados(aEvento, 'CPF');
+
+    sPathEvento := PathWithDelim(FPConfiguracoesBPe.Arquivos.GetPathEvento(TipoEvento, sCNPJCPF, '', DhEvt));
+
+    if FPConfiguracoesBPe.Arquivos.SalvarEvento and (aProcEvento <> '') then
       FPDFeOwner.Gravar( aIDEvento + '-procEventoBPe.xml', aProcEvento, sPathEvento);
   end;
 end;
@@ -1265,7 +1275,7 @@ begin
       end
       else
       begin
-        if ExtrairEventos and FPConfiguracoesBPe.Arquivos.Salvar and
+        if ExtrairEventos and FPConfiguracoesBPe.Arquivos.SalvarEvento and
            (NaoEstaVazio(SeparaDados(FPRetWS, 'procEventoBPe'))) then
         begin
           Inicio := Pos('<procEventoBPe', FPRetWS);
@@ -1449,6 +1459,8 @@ begin
     {*)}
 
     EventoBPe.Versao := FPVersaoServico;
+    AjustarOpcoes(EventoBPe.Opcoes);
+    EventoBPe.GerarXml;
 
     Eventos := NativeStringToUTF8(EventoBPe.XmlEnvio);
     EventosAssinados := '';
@@ -1586,7 +1598,7 @@ begin
                    Texto +
                  '</procEventoBPe>';
 
-        if FPConfiguracoesBPe.Arquivos.Salvar then
+        if FPConfiguracoesBPe.Arquivos.SalvarEvento then
         begin
           NomeArq := OnlyNumber(FEvento.Evento[0].infEvento.Id) + '-procEventoBPe.xml';
           PathArq := PathWithDelim(GerarPathEvento(FEvento.Evento[0].infEvento.CNPJ));

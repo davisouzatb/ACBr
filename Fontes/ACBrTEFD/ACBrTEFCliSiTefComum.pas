@@ -39,6 +39,7 @@ interface
 uses
   Classes,
   SysUtils,
+  ACBrBase,
   ACBrTEFComum;
 
 resourcestring
@@ -186,6 +187,9 @@ type
               NumeroDigitado: PAnsiChar): Integer;
               {$IfDef MSWINDOWS}stdcall{$Else}cdecl{$EndIf};
 
+    xObtemVersao: function(VersaoCliSiTef: PAnsiChar; VersaoCliSiTefI: PAnsiChar): Integer;
+              {$IfDef MSWINDOWS}stdcall{$Else}cdecl{$EndIf};
+
     procedure SetInicializada(AValue: Boolean);
 
     procedure LoadDLLFunctions;
@@ -241,8 +245,8 @@ type
     function VerificaPresencaPinPad: Boolean;
     function ObtemDadoPinPadDiretoEx(TipoDocumento: Integer; ChaveAcesso,
       Identificador: AnsiString): AnsiString;
-
     function LeDigitoPinPad(MensagemDisplay: AnsiString): AnsiString;
+    function ObtemVersao(out VersaoCliSiTef: String; out VersaoCliSiTefI: String):Integer;
 
     property PathDLL: string read fPathDLL write fPathDLL;
     property Inicializada: Boolean read fInicializada write SetInicializada;
@@ -341,7 +345,7 @@ begin
         133: NSU_TEF := LinStr;
         134: NSU := LinStr;
         135: CodigoAutorizacaoTransacao := LinStr;
-        136: Bin := LinStr;
+        136: BIN := LinStr;
         139: ValorEntradaCDC := Linha.Informacao.AsFloat;
         140: DataEntradaCDC := Linha.Informacao.AsDate;
         156: Rede := LinStr;
@@ -407,6 +411,7 @@ begin
         1002: NFCeSAT.DataExpiracao := LinStr;
         1003: NFCeSAT.DonoCartao := LinStr;
         1190: NFCeSAT.UltimosQuatroDigitos := LinStr;
+        2021: PAN := LinStr;
         4029:
         begin
           Desconto := Linha.Informacao.AsFloat;
@@ -519,6 +524,7 @@ begin
   xVerificaPresencaPinPad             := nil;
   xObtemDadoPinPadDiretoEx            := nil;
   xLeDigitoPinPad                     := nil;
+  xObtemVersao                        := nil;
 end;
 
 destructor TACBrTEFCliSiTefAPI.Destroy;
@@ -576,6 +582,7 @@ begin
   CliSiTefFunctionDetect('VerificaPresencaPinPad',@xVerificaPresencaPinPad);
   CliSiTefFunctionDetect('ObtemDadoPinPadDiretoEx', @xObtemDadoPinPadDiretoEx);
   CliSiTefFunctionDetect('LeDigitoPinPad', @xLeDigitoPinPad);
+  CliSiTefFunctionDetect('ObtemVersao', @xObtemVersao);
 
   fInicializada := True;
 end ;
@@ -604,6 +611,7 @@ begin
   xVerificaPresencaPinPad             := Nil;
   xObtemDadoPinPadDiretoEx            := Nil;
   xLeDigitoPinPad                     := Nil;
+  @xObtemVersao                       := Nil;
 
   fInicializada := False;
 end;
@@ -728,6 +736,27 @@ begin
     Result := xObtemQuantidadeTransacoesPendentes(sDate,CupomFiscal)
   else
     Result := -1;
+end;
+
+function TACBrTEFCliSiTefAPI.ObtemVersao(out VersaoCliSiTef: String; out
+  VersaoCliSiTefI: String): Integer;
+var
+  lVersaoCliSiTef: array [0..63] of AnsiChar;
+  lVersaoCliSiTefI: array [0..63] of AnsiChar;
+begin
+  Result := -1;
+  VersaoCliSiTef := '';
+  VersaoCliSiTefI := '';
+
+  LoadDLLFunctions;
+  if Assigned(xObtemVersao) then
+    Result := xObtemVersao(lVersaoCliSiTef, lVersaoCliSiTefI);
+
+  if (Result = 0) then
+  begin
+    VersaoCliSiTef := TrimRight(lVersaoCliSiTef);
+    VersaoCliSiTefI := TrimRight(lVersaoCliSiTefI);
+  end;
 end;
 
 function TACBrTEFCliSiTefAPI.EnviaRecebeSiTefDireto(RedeDestino: SmallInt;

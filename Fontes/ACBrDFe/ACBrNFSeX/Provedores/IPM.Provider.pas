@@ -1404,7 +1404,7 @@ var
   jDocument, JSonErro: TACBrJSONObject;
   Codigo, Mensagem, Xml: string;
 begin
-  Xml := ConverteANSIparaUTF8(aXML);
+  Xml := ConverteANSItoUTF8(aXML);
   Xml := RemoverDeclaracaoXML(Xml);
 
   if (Pos('{"', Xml) > 0) and (Pos('":"', Xml) > 0) then
@@ -1532,7 +1532,7 @@ var
   jDocument, JSonErro: TACBrJSONObject;
   Codigo, Mensagem, Xml: string;
 begin
-  Xml := ConverteANSIparaUTF8(aXML);
+  Xml := ConverteANSItoUTF8(aXML);
   Xml := RemoverDeclaracaoXML(Xml);
 
   if (Pos('{"', Xml) > 0) and (Pos('":"', Xml) > 0) then
@@ -1863,7 +1863,7 @@ var
   jDocument, JSonErro: TACBrJSONObject;
   Codigo, Mensagem, Xml: string;
 begin
-  Xml := ConverteANSIparaUTF8(aXML);
+  Xml := ConverteANSItoUTF8(aXML);
   Xml := RemoverDeclaracaoXML(Xml);
 
   if (Pos('{"', Xml) > 0) and (Pos('":"', Xml) > 0) then
@@ -1919,6 +1919,7 @@ begin
   ConfigGeral.QuebradeLinha := sLineBreak;
   ConfigGeral.Identificador := '';
   ConfigGeral.ConsultaPorFaixaPreencherNumNfseFinal := True;
+  ConfigGeral.QuebradeLinha := '\n';
 
   ConfigGeral.Autenticacao.RequerLogin := True;
 

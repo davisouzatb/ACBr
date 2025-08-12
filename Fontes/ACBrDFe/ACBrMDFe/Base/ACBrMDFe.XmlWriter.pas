@@ -348,7 +348,7 @@ begin
                  (MDFe.signature.X509Certificate = ''));
     if Gerar then
     begin
-      FMDFe.signature.URI := '#MDFe' + OnlyNumber(MDFe.infMDFe.ID);
+      FMDFe.signature.URI := '#MDFe' + FChaveMDFe;
       xmlNode := GerarSignature(FMDFe.signature);
       MDFeNode.AppendChild(xmlNode);
     end;
@@ -368,7 +368,7 @@ var
 begin
   Result := FDocument.CreateElement('infMDFe');
 
-  Result.SetAttribute('Id', MDFe.infMDFe.ID);
+  Result.SetAttribute('Id', 'MDFe' + FChaveMDFe);
   Result.SetAttribute('versao', FloatToString(MDFe.infMDFe.Versao, '.', '#0.00'));
 
   Result.AppendChild(Gerar_Ide);
@@ -1156,7 +1156,7 @@ begin
     Result[i].AppendChild(AddNode(tcInt, '#07', 'tara', 1, 6, 1,
                                       MDFe.Rodo.veicReboque[i].tara, DSC_TARA));
 
-    Result[i].AppendChild(AddNode(tcInt, '#08', 'capKG', 1, 6, 0,
+    Result[i].AppendChild(AddNode(tcInt, '#08', 'capKG', 1, 6, 1,
                                     MDFe.Rodo.veicReboque[i].capKG, DSC_CAPKG));
 
     Result[i].AppendChild(AddNode(tcInt, '#09', 'capM3', 1, 6, 0,
@@ -1340,6 +1340,9 @@ begin
       Result.AppendChild(nodeArray[i]);
     end;
   end;
+
+  Result.AppendChild(AddNode(tcStr, '#11', 'MMSI', 1, 9, 0,
+                                                    MDFe.aquav.MMSI, DSC_MMSI));
 end;
 
 function TMDFeXmlWriter.Gerar_infTermCarreg: TACBrXmlNodeArray;
@@ -2798,7 +2801,7 @@ begin
 
     if (idCSRT <> 0) and (CSRT <> '') then
     begin
-      Result.AppendChild(AddNode(tcInt, '#315', 'idCSRT', 2, 2, 1,
+      Result.AppendChild(AddNode(tcInt, '#315', 'idCSRT', 3, 3, 1,
                                                            idCSRT, DSC_IDCSRT));
 
       Result.AppendChild(AddNode(tcStr, '#316', 'hashCSRT', 28, 28, 1,
@@ -2817,11 +2820,11 @@ begin
 
   xmlNode := Result.AddChild('infProt');
 
-  xmlNode.AddChild('tpAmb').Content := TpAmbToStr(MDFe.procMDFe.tpAmb);
+  xmlNode.AddChild('tpAmb').Content := TipoAmbienteToStr(MDFe.procMDFe.tpAmb);
 
   xmlNode.AddChild('verAplic').Content := MDFe.procMDFe.verAplic;
 
-  xmlNode.AddChild('chMDFe').Content := MDFe.procMDFe.chMDFe;
+  xmlNode.AddChild('chMDFe').Content := MDFe.procMDFe.chDFe;
 
   xmlNode.AddChild('dhRecbto').Content :=
     FormatDateTime('yyyy-mm-dd"T"hh:nn:ss', MDFe.procMDFe.dhRecbto) +

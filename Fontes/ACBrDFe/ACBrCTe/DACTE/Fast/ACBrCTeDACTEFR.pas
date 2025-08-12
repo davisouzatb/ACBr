@@ -2490,11 +2490,12 @@ begin
       FieldByName('dhEmi').AsDateTime := dhEmi;
 
       case tpCTe of
-        tcNormal: FieldByName('TpCT').AsString      := 'Normal';
-        tcComplemento: FieldByName('TpCT').AsString := 'Complemento';
-        tcAnulacao: FieldByName('TpCT').AsString    := 'Anulação';
-        tcSubstituto: FieldByName('TpCT').AsString  := 'Substituto';
-        tcCTeSimp: FieldByName('TpCT').AsString     := 'CTe Simplificado';
+        tcNormal: FieldByName('TpCT').AsString        := 'Normal';
+        tcComplemento: FieldByName('TpCT').AsString   := 'Complemento';
+        tcAnulacao: FieldByName('TpCT').AsString      := 'Anulação';
+        tcSubstituto: FieldByName('TpCT').AsString    := 'Substituto';
+        tcCTeSimp: FieldByName('TpCT').AsString       := 'CTe Simplificado';
+        tcSubstCTeSimpl: FieldByName('TpCT').AsString := 'CTe Simplificado - Substituto';
       end;
 
       FieldByName('cMunEmi').AsString := IntToStr(cMunEnv);
@@ -3297,7 +3298,7 @@ begin
   begin
 
     Append;
-    if (FCTe.ide.modelo = 67) or (FCTe.ide.tpCTe = tcCTeSimp) then  //67-CTeOS
+    if ((FCTe.ide.modelo in [57,67]) or (FCTe.ide.tpCTe = tcCTeSimp)) and (FCTe.toma.xNome <> '') then  //67-CTeOS
     begin
       FieldByName('CNPJ').AsString    := FormatarCNPJouCPF(FCTe.toma.CNPJCPF);
       FieldByName('XNome').AsString   := FCTe.toma.xNome;

@@ -150,6 +150,7 @@ type
     FSacado_CNPJCPF : String;
     FVencimento: TDateTime;
     FDataDocumento: TDateTime;
+    FDataRegistro: TDateTime;
     FNumeroDocumento: String;
     FDataProcessamento: TDateTime;
     FNossoNumero: String;
@@ -177,6 +178,10 @@ type
     FHoraBaixa: String;
     FEstadoTituloCobranca : String;
     FLiquidadoBanco:integer;
+    FEMV: String;
+    FTxID: String;
+    FURL: String;
+
 
 
   public
@@ -189,6 +194,7 @@ type
     property Sacado_CNPJCPF : String read FSacado_CNPJCPF write FSacado_CNPJCPF;
     property Vencimento: TDateTime read FVencimento write FVencimento;
     property DataDocumento: TDateTime read FDataDocumento write FDataDocumento;
+    property DataRegistro: TDateTime read FDataRegistro write FDataRegistro;
     property NumeroDocumento: String read FNumeroDocumento write FNumeroDocumento;
     property DataProcessamento: TDateTime read FDataProcessamento write FDataProcessamento;
     property NossoNumero: String read FNossoNumero write FNossoNumero;
@@ -216,6 +222,9 @@ type
     property EstadoTituloCobranca: String read FEstadoTituloCobranca write FEstadoTituloCobranca;
     property HoraBaixa: String read FHoraBaixa write FHoraBaixa;
     property LiquidadoBanco: integer read FLiquidadoBanco write FLiquidadoBanco;
+    property EMV: String read FEMV write FEMV;
+    property TxID: String read FTxID write FTxID;
+    property URL:  String read FURL write FURL;
   end;
 
   { TRetornoBoleto }
@@ -311,6 +320,7 @@ type
     FSeuNumero: String;
     FTipoDiasProtesto: TACBrTipoDiasIntrucao;
     FVencimento: TDateTime;
+    FDataRegistro: TDateTime;
     FDataDocumento: TDateTime;
     FNumeroDocumento: String;
     FEspecieDoc: String;
@@ -389,6 +399,7 @@ type
     property SeuNumero: String read FSeuNumero write FSeuNumero ;
     property TipoDiasProtesto: TACBrTipoDiasIntrucao read FTipoDiasProtesto write FTipoDiasProtesto ;
     property Vencimento: TDateTime read FVencimento write FVencimento ;
+    property DataRegistro: TDateTime read FDataRegistro write FDataRegistro ;
     property DataDocumento: TDateTime read FDataDocumento write FDataDocumento ;
     property NumeroDocumento: String read FNumeroDocumento write FNumeroDocumento ;
     property EspecieDoc: String read FEspecieDoc write FEspecieDoc ;
@@ -499,7 +510,8 @@ type
     FHeader_Operacao: String;
     FHeader_Indice: Integer;
     FHeader_Sistema_Origem: String;
-    FHeader_Agencia: Integer;
+    FHeader_Agencia: String;
+    FHeader_ContaCorrente: String;
     FHeader_Id_Origem: String;
     FHeader_Data_Hora: TDateTime;
     FHeader_Id_Processo: String;
@@ -543,7 +555,8 @@ type
     property Header_Operacao: String             read FHeader_Operacao             write FHeader_Operacao;
     property Header_Indice: Integer              read FHeader_Indice               write FHeader_Indice;
     property Header_Sistema_Origem: String       read FHeader_Sistema_Origem       write FHeader_Sistema_Origem;
-    property Header_Agencia: Integer             read FHeader_Agencia              write FHeader_Agencia;
+    property Header_Agencia: String              read FHeader_Agencia              write FHeader_Agencia;
+    property Header_ContaCorrente: String        read FHeader_ContaCorrente        write FHeader_ContaCorrente;
     property Header_Id_Origem: String            read FHeader_Id_Origem            write FHeader_Id_Origem;
     property Header_Data_Hora: TDateTime         read FHeader_Data_Hora            write FHeader_Data_Hora;
     property Header_Id_Processo: String          read FHeader_Id_Processo          write FHeader_Id_Processo;
@@ -676,6 +689,7 @@ begin
     SeuNumero:= DadosRet.TituloRet.SeuNumero;
     TipoDiasProtesto:= DadosRet.TituloRet.TipoDiasProtesto;
     Vencimento:= DadosRet.TituloRet.Vencimento;
+    DataRegistro:=DadosRet.TituloRet.DataRegistro;
     DataDocumento:= DadosRet.TituloRet.DataDocumento;
     NumeroDocumento:= DadosRet.TituloRet.NumeroDocumento;
     EspecieDoc:= DadosRet.TituloRet.EspecieDoc;
@@ -791,6 +805,7 @@ begin
   Header_Indice:= RetEnvio.Header.Indice;
   Header_Sistema_Origem:= RetEnvio.Header.Sistema_Origem;
   Header_Agencia:= RetEnvio.Header.Agencia;
+  Header_ContaCorrente:= RetEnvio.Header.ContaCorrente;
   Header_Id_Origem:= RetEnvio.Header.Id_Origem;
   Header_Data_Hora:= RetEnvio.Header.Data_Hora;
   Header_Id_Processo:= RetEnvio.Header.Id_Processo;
@@ -916,6 +931,7 @@ begin
     Sacado_Nome := ACBrBoleto.ListadeBoletos[FID].Sacado.NomeSacado;
     Sacado_CNPJCPF := ACBrBoleto.ListadeBoletos[FID].Sacado.CNPJCPF;
     Vencimento := ACBrBoleto.ListadeBoletos[FID].Vencimento;
+    DataRegistro:=ACBrBoleto.ListadeBoletos[FID].DataRegistro;
     DataDocumento := ACBrBoleto.ListadeBoletos[FID].DataDocumento;
     NumeroDocumento := ACBrBoleto.ListadeBoletos[FID].NumeroDocumento;
     DataProcessamento := ACBrBoleto.ListadeBoletos[FID].DataProcessamento;
@@ -940,6 +956,10 @@ begin
     SeuNumero := ACBrBoleto.ListadeBoletos[FID].SeuNumero;
     CodTipoOcorrencia := GetEnumName( TypeInfo(TACBrTipoOcorrencia),
                                              Integer(ACBrBoleto.ListadeBoletos[FID].OcorrenciaOriginal.Tipo));
+    EMV  := ACBrBoleto.ListadeBoletos[FID].QrCode.emv;
+    TxID := ACBrBoleto.ListadeBoletos[FID].QrCode.txId;
+    FURL := ACBrBoleto.ListadeBoletos[FID].QrCode.url;
+
     if ACBrBoleto.ListadeBoletos[FID].Liquidacao.Banco > 0 then
        LiquidadoBanco := ACBrBoleto.ListadeBoletos[FID].Liquidacao.Banco;
     DescricaoTipoOcorrencia := ACBrBoleto.ListadeBoletos[FID].OcorrenciaOriginal.Descricao;

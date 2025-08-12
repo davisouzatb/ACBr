@@ -47,6 +47,7 @@ uses
   ACBrBase,
   pcnConversao,
   pcnSignature,
+  ACBrBPeClass,
   ACBrBPeEventoClass,
   ACBrBPeConsts,
   ACBrXmlBase,
@@ -104,6 +105,25 @@ type
     function Gerar_Evento_NaoEmbarque(AIdx: Integer): TACBrXmlNode;
     function Gerar_Evento_AlteracaoPoltrona(AIdx: Integer): TACBrXmlNode;
     function Gerar_Evento_ExcessoBagagem(AIdx: Integer): TACBrXmlNode;
+
+    // Reforma Tributaria
+    function Gerar_IBSCBS(IBSCBS: TIBSCBS): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS(gIBSCBS: TgIBSCBS): TACBrXmlNode;
+
+    function Gerar_IBSCBS_gIBSCBS_gIBSUF(gIBSUF: TgIBSUFValores): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS_gIBSMun(gIBSMun: TgIBSMunValores): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS_gCBS(gCBS: TgCBSValores): TACBrXmlNode;
+
+    function Gerar_IBSCBS_gIBSCBS_gIBSUF_gDif(Dif: TgDif): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS_gIBSMun_gDif(Dif: TgDif): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS_gCBS_gDif(Dif: TgDif): TACBrXmlNode;
+
+    function Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gDevTrib(DevTrib: TgDevTrib): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gRed(Red: TgRed): TACBrXmlNode;
+
+    function Gerar_IBSCBS_gIBSCBS_gTribRegular(gTribRegular: TgTribRegular): TACBrXmlNode;
+    function Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(gIBSCredPres: TgIBSCBSCredPres;
+      const Grupo: string): TACBrXmlNode;
   public
     constructor Create;
     destructor Destroy; override;
@@ -132,6 +152,7 @@ uses
   ACBrUtil.FilesIO,
   ACBrUtil.DateTime,
   ACBrBPeRetEnvEvento,
+  ACBrDFe.Conversao,
   ACBrBPeConversao;
 
 { TEventoBPe }
@@ -312,6 +333,9 @@ begin
 
   Result.AppendChild(AddNode(tcDe2, 'EP05', 'vTotBag', 1, 15, 1,
                                     Evento[AIdx].FInfEvento.detEvento.vTotBag));
+
+  // Reforma Tributária
+  Result.AppendChild(Gerar_IBSCBS(Evento[AIdx].FInfEvento.detEvento.IBSCBS));
 end;
 
 { TInfEventoCollectionItem }
@@ -483,6 +507,9 @@ begin
         infEvento.detEvento.poltrona := INIRec.ReadInteger(sSecao, 'poltrona', 0);
         infEvento.detEvento.qBagagem := INIRec.ReadInteger(sSecao, 'qBagagem', 0);
         infEvento.detEvento.vTotBag := StringToFloatDef(INIRec.ReadString(sSecao, 'vTotBag', ''), 0);
+
+        // Reforma Tributária
+        // Falta Implementar
       end;
 
       Inc(I);
@@ -492,6 +519,217 @@ begin
   finally
     INIRec.Free;
   end;
+end;
+
+// Reforma Tributaria
+function TEventoBPe.Gerar_IBSCBS(IBSCBS: TIBSCBS): TACBrXmlNode;
+begin
+  Result := nil;
+
+  if (IBSCBS.gIBSCBS.vBC > 0) then
+  begin
+    Result := FDocument.CreateElement('IBSCBS');
+
+    Result.AppendChild(AddNode(tcStr, '#1', 'CST', 3, 3, 1,
+                                          CSTIBSCBSToStr(IBSCBS.CST), DSC_CST));
+
+    Result.AppendChild(AddNode(tcStr, '#2', 'cClassTrib', 6, 6, 1,
+                           cClassTribToStr(IBSCBS.cClassTrib), DSC_CCLASSTRIB));
+
+    if IBSCBS.gIBSCBS.vBC > 0 then
+      Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
+  end;
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS(gIBSCBS: TgIBSCBS): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gIBSCBS');
+
+
+  Result.AppendChild(AddNode(tcDe2, '#4', 'vBC', 1, 15, 1,
+                                                         gIBSCBS.vBC, DSC_VBC));
+
+  Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUF(gIBSCBS.gIBSUF));
+  Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSMun(gIBSCBS.gIBSMun));
+  Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gCBS(gIBSCBS.gCBS));
+
+  if gIBSCBS.gTribRegular.pAliqEfetRegIBSUF > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gTribRegular(gIBSCBS.gTribRegular));
+
+  if gIBSCBS.gIBSCredPres.pCredPres > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(gIBSCBS.gIBSCredPres, 'gIBSCredPres'));
+
+  if gIBSCBS.gCBSCredPres.pCredPres > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(gIBSCBS.gCBSCredPres, 'gCBSCredPres'));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSUF(
+  gIBSUF: TgIBSUFValores): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gIBSUF');
+
+  Result.AppendChild(AddNode(tcDe4, '#6', 'pIBSUF', 1, 7, 1,
+                                                      gIBSUF.pIBS, DSC_PIBSUF));
+
+  if gIBSUF.gDif.pDif > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUF_gDif(gIBSUF.gDif));
+
+  if gIBSUF.gDevTrib.vDevTrib > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gDevTrib(gIBSUF.gDevTrib));
+
+  if gIBSUF.gRed.pRedAliq > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gRed(gIBSUF.gRed));
+
+  Result.AppendChild(AddNode(tcDe2, '#23', 'vIBSUF', 1, 15, 1,
+                                                      gIBSUF.vIBS, DSC_VIBSUF));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSUF_gDif(
+  Dif: TgDif): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gDif');
+
+  Result.AppendChild(AddNode(tcDe4, '#10', 'pDif', 1, 7, 1,
+                                                           Dif.pDif, DSC_PDIF));
+
+  Result.AppendChild(AddNode(tcDe2, '#11', 'vDif', 1, 15, 1,
+                                                           Dif.vDif, DSC_VDIF));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gDevTrib(
+  DevTrib: TgDevTrib): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gDevTrib');
+
+  Result.AppendChild(AddNode(tcDe2, '#13', 'vDevTrib', 1, 15, 1,
+                                               DevTrib.vDevTrib, DSC_VDEVTRIB));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gRed(
+  Red: TgRed): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gRed');
+
+  Result.AppendChild(AddNode(tcDe4, '#15', 'pRedAliq', 1, 7, 1,
+                                                   Red.pRedAliq, DSC_PREDALIQ));
+
+  Result.AppendChild(AddNode(tcDe4, '#16', 'pAliqEfet', 1, 7, 1,
+                                                 Red.pAliqEfet, DSC_PALIQEFET));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSMun(
+  gIBSMun: TgIBSMunValores): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gIBSMun');
+
+  Result.AppendChild(AddNode(tcDe4, '#6', 'pIBSMun', 1, 7, 1,
+                                                     gIBSMun.pIBS, DSC_PIBSUF));
+
+  if gIBSMun.gDif.pDif > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSMun_gDif(gIBSMun.gDif));
+
+  if gIBSMun.gDevTrib.vDevTrib > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gDevTrib(gIBSMun.gDevTrib));
+
+  if gIBSMun.gRed.pRedAliq > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gRed(gIBSMun.gRed));
+
+  Result.AppendChild(AddNode(tcDe2, '#23', 'vIBSMun', 1, 15, 1,
+                                                      gIBSMun.vIBS, DSC_VIBSUF));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSMun_gDif(
+  Dif: TgDif): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gDif');
+
+  Result.AppendChild(AddNode(tcDe4, '#10', 'pDif', 1, 7, 1,
+                                                           Dif.pDif, DSC_PDIF));
+
+  Result.AppendChild(AddNode(tcDe2, '#11', 'vDif', 1, 15, 1,
+                                                           Dif.vDif, DSC_VDIF));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gCBS(
+  gCBS: TgCBSValores): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gCBS');
+
+  Result.AppendChild(AddNode(tcDe4, '#44', 'pCBS', 1, 7, 1,
+                                                          gCBS.pCBS, DSC_PCBS));
+
+  if gCBS.gDif.pDif > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gCBS_gDif(gCBS.gDif));
+
+  if gCBS.gDevTrib.vDevTrib > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gDevTrib(gCBS.gDevTrib));
+
+  if gCBS.gRed.pRedAliq > 0 then
+    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gRed(gCBS.gRed));
+
+  Result.AppendChild(AddNode(tcDe2, '#61', 'vCBS', 1, 15, 1,
+                                                          gCBS.vCBS, DSC_VCBS));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gCBS_gDif(
+  Dif: TgDif): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gDif');
+
+  Result.AppendChild(AddNode(tcDe4, '#10', 'pDif', 1, 7, 1,
+                                                           Dif.pDif, DSC_PDIF));
+
+  Result.AppendChild(AddNode(tcDe2, '#11', 'vDif', 1, 15, 1,
+                                                           Dif.vDif, DSC_VDIF));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gTribRegular(
+  gTribRegular: TgTribRegular): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement('gTribRegular');
+
+  Result.AppendChild(AddNode(tcStr, '#56', 'CSTReg', 3, 3, 1,
+                                 CSTIBSCBSToStr(gTribRegular.CSTReg), DSC_CST));
+
+  Result.AppendChild(AddNode(tcStr, '#57', 'cClassTribReg', 6, 6, 1,
+                  cClassTribToStr(gTribRegular.cClassTribReg), DSC_CCLASSTRIB));
+
+  Result.AppendChild(AddNode(tcDe4, '#58', 'pAliqEfetRegIBSUF', 1, 7, 1,
+                                    gTribRegular.pAliqEfetRegIBSUF, DSC_PALIQ));
+
+  Result.AppendChild(AddNode(tcDe2, '#59', 'vTribRegIBSUF', 1, 15, 1,
+                                     gTribRegular.vTribRegIBSUF, DSC_VTRIBREG));
+
+  Result.AppendChild(AddNode(tcDe4, '#60', 'pAliqEfetRegIBSMun', 1, 7, 1,
+                                   gTribRegular.pAliqEfetRegIBSMun, DSC_PALIQ));
+
+  Result.AppendChild(AddNode(tcDe2, '#61', 'vTribRegIBSMun', 1, 15, 1,
+                                    gTribRegular.vTribRegIBSMun, DSC_VTRIBREG));
+
+  Result.AppendChild(AddNode(tcDe4, '#62', 'pAliqEfetRegCBS', 1, 7, 1,
+                                      gTribRegular.pAliqEfetRegCBS, DSC_PALIQ));
+
+  Result.AppendChild(AddNode(tcDe2, '#63', 'vTribRegCBS', 1, 15, 1,
+                                       gTribRegular.vTribRegCBS, DSC_VTRIBREG));
+end;
+
+function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(
+  gIBSCredPres: TgIBSCBSCredPres; const Grupo: string): TACBrXmlNode;
+begin
+  Result := FDocument.CreateElement(Grupo);
+
+  Result.AppendChild(AddNode(tcStr, '#63', 'cCredPres', 2, 2, 1,
+                        cCredPresToStr(gIBSCredPres.cCredPres), DSC_CCREDPRES));
+
+  Result.AppendChild(AddNode(tcDe4, '#64', 'pCredPres', 1, 7, 1,
+                                        gIBSCredPres.pCredPres, DSC_PCREDPRES));
+
+  if gIBSCredPres.vCredPres > 0 then
+    Result.AppendChild(AddNode(tcDe2, '#65', 'vCredPres', 1, 15, 1,
+                                         gIBSCredPres.vCredPres, DSC_VCREDPRES))
+  else
+    Result.AppendChild(AddNode(tcDe2, '#66', 'vCredPresCondSus', 1, 15, 1,
+                          gIBSCredPres.vCredPresCondSus, DSC_VCREDPRESCONDSUS));
 end;
 
 end.

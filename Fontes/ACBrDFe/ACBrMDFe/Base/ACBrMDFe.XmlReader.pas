@@ -229,9 +229,9 @@ var
 begin
   if not Assigned(ANode) then Exit;
 
-  MDFe.procMDFe.tpAmb := StrToTpAmb(ok, ObterConteudo(ANode.Childrens.Find('tpAmb'), tcStr));
+  MDFe.procMDFe.tpAmb := StrToTipoAmbiente(ok, ObterConteudo(ANode.Childrens.Find('tpAmb'), tcStr));
   MDFe.procMDFe.verAplic := ObterConteudo(ANode.Childrens.Find('verAplic'), tcStr);
-  MDFe.procMDFe.chMDFe := ObterConteudo(ANode.Childrens.Find('chMDFe'), tcStr);
+  MDFe.procMDFe.chDFe := ObterConteudo(ANode.Childrens.Find('chMDFe'), tcStr);
   MDFe.procMDFe.dhRecbto := ObterConteudo(ANode.Childrens.Find('dhRecbto'), tcDatHor);
   MDFe.procMDFe.nProt := ObterConteudo(ANode.Childrens.Find('nProt'), tcStr);
   MDFe.procMDFe.digVal := ObterConteudo(ANode.Childrens.Find('digVal'), tcStr);
@@ -769,6 +769,7 @@ begin
   MDFe.aquav.cPrtDest := ObterConteudo(ANode.Childrens.Find('cPrtDest'), tcStr);
   MDFe.aquav.prtTrans := ObterConteudo(ANode.Childrens.Find('prtTrans'), tcStr);
   MDFe.aquav.tpNav := StrToTpNavegacao(ok, ObterConteudo(ANode.Childrens.Find('tpNav'), tcStr));
+  MDFe.aquav.MMSI := ObterConteudo(ANode.Childrens.Find('MMSI'), tcStr);
 
   ANodes := ANode.Childrens.FindAll('infTermCarreg');
   MDFe.aquav.infTermCarreg.Clear;

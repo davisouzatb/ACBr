@@ -49,6 +49,7 @@ uses
   ACBrBase,
   ACBrUtil.DateTime,
   ACBrUtil.Strings,
+  ACBrDFe.Conversao,
   ACBrNFSeXConversao;
 
 type
@@ -360,6 +361,7 @@ type
     FDescontoCondicionado: Double;
     FDescontoIncondicionado: Double;
     FJustificativaDeducao: string;
+    FdsImpostos: string;
     FvalorOutrasRetencoes: Double;
     FDescricaoOutrasRetencoes: string;
     FvalorRepasse: Double; // Governa
@@ -422,6 +424,7 @@ type
     property DescontoIncondicionado: Double read FDescontoIncondicionado write FDescontoIncondicionado;
     //Just. usada pelo provedor Equiplano
     property JustificativaDeducao: string read FJustificativaDeducao write FJustificativaDeducao;
+    property dsImpostos: string read FdsImpostos write FdsImpostos;
     //propriedade do Provedor Governa
     property valorOutrasRetencoes: Double read FvalorOutrasRetencoes write FvalorOutrasRetencoes;
     property DescricaoOutrasRetencoes: string read FDescricaoOutrasRetencoes write FDescricaoOutrasRetencoes;
@@ -808,6 +811,7 @@ type
     FCodigoMunicipio: string;
     FMunicipioPrestacaoServico: string;
     FCodigoPais: Integer;
+    FxPais: string;
     FExigibilidadeISS: TnfseExigibilidadeISS;
     FMunicipioIncidencia: Integer;
     FNumeroProcesso: string;
@@ -862,6 +866,7 @@ type
     property CodigoMunicipio: string read FCodigoMunicipio write FCodigoMunicipio;
     property MunicipioPrestacaoServico: string read FMunicipioPrestacaoServico write FMunicipioPrestacaoServico;
     property CodigoPais: Integer read FCodigoPais write FCodigoPais;
+    property xPais: string read FxPais write FxPais;
     property ExigibilidadeISS: TnfseExigibilidadeISS read FExigibilidadeISS write FExigibilidadeISS;
     property IdentifNaoExigibilidade: string read FIdentifNaoExigibilidade write FIdentifNaoExigibilidade;
     property MunicipioIncidencia: Integer read FMunicipioIncidencia write FMunicipioIncidencia;
@@ -1252,6 +1257,140 @@ type
     property xMotivo: string read FxMotivo write FxMotivo;
   end;
 
+  { TvaloresIBSCBS }
+
+  TvaloresIBSCBS = class(TObject)
+  private
+    FvBC: Double;
+    FpIBSUF: Double;
+    FpRedAliqUF: Double;
+    FpAliqEfetUF: Double;
+    FvTribOpUF: Double;
+
+    FpIBSMun: Double;
+    FpRedAliqMun: Double;
+    FpAliqEfetMun: Double;
+    FvTribOpMun: Double;
+
+    FpCBS: Double;
+    FpRedAliqCBS: Double;
+    FpAliqEfetCBS: Double;
+    FvTribOpCBS: Double;
+  public
+    property vBC: Double read FvBC write FvBC;
+    property pIBSUF: Double read FpIBSUF write FpIBSUF;
+    property pRedAliqUF: Double read FpRedAliqUF write FpRedAliqUF;
+    property pAliqEfetUF: Double read FpAliqEfetUF write FpAliqEfetUF;
+    property vTribOpUF: Double read FvTribOpUF write FvTribOpUF;
+
+    property pIBSMun: Double read FpIBSMun write FpIBSMun;
+    property pAliqEfetMun: Double read FpAliqEfetMun write FpAliqEfetMun;
+    property pRedAliqMun: Double read FpRedAliqMun write FpRedAliqMun;
+    property vTribOpMun: Double read FvTribOpMun write FvTribOpMun;
+
+    property pCBS: Double read FpCBS write FpCBS;
+    property pAliqEfetCBS: Double read FpAliqEfetCBS write FpAliqEfetCBS;
+    property pRedAliqCBS: Double read FpRedAliqCBS write FpRedAliqCBS;
+    property vTribOpCBS: Double read FvTribOpCBS write FvTribOpCBS;
+  end;
+
+  { TgIBS }
+
+  TgIBS = class(TObject)
+  private
+    FvCredPresIBS: Double;
+    FvIBSTot: Double;
+
+    FvDifUF: Double;
+    FvDesonUF: Double;
+    FvIBSUF: Double;
+
+    FvDifMun: Double;
+    FvDesonMun: Double;
+    FvIBSMun: Double;
+  public
+    // os 2 campos abaixo estão dentro do grupo gIBS
+    property vCredPresIBS: Double read FvCredPresIBS write FvCredPresIBS;
+    property vIBSTot: Double read FvIBSTot write FvIBSTot;
+
+    // os 4 campos abaixo estão dentro do grupo gIBS/gIBSUFTot
+    property vDifUF: Double read FvDifUF write FvDifUF;
+    property vDesonUF: Double read FvDesonUF write FvDesonUF;
+    property vIBSUF: Double read FvIBSUF write FvIBSUF;
+
+    // os 4 campos abaixo estão dentro do grupo gIBS/gIBSMunTot
+    property vDifMun: Double read FvDifMun write FvDifMun;
+    property vDesonMun: Double read FvDesonMun write FvDesonMun;
+    property vIBSMun: Double read FvIBSMun write FvIBSMun;
+  end;
+
+  { TgCBS }
+
+  TgCBS = class(TObject)
+  private
+    FvCredPresCBS: Double;
+    FvDifCBS: Double;
+    FvDesonCBS: Double;
+    FvCBS: Double;
+  public
+    property vCredPresCBS: Double read FvCredPresCBS write FvCredPresCBS;
+    property vDifCBS: Double read FvDifCBS write FvDifCBS;
+    property vDesonCBS: Double read FvDesonCBS write FvDesonCBS;
+    property vCBS: Double read FvCBS write FvCBS;
+  end;
+
+  { TtotCIBS }
+
+  TtotCIBS = class(TObject)
+  private
+    FvTotNF: Double;
+    FgIBS: TgIBS;
+    FgCBS: TgCBS;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property vTotNF: Double read FvTotNF write FvTotNF;
+    property gIBS: TgIBS read FgIBS write FgIBS;
+    property gCBS: TgCBS read FgCBS write FgCBS;
+  end;
+
+  { TCompGov }
+
+  TCompGov = class(TObject)
+  private
+    FindCompGov: TindCompGov;
+    FtpCompraGov: TtpEnteGov;
+    FpRedutor: Double;
+  public
+    property indCompGov: TindCompGov read FindCompGov write FindCompGov;
+    property tpCompraGov: TtpEnteGov read FtpCompraGov write FtpCompraGov;
+    property pRedutor: Double read FpRedutor write FpRedutor;
+  end;
+
+  { TIBSCBSNfse }
+
+  TIBSCBSNfse = class(TObject)
+  private
+    FxLocalidadeIncid: string;
+    FxCSTIBSCBS: string;
+    FxClassTribIBSCBS: string;
+    FCompGov: TCompGov;
+    Fvalores: TvaloresIBSCBS;
+    FtotCIBS: TtotCIBS;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property xLocalidadeIncid: string read FxLocalidadeIncid write FxLocalidadeIncid;
+    property xCSTIBSCBS: string read FxCSTIBSCBS write FxCSTIBSCBS;
+    property xClassTribIBSCBS: string read FxClassTribIBSCBS write FxClassTribIBSCBS;
+    property CompGov: TCompGov read FCompGov write FCompGov;
+    property valores: TvaloresIBSCBS read Fvalores write Fvalores;
+
+    property totCIBS: TtotCIBS read FtotCIBS write FtotCIBS;
+  end;
+
   { TinfNFSe }
 
   TinfNFSe = class(TObject)
@@ -1274,6 +1413,8 @@ type
     FnDFSe: string;
     Femit: TDadosPessoa;
     Fvalores: TValoresNfse;
+    // Reforma Tributaria
+    FIBSCBS: TIBSCBSNfse;
   public
     constructor Create;
     destructor Destroy; override;
@@ -1296,6 +1437,8 @@ type
     property nDFSe: string read FnDFSe write FnDFSe;
     property emit: TDadosPessoa read Femit write Femit;
     property valores: TValoresNfse read Fvalores write Fvalores;
+    // Reforma Tributaria
+    property IBSCBS: TIBSCBSNfse read FIBSCBS write FIBSCBS;
   end;
 
   { TLinkNFSeParam }
@@ -1325,6 +1468,239 @@ type
     property InscMun: String read FInscMun write FInscMun;
     property xMunicipio: String read FxMunicipio write FxMunicipio;
     property ID: String read FID write FID;
+  end;
+
+  { TendNac }
+
+  TendNac = class(TObject)
+  private
+    FcMun: Integer;
+    FCEP: string;
+  public
+    property cMun: Integer read FcMun write FcMun;
+    property CEP: string read FCEP write FCEP;
+  end;
+
+  { TendExt }
+
+  TendExt = class(TObject)
+  private
+    FcPais: Integer;
+    FcEndPost: string;
+    FxCidade: string;
+    FxEstProvReg: string;
+  public
+    property cPais: Integer read FcPais write FCPais;
+    property cEndPost: string read FcEndPost write FcEndPost;
+    property xCidade: string read FxCidade write FxCidade;
+    property xEstProvReg: string read FxEstProvReg write FxEstProvReg;
+  end;
+
+  { Tender }
+
+  Tender = class(TObject)
+  private
+    FendNac: TendNac;
+    FendExt: TendExt;
+    FxLgr: string;
+    Fnro: string;
+    FxCpl: string;
+    FxBairro: string;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property endNac: TendNac read FendNac write FendNac;
+    property endExt: TendExt read FendExt write FendExt;
+    property xLgr: string read FxLgr write FxLgr;
+    property nro: string read Fnro write Fnro;
+    property xCpl: string read FxCpl write FxCpl;
+    property xBairro: string read FxBairro write FxBairro;
+  end;
+
+  { TDadosdaPessoa }
+
+  TDadosdaPessoa = class(TObject)
+  private
+    FCNPJCPF: string;
+    FNIF: string;
+    FcNaoNIF: TNaoNIF;
+    FCAEPF: string;
+    FxNome: string;
+    Fender: Tender;
+    Ffone: string;
+    Femail: string;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property CNPJCPF: string read FCNPJCPF write FCNPJCPF;
+    property NIF: string read FNIF write FNIF;
+    property cNaoNIF: TNaoNIF read FcNaoNIF write FcNaoNIF;
+    property CAEPF: string read FCAEPF write FCAEPF;
+    property xNome: string read FxNome write FxNome;
+    property ender: Tender read Fender write Fender;
+    property fone: string read Ffone write Ffone;
+    property email: string read Femail write Femail;
+  end;
+
+  { TgCompraGov }
+
+  TgCompraGov = class(TObject)
+  private
+    FindCompGov: TindCompGov;
+  public
+    property indCompGov: TindCompGov read FindCompGov write FindCompGov;
+  end;
+  { Tserv }
+
+  Tserv = class(TObject)
+  private
+    FmodoPrestServ: TmodoPrestServ;
+    FclocalPrestServ: Integer;
+    FcPaisPrestServ: Integer;
+    FcCIB: string;
+    FgCompraGov: TgCompraGov;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property modoPrestServ: TmodoPrestServ read FmodoPrestServ write FmodoPrestServ;
+    property clocalPrestServ: Integer read FclocalPrestServ write FclocalPrestServ;
+    property cPaisPrestServ: Integer read FcPaisPrestServ write FcPaisPrestServ;
+    property cCIB: string read FcCIB write FcCIB;
+    property gCompraGov: TgCompraGov read FgCompraGov write FgCompraGov;
+  end;
+
+  { TgIBSCredPres }
+
+  TgIBSCredPres = class(TObject)
+  private
+    FcCredPresIBS: TcCredPres;
+    FpCredPresIBS: Double;
+  public
+    property cCredPresIBS: TcCredPres read FcCredPresIBS write FcCredPresIBS;
+    property pCredPresIBS: Double read FpCredPresIBS write FpCredPresIBS;
+  end;
+
+  { TgIBSUFValores }
+
+  TgIBSUFValores = class(TObject)
+  private
+    FpDifUF: Double;
+    FvDevTribUF: Double;
+    FcstUFDeson: TCSTIBSCBS;
+    FcClassTribUFDeson: TcClassTrib;
+    FpAliqUFDeson: Double;
+  public
+    property pDifUF: Double read FpDifUF write FpDifUF;
+    property vDevTribUF: Double read FvDevTribUF write FvDevTribUF;
+    property cstUFDeson: TCSTIBSCBS read FcstUFDeson write FcstUFDeson;
+    property cClassTribUFDeson: TcClassTrib read FcClassTribUFDeson write FcClassTribUFDeson;
+    property pAliqUFDeson: Double read FpAliqUFDeson write FpAliqUFDeson;
+  end;
+
+  { TgIBSMunValores }
+
+  TgIBSMunValores = class(TObject)
+  private
+    FpDifMun: Double;
+    FvDevTribMun: Double;
+    FcstMunDeson: TCSTIBSCBS;
+    FcClassTribMunDeson: TcClassTrib;
+    FpAliqMunDeson: Double;
+  public
+    property pDifMun: Double read FpDifMun write FpDifMun;
+    property vDevTribMun: Double read FvDevTribMun write FvDevTribMun;
+    property cstMunDeson: TCSTIBSCBS read FcstMunDeson write FcstMunDeson;
+    property cClassTribMunDeson: TcClassTrib read FcClassTribMunDeson write FcClassTribMunDeson;
+    property pAliqMunDeson: Double read FpAliqMunDeson write FpAliqMunDeson;
+  end;
+
+  { TgCBSValores }
+
+  TgCBSValores = class(TObject)
+  private
+    FcCredPresCBS: TcCredPres;
+    FpCredPresCBS: Double;
+    FpDifCBS: Double;
+    FvDevTribCBS: Double;
+    FcstCBSDeson: TCSTIBSCBS;
+    FcClassTribCBSDeson: TcClassTrib;
+    FpAliqCBSDeson: Double;
+  public
+    property cCredPresCBS: TcCredPres read FcCredPresCBS write FcCredPresCBS;
+    property pCredPresCBS: Double read FpCredPresCBS write FpCredPresCBS;
+    property pDifCBS: Double read FpDifCBS write FpDifCBS;
+    property vDevTribCBS: Double read FvDevTribCBS write FvDevTribCBS;
+    property cstCBSDeson: TCSTIBSCBS read FcstCBSDeson write FcstCBSDeson;
+    property cClassTribCBSDeson: TcClassTrib read FcClassTribCBSDeson write FcClassTribCBSDeson;
+    property pAliqCBSDeson: Double read FpAliqCBSDeson write FpAliqCBSDeson;
+  end;
+
+  { TgIBSCBS }
+
+  TgIBSCBS = class(TObject)
+  private
+    FcstIBSCBS: TCSTIBSCBS;
+    FcClassTribIBSCBS: TcClassTrib;
+    FgIBSCredPres: TgIBSCredPres;
+    FgIBSUF: TgIBSUFValores;
+    FgIBSMun: TgIBSMunValores;
+    FgCBS: TgCBSValores;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property cstIBSCBS: TCSTIBSCBS read FcstIBSCBS write FcstIBSCBS;
+    property cClassTribIBSCBS: TcClassTrib read FcClassTribIBSCBS write FcClassTribIBSCBS;
+    property gIBSCredPres: TgIBSCredPres read FgIBSCredPres write FgIBSCredPres;
+
+    property gIBSUF: TgIBSUFValores read FgIBSUF write FgIBSUF;
+    property gIBSMun: TgIBSMunValores read FgIBSMun write FgIBSMun;
+    property gCBS: TgCBSValores read FgCBS write FgCBS;
+  end;
+
+  { Ttrib }
+
+  Ttrib = class(TObject)
+  private
+    FgIBSCBS: TgIBSCBS;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property gIBSCBS: TgIBSCBS read FgIBSCBS write FgIBSCBS;
+  end;
+
+  { Tvalorestrib }
+
+  Tvalorestrib = class(TObject)
+  private
+    Ftrib: Ttrib;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property trib: Ttrib read Ftrib write Ftrib;
+  end;
+
+  { TIBSCBSDPS }
+
+  TIBSCBSDPS = class(TObject)
+  private
+    Fdest: TDadosdaPessoa;
+    Fadq: TDadosdaPessoa;
+    Fserv: Tserv;
+    Fvalores: Tvalorestrib;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property dest: TDadosdaPessoa read Fdest write Fdest;
+    property adq: TDadosdaPessoa read Fadq write Fadq;
+    property serv: Tserv read Fserv write Fserv;
+    property valores: Tvalorestrib read Fvalores write Fvalores;
   end;
 
   TNFSe = class(TPersistent)
@@ -1395,6 +1771,7 @@ type
     FModeloNFSe: string;
     FTransportadora: TDadosTransportadora;
     FCanhoto: TnfseCanhoto;
+    FinfAdicAT: TnfseSimNao;
 
     Femail: TemailCollection;
     FTipoRecolhimento: string;
@@ -1402,6 +1779,7 @@ type
     FFrmRec: TFrmRec;
     FTipoTributacaoRPS: TTipoTributacaoRPS;
     FAssinatura: string;
+    FTransacao: TnfseSimNao;
     FInformacoesComplementares: string;
 
     FPercentualCargaTributaria: Double;
@@ -1425,6 +1803,8 @@ type
     FOptanteSN: TOptanteSN;
     FRegimeApuracaoSN: TRegimeApuracaoSN;
     Fsubst: TSubstituicao;
+    // Reforma Tributaria
+    FIBSCBS: TIBSCBSDPS;
 
     FinfNFSe: TinfNFSe;
     FDescricaoCodigoTributacaoMunicipio: string;
@@ -1510,6 +1890,7 @@ type
     property Canhoto: TnfseCanhoto read FCanhoto Write FCanhoto;
     property Transportadora: TDadosTransportadora read FTransportadora write FTransportadora;
     property Despesa: TDespesaCollection read FDespesa write SetDespesa;
+    property infAdicAT: TnfseSimNao read FinfAdicAT write FinfAdicAT;
     // Provedor Governa
     property TipoRecolhimento: string read FTipoRecolhimento write FTipoRecolhimento;
 
@@ -1517,8 +1898,10 @@ type
 
     property TipoTributacaoRPS: TTipoTributacaoRPS read FTipoTributacaoRPS write FTipoTributacaoRPS;
 
-    // Provedor SP
+    // Provedor ISSSaoPaulo
     property Assinatura: string read FAssinatura write FAssinatura;
+    property Transacao: TnfseSimNao read FTransacao write FTransacao;
+
     // Provedor Governa
     property RegRec: TRegRec read FRegRec write FRegRec;
     property FrmRec: TFrmRec read FFrmRec write FFrmRec;
@@ -1547,6 +1930,8 @@ type
     property OptanteSN: TOptanteSN read FOptanteSN write FOptanteSN;
     property RegimeApuracaoSN: TRegimeApuracaoSN read FRegimeApuracaoSN write FRegimeApuracaoSN;
     property subst: TSubstituicao read Fsubst write Fsubst;
+    // Reforma Tributaria
+    property IBSCBS: TIBSCBSDPS read FIBSCBS write FIBSCBS;
 
     property infNFSe: TinfNFSe read FinfNFSe write FinfNFSe;
     // Provedor eGoverneISS
@@ -1783,6 +2168,8 @@ begin
   FDespesa := TDespesaCollection.Create;
   FGenericos := TGenericosCollection.Create;
   Fsubst := TSubstituicao.Create;
+  FIBSCBS := TIBSCBSDPS.Create;
+
   FinfNFSe := TinfNFSe.Create;
 
   Clear;
@@ -1811,6 +2198,8 @@ begin
   FTransportadora.Free;
   FGenericos.Free;
   Fsubst.Free;
+  FIBSCBS.Free;
+
   FinfNFSe.Free;
 
   inherited Destroy;
@@ -2356,12 +2745,14 @@ begin
 
   Femit := TDadosPessoa.Create;
   Fvalores := TValoresNfse.Create;
+  FIBSCBS := TIBSCBSNfse.Create;
 end;
 
 destructor TinfNFSe.Destroy;
 begin
   Femit.Free;
   Fvalores.Free;
+  FIBSCBS.Free;
 
   inherited Destroy;
 end;
@@ -2422,6 +2813,170 @@ end;
 destructor TDadosProfissionalParceiro.Destroy;
 begin
   FIdentificacaoParceiro.Free;
+
+  inherited Destroy;
+end;
+
+{ TIBSCBSDPS }
+
+constructor TIBSCBSDPS.Create;
+begin
+  inherited Create;
+
+  Fdest := TDadosdaPessoa.Create;
+  Fadq := TDadosdaPessoa.Create;
+  Fserv := Tserv.Create;
+  Fvalores := Tvalorestrib.Create;
+end;
+
+destructor TIBSCBSDPS.Destroy;
+begin
+  Fdest.Free;
+  Fadq.Free;
+  Fserv.Free;
+  Fvalores.Free;
+
+  inherited Destroy;
+end;
+
+{ TDadosdaPessoa }
+
+constructor TDadosdaPessoa.Create;
+begin
+  inherited Create;
+
+  Fender := Tender.Create;
+end;
+
+destructor TDadosdaPessoa.Destroy;
+begin
+  Fender.Free;
+
+  inherited Destroy;
+end;
+
+{ Tender }
+
+constructor Tender.Create;
+begin
+  inherited Create;
+
+  FendNac := TendNac.Create;
+  FendExt := TendExt.Create;
+end;
+
+destructor Tender.Destroy;
+begin
+  FendNac.Free;
+  FendExt.Free;
+
+  inherited Destroy;
+end;
+
+{ Tvalorestrib }
+
+constructor Tvalorestrib.Create;
+begin
+  inherited Create;
+
+  Ftrib := Ttrib.Create;
+end;
+
+destructor Tvalorestrib.Destroy;
+begin
+  Ftrib.Free;
+
+  inherited Destroy;
+end;
+
+{ Ttrib }
+
+constructor Ttrib.Create;
+begin
+  inherited Create;
+
+  FgIBSCBS := TgIBSCBS.Create;
+end;
+
+destructor Ttrib.Destroy;
+begin
+  FgIBSCBS.Free;
+
+  inherited Destroy;
+end;
+
+{ TgIBSCBS }
+
+constructor TgIBSCBS.Create;
+begin
+  inherited Create;
+
+  FgIBSCredPres := TgIBSCredPres.Create;
+  FgIBSUF := TgIBSUFValores.Create;
+  FgIBSMun := TgIBSMunValores.Create;
+  FgCBS := TgCBSValores.Create;
+end;
+
+destructor TgIBSCBS.Destroy;
+begin
+  FgIBSCredPres.Free;
+  FgIBSUF.Free;
+  FgIBSMun.Free;
+  FgCBS.Free;
+
+  inherited Destroy;
+end;
+
+{ TIBSCBSNfse }
+
+constructor TIBSCBSNfse.Create;
+begin
+  inherited Create;
+
+  Fvalores := TvaloresIBSCBS.Create;
+
+  FtotCIBS := TtotCIBS.Create;
+end;
+
+destructor TIBSCBSNfse.Destroy;
+begin
+  Fvalores.Free;
+
+  FtotCIBS.Free;
+
+  inherited Destroy;
+end;
+
+{ TtotCIBS }
+
+constructor TtotCIBS.Create;
+begin
+  inherited Create;
+
+  FgIBS := TgIBS.Create;
+  FgCBS := TgCBS.Create;
+end;
+
+destructor TtotCIBS.Destroy;
+begin
+  FgIBS.Free;
+  FgCBS.Free;
+
+  inherited Destroy;
+end;
+
+{ Tserv }
+
+constructor Tserv.Create;
+begin
+  inherited Create;
+
+  FgCompraGov := TgCompraGov.Create;
+end;
+
+destructor Tserv.Destroy;
+begin
+  FgCompraGov.Free;
 
   inherited Destroy;
 end;

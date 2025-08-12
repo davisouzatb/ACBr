@@ -228,6 +228,9 @@ begin
     if (Pos('ENCODING:UTF-8',oFile.Text) > 0) then
       oFile.Text := UTF8ToNativeString(oFile.Text);
 
+    if Pos('><', oFile.Text) > 0 then
+      oFile.Text := StringReplace(oFile.Text,'><','>' + sLineBreak + '<',[rfReplaceAll]);
+
     while i < oFile.Count do
     begin
       sLine := oFile.Strings[i];

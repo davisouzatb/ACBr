@@ -38,7 +38,7 @@ interface
 
 uses
   Classes, SysUtils, Forms,
-  ACBrLibComum, ACBrLibNFeDataModule;
+  ACBrLibComum, ACBrLibNFeDataModule, ACBrDFeException;
 
 type
 
@@ -806,6 +806,9 @@ begin
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
 
+    on E: EACBrDFeExceptionTimeOut do
+       Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -869,6 +872,9 @@ begin
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
 
+    on E: EACBrDFeExceptionTimeOut do
+       Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -925,6 +931,10 @@ begin
   except
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: EACBrDFeExceptionTimeOut do
+       Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -1064,6 +1074,9 @@ begin
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
 
+    on E: EACBrDFeExceptionTimeOut do
+      Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -1108,6 +1121,10 @@ begin
   except
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: EACBrDFeExceptionTimeOut do
+      Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -1186,6 +1203,9 @@ begin
   except
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: EACBrDFeExceptionTimeOut do
+       Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
 
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
@@ -1292,6 +1312,10 @@ begin
   except
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: EACBrDFeExceptionTimeOut do
+       Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -1344,6 +1368,9 @@ begin
   except
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: EACBrDFeExceptionTimeOut do
+      Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
 
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
@@ -1461,6 +1488,9 @@ begin
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
 
+    on E: EACBrDFeExceptionTimeOut do
+       Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -1520,6 +1550,9 @@ begin
   except
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: EACBrDFeExceptionTimeOut do
+      Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
 
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
@@ -1583,6 +1616,9 @@ begin
     on E: EACBrLibException do
       Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
 
+    on E: EACBrDFeExceptionTimeOut do
+      Result := SetRetorno(ErrTimeOut, ConverterStringSaida(E.Message));
+
     on E: Exception do
       Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
   end;
@@ -1593,8 +1629,9 @@ function TACBrLibNFe.EnviarEmail(const ePara, eXmlNFe: PAnsiChar; const AEnviaPD
 var
   Resposta, APara, AXmlNFe, AAssunto, ACC, AAnexos, AMensagem: string;
   slMensagemEmail, slCC, slAnexos: TStringList;
-  EhArquivo: boolean;
+  EhArquivo, LXmlCarregado: boolean;
   Resp: TLibNFeResposta;
+  LNFeEnviar : TACBrNFe;
 begin
   try
     APara := ConverterStringEntrada(ePara);
@@ -1612,68 +1649,69 @@ begin
 
     NFeDM.Travar;
 
+    LNFeEnviar := TACBrNFe.Create(Nil);
+
     try
-      with NFeDM do
-      begin
-        EhArquivo := StringEhArquivo(AXmlNFe);
+      EhArquivo := StringEhArquivo(AXmlNFe);
 
-        if EhArquivo then
-          VerificarArquivoExiste(AXmlNFe);
+      if EhArquivo then
+        VerificarArquivoExiste(AXmlNFe);
 
-        if EhArquivo then
-          ACBrNFe1.NotasFiscais.LoadFromFile(AXmlNFe)
-        else
-          ACBrNFe1.NotasFiscais.LoadFromString(AXmlNFe);
+      if EhArquivo then
+        LXmlCarregado := LNFeEnviar.NotasFiscais.LoadFromFile(AXmlNFe)
+      else
+        LXmlCarregado := LNFeEnviar.NotasFiscais.LoadFromString(AXmlNFe);
 
-        if ACBrNFe1.NotasFiscais.Count = 0 then
-          raise EACBrLibException.Create(ErrEnvio, Format(SInfNFeCarregadas, [ACBrNFe1.NotasFiscais.Count]))
-        else
-        begin
-          slMensagemEmail := TStringList.Create;
-          slCC := TStringList.Create;
-          slAnexos := TStringList.Create;
+      if not LXmlCarregado then
+         raise EACBrLibException.Create(ErrEnvio, 'Erro Caminho ou conteudo do XML inválido, não foi possível fazer a leitura do conteúdo do XML');
 
-          Resp := TLibNFeResposta.Create('EnviaEmail', Config.TipoResposta, Config.CodResposta);
+      if LNFeEnviar.NotasFiscais.Count = 0 then
+        raise EACBrLibException.Create(ErrEnvio, Format(SInfNFeCarregadas, [LNFeEnviar.NotasFiscais.Count]));
 
-          try
-            with ACBrNFe1 do
-            begin
-              slMensagemEmail.DelimitedText := sLineBreak;
-              slMensagemEmail.Text := StringReplace(AMensagem, ';', sLineBreak, [rfReplaceAll]);
+      slMensagemEmail := TStringList.Create;
+      slCC := TStringList.Create;
+      slAnexos := TStringList.Create;
 
-              slCC.DelimitedText := sLineBreak;
-              slCC.Text := StringReplace(ACC, ';', sLineBreak, [rfReplaceAll]);
+      Resp := TLibNFeResposta.Create('EnviaEmail', Config.TipoResposta, Config.CodResposta);
 
-              slAnexos.DelimitedText := sLineBreak;
-              slAnexos.Text := StringReplace(AAnexos, ';', sLineBreak, [rfReplaceAll]);
+      if (AEnviaPDF) then
+        NFeDM.ConfigurarImpressao('', True, LNFeEnviar);
 
-              if (AEnviaPDF) then
-                NFeDM.ConfigurarImpressao('', True);
+      LNFeEnviar.MAIL := NFeDM.ACBrMail1;
 
-              NotasFiscais.Items[0].EnviarEmail(
-                  APara,
-                  AAssunto,
-                  slMensagemEmail,
-                  AEnviaPDF, // Enviar PDF junto
-                  slCC,      // Lista com emails que serão enviado cópias - TStrings
-                  slAnexos); // Lista de slAnexos - TStrings
+      try
+        slMensagemEmail.DelimitedText := sLineBreak;
+        slMensagemEmail.Text := StringReplace(AMensagem, ';', sLineBreak, [rfReplaceAll]);
 
-              Resp.Msg := 'Email enviado com sucesso';
-              Resposta := Resp.Gerar;
+        slCC.DelimitedText := sLineBreak;
+        slCC.Text := StringReplace(ACC, ';', sLineBreak, [rfReplaceAll]);
 
-              Result := SetRetorno(ErrOK, Resposta);
-            end;
-          finally
-            Resp.Free;
-            slCC.Free;
-            slAnexos.Free;
-            slMensagemEmail.Free;
-            if (AEnviaPDF) then NFeDM.FinalizarImpressao;
-          end;
-        end;
+        slAnexos.DelimitedText := sLineBreak;
+        slAnexos.Text := StringReplace(AAnexos, ';', sLineBreak, [rfReplaceAll]);
+
+        LNFeEnviar.NotasFiscais[0].EnviarEmail(
+              APara,
+              AAssunto,
+              slMensagemEmail,
+              AEnviaPDF, // Enviar PDF junto
+              slCC,      // Lista com emails que serão enviado cópias - TStrings
+              slAnexos); // Lista de slAnexos - TStrings
+
+        Resp.Msg := 'Email enviado com sucesso';
+        Resposta := Resp.Gerar;
+
+        Result := SetRetorno(ErrOK, Resposta);
+      finally
+        Resp.Free;
+        slCC.Free;
+        slAnexos.Free;
+        slMensagemEmail.Free;
+
+        if (AEnviaPDF) then NFeDM.FinalizarImpressao;
       end;
     finally
       NFeDM.Destravar;
+      LNFeEnviar.Free;
     end;
   except
     on E: EACBrLibException do
@@ -1837,7 +1875,7 @@ begin
     Resposta := TLibImpressaoResposta.Create(NFeDM.ACBrNFe1.NotasFiscais.Count, Config.TipoResposta, Config.CodResposta);
 
     try
-      NFeDM.ConfigurarImpressao(Impressora, False, Protocolo, MostrarPreview, MarcaDagua, ViaConsumidor, Simplificado);
+      NFeDM.ConfigurarImpressao(Impressora, False, nil, Protocolo, MostrarPreview, MarcaDagua, ViaConsumidor, Simplificado);
       if nNumCopias > 0 then
         NFeDM.ACBrNFe1.DANFE.NumCopias := nNumCopias;
 

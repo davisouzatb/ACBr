@@ -37,7 +37,7 @@ unit ACBrMDFeDAMDFEFR;
 interface
 
 uses
-  SysUtils, Classes, DB, DBClient, ACBrBase, ACBrMDFeDAMDFeClass, pcnConversao,
+  SysUtils, Classes, DB, DBClient, ACBrXmlBase, ACBrBase, ACBrMDFeDAMDFeClass, pcnConversao,
   ACBrMDFe.Classes, frxClass, ACBrDFeUtil,
   ACBrMDFe.EnvEvento,
   frxDBSet,
@@ -1138,15 +1138,15 @@ var i:integer;
 begin
   with cdsContratantes, FMDFe.rodo.infANTT do
   begin
-    Append;
     for I := 0 to infContratante.Count - 1 do
     begin
+      Append;
       if Length(infContratante[i].CNPJCPF)=11 then
         FieldByName('CNPJCPF').AsString         := FormatarCPF(infContratante[i].CNPJCPF)
       else
         FieldByName('CNPJCPF').AsString         := FormatarCNPJ(infContratante[i].CNPJCPF);
+      Post;
     end;
-    Post;
   end;
 end;
 
@@ -1761,7 +1761,7 @@ begin
     begin
       FieldByName('placa').AsString     := FieldByName('placa').AsString + #13#10 + FormatarPlaca(veicReboque.Items[i].placa) + ' / ' + veicReboque.Items[i].UF;
       FieldByName('RENAVAM').AsString   := FieldByName('RENAVAM').AsString + #13#10 + veicReboque.Items[i].RENAVAM;
-      FieldByName('RNTRCProp').AsString := FieldByName('RNTRCProp').AsString + #13#10 + IfThen(veicReboque.Items[i].prop.RNTRC <> '', veicReboque.Items[i].prop.RNTRC, FMDFe.rodo.RNTRC);
+      FieldByName('RNTRCProp').AsString := FieldByName('RNTRCProp').AsString + #13#10 + IfThen(veicReboque.Items[i].prop.RNTRC <> '', veicReboque.Items[i].prop.RNTRC, FieldByName('RNTRC').AsString);
       FieldByName('CNPJCPFProp').AsString := FieldByName('CNPJCPFProp').AsString + #13#10 + veicReboque.Items[i].prop.CNPJCPF;
     end;
 
@@ -1829,9 +1829,9 @@ begin
         FieldByName('cOrgao').AsInteger := InfEvento.cOrgao;
 
         case InfEvento.tpAmb of
-          taProducao:
+          TACBrTipoAmbiente(taProducao):
             FieldByName('tpAmb').AsString := 'PRODUÇÃO';
-          taHomologacao:
+          TACBrTipoAmbiente(taHomologacao):
             begin
               FieldByName('tpAmb').AsString      := 'HOMOLOGAÇÃO - SEM VALOR FISCAL';
               frxReport.Variables['HOMOLOGACAO'] := True;

@@ -74,7 +74,8 @@ type
   private
     FidLote: Int64;
     Fversao: string;
-    FtpAmb: TpcnTipoAmbiente;
+//    FtpAmb: TpcnTipoAmbiente;
+    FtpAmb: TACBrTipoAmbiente;
     FverAplic: string;
     FcStat: Integer;
     FcOrgao: Integer;
@@ -105,7 +106,8 @@ type
 
     property idLote: Int64                      read FidLote    write FidLote;
     property versao: string                     read Fversao    write Fversao;
-    property tpAmb: TpcnTipoAmbiente            read FtpAmb     write FtpAmb;
+//    property tpAmb: TpcnTipoAmbiente            read FtpAmb     write FtpAmb;
+    property tpAmb: TACBrTipoAmbiente           read FtpAmb     write FtpAmb;
     property verAplic: string                   read FverAplic  write FverAplic;
     property cOrgao: Integer                    read FcOrgao    write FcOrgao;
     property cStat: Integer                     read FcStat     write FcStat;
@@ -188,7 +190,7 @@ end;
 procedure TRetEventoMDFe.Ler_DetEvento(const ANode: TACBrXmlNode);
 var
   sAux: string;
-  AuxNode: TACBrXmlNode;
+  AuxNode, AuxNodeCond: TACBrXmlNode;
   ANodes: TACBrXmlNodeArray;
   i: Integer;
 begin
@@ -223,8 +225,14 @@ begin
     InfEvento.detEvento.cUF := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('cUF'), tcInt);
     InfEvento.detEvento.cMun := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('cMun'), tcInt);
     InfEvento.DetEvento.xJust := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('xJust'), tcStr);
-    InfEvento.detEvento.xNome := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('xNome'), tcStr);
-    InfEvento.detEvento.CPF := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('CPF'), tcStr);
+
+    AuxNodeCond := AuxNode.Childrens.FindAnyNs('condutor');
+
+    if AuxNodeCond <> nil then
+    begin
+      InfEvento.detEvento.xNome := ObterConteudoTag(AuxNodeCond.Childrens.FindAnyNs('xNome'), tcStr);
+      InfEvento.detEvento.CPF := ObterConteudoTag(AuxNodeCond.Childrens.FindAnyNs('CPF'), tcStr);
+    end;
 
     sAux := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('indEncPorTerceiro'), tcStr);
 
@@ -370,7 +378,7 @@ begin
 
   infEvento.Id := ObterConteudoTag(ANode.Attributes.Items['Id']);
   infEvento.cOrgao := ObterConteudoTag(ANode.Childrens.FindAnyNs('cOrgao'), tcInt);
-  infEvento.tpAmb := StrToTpAmb(ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('tpAmb'), tcStr));
+  infEvento.tpAmb := StrToTipoAmbiente(ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('tpAmb'), tcStr));
   infEvento.CNPJCPF := ObterConteudoTagCNPJCPF(ANode);
   infEvento.chMDFe := ObterConteudoTag(ANode.Childrens.FindAnyNs('chMDFe'), tcStr);
   infEvento.dhEvento := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhEvento'), tcDatHor);
@@ -393,7 +401,7 @@ begin
   Item.RetInfEvento.XML := ANode.OuterXml;
 
   Item.RetInfEvento.Id := ObterConteudoTag(ANode.Attributes.Items['Id']);
-  Item.RetInfEvento.tpAmb := StrToTpAmb(ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('tpAmb'), tcStr));
+  Item.RetInfEvento.tpAmb := StrToTipoAmbiente(ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('tpAmb'), tcStr));
   Item.RetInfEvento.verAplic := ObterConteudoTag(ANode.Childrens.FindAnyNs('verAplic'), tcStr);
   Item.RetInfEvento.cOrgao := ObterConteudoTag(ANode.Childrens.FindAnyNs('cOrgao'), tcInt);
   Item.RetInfEvento.cStat := ObterConteudoTag(ANode.Childrens.FindAnyNs('cStat'), tcInt);
@@ -466,6 +474,8 @@ begin
 
           Ler_InfEvento(AuxNode.Childrens.FindAnyNs('infEvento'));
 
+          LerSignature(AuxNode.Childrens.FindAnyNs('Signature'), signature);
+
           AuxNode := ANode.Childrens.FindAnyNs('retEventoMDFe');
 
           if AuxNode <> nil then
@@ -489,8 +499,6 @@ begin
 
         if (ANode.LocalName = 'eventoMDFe') or (ANode.LocalName = 'evento') then
           Ler_InfEvento(ANode.Childrens.FindAnyNs('infEvento'));
-
-        LerSignature(ANode.Childrens.FindAnyNs('Signature'), signature);
       end;
 
       Result := True;

@@ -225,7 +225,7 @@ namespace ACBr.C6Bank
 
                 boleto.Config.Webservice.PathGravarRegistro = txtPathLog.Text;
                 boleto.Config.Webservice.NomeArquivoLog = txtNomeArquivoLog.Text;
-                boleto.Config.Webservice.Ambiente = rdbProducao.Checked ? AmbienteWebservice.Homologaçao : AmbienteWebservice.Producao;
+                boleto.Config.Webservice.Ambiente = rdbProducao.Checked ? AmbienteWebservice.Producao : AmbienteWebservice.Homologaçao;
                 boleto.Config.Webservice.Operacao = cmbOperacao.GetSelectedValue<OperacaoBoleto>();
                 boleto.Config.Webservice.SSLType = cmbSSlType.GetSelectedValue<SSLType>();
                 boleto.Config.DFe.SSLHttpLib = cmbHttp.GetSelectedValue<SSLHttpLib>();
@@ -316,9 +316,10 @@ namespace ACBr.C6Bank
 
             txtPathLog.Text = boleto.Config.Webservice.PathGravarRegistro;
             txtNomeArquivoLog.Text = boleto.Config.Webservice.NomeArquivoLog;
+
             var ambiente = boleto.Config.Webservice.Ambiente;
-            rdbProducao.Checked = ambiente == AmbienteWebservice.Homologaçao;
-            rdbHomologacao.Checked = ambiente == AmbienteWebservice.Producao;
+            rdbProducao.Checked = ambiente == AmbienteWebservice.Producao;
+            rdbHomologacao.Checked = ambiente == AmbienteWebservice.Homologaçao;
 
             cmbOperacao.SetSelectedValue(boleto.Config.Webservice.Operacao);
             cmbSSlType.SetSelectedValue(boleto.Config.Webservice.SSLType);
@@ -357,6 +358,12 @@ namespace ACBr.C6Bank
                 pixcd.Config.NomeRecebedor = txtNomeRecebedor.Text;
                 pixcd.Config.UFRecebedor = txtUFRecebedor.Text;
 
+                //PSP C6Bank
+                pixcd.Config.C6Bank.ChavePIX = txtChavePIXC6Bank.Text;
+                pixcd.Config.C6Bank.ClientID = txtClientIDC6Bank.Text;
+                pixcd.Config.C6Bank.ClientSecret = txtClientSecretC6Bank.Text;
+                pixcd.Config.C6Bank.ArqChavePrivada = txtArquivoChavePrivadaC6Bank.Text;
+                pixcd.Config.C6Bank.ArqCertificado = txtArquivoCertificadoC6Bank.Text;
 
                 Application.DoEvents();
             }
@@ -393,6 +400,13 @@ namespace ACBr.C6Bank
             txtCidadeRecebedor.Text = pixcd.Config.CidadeRecebedor;
             txtNomeRecebedor.Text = pixcd.Config.NomeRecebedor;
             txtUFRecebedor.Text = pixcd.Config.UFRecebedor;
+
+            //PSP C6Bank
+            txtChavePIXC6Bank.Text = pixcd.Config.C6Bank.ChavePIX;
+            txtClientIDC6Bank.Text = pixcd.Config.C6Bank.ClientID;
+            txtClientSecretC6Bank.Text = pixcd.Config.C6Bank.ClientSecret;
+            txtArquivoChavePrivadaC6Bank.Text = pixcd.Config.C6Bank.ArqChavePrivada;
+            txtArquivoCertificadoC6Bank.Text = pixcd.Config.C6Bank.ArqCertificado;
         }
 
         private void btnDirLogo_Click(object sender, EventArgs e)

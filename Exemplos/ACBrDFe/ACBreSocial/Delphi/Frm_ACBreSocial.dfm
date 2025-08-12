@@ -94,7 +94,7 @@ object frmACBreSocial: TfrmACBreSocial
           Top = 0
           Width = 287
           Height = 476
-          ActivePage = TabSheet3
+          ActivePage = TabSheet12
           Align = alClient
           MultiLine = True
           TabOrder = 0
@@ -1391,6 +1391,13 @@ object frmACBreSocial: TfrmACBreSocial
           Caption = 
             'S-2245 Treinamentos, Capacita'#231#245'es, Exerc'#237'cios Simulados '#13#10'e Outr' +
             'as Anota'#231#245'es'
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsStrikeOut]
+          ParentFont = False
           TabOrder = 10
         end
         object cbS2250: TCheckBox
@@ -1776,7 +1783,7 @@ object frmACBreSocial: TfrmACBreSocial
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C0000007C410000F81800000000000000000000000000000000000000000000
+            4C000000DB510000361F00000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000

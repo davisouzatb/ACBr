@@ -48,7 +48,7 @@ uses
 const
   CSUBDIRETORIO_PAYGOWEB = 'PGWeb';
 
-// https://dev.softwareexpress.com.br/en/docs/clisitef/clisitef_documento_principal/
+// https://dev.softwareexpress.com.br/docs/clisitef/clisitef_documento_principal/
 
 type
 
@@ -72,6 +72,7 @@ type
     fOperacaoAdministrativa: Integer;
     fOperacaoCancelamento: Integer;
     fAutorizador: String;
+    fFinalizarTransacaoIndividual: Boolean;
   private
     function ExecutarTransacaoSiTef(Funcao: Integer; Valor: Double): Boolean;
     procedure FazerRequisicaoSiTef(Funcao: Integer; Valor: Double);
@@ -122,6 +123,8 @@ type
     procedure ExibirMensagemPinPad(const MsgPinPad: String); override;
     function ObterDadoPinPad(TipoDado: TACBrTEFAPIDadoPinPad; TimeOut: integer = 30000;
       MinLen: SmallInt = 0; MaxLen: SmallInt = 0): String; override;
+    function VerificarPresencaPinPad: Byte; override;
+    function VersaoAPI: String; override;
 
     property TEFCliSiTefAPI: TACBrTEFCliSiTefAPI read fTEFCliSiTefAPI;
 
@@ -141,6 +144,9 @@ type
     property ParamAdicFuncao: TACBrTEFParametros read fParamAdicFuncao;
     property ParamAdicFinalizacao: TACBrTEFParametros read fParamAdicFinalizacao;
     property RespostasPorTipo: TACBrTEFParametros read fRespostasPorTipo;
+
+    property FinalizarTransacaoIndividual: Boolean read fFinalizarTransacaoIndividual
+      write fFinalizarTransacaoIndividual default False;
 
     property Autorizador: String read fAutorizador write fAutorizador;
     property IniciouRequisicao: Boolean read fIniciouRequisicao;
@@ -173,6 +179,7 @@ begin
   fDocumentosFinalizados := '';
   fUltimoRetornoAPI := 0;
   fAutorizador := '';
+  fFinalizarTransacaoIndividual := False;
 
   fParamAdicConfig := TACBrTEFParametros.Create;
   fParamAdicFuncao := TACBrTEFParametros.Create;
@@ -708,6 +715,7 @@ begin
         TefAPI.QuandoExibirMensagem('', telaTodas, -1);
 
       StrPCopy(Buffer, Resposta);
+      //Move(Resposta[1], Buffer[0], Length(Resposta));
     until (fUltimoRetornoAPI <> 10000);
   finally
     fIniciouRequisicao := False;
@@ -733,7 +741,7 @@ begin
    else
      DoctoStr := fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao;
 
-   if (pos(DoctoStr, fDocumentosFinalizados) > 0) then
+   if (not fFinalizarTransacaoIndividual) and (pos(DoctoStr, fDocumentosFinalizados) > 0) then
      Exit;
 
   fDocumentosFinalizados := fDocumentosFinalizados + DocumentoVinculado + '|' ;
@@ -1080,13 +1088,14 @@ procedure TACBrTEFAPIClassCliSiTef.FinalizarTransacao(const Rede, NSU,
   CodigoFinalizacao: String; AStatus: TACBrTEFStatusTransacao);
 var
   Confirma: Boolean;
-  i: Integer;
+  i, p: Integer;
   DocumentoVinculado: String;
   DataHora: TDateTime;
 begin
   // CliSiTEF não usa Rede, NSU e Finalizacao
   DocumentoVinculado := '';
   DataHora := 0;
+  p := -1;
   Confirma := (AStatus in [tefstsSucessoAutomatico, tefstsSucessoManual]);
   if (NSU = '') and (CodigoFinalizacao <> '') then  // capturado por 130 em CarregarRespostasPendentes ?
   begin
@@ -1107,10 +1116,16 @@ begin
     begin
       DocumentoVinculado := fpACBrTEFAPI.RespostasTEF[i].DocumentoVinculado;
       DataHora := fpACBrTEFAPI.RespostasTEF[i].DataHoraTransacaoComprovante;
+
+      if fFinalizarTransacaoIndividual then
+        p := ParamAdicFinalizacao.Add('{NumeroPagamentoCupom='+IntToStr(fpACBrTEFAPI.RespostasTEF[i].IdPagamento)+'}');
     end;
   end;
 
   FinalizarTransacaoSiTef(Confirma, DocumentoVinculado, DataHora);
+  
+  if (p >= 0) then
+    ParamAdicFinalizacao.Delete(p);
 end;
 
 procedure TACBrTEFAPIClassCliSiTef.ResolverTransacaoPendente(
@@ -1130,6 +1145,20 @@ begin
     AMsg := CACBrTEFCliSiTef_TransacaoNaoEfetuada;
 
   TACBrTEFAPI(fpACBrTEFAPI).QuandoExibirMensagem(ACBrStr(AMsg), telaOperador, 0);
+end;
+
+function TACBrTEFAPIClassCliSiTef.VerificarPresencaPinPad: Byte;
+begin
+  Result := Ord(fTEFCliSiTefAPI.VerificaPresencaPinPad);
+end;
+
+function TACBrTEFAPIClassCliSiTef.VersaoAPI: String;
+var
+  lVersaoCliSiTef: String;
+  lVersaoCliSiTefI: String;
+begin
+  InterpretarRetornoCliSiTef( fTEFCliSiTefAPI.ObtemVersao(lVersaoCliSiTef, lVersaoCliSiTefI) );
+  Result := lVersaoCliSiTef;
 end;
 
 procedure TACBrTEFAPIClassCliSiTef.AbortarTransacaoEmAndamento;
@@ -1174,10 +1203,16 @@ begin
   if (MinLen = 0) and (MaxLen = 0) then
     CalcularTamanhosCampoDadoPinPad(TipoDado, MinLen, MaxLen);
 
+  // SiTef espera o tempo em Segundos.. convertendo de milisegundos
+  if (TimeOut > 1000) then
+    TimeOut := trunc(TimeOut/1000)
+  else if (TimeOut > 100)then
+    TimeOut := trunc(TimeOut/100);
+
   fRespostasPorTipo.ValueInfo[2967] := DadoPortador;
   fRespostasPorTipo.ValueInfo[2968] := IntToStr(MinLen);
   fRespostasPorTipo.ValueInfo[2969] := IntToStr(MaxLen);
-  fRespostasPorTipo.ValueInfo[2970] := IntToStr(trunc(TimeOut/100));
+  fRespostasPorTipo.ValueInfo[2970] := IntToStr(TimeOut);
 
   Ok := ExecutarTransacaoSiTef(CSITEF_OP_DadosPinPadAberto, 0);
   if Ok then

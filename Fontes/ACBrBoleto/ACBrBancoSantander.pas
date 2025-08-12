@@ -194,6 +194,12 @@ begin
         Result := '17'
       else if Trim(EspecieDoc) = 'AP' then {AP – APOLICE DE SEGURO}
         Result := '20'
+      else if Trim(EspecieDoc) = 'BCC' then {BCC - BOLETO DE CARTÃO DE CRÉDITO}
+        Result := '31'
+      else if Trim(EspecieDoc) = 'BDP' then {BPD - BOLETO DE PROPOSTA}
+        Result := '32'
+      else if Trim(EspecieDoc) = 'BDA' then {BDA - BOLETO DE DEPOSITO DE APORTE}
+        Result := '33'
       else if Trim(EspecieDoc) = 'CH' then {CH - CHEQUE}
         Result := '97'
       else if Trim(EspecieDoc) = 'ND' then {ND - NOTA PROMISSORIA DIRETA}
@@ -678,7 +684,7 @@ begin
                 Space(1)                                                                                     + // 061 - 061 / Reservado (uso Banco)
                 Space(1)                                                                                     + // 062 - 062 / Reservado (uso Banco)
                 PadRight(Copy(NumeroDocumento, 1, 15), 15, ' ')                                              + // 063 - 077 / Nº do documento
-                FormatDateTime('ddmmyyyy',Vencimento)                                                        + // 078 - 085 / Data de vencimento do título
+                ifThen(sEspecie = '31',  '00000000', FormatDateTime('ddmmyyyy',Vencimento))                  + // 078 - 085 / Data de vencimento do título
                 IntToStrZero(round(ValorDocumento * 100), 15)                                                + // 086 - 100 / Valor nominal do título
                 PadLeft('0', 4, '0')                                                                         + // 101 - 104 / Agência encarregada da cobrança
                 '0'                                                                                          + // 105 - 105 / Dígito da Agência encarregada da cobrança
@@ -833,173 +839,177 @@ var
   LTipoChaveDICT, Ltipopagamento : string;
 begin
 
-   aCarteira := StrToIntDef( DefineCarteira(ACBrTitulo) , 0);
+  aCarteira := StrToIntDef( DefineCarteira(ACBrTitulo) , 0);
 
-   if aCarteira = 5 then
-      aAgencia := PadLeft(OnlyNumber(ACBrTitulo.ACBrBoleto.Cedente.Agencia) +
-                       ACBrTitulo.ACBrBoleto.Cedente.AgenciaDigito,5,'0')
-   else
-      aAgencia:= '00000';
+  if aCarteira = 5 then
+    aAgencia := PadLeft(OnlyNumber(ACBrTitulo.ACBrBoleto.Cedente.Agencia) +
+                     ACBrTitulo.ACBrBoleto.Cedente.AgenciaDigito,5,'0')
+  else
+    aAgencia:= '00000';
 
-   FvTotalTitulos := FvTotalTitulos + ACBrTitulo.ValorDocumento;
+  FvTotalTitulos := FvTotalTitulos + ACBrTitulo.ValorDocumento;
 
-   with ACBrTitulo do
-   begin
-      DigitoNossoNumero := CalcularDigitoVerificador(ACBrTitulo);
+  with ACBrTitulo do
+  begin
+    DigitoNossoNumero := CalcularDigitoVerificador(ACBrTitulo);
 
-      {Tipo de Ocorrencia}
-      ocorrencia := TipoOcorrenciaToCodRemessa(ACBrTitulo.OcorrenciaOriginal.Tipo);
+    {Tipo de Ocorrencia}
+    ocorrencia := TipoOcorrenciaToCodRemessa(ACBrTitulo.OcorrenciaOriginal.Tipo);
 
-      {Especie Documento}
-      aEspecie := DefineEspecieDoc(ACBrTitulo);
+    {Especie Documento}
+    aEspecie := DefineEspecieDoc(ACBrTitulo);
 
-      {Instruções}
-      Protesto := InstrucoesProtesto(ACBrTitulo);
+    {Instruções}
+    Protesto := InstrucoesProtesto(ACBrTitulo);
 
-      {Pegando Tipo de Sacado}
-      TipoSacado := DefineTipoSacado(ACBrTitulo);
+    {Pegando Tipo de Sacado}
+    TipoSacado := DefineTipoSacado(ACBrTitulo);
 
-      with ACBrBoleto do
+    with ACBrBoleto do
+    begin
+       wLinha:= '1'                                                         +  // 1- ID Registro
+                IfThen(Cedente.TipoInscricao = pJuridica,'02','01')         +  // 2 a 3
+                PadLeft(trim(OnlyNumber(Cedente.CNPJCPF)),14,'0')           +  // 4 a 17
+                PadRight(trim(Cedente.CodigoTransmissao),20,'0')            +  // 18 a 37
+                PadRight( SeuNumero ,25,' ')                                +  // 38 a 62
+                PadLeft(RightStr(NossoNumero,7),7,'0') + DigitoNossoNumero  +  // 63 a 70
+                IfThen(DataAbatimento < EncodeDate(2000,01,01),
+                       '000000',
+                       FormatDateTime( 'ddmmyy', DataAbatimento))           +  // 71 a 76
+                ' '+IfThen(PercentualMulta > 0,'4','0')                     +  // 77 a 78
+                IntToStrZero( round( PercentualMulta * 100 ), 4)            +  // 79 a 82
+                '00'+StringOfChar( '0', 13)+space(4)                        +  // 83 a 101
+                IfThen((DataMulta <= 0),'000000',
+                       FormatDateTime( 'ddmmyy', DataMulta))                +  // 102 a 107
+                 IntToStr(aCarteira) + Ocorrencia                           +  // 108 a 110
+                PadRight( NumeroDocumento,10,' ')                           +  // 111 a 120
+                FormatDateTime( 'ddmmyy', Vencimento)                       +  // 121 a 126
+                IntToStrZero( round( ValorDocumento * 100), 13)             +  // 127 a 139
+                '033' + aAgencia                                            +  // 140 a 147
+                PadLeft(aEspecie, 2) + 'N'                                  +  // 148 a 150
+                FormatDateTime( 'ddmmyy', DataDocumento )                   +  // 151 a 156
+                PadLeft(trim(Instrucao1),2,'0')                             +  // 157 a 158
+                PadLeft(trim(Instrucao2),2,'0')                             +  // 159 a 160
+                IntToStrZero( round(ValorMoraJuros * 100 ), 13)             +  // 161 a 173
+                IfThen(DataDesconto < EncodeDate(2000,01,01),
+                       '000000',
+                       FormatDateTime( 'ddmmyy', DataDesconto))             +  // 174 a 179
+                IntToStrZero( round( ValorDesconto * 100), 13)              +  // 180 a 192
+                IntToStrZero( round( ValorIOF * 100 ), 13)                  +  // 193 a 205
+                IntToStrZero( round( ValorAbatimento * 100 ), 13)           +  // 206 a 218
+                TipoSacado + PadLeft(OnlyNumber(Sacado.CNPJCPF),14,'0')     +  // 219 a 234
+                PadRight( Sacado.NomeSacado, 40, ' ')                       +  // 235 a 274
+                PadRight( Sacado.Logradouro + ' '+ Sacado.Numero, 40, ' ')  +  // 275 a 314
+                PadRight( Sacado.Bairro,12,' ')                             +  // 315 a 326
+                PadRight( OnlyNumber(Sacado.CEP) , 8, ' ' )                 +  // 327 a 334
+                PadRight( Sacado.Cidade, 15, ' ')                           +
+                PadRight( Sacado.UF, 2 )                                    +  // 335 a 351
+                Space(30)                                                   +  // 352 a 381
+                ' I'                                                        +  // 382 a 383
+                Copy( Cedente.Conta, length( Cedente.Conta ),1 )            +  //
+                PadLeft( Cedente.ContaDigito, 1 )                           +  // 384 a 385
+                Space(6)                                                    +  // 386 a 391
+                Protesto + ' '                                              +  // 392 a 394
+                IntToStrZero( aRemessa.Count + 1, 6 );                         // 395 a 400
+
+       aRemessa.Add(UpperCase(wLinha));
+
+
+      if (ACBrTitulo.ACBrBoleto.Cedente.PIX.TipoChavePIX <> tchNenhuma) then
       begin
-         wLinha:= '1'                                                         +  // 1- ID Registro
-                  IfThen(Cedente.TipoInscricao = pJuridica,'02','01')         +  // 2 a 3
-                  PadLeft(trim(OnlyNumber(Cedente.CNPJCPF)),14,'0')           +  // 4 a 17
-                  PadRight(trim(Cedente.CodigoTransmissao),20,'0')            +  // 18 a 37
-                  PadRight( SeuNumero ,25,' ')                                +  // 38 a 62
-                  PadLeft(RightStr(NossoNumero,7),7,'0') + DigitoNossoNumero  +  // 63 a 70
-                  IfThen(DataAbatimento < EncodeDate(2000,01,01),
-                         '000000',
-                         FormatDateTime( 'ddmmyy', DataAbatimento))           +  // 71 a 76
-                  ' '+IfThen(PercentualMulta > 0,'4','0')                     +  // 77 a 78
-                  IntToStrZero( round( PercentualMulta * 100 ), 4)            +  // 79 a 82
-                  '00'+StringOfChar( '0', 13)+space(4)                        +  // 83 a 101
-                  IfThen((DataMulta <= 0),'000000',
-                         FormatDateTime( 'ddmmyy', DataMulta))                +  // 102 a 107
-                   IntToStr(aCarteira) + Ocorrencia                           +  // 108 a 110
-                  PadRight( NumeroDocumento,10,' ')                           +  // 111 a 120
-                  FormatDateTime( 'ddmmyy', Vencimento)                       +  // 121 a 126
-                  IntToStrZero( round( ValorDocumento * 100), 13)             +  // 127 a 139
-                  '033' + aAgencia                                            +  // 140 a 147
-                  PadLeft(aEspecie, 2) + 'N'                                  +  // 148 a 150
-                  FormatDateTime( 'ddmmyy', DataDocumento )                   +  // 151 a 156
-                  PadLeft(trim(Instrucao1),2,'0')                             +  // 157 a 158
-                  PadLeft(trim(Instrucao2),2,'0')                             +  // 159 a 160
-                  IntToStrZero( round(ValorMoraJuros * 100 ), 13)             +  // 161 a 173
-                  IfThen(DataDesconto < EncodeDate(2000,01,01),
-                         '000000',
-                         FormatDateTime( 'ddmmyy', DataDesconto))             +  // 174 a 179
-                  IntToStrZero( round( ValorDesconto * 100), 13)              +  // 180 a 192
-                  IntToStrZero( round( ValorIOF * 100 ), 13)                  +  // 193 a 205
-                  IntToStrZero( round( ValorAbatimento * 100 ), 13)           +  // 206 a 218
-                  TipoSacado + PadLeft(OnlyNumber(Sacado.CNPJCPF),14,'0')     +  // 219 a 234
-                  PadRight( Sacado.NomeSacado, 40, ' ')                       +  // 235 a 274
-                  PadRight( Sacado.Logradouro + ' '+ Sacado.Numero, 40, ' ')  +  // 275 a 314
-                  PadRight( Sacado.Bairro,12,' ')                             +  // 315 a 326
-                  PadRight( OnlyNumber(Sacado.CEP) , 8, ' ' )                 +  // 327 a 334
-                  PadRight( Sacado.Cidade, 15, ' ')                           +
-                  PadRight( Sacado.UF, 2 )                                    +  // 335 a 351
-                  Space(30)                                                   +  // 352 a 381
-                  ' I'                                                        +  // 382 a 383
-                  Copy( Cedente.Conta, length( Cedente.Conta ),1 )            +  //
-                  PadLeft( Cedente.ContaDigito, 1 )                           +  // 384 a 385
-                  Space(6)                                                    +  // 386 a 391
-                  Protesto + ' '                                              +  // 392 a 394
-                  IntToStrZero( aRemessa.Count + 1, 6 );                         // 395 a 400
-
-         aRemessa.Add(UpperCase(wLinha));
-            LMensagem1 := '';
-            LMensagem2 := '';
-            LMensagem3 := '';
-            if Mensagem.Count >= 1 then
-              LMensagem1 := TiraAcentos(Mensagem[0]);
-
-            if Mensagem.Count >= 2 then
-              LMensagem2 := TiraAcentos(Mensagem[1]);
-
-            if Mensagem.Count >= 3 then
-              LMensagem3 := TiraAcentos(Mensagem[2]);
-
-            wLinha:= '2'                                                      + // 001-001 "2" - Recibo Pagador
-                     space(16)                                                + // 002-017 Reservado Banco
-                     PadLeft(Cedente.CodigoTransmissao,20,'0')                + // 018-037 Agencia / Conta Movimento / Conta Cobranca
-                     Space(10)                                                + // 038-047 Reservado Banco
-                     '01'                                                     + // 048-049 SubRegistro "01"
-                     PadRight(LMensagem1, 50)                                 + // 050-099 Mensagem Variavel
-                     '02'                                                     + // 100-101 SubSequencia "02"
-                     PadRight(LMensagem2, 50)                                 + // 102-151 Mensagem Variavel
-                     '02'                                                     + // 152-153 SubSequencia "02"
-                     PadRight(LMensagem3, 50)                                 + // 154-203 Mensagem Variavel
-                     Space(179)                                               + // 204-382 Reservado Banco
-                     'I'                                                      + // 383-383 Identificação do Complemento
-                     PadLeft(Copy( Cedente.Conta, length( Cedente.Conta ),1 ), 1, '0') +
-                     PadLeft( Cedente.ContaDigito, 1, '0' )                   + // 384-385 Complemento
-                     Space(9)                                                 + // 386-394 Reservado Banco
-                     IntToStrZero( aRemessa.Count + 1 , 6 );                    // 395-400 Sequencial de Registro
-            aRemessa.Add(UpperCase(wLinha));
-
-            //2ª linha de mensagem
-            LMensagem4 := '';
-            LMensagem5 := '';
-            LMensagem6 := '';
-            if Mensagem.Count >= 4 then
-              LMensagem4 := TiraAcentos(Mensagem[3]);
-
-            if Mensagem.Count >= 5 then
-              LMensagem5 := TiraAcentos(Mensagem[4]);
-
-            if Mensagem.Count >= 6 then
-              LMensagem6 := TiraAcentos(Mensagem[5]);
-
-            wLinha:= '2'                                                      + // 001-001 "2" - Recibo Pagador
-                     space(16)                                                + // 002-017 Reservado Banco
-                     PadLeft(Cedente.CodigoTransmissao,20,'0')                + // 018-037 Agencia / Conta Movimento / Conta Cobranca
-                     Space(10)                                                + // 038-047 Reservado Banco
-                     '01'                                                     + // 048-049 SubRegistro "01"
-                     PadRight(LMensagem4, 50)                                 + // 050-099 Mensagem Variavel
-                     '02'                                                     + // 100-101 SubSequencia "02"
-                     PadRight(LMensagem5, 50)                                 + // 102-151 Mensagem Variavel
-                     '02'                                                     + // 152-153 SubSequencia "02"
-                     PadRight(LMensagem6, 50)                                 + // 154-203 Mensagem Variavel
-                     Space(179)                                               + // 204-382 Reservado Banco
-                     'I'                                                      + // 383-383 Identificação do Complemento
-                     PadLeft(Copy( Cedente.Conta, length( Cedente.Conta ),1 ), 1, '0') +
-                     PadLeft( Cedente.ContaDigito, 1, '0' )                   + // 384-385 Complemento
-                     Space(9)                                                 + // 386-394 Reservado Banco
-                     IntToStrZero( aRemessa.Count + 1 , 6 );                    // 395-400 Sequencial de Registro
-            if (LMensagem4 <> '') or (LMensagem5 <> '') or (LMensagem6 <> '') then
-               aRemessa.Add(UpperCase(wLinha));
-
-         if (ACBrTitulo.ACBrBoleto.Cedente.PIX.TipoChavePIX <> tchNenhuma) then
-         begin
-           case ACBrTitulo.ACBrBoleto.Cedente.PIX.TipoChavePIX of
-             tchCPF       : LTipoChaveDICT := '1';
-             tchCNPJ      : LTipoChaveDICT := '2';
-             tchCelular   : LTipoChaveDICT := '3';
-             tchEmail     : LTipoChaveDICT := '4';
-             tchAleatoria : LTipoChaveDICT := '5';
-           end;
-           case tipopagamento of
-             tpAceita_Qualquer_Valor : Ltipopagamento := '01';
-             tpAceita_Valores_entre_Minimo_Maximo: Ltipopagamento := '02';
-             tpNao_Aceita_Valor_Divergente: Ltipopagamento := '03';
-           end;
-           wLinha:= '8'                                                       + // 001 - 001 PIX
-                    Ltipopagamento                                      		  + // 002 - 003 Identificação do tipo de pagamento
-                    IntToStrZero(QtdeParcelas,2)                              +  // 004 - 005 Quantidade de pagamento possíveis
-                    '2'                                                       +  // 006 - 006 Tipo de valor informado (1=%, 2=Valor)
-                    IntToStrZero( round( ValorDocumento * 100), 13)           +  // 007 - 019 Valor Máximo
-                    PadLeft('0',5,'0')                                        +  // 020 - 024 % (Percentual) Máximo
-                    IntToStrZero( round( ValorDocumento * 100), 13)           +  // 025 - 037 Valor Mínimo
-                    PadLeft('0',5,'0')                                        +  // 038 - 042 % (Percentual) Mínimo
-                    LTipoChaveDICT                                            +  // 043 - 043 Tipo de Chave Pix
-                    PadRight(ACBrTitulo.ACBrBoleto.Cedente.PIX.Chave,77,' ')  +  // 044 - 120 Chave Pix
-                    PadRight(QrCode.txId,35,' ')                              +  // 121 - 155 Código de identificação do Qr Code (TXID)
-                    Space(239)                                                +  // 156 - 394 Reservado (uso Banco)
-                    IntToStrZero( aRemessa.Count + 1 , 6 );                      // 395 - 400 Sequencial de Registro
-           aRemessa.Add(UpperCase(wLinha));
-         end;
+       case ACBrTitulo.ACBrBoleto.Cedente.PIX.TipoChavePIX of
+         tchCPF       : LTipoChaveDICT := '1';
+         tchCNPJ      : LTipoChaveDICT := '2';
+         tchCelular   : LTipoChaveDICT := '3';
+         tchEmail     : LTipoChaveDICT := '4';
+         tchAleatoria : LTipoChaveDICT := '5';
+       end;
+       case tipopagamento of
+         tpAceita_Qualquer_Valor : Ltipopagamento := '01';
+         tpAceita_Valores_entre_Minimo_Maximo: Ltipopagamento := '02';
+         tpNao_Aceita_Valor_Divergente: Ltipopagamento := '03';
+       end;
+       wLinha:= '8'                                                       + // 001 - 001 PIX
+                Ltipopagamento                                      		  + // 002 - 003 Identificação do tipo de pagamento
+                IntToStrZero(QtdeParcelas,2)                              +  // 004 - 005 Quantidade de pagamento possíveis
+                '2'                                                       +  // 006 - 006 Tipo de valor informado (1=%, 2=Valor)
+                IntToStrZero( round( ValorDocumento * 100), 13)           +  // 007 - 019 Valor Máximo
+                PadLeft('0',5,'0')                                        +  // 020 - 024 % (Percentual) Máximo
+                IntToStrZero( round( ValorDocumento * 100), 13)           +  // 025 - 037 Valor Mínimo
+                PadLeft('0',5,'0')                                        +  // 038 - 042 % (Percentual) Mínimo
+                LTipoChaveDICT                                            +  // 043 - 043 Tipo de Chave Pix
+                PadRight(ACBrTitulo.ACBrBoleto.Cedente.PIX.Chave,77,' ')  +  // 044 - 120 Chave Pix
+                PadRight(QrCode.txId,35,' ')                              +  // 121 - 155 Código de identificação do Qr Code (TXID)
+                Space(239)                                                +  // 156 - 394 Reservado (uso Banco)
+                IntToStrZero( aRemessa.Count + 1 , 6 );                      // 395 - 400 Sequencial de Registro
+       aRemessa.Add(UpperCase(wLinha));
       end;
-   end;
+
+      LMensagem1 := '';
+      LMensagem2 := '';
+      LMensagem3 := '';
+      if Mensagem.Count >= 1 then
+        LMensagem1 := TiraAcentos(Mensagem[0]);
+
+      if Mensagem.Count >= 2 then
+        LMensagem2 := TiraAcentos(Mensagem[1]);
+
+      if Mensagem.Count >= 3 then
+        LMensagem3 := TiraAcentos(Mensagem[2]);
+
+      wLinha:= '2'                                                      + // 001-001 "2" - Recibo Pagador
+               space(16)                                                + // 002-017 Reservado Banco
+               PadLeft(Cedente.CodigoTransmissao,20,'0')                + // 018-037 Agencia / Conta Movimento / Conta Cobranca
+               Space(10)                                                + // 038-047 Reservado Banco
+               '01'                                                     + // 048-049 SubRegistro "01"
+               PadRight(LMensagem1, 50)                                 + // 050-099 Mensagem Variavel
+               '02'                                                     + // 100-101 SubSequencia "02"
+               PadRight(LMensagem2, 50)                                 + // 102-151 Mensagem Variavel
+               '02'                                                     + // 152-153 SubSequencia "02"
+               PadRight(LMensagem3, 50)                                 + // 154-203 Mensagem Variavel
+               Space(179)                                               + // 204-382 Reservado Banco
+               'I'                                                      + // 383-383 Identificação do Complemento
+               PadLeft(Copy( Cedente.Conta, length( Cedente.Conta ),1 ), 1, '0') +
+               PadLeft( Cedente.ContaDigito, 1, '0' )                   + // 384-385 Complemento
+               Space(9)                                                 + // 386-394 Reservado Banco
+               IntToStrZero( aRemessa.Count + 1 , 6 );                    // 395-400 Sequencial de Registro
+      aRemessa.Add(UpperCase(wLinha));
+
+      //2ª linha de mensagem
+      LMensagem4 := '';
+      LMensagem5 := '';
+      LMensagem6 := '';
+      if Mensagem.Count >= 4 then
+      LMensagem4 := TiraAcentos(Mensagem[3]);
+
+      if Mensagem.Count >= 5 then
+      LMensagem5 := TiraAcentos(Mensagem[4]);
+
+      if Mensagem.Count >= 6 then
+      LMensagem6 := TiraAcentos(Mensagem[5]);
+
+      wLinha:= '2'                                                      + // 001-001 "2" - Recibo Pagador
+           space(16)                                                + // 002-017 Reservado Banco
+           PadLeft(Cedente.CodigoTransmissao,20,'0')                + // 018-037 Agencia / Conta Movimento / Conta Cobranca
+           Space(10)                                                + // 038-047 Reservado Banco
+           '01'                                                     + // 048-049 SubRegistro "01"
+           PadRight(LMensagem4, 50)                                 + // 050-099 Mensagem Variavel
+           '02'                                                     + // 100-101 SubSequencia "02"
+           PadRight(LMensagem5, 50)                                 + // 102-151 Mensagem Variavel
+           '02'                                                     + // 152-153 SubSequencia "02"
+           PadRight(LMensagem6, 50)                                 + // 154-203 Mensagem Variavel
+           Space(179)                                               + // 204-382 Reservado Banco
+           'I'                                                      + // 383-383 Identificação do Complemento
+           PadLeft(Copy( Cedente.Conta, length( Cedente.Conta ),1 ), 1, '0') +
+           PadLeft( Cedente.ContaDigito, 1, '0' )                   + // 384-385 Complemento
+           Space(9)                                                 + // 386-394 Reservado Banco
+           IntToStrZero( aRemessa.Count + 1 , 6 );                    // 395-400 Sequencial de Registro
+      if (LMensagem4 <> '') or (LMensagem5 <> '') or (LMensagem6 <> '') then
+       aRemessa.Add(UpperCase(wLinha));
+
+
+    end;
+  end;
 end;
 
 function TACBrBancoSantander.GerarRegistroTrailler240(
@@ -1246,7 +1256,7 @@ procedure TACBrBancoSantander.LerRetorno400(ARetorno: TStringList);
 var
   Titulo : TACBrTitulo;
   ContLinha, CodOcorrencia, CodMotivo : Integer;
-  Linha, rCedente, rAgencia, rConta, rDigitoConta, rCNPJCPF : String;
+  Linha, rCedente, rAgencia, rConta, rDigitoConta, rCNPJCPF, LUrl, LTxId: String;
   wCodBanco: Integer;
 begin
    wCodBanco := StrToIntDef(copy(ARetorno.Strings[0],77,3),-1);
@@ -1302,31 +1312,35 @@ begin
    begin
       Linha := ARetorno[ContLinha] ;
 
-      if Copy(Linha,1,1)<> '1' then
-         Continue;
-
-      Titulo := ACBrBanco.ACBrBoleto.CriarTituloNaLista;
+      if Linha[1] = '1' then
+        Titulo := ACBrBanco.ACBrBoleto.CriarTituloNaLista;
 
       with Titulo do
       begin
-         SeuNumero   := copy(Linha,38,25);
-         NossoNumero := Copy(Linha,63,07);
-         Carteira    := Copy(Linha,108,1);
+        if Linha[1] = '1' then
+        begin
+          SeuNumero   := copy(Linha,38,25);
+          if ACBrBanco.ACBrBoleto.LerNossoNumeroCompleto then
+            NossoNumero := Copy(Linha,63,08)
+          else
+            NossoNumero := Copy(Linha,63,07);
 
-         OcorrenciaOriginal.Tipo := CodOcorrenciaToTipo(StrToIntDef(
+          Carteira    := Copy(Linha,108,1);
+
+          OcorrenciaOriginal.Tipo := CodOcorrenciaToTipo(StrToIntDef(
                                                         copy(Linha,109,2),0));
 
-         DataOcorrencia:= StringToDateTimeDef(Copy(Linha,111,2)+'/'+
+          DataOcorrencia:= StringToDateTimeDef(Copy(Linha,111,2)+'/'+
                                               Copy(Linha,113,2)+'/'+
                                               Copy(Linha,115,2),0, 'DD/MM/YY' );
 
-         NumeroDocumento:= Copy(Linha,117,10);
+          NumeroDocumento:= Copy(Linha,117,10);
 
-         CodOcorrencia := StrToIntDef(copy(Linha,135,2),0);
+          CodOcorrencia := StrToIntDef(copy(Linha,135,2),0);
 
-         //-|Se a ocorrencia for igual a > 0 - Houve Erros
-         if(CodOcorrencia > 0) then
-         begin
+          //-|Se a ocorrencia for igual a > 0 - Houve Erros
+          if(CodOcorrencia > 0) then
+          begin
             if copy(Linha,137,3) <> '   ' then
             begin
                CodMotivo:= StrToIntDef(copy(Linha,137,3),0);
@@ -1350,37 +1364,45 @@ begin
                DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(
                                                   OcorrenciaOriginal.Tipo,CodMotivo));
             end;
-         end;
+          end;
 
-         Vencimento := StringToDateTimeDef( Copy(Linha,147,2)+'/'+
+          Vencimento := StringToDateTimeDef( Copy(Linha,147,2)+'/'+
                                             Copy(Linha,149,2)+'/'+
                                             Copy(Linha,151,2),0, 'DD/MM/YY' );
 
-         ValorDocumento       := StrToFloatDef(Copy(Linha,153,13),0)/100;
+          ValorDocumento       := StrToFloatDef(Copy(Linha,153,13),0)/100;
 
-         EspecieDoc := CodEspecieDocToTipo(Copy(Linha,174,2));
+          EspecieDoc := CodEspecieDocToTipo(Copy(Linha,174,2));
 
-         ValorDespesaCobranca := StrToFloatDef(Copy(Linha,176,13),0)/100;
-         ValorOutrasDespesas  := StrToFloatDef(Copy(Linha,189,13),0)/100;
-         ValorMoraJuros       := StrToFloatDef(Copy(Linha,202,13),0) +
+          ValorDespesaCobranca := StrToFloatDef(Copy(Linha,176,13),0)/100;
+          ValorOutrasDespesas  := StrToFloatDef(Copy(Linha,189,13),0)/100;
+          ValorMoraJuros       := StrToFloatDef(Copy(Linha,202,13),0) +
                                  StrToFloatDef(Copy(Linha,267,13),0)/100;
-         ValorIOF             := StrToFloatDef(Copy(Linha,215,13),0)/100;
-         ValorAbatimento      := StrToFloatDef(Copy(Linha,228,13),0)/100;
-         ValorDesconto        := StrToFloatDef(Copy(Linha,241,13),0)/100;
-         ValorRecebido        := StrToFloatDef(Copy(Linha,254,13),0)/100;
-         ValorOutrosCreditos  := StrToFloatDef(Copy(Linha,280,13),0)/100;
+          ValorIOF             := StrToFloatDef(Copy(Linha,215,13),0)/100;
+          ValorAbatimento      := StrToFloatDef(Copy(Linha,228,13),0)/100;
+          ValorDesconto        := StrToFloatDef(Copy(Linha,241,13),0)/100;
+          ValorRecebido        := StrToFloatDef(Copy(Linha,254,13),0)/100;
+          ValorOutrosCreditos  := StrToFloatDef(Copy(Linha,280,13),0)/100;
 
-         if Copy(Linha,294,1) = 'N' then
+          if Copy(Linha,294,1) = 'N' then
             Aceite:=  atNao
-         else
+          else
             Aceite:=  atSim;
 
-         if StrToIntDef(Copy(Linha,296,6),0) <> 0 then
+          if StrToIntDef(Copy(Linha,296,6),0) <> 0 then
             DataCredito:= StringToDateTimeDef( Copy(Linha,296,2)+'/'+
                                                Copy(Linha,298,2)+'/'+
                                                Copy(Linha,300,2),0, 'DD/MM/YY' );
 
-         Sacado.NomeSacado:= Copy(Linha,302,36);
+          Sacado.NomeSacado:= Copy(Linha,302,36);
+        end;
+        if Linha[1] = '2' then
+        begin
+          LUrl := Trim(Copy(Linha,03,77));
+          LTxId:= Trim(Copy(Linha,80,35));
+          if NaoEstaVazio(lURL) and NaoEstaVazio(LtxId) then
+            QrCode.PIXQRCodeDinamico(LUrl,LTxId, Titulo);
+        end;
       end;
    end;
 end;

@@ -1045,7 +1045,7 @@ inherited frmDACTeRLRetrato: TfrmDACTeRLRetrato
       object rllTipoCte: TRLLabel
         Left = 4
         Top = 137
-        Width = 76
+        Width = 168
         Height = 15
         AutoSize = False
         Color = clWhite
@@ -1060,7 +1060,7 @@ inherited frmDACTeRLRetrato: TfrmDACTeRLRetrato
       object rllTipoServico: TRLLabel
         Left = 178
         Top = 137
-        Width = 91
+        Width = 132
         Height = 15
         AutoSize = False
         Color = clWhite
@@ -2205,6 +2205,15 @@ inherited frmDACTeRLRetrato: TfrmDACTeRLRetrato
       Color = clWhite
       ParentColor = False
       BeforePrint = rlb_03_DadosDACTeBeforePrint
+      object rliMarcadAgua: TRLImage
+        Left = 0
+        Top = 0
+        Width = 742
+        Height = 202
+        Center = True
+        Scaled = True
+        Visible = False
+      end
       object rlsLinhaH08: TRLDraw
         Left = 1
         Top = 167
@@ -8636,7 +8645,7 @@ inherited frmDACTeRLRetrato: TfrmDACTeRLRetrato
     Top = 16
   end
   inherited Datasource1: TDataSource
-    Left = 336
+    Left = 328
     Top = 16
   end
 end

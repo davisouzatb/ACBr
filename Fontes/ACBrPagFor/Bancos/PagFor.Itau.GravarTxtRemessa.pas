@@ -366,7 +366,7 @@ begin
     begin
       Inc(FQtdeRegistros);
       Inc(FQtdeRegistrosLote);
-      Inc(FSequencialDoRegistroNoLote);
+//      Inc(FSequencialDoRegistroNoLote);
 
       GravarCampo(BancoToStr(PagFor.Geral.Banco), 3, tcStr);
       GravarCampo(FQtdeLotes, 4, tcInt);
@@ -519,7 +519,7 @@ begin
     begin
       Inc(FQtdeRegistros);
       Inc(FQtdeRegistrosLote);
-      Inc(FSequencialDoRegistroNoLote);
+//      Inc(FSequencialDoRegistroNoLote);
 
       GravarCampo(BancoToStr(PagFor.Geral.Banco), 3, tcStr);
       GravarCampo(FQtdeLotes, 4, tcInt);
@@ -939,7 +939,7 @@ begin
       {opcionais segmento O}
       GeraSegmentoW(SegmentoW);
       GeraSegmentoZ(SegmentoZ);
-      GeraSegmentoB(SegmentoB);
+//      GeraSegmentoB(SegmentoB);
     end;
   end;
 end;
@@ -956,7 +956,7 @@ begin
     begin
       Inc(FQtdeRegistros);
       Inc(FQtdeRegistrosLote);
-      Inc(FSequencialDoRegistroNoLote);
+//      Inc(FSequencialDoRegistroNoLote);
 
       GravarCampo(BancoToStr(PagFor.Geral.Banco), 3, tcStr);
       GravarCampo(FQtdeLotes, 4, tcInt);

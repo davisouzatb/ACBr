@@ -25,11 +25,12 @@ uses
   ACBrEscDaruma, ACBrEscDatecs, ACBrEscDiebold, ACBrEscElgin, ACBrEscEpsonP2, 
   ACBrEscGPrinter, ACBrEscPosEpson, ACBrEscPosStar, ACBrEscSunmi, 
   ACBrEscZJiang, ACBrETQ, ACBrETQClass, ACBrETQEpl2, ACBrETQEscLabel, 
-  ACBrETQPpla, ACBrETQZplII, ACBrGAV, ACBrGAVClass, ACBrGAVImpressoraComum, 
-  ACBrGAVImpressoraECF, ACBrGAVSerialGerbo, ACBrGAVSerialMenno, ACBrLCB, 
-  ACBrPosPrinter, ACBrRFD, ACBrSMS, ACBrSMSClass, ACBrSMSDaruma, ACBrSMSZTE, 
-  ACBrTER, ACBrTERClass, ACBrTERWilbor, ACBrSIN, ACBrAbecsPinPad, 
-  LazarusPackageIntf;
+  ACBrETQPpla, ACBrETQZplII, ACBrETQTspl, ACBrGAV, ACBrGAVClass, 
+  ACBrGAVImpressoraComum, ACBrGAVImpressoraECF, ACBrGAVSerialGerbo, 
+  ACBrGAVSerialMenno, ACBrLCB, ACBrPosPrinter, ACBrRFD, ACBrSMS, ACBrSMSClass, 
+  ACBrSMSDaruma, ACBrSMSZTE, ACBrTER, ACBrTERClass, ACBrTERWilbor, ACBrSIN, 
+  ACBrAbecsPinPad, ACBrBALTrentin, ACBrBALWeightechWT3000IR_ABS, 
+  ACBrBALWeightechWT3000IR_ABS_Fm1Fm2Fm9, LazarusPackageIntf;
 
 implementation
 

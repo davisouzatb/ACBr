@@ -38,7 +38,7 @@ interface
 
 uses
   SysUtils, Classes,
-  ACBrXmlBase, ACBrXmlDocument, ACBrNFSeXClass, ACBrNFSeXConversao,
+  ACBrBase, ACBrXmlBase, ACBrXmlDocument, ACBrNFSeXClass, ACBrNFSeXConversao,
   ACBrNFSeXGravarXml, ACBrNFSeXLerXml,
   ACBrNFSeXProviderABRASFv1, ACBrNFSeXProviderABRASFv2,
   ACBrNFSeXWebserviceBase, ACBrNFSeXWebservicesResponse;
@@ -70,6 +70,10 @@ type
     function CriarServiceClient(const AMetodo: TMetodo): TACBrNFSeXWebservice; override;
 
     procedure ValidarSchema(Response: TNFSeWebserviceResponse; aMetodo: TMetodo); override;
+  public
+    function RegimeEspecialTributacaoToStr(const t: TnfseRegimeEspecialTributacao): string; override;
+    function StrToRegimeEspecialTributacao(out ok: boolean; const s: string): TnfseRegimeEspecialTributacao; override;
+    function RegimeEspecialTributacaoDescricao(const t: TnfseRegimeEspecialTributacao): string; override;
   end;
 
   TACBrNFSeXWebserviceSimplISS203 = class(TACBrNFSeXWebserviceSoap11)
@@ -96,6 +100,9 @@ type
     function CriarServiceClient(const AMetodo: TMetodo): TACBrNFSeXWebservice; override;
 
     function PrepararRpsParaLote(const aXml: string): string; override;
+
+    procedure LerCancelamento(const ANode: TACBrXmlNode;
+      const Response: TNFSeWebServiceResponse); override;
   public
     function RegimeEspecialTributacaoToStr(const t: TnfseRegimeEspecialTributacao): string; override;
     function StrToRegimeEspecialTributacao(out ok: boolean; const s: string): TnfseRegimeEspecialTributacao; override;
@@ -171,6 +178,55 @@ begin
     else
       raise EACBrDFeException.Create(ERR_SEM_URL_HOM);
   end;
+end;
+
+function TACBrNFSeProviderSimplISS.RegimeEspecialTributacaoDescricao(
+  const t: TnfseRegimeEspecialTributacao): string;
+begin
+  case t of
+    retMicroempresaMunicipal     : Result := '1 - Microempresa municipal';
+    retEstimativa                : Result := '2 - Estimativa';
+    retSociedadeProfissionais    : Result := '3 - Sociedade de profissionais';
+    retCooperativa               : Result := '4 - Cooperativa';
+    retMicroempresarioIndividual : Result := '5 - Microempresário Individual (MEI)';
+    retMicroempresarioEmpresaPP  : Result := '6 - Microempresário e Empresa de Pequeno Porte (ME EPP)';
+    retTribFaturamentoVariavel   : Result := '7 - Tributação por Faturamento (Variável)';
+    retFixo                      : Result := '8 - Fixo';
+    retIsencao                   : Result := '9 - Isenção';
+    retImune                     : Result := '10 - Imune';
+    retExigibSuspensaJudicial    : Result := '11 - Exigibilidade suspensa por decisão judicial';
+    retExigibSuspensaAdm         : Result := '12 - Exigibilidade suspensa por procedimento administrativo';
+  else
+    Result := '';
+  end;
+end;
+
+function TACBrNFSeProviderSimplISS.RegimeEspecialTributacaoToStr(
+  const t: TnfseRegimeEspecialTributacao): string;
+begin
+  Result := EnumeradoToStr(t,
+                         ['', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                          '10', '11', '12'],
+                         [retNenhum, retMicroempresaMunicipal, retEstimativa,
+                         retSociedadeProfissionais, retCooperativa,
+                         retMicroempresarioIndividual, retMicroempresarioEmpresaPP,
+                         retTribFaturamentoVariavel, retFixo, retIsencao,
+                         retImune, retExigibSuspensaJudicial,
+                         retExigibSuspensaAdm]);
+end;
+
+function TACBrNFSeProviderSimplISS.StrToRegimeEspecialTributacao(
+  out ok: boolean; const s: string): TnfseRegimeEspecialTributacao;
+begin
+  Result := StrToEnumerado(ok, s,
+                        ['', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                         '10', '11', '12'],
+                        [retNenhum, retMicroempresaMunicipal, retEstimativa,
+                         retSociedadeProfissionais, retCooperativa,
+                         retMicroempresarioIndividual, retMicroempresarioEmpresaPP,
+                         retTribFaturamentoVariavel, retFixo, retIsencao,
+                         retImune, retExigibSuspensaJudicial,
+                         retExigibSuspensaAdm]);
 end;
 
 procedure TACBrNFSeProviderSimplISS.ValidarSchema(
@@ -446,6 +502,31 @@ begin
   end;
 end;
 
+procedure TACBrNFSeProviderSimplISS203.LerCancelamento(
+  const ANode: TACBrXmlNode; const Response: TNFSeWebServiceResponse);
+var
+  AuxNode, ANodeNfseCancelamento: TACBrXmlNode;
+begin
+  ANodeNfseCancelamento := ANode.Childrens.FindAnyNs('NfseCancelamento');
+
+  if ANodeNfseCancelamento <> nil then
+  begin
+    AuxNode := ANodeNfseCancelamento.Childrens.FindAnyNs('Confirmacao');
+
+    if Assigned(AuxNode) then
+    begin
+      Response.DataCanc := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('DataHoraCancelamento'), FpFormatoDataHora);
+
+      Response.SucessoCanc := Response.DataCanc > 0;
+    end;
+
+    Response.DescSituacao := '';
+
+    if (Response.DataCanc > 0) and (Response.SucessoCanc) then
+      Response.DescSituacao := 'Nota Cancelada';
+  end;
+end;
+
 function TACBrNFSeProviderSimplISS203.PrepararRpsParaLote(
   const aXml: string): string;
 begin
@@ -665,6 +746,7 @@ begin
   Result := RemoverIdentacao(Result);
   Result := RemoverCaracteresDesnecessarios(Result);
   Result := RemoverPrefixosDesnecessarios(Result);
+  Result := StringReplace(Result, '&', '&amp;', [rfReplaceAll]);
 end;
 
 {

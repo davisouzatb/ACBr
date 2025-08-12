@@ -48,6 +48,7 @@ type
     FNFSeDM: TLibNFSeDM;
 
     function SetRetornoNFSeRPSCarregadas(const Count: integer): Integer;
+    function SetRetornoNFSeCarregadas(const Count: Integer): Integer;
 
   protected
     procedure Inicializar; override;
@@ -64,6 +65,7 @@ type
     function CarregarLoteXML(const eArquivoOuXML: PAnsiChar): Integer;
     function CarregarINI(const eArquivoOuINI: PAnsiChar): Integer;
     function ObterXml(aIndex: Integer; const sResposta: PAnsiChar; var esTamanho: Integer): Integer;
+    function ObterXmlRps(aIndex: Integer; const sResposta: PAnsiChar; var esTamanho: Integer): Integer;
     function GravarXml(aIndex: Integer; const eNomeArquivo, ePathArquivo: PAnsiChar): Integer;
     function ObterIni(AIndex: Integer; const sResposta: PAnsiChar; var esTamanho: Integer): Integer;
     function GravarIni(AIndex: Integer; const eNomeArquivo, ePathArquivo: PAnsiChar): Integer;
@@ -150,7 +152,13 @@ begin
   FNFSeDM.AplicarConfiguracoes;
 end;
 
-function TACBrLibNFSe.SetRetornoNFSeRPSCarregadas(const Count: integer): integer;
+function TACBrLibNFSe.SetRetornoNFSeRPSCarregadas(const Count: integer
+  ): Integer;
+begin
+  Result := SetRetorno(0, Format(SInfNFSeRPSCarregadas, [Count]));
+end;
+
+function TACBrLibNFSe.SetRetornoNFSeCarregadas(const Count: Integer): Integer;
 begin
   Result := SetRetorno(0, Format(SInfNFSeCarregadas, [Count]));
 end;
@@ -209,7 +217,7 @@ begin
     try
       NFSeDM.ACBrNFSeX1.NotasFiscais.LoadFromLoteNfse(ArquivoOuXml);
 
-      Result := SetRetornoNFSeRPSCarregadas(NFSeDM.ACBrNFSeX1.NotasFiscais.Count);
+      Result := SetRetornoNFSeCarregadas(NFSeDM.ACBrNFSeX1.NotasFiscais.Count);
     finally
       NFSeDM.Destravar;
     end;
@@ -274,6 +282,41 @@ begin
         NFSeDM.ACBrNFSeX1.NotasFiscais.Items[aIndex].GerarXML;
 
       Resposta := NFSeDM.ACBrNFSeX1.NotasFiscais.Items[aIndex].XmlNfse;
+      MoverStringParaPChar(Resposta, sResposta, esTamanho);
+      Result := SetRetorno(ErrOK, Resposta);
+    finally
+      NFSeDM.Destravar;
+    end;
+  except
+    on E: EACBrLibException do
+      Result := SetRetorno(E.Erro, ConverterStringSaida(E.Message));
+
+    on E: Exception do
+      Result := SetRetorno(ErrExecutandoMetodo, ConverterStringSaida(E.Message));
+  end;
+end;
+
+function TACBrLibNFSe.ObterXmlRps(aIndex: Integer; const sResposta: PAnsiChar; var esTamanho: Integer): Integer;
+var
+  Resposta: Ansistring;
+begin
+  try
+    if Config.Log.Nivel > logNormal then
+      GravarLog('NFSE_ObterXmlRps(' + IntToStr(aIndex) + ' )', logCompleto, True)
+    else
+      GravarLog('NFSE_ObterXmlRps', logNormal);
+
+    NFSeDM.Travar;
+
+    try
+      if (NFSeDM.ACBrNFSeX1.NotasFiscais.Count < 1) or (aIndex < 0) or
+         (aIndex >= NFSeDM.ACBrNFSeX1.NotasFiscais.Count) then
+         raise EACBrLibException.Create(ErrIndex, Format(SErrIndex, [aIndex]));
+
+      if EstaVazio(NFSeDM.ACBrNFSeX1.NotasFiscais.Items[aIndex].XmlNfse) then
+        NFSeDM.ACBrNFSeX1.NotasFiscais.Items[aIndex].GerarXML;
+
+      Resposta := NFSeDM.ACBrNFSeX1.NotasFiscais.Items[aIndex].XmlRps;
       MoverStringParaPChar(Resposta, sResposta, esTamanho);
       Result := SetRetorno(ErrOK, Resposta);
     finally

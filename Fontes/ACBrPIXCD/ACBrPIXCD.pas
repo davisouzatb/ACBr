@@ -46,8 +46,13 @@ uses
   Classes, SysUtils, httpsend, ssl_openssl,
   ACBrOpenSSLUtils, ACBrBase, ACBrPIXBase, ACBrPIXBRCode,
   ACBrPIXSchemasPix,
+  ACBrPIXSchemasRec,
   ACBrPIXSchemasCob,
   ACBrPIXSchemasCobV,
+  ACBrPIXSchemasCobR,
+  ACBrPIXSchemasWebhook,
+  ACBrPIXSchemasSolicRec,
+  ACBrPIXSchemasLocation,
   ACBrPIXSchemasProblema,
   ACBrPIXSchemasDevolucao,
   ACBrPIXSchemasPixConsultados,
@@ -64,11 +69,19 @@ const
   ChttpMethodDELETE = 'DELETE';
 
   cEndPointPix = '/pix';
+  cEndPointRec = '/rec';
   cEndPointCob = '/cob';
   cEndPointCobV = '/cobv';
+  cEndPointCobR = '/cobr';
+  cEndPointLocRec = '/locrec';
+  cEndPointSolicRec = '/solicrec';
+  cEndPointWebhook = '/webhook';
+  cEndPointWebhookRec = '/webhookrec';
+  cEndPointWebhookCobR = '/webhookcobr';
 
   CContentTypeUTF8 = 'charset=utf-8';
   CContentTypeTextPlain = 'text/plain';
+  CContentTypeApplicationPDF = 'application/pdf';
   CContentTypeApplicationJSon = 'application/json';
   CContentTypeApplicationWwwFormUrlEncoded = 'application/x-www-form-urlencoded';
 
@@ -158,7 +171,10 @@ type
   TACBrPSPScope =
     (scCobWrite, scCobRead, scCobVWrite, scCobVRead, scLoteCobVWrite,
      scLoteCobVRead, scPixWrite, scPixRead, scWebhookWrite, scWebhookRead,
-     scPayloadLocationWrite, scPayloadLocationRead);
+     scPayloadLocationWrite, scPayloadLocationRead, scRecWrite, scRecRead,
+     scSolicRecWrite, scSolicRecRead, scCobRWrite, scCobRRead, scWebhookRecWrite,
+     scWebhookRecRead, scWebhookCobRWrite, scWebhookCobRRead,
+     scPayloadLocationRecWrite, scPayloadLocationRecRead);
 
   TACBrPSPScopes = set of TACBrPSPScope;
 
@@ -172,7 +188,7 @@ type
     function GetNivelLog: Byte;
   protected
     fpEndPoint: String;
-    procedure RegistrarLog(const ALinha: String);
+    procedure RegistrarLog(const ALinha: String; aNivelMin: Integer = 1);
     property NivelLog: Byte read GetNivelLog;
   public
     constructor Create(AOwner: TACBrPSP);
@@ -218,6 +234,7 @@ type
     fCobsConsultadas: TACBrPIXCobsConsultadas;
     fCobSolicitada: TACBrPIXCobSolicitada;
     fCobGerada: TACBrPIXCobGerada;
+    procedure VerificarCopiaECola;
   public
     constructor Create(AOwner: TACBrPSP);
     destructor Destroy; override;
@@ -247,6 +264,7 @@ type
     fCobsVConsultadas: TACBrPIXCobsVConsultadas;
     fCobVSolicitada: TACBrPIXCobVSolicitada;
     fCobVGerada: TACBrPIXCobVGerada;
+    procedure VerificarCopiaECola;
   public
     constructor Create(aOwner: TACBrPSP);
     destructor Destroy; override;
@@ -265,6 +283,200 @@ type
     property CobVGerada: TACBrPIXCobVGerada read fCobVGerada;
     property CobVRevisada: TACBrPIXCobVRevisada read fCobVRevisada;
     property CobVCompleta: TACBrPIXCobVCompleta read fCobVCompleta;
+  end;
+
+  { TACBrPixEndPointRec - EndPoint /rec }
+
+  TACBrPixEndPointRec = class(TACBrPixEndPoint)
+  private
+    fRecorrenciaGerada: TACBrPIXRecGerada;
+    fRecorrenciaCompleta: TACBrPIXRecCompleta;
+    fRecorrenciaRevisada: TACBrPIXRecRevisada;
+    fRecorrenciaSolicitada: TACBrPIXRecSolicitada;
+    fRecorrenciasConsultadas: TACBrPIXRecsConsultadas;
+    function GetRecorrenciaGerada: TACBrPIXRecGerada;
+    function GetRecorrenciaCompleta: TACBrPIXRecCompleta;
+    function GetRecorrenciaRevisada: TACBrPIXRecRevisada;
+    function GetRecorrenciaSolicitada: TACBrPIXRecSolicitada;
+    function GetRecorrenciasConsultadas: TACBrPIXRecsConsultadas;
+  public
+    constructor Create(AOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+
+    function CriarRecorrencia: Boolean;
+    function RevisarRecorrencia(const aIdRec: String): Boolean;
+    function ConsultarRecorrencia(aIdRec: String; aTxId: String = ''): Boolean;
+    function ConsultarRecorrencias(aInicio: TDateTime; aFim: TDateTime;
+      const aCpfCnpj: String = ''; aLocationPresente: Boolean = False;
+      aStatus: TACBrPIXStatusRecorrencia = strNENHUM; aConvenio: String = '';
+      aPagAtual: Integer = 0; aItensPorPagina: Integer = 100): Boolean;
+
+    property RecorrenciaGerada: TACBrPIXRecGerada read GetRecorrenciaGerada;
+    property RecorrenciaCompleta: TACBrPIXRecCompleta read GetRecorrenciaCompleta;
+    property RecorrenciaRevisada: TACBrPIXRecRevisada read GetRecorrenciaRevisada;
+    property RecorrenciaSolicitada: TACBrPIXRecSolicitada read GetRecorrenciaSolicitada;
+    property RecorrenciasConsultadas: TACBrPIXRecsConsultadas read GetRecorrenciasConsultadas;
+  end;
+
+  { TACBrPixEndPointSolicRec - EndPoint /solicrec }
+
+  TACBrPixEndPointSolicRec = class(TACBrPixEndPoint)
+  private
+    fSolicitacaoCompleta: TACBrPIXSolicitacaoRecCompleta;
+    fSolicitacaoGerada: TACBrPIXSolicitacaoRecCompleta;
+    fSolicitacaoRevisada: TACBrPIXSolicitacaoRecRevisada;
+    fSolicitacaoSolicitada: TACBrPIXSolicitacaoRecSolicitada;
+    function GetSolicitacaoCompleta: TACBrPIXSolicitacaoRecCompleta;
+    function GetSolicitacaoGerada: TACBrPIXSolicitacaoRecCompleta;
+    function GetSolicitacaoRevisada: TACBrPIXSolicitacaoRecRevisada;
+    function GetSolicitacaoSolicitada: TACBrPIXSolicitacaoRecSolicitada;
+  public
+    constructor Create(AOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+
+    function CriarSolicitacaoConfirmacao: Boolean;
+    function RevisarSolicitacao(const aIdSolicRec: String): Boolean;
+    function ConsultarSolicitacao(aIdSolicRec: String): Boolean;
+
+    property SolicitacaoGerada: TACBrPIXSolicitacaoRecCompleta read GetSolicitacaoGerada;
+    property SolicitacaoCompleta: TACBrPIXSolicitacaoRecCompleta read GetSolicitacaoCompleta;
+    property SolicitacaoRevisada: TACBrPIXSolicitacaoRecRevisada read GetSolicitacaoRevisada;
+    property SolicitacaoSolicitada: TACBrPIXSolicitacaoRecSolicitada read GetSolicitacaoSolicitada;
+  end;
+
+  { TACBrPixEndPointLocRec - EndPoint /locrec }
+
+  TACBrPixEndPointLocRec = class(TACBrPixEndPoint)
+  private  
+    fLocationCompleta: TACBrPIXRecLocation;
+    fLocationsConsultadas: TACBrPIXRecLocConsultadas;
+    fLocationGerada: TACBrPIXRecLocationGerada;
+    function GetLocationCompleta: TACBrPIXRecLocation;
+    function GetLocationsConsultadas: TACBrPIXRecLocConsultadas;
+    function GetLocationGerada: TACBrPIXRecLocationGerada;
+  public
+    constructor Create(AOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+
+    function CriarLocation: Boolean;
+    function DesvincularLocation(aId: Integer): Boolean;
+    function ConsultarLocation(const aId: Integer): Boolean;
+    function ConsultarLocations(const aInicio: TDateTime; const aFim: TDateTime;
+      const idRecPresente: Boolean = True; const aConvenio: String = '';
+      const aPagAtual: Integer = 0; const aItensPorPagina: Integer = 100): Boolean;
+
+    property LocationGerada: TACBrPIXRecLocationGerada read GetLocationGerada;
+    property LocationCompleta: TACBrPIXRecLocation read GetLocationCompleta;
+    property LocationsConsultadas: TACBrPIXRecLocConsultadas read GetLocationsConsultadas;
+  end;
+
+  { TACBrPixEndPointCobR - EndPoint /cobr }
+
+  TACBrPixEndPointCobR = class(TACBrPixEndPoint)
+  private
+    fCobRCompleta: TACBrPIXCobRCompleta;
+    fCobRRevisada: TACBrPIXCobRRevisada;
+    fCobsRConsultadas: TACBrPIXCobsRConsultadas;
+    fCobRSolicitada: TACBrPIXCobRSolicitada;
+    fCobRGerada: TACBrPIXCobRGerada;
+    function GetCobRCompleta: TACBrPIXCobRCompleta;
+    function GetCobRGerada: TACBrPIXCobRGerada;
+    function GetCobRRevisada: TACBrPIXCobRRevisada;
+    function GetCobRSolicitada: TACBrPIXCobRSolicitada;
+    function GetCobsRConsultadas: TACBrPIXCobsRConsultadas;
+  public
+    constructor Create(aOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+
+    function CriarCobranca(const TxId: String = ''): Boolean;
+    function RevisarCobranca(const TxId: String): Boolean;
+    function ConsultarCobranca(const TxId: String): Boolean;
+    function SolicitarRetentativa(const TxId: String;
+      const aDataLiquidacao: TDateTime): Boolean;
+    function ConsultarCobrancas(aInicio: TDateTime; aFim: TDateTime;
+      const idRec: String = ''; const aCpfCnpj: String = '';
+      const aStatus: TACBrPIXStatusRegistroCobranca = srcNENHUM;
+      const aConvenio: String = ''; const aPagAtual: Integer = 0;
+      const aItensPorPagina: Integer = 100): Boolean;
+
+    property CobsRConsultadas: TACBrPIXCobsRConsultadas read GetCobsRConsultadas;
+    property CobRSolicitada: TACBrPIXCobRSolicitada read GetCobRSolicitada;
+    property CobRGerada: TACBrPIXCobRGerada read GetCobRGerada;
+    property CobRRevisada: TACBrPIXCobRRevisada read GetCobRRevisada;
+    property CobRCompleta: TACBrPIXCobRCompleta read GetCobRCompleta;
+  end;
+
+  { TACBrPixEndPointWebhook - EndPoint /webhook }
+
+  TACBrPixEndPointWebhook = class(TACBrPixEndPoint)
+  private
+    fWebhookSolicitado: TACBrPIXWebhookRequest;
+    fWebhookConsultado: TACBrPIXWebhookCobResponse;
+    fWebhooksConsultados: TACBrPIXWebhookConsultados;
+    function GetWebhookConsultado: TACBrPIXWebhookCobResponse;
+    function GetWebhookSolicitado: TACBrPIXWebhookRequest;
+    function GetWebhooksConsultados: TACBrPIXWebhookConsultados;
+  public
+    constructor Create(AOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+    
+    function CancelarWebhook(aChave: String): Boolean;
+    function ConfigurarWebhook(aChave: String): Boolean;
+
+    function ConsultarWebhook(aChave: String): Boolean;
+    function ConsultarWebhooks(aInicio: TDateTime; aFim: TDateTime;
+      const aPagAtual: Integer = 0; const aItensPorPagina: Integer = 100): Boolean;
+                                                                            
+    property WebhookSolicitado: TACBrPIXWebhookRequest read GetWebhookSolicitado;
+    property WebhookConsultado: TACBrPIXWebhookCobResponse read GetWebhookConsultado;
+    property WebhooksConsultados: TACBrPIXWebhookConsultados read GetWebhooksConsultados;
+  end;
+
+  { TACBrPixEndPointWebhookRec - EndPoint /webhookrec }
+
+  TACBrPixEndPointWebhookRec = class(TACBrPixEndPoint)
+  private
+    fWebhookRecSolicitado: TACBrPIXWebhookRequest;
+    fWebhookRecConsultado: TACBrPIXWebhookResponse;
+    function GetWebhookRecConsultado: TACBrPIXWebhookResponse;
+    function GetWebhookRecSolicitado: TACBrPIXWebhookRequest;
+  public
+    constructor Create(AOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+
+    function CancelarWebhookRec: Boolean;
+    function ConsultarWebhookRec: Boolean;
+    function ConfigurarWebhookRec: Boolean;
+
+    property WebhookRecSolicitado: TACBrPIXWebhookRequest read GetWebhookRecSolicitado;
+    property WebhookRecConsultado: TACBrPIXWebhookResponse read GetWebhookRecConsultado;
+  end;
+
+  { TACBrPixEndPointWebhookCobR - EndPoint /webhookcobr }
+
+  TACBrPixEndPointWebhookCobR = class(TACBrPixEndPoint)
+  private
+    fWebhookCobRSolicitado: TACBrPIXWebhookRequest;
+    fWebhookCobRConsultado: TACBrPIXWebhookResponse;
+    function GetWebhookCobRConsultado: TACBrPIXWebhookResponse;
+    function GetWebhookCobRSolicitado: TACBrPIXWebhookRequest;
+  public
+    constructor Create(AOwner: TACBrPSP);
+    destructor Destroy; override;
+    procedure Clear;
+
+    function CancelarWebhookCobR: Boolean;
+    function ConsultarWebhookCobR: Boolean;
+    function ConfigurarWebhookCobR: Boolean;
+
+    property WebhookCobRSolicitado: TACBrPIXWebhookRequest read GetWebhookCobRSolicitado;
+    property WebhookCobRConsultado: TACBrPIXWebhookResponse read GetWebhookCobRConsultado;
   end;
 
   TACBrQuandoAcessarEndPoint = procedure(const AEndPoint: String;
@@ -306,6 +518,7 @@ type
   private
     fAPIVersion: TACBrPIXAPIVersion;
     fChavePIX: String;
+    fepLocRec: TACBrPixEndPointLocRec;
     fScopes: TACBrPSPScopes;
     fURLPathParams: TStringList;
     fURLQueryParams: TACBrQueryParams;
@@ -317,8 +530,14 @@ type
     fTipoChave: TACBrPIXTipoChave;
 
     fepPix: TACBrPixEndPointPix;
+    fepRec: TACBrPixEndPointRec;
     fepCob: TACBrPixEndPointCob;
     fepCobV: TACBrPixEndPointCobV;
+    fepCobR: TACBrPixEndPointCobR;
+    fepSolicRec: TACBrPixEndPointSolicRec;
+    fepWebhook: TACBrPixEndPointWebhook;
+    fepWebhookRec: TACBrPixEndPointWebhookRec;
+    fepWebhookCobR: TACBrPixEndPointWebhookCobR;
     fPixCD: TACBrPixCD;
     fHttpSend: THTTPSend;
     fHttpRespStream: TMemoryStream;
@@ -347,7 +566,7 @@ type
     procedure VerificarPIXCDAtribuido;
 
     procedure DispararExcecao(E: Exception);
-    procedure RegistrarLog(const ALinha: String);
+    procedure RegistrarLog(const ALinha: String; aNivelLog: Integer = 1);
     property NivelLog: Byte read GetNivelLog;
 
     function ObterURLAmbiente(const Ambiente: TACBrPixCDAmbiente): String; virtual;
@@ -404,8 +623,15 @@ type
     property ValidadeToken: TDateTime read fpValidadeToken;
 
     property epPix: TACBrPixEndPointPix read fepPix;
+    property epRec: TACBrPixEndPointRec read fepRec;
     property epCob: TACBrPixEndPointCob read fepCob;
     property epCobV: TACBrPixEndPointCobV read fepCobV;
+    property epCobR: TACBrPixEndPointCobR read fepCobR;
+    property epLocRec: TACBrPixEndPointLocRec read fepLocRec;
+    property epSolicRec: TACBrPixEndPointSolicRec read fepSolicRec;
+    property epWebhook: TACBrPixEndPointWebhook read fepWebhook;
+    property epWebhookRec: TACBrPixEndPointWebhookRec read fepWebhookRec;
+    property epWebhookCobR: TACBrPixEndPointWebhookCobR read fepWebhookCobR;
 
     property Http: THTTPSend read fHttpSend;
     property IsBacen: Boolean read fpIsBacen;
@@ -564,7 +790,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure RegistrarLog(const ALinha: String);
+    procedure RegistrarLog(const ALinha: String; aNivelLog: Integer = 1);
 
     function GerarQRCodeEstatico(Valor: Currency; const infoAdicional: String = '';
       const TxId: String = ''): String; overload;
@@ -677,6 +903,18 @@ end;
 
 { TACBrPixEndPointCobV }
 
+procedure TACBrPixEndPointCobV.VerificarCopiaECola;
+begin
+  try
+    if EstaVazio(Trim(CobVGerada.pixCopiaECola)) and Assigned(fPSP.ACBrPixCD) and
+       NaoEstaVazio(CobVGerada.loc.location) and
+       NaoEstaVazio(fPSP.ACBrPixCD.Recebedor.Nome) and
+       NaoEstaVazio(fPSP.ACBrPixCD.Recebedor.Cidade) then
+      CobVGerada.pixCopiaECola := fPSP.ACBrPixCD.GerarQRCodeDinamico(CobVGerada.loc.location);
+  except
+  end;
+end;
+
 constructor TACBrPixEndPointCobV.Create(aOwner: TACBrPSP);
 begin
   if (aOwner = nil) then
@@ -739,7 +977,10 @@ begin
   Result := (ResultCode = HTTP_CREATED);
 
   if Result then
-    fCobVGerada.AsJSON := String(RespostaHttp)
+  begin
+    fCobVGerada.AsJSON := String(RespostaHttp);
+    VerificarCopiaECola;
+  end
   else
     fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
 end;
@@ -852,6 +1093,1131 @@ begin
   if Result then
     fCobsVConsultadas.AsJSON := String(RespostaHttp)
   else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointRec }
+
+function TACBrPixEndPointRec.GetRecorrenciaSolicitada: TACBrPIXRecSolicitada;
+begin
+  if (not Assigned(fRecorrenciaSolicitada)) then
+    fRecorrenciaSolicitada := TACBrPIXRecSolicitada.Create;
+  Result := fRecorrenciaSolicitada;
+end;
+
+function TACBrPixEndPointRec.GetRecorrenciaGerada: TACBrPIXRecGerada;
+begin
+  if (not Assigned(fRecorrenciaGerada)) then
+    fRecorrenciaGerada := TACBrPIXRecGerada.Create;
+  Result := fRecorrenciaGerada;
+end;
+
+function TACBrPixEndPointRec.GetRecorrenciaCompleta: TACBrPIXRecCompleta;
+begin
+  if (not Assigned(fRecorrenciaCompleta)) then
+    fRecorrenciaCompleta := TACBrPIXRecCompleta.Create;
+  Result := fRecorrenciaCompleta;
+end;
+
+function TACBrPixEndPointRec.GetRecorrenciaRevisada: TACBrPIXRecRevisada;
+begin
+  if (not Assigned(fRecorrenciaRevisada)) then
+    fRecorrenciaRevisada := TACBrPIXRecRevisada.Create;
+  Result := fRecorrenciaRevisada;
+end;
+
+function TACBrPixEndPointRec.GetRecorrenciasConsultadas: TACBrPIXRecsConsultadas;
+begin
+  if (not Assigned(fRecorrenciasConsultadas)) then
+    fRecorrenciasConsultadas := TACBrPIXRecsConsultadas.Create;
+  Result := fRecorrenciasConsultadas;
+end;
+
+constructor TACBrPixEndPointRec.Create(AOwner: TACBrPSP);
+begin
+  if (aOwner = nil) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPNaoAtribuido));
+
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointRec;
+end;
+
+destructor TACBrPixEndPointRec.Destroy;
+begin
+  if Assigned(fRecorrenciaSolicitada) then
+    fRecorrenciaSolicitada.Free;
+  if Assigned(fRecorrenciaCompleta) then
+    fRecorrenciaCompleta.Free;
+  if Assigned(fRecorrenciasConsultadas) then
+    fRecorrenciasConsultadas.Free;
+  if Assigned(fRecorrenciaGerada) then
+    fRecorrenciaGerada.Free;
+  if Assigned(fRecorrenciaRevisada) then
+    fRecorrenciaRevisada.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointRec.Clear;
+begin
+  if Assigned(fRecorrenciaSolicitada) then
+    fRecorrenciaSolicitada.Clear;
+  if Assigned(fRecorrenciasConsultadas) then
+    fRecorrenciasConsultadas.Clear;
+  if Assigned(fRecorrenciaGerada) then
+    fRecorrenciaGerada.Clear;
+  if Assigned(fRecorrenciaCompleta) then
+    fRecorrenciaCompleta.Clear;
+  if Assigned(fRecorrenciaRevisada) then
+    fRecorrenciaRevisada.Clear;
+end;
+
+function TACBrPixEndPointRec.CriarRecorrencia: Boolean;
+var
+  wBody, ep: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('CriarRecorrencia', 2);
+
+  if (not Assigned(fRecorrenciaSolicitada)) or fRecorrenciaSolicitada.IsEmpty then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['RecorrenciaSolicitada']);
+
+  wBody := Trim(fRecorrenciaSolicitada.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  ep := ChttpMethodPOST;
+
+  fPSP.ConfigurarBody(ep, EndPoint, wBody);
+  WriteStrToStream(fPSP.Http.Document, wBody);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ep, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_CREATED);
+
+  if Result then
+    RecorrenciaGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointRec.RevisarRecorrencia(const aIdRec: String): Boolean;
+var
+  wBody: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('RevisarRecorrencia(idRec: %s)', [aIdRec]), 2);
+  if EstaVazio(Trim(aIdRec)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['idRec']);
+
+  wBody := EmptyStr;
+  if Assigned(fRecorrenciaRevisada) and (not fRecorrenciaRevisada.IsEmpty) then
+    wBody := Trim(fRecorrenciaRevisada.AsJSON);
+  if EstaVazio(wBody) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['RecorrenciaRevisada']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aIdRec);
+  fPSP.ConfigurarBody(ChttpMethodPATCH, EndPoint, wBody);
+  WriteStrToStream(fPSP.Http.Document, wBody);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ChttpMethodPATCH, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    RecorrenciaGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointRec.ConsultarRecorrencia(aIdRec: String; aTxId: String): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarRecorrencia(%s)', [aIdRec]), 2);
+  if EstaVazio(Trim(aIdRec)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['idRec']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aIdRec);
+
+  if NaoEstaVazio(aTxId) then
+    fPSP.URLQueryParams.Values['txid'] := aTxId;
+
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    RecorrenciaCompleta.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointRec.ConsultarRecorrencias(aInicio: TDateTime; aFim: TDateTime;
+  const aCpfCnpj: String; aLocationPresente: Boolean; aStatus: TACBrPIXStatusRecorrencia;
+  aConvenio: String; aPagAtual: Integer; aItensPorPagina: Integer): Boolean;
+var
+  s, e: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarRecorrencias(%s, %s, %s, %s, %s, %s, %s, %s)',
+    [FormatDateTimeBr(aInicio), FormatDateTimeBr(aFim), aCpfCnpj,
+     BoolToStr(aLocationPresente, True), PIXStatusRecorrenciaToString(aStatus),
+     aConvenio, IntToStr(aPagAtual), IntToStr(aItensPorPagina)]), 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  with fPSP.URLQueryParams do
+  begin
+    Values['inicio'] := DateTimeToIso8601(aInicio);
+    Values['fim'] := DateTimeToIso8601(aFim);
+
+    s := OnlyNumber(aCpfCnpj);
+    if NaoEstaVazio(s) then
+    begin
+      e := ValidarCNPJouCPF(s);
+      if NaoEstaVazio(e) then
+        raise EACBrPixException.Create(ACBrStr(e));
+
+      if (Length(s) < 12) then
+        Values['cpf'] := s
+      else
+        Values['cnpj'] := s;
+    end;
+
+    Values['locationPresente'] := IfThen(aLocationPresente, 'true', 'false');
+    if (aStatus <> strNENHUM) then
+      Values['status'] := PIXStatusRecorrenciaToString(aStatus);
+
+    if (aPagAtual > 0) then
+      Values['paginacao.paginaAtual'] := IntToStr(aPagAtual);
+
+    if (aItensPorPagina > 0) then
+      Values['paginacao.itensPorPagina'] := IntToStr(aItensPorPagina);
+  end;
+
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    RecorrenciasConsultadas.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointSolicRec }
+
+function TACBrPixEndPointSolicRec.GetSolicitacaoCompleta: TACBrPIXSolicitacaoRecCompleta;
+begin
+  if (not Assigned(fSolicitacaoCompleta)) then
+    fSolicitacaoCompleta := TACBrPIXSolicitacaoRecCompleta.Create;
+  Result := fSolicitacaoCompleta;
+end;
+
+function TACBrPixEndPointSolicRec.GetSolicitacaoGerada: TACBrPIXSolicitacaoRecCompleta;
+begin
+  if (not Assigned(fSolicitacaoGerada)) then
+    fSolicitacaoGerada := TACBrPIXSolicitacaoRecCompleta.Create;
+  Result := fSolicitacaoGerada;
+end;
+
+function TACBrPixEndPointSolicRec.GetSolicitacaoRevisada: TACBrPIXSolicitacaoRecRevisada;
+begin
+  if (not Assigned(fSolicitacaoRevisada)) then
+    fSolicitacaoRevisada := TACBrPIXSolicitacaoRecRevisada.Create;
+  Result := fSolicitacaoRevisada;
+end;
+
+function TACBrPixEndPointSolicRec.GetSolicitacaoSolicitada: TACBrPIXSolicitacaoRecSolicitada;
+begin
+  if (not Assigned(fSolicitacaoSolicitada)) then
+    fSolicitacaoSolicitada := TACBrPIXSolicitacaoRecSolicitada.Create;
+  Result := fSolicitacaoSolicitada;
+end;
+
+constructor TACBrPixEndPointSolicRec.Create(AOwner: TACBrPSP);
+begin
+  if (aOwner = nil) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPNaoAtribuido));
+
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointSolicRec;
+end;
+
+destructor TACBrPixEndPointSolicRec.Destroy;
+begin
+  if Assigned(fSolicitacaoCompleta) then
+    fSolicitacaoCompleta.Free;
+  if Assigned(fSolicitacaoGerada) then
+    fSolicitacaoGerada.Free;
+  if Assigned(fSolicitacaoRevisada) then
+    fSolicitacaoRevisada.Free;
+  if Assigned(fSolicitacaoSolicitada) then
+    fSolicitacaoSolicitada.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointSolicRec.Clear;
+begin
+  if Assigned(fSolicitacaoCompleta) then
+    fSolicitacaoCompleta.Clear;
+  if Assigned(fSolicitacaoGerada) then
+    fSolicitacaoGerada.Clear;
+  if Assigned(fSolicitacaoRevisada) then
+    fSolicitacaoRevisada.Clear;
+  if Assigned(fSolicitacaoSolicitada) then
+    fSolicitacaoSolicitada.Clear;
+end;
+
+function TACBrPixEndPointSolicRec.CriarSolicitacaoConfirmacao: Boolean;
+var
+  wBody, ep: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  wBody := EmptyStr;
+  RegistrarLog('CriarSolicitacaoConfirmacao', 2);
+
+  if (not Assigned(fSolicitacaoSolicitada)) or fSolicitacaoSolicitada.IsEmpty then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['SolicitacaoSolicitada']);
+
+  wBody := Trim(fSolicitacaoSolicitada.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  ep := ChttpMethodPOST;
+
+  fPSP.ConfigurarBody(ep, EndPoint, wBody);
+  WriteStrToStream(fPSP.Http.Document, wBody);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ep, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_CREATED);
+
+  if Result then
+    SolicitacaoGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointSolicRec.RevisarSolicitacao(
+  const aIdSolicRec: String): Boolean;
+var
+  wBody: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('RevisarSolicitacao(idSolicRec: %s)', [aIdSolicRec]), 2);
+  if EstaVazio(Trim(aIdSolicRec)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['idSolicRec']);
+
+  if (not Assigned(fSolicitacaoRevisada)) or fSolicitacaoRevisada.IsEmpty then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['SolicitacaoRevisada']);
+
+  wBody := Trim(fSolicitacaoRevisada.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aIdSolicRec);
+  fPSP.ConfigurarBody(ChttpMethodPATCH, EndPoint, wBody);
+  WriteStrToStream(fPSP.Http.Document, wBody);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ChttpMethodPATCH, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_CREATED);
+
+  if Result then
+    SolicitacaoGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointSolicRec.ConsultarSolicitacao(aIdSolicRec: String): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarSolicitacao(%s)', [aIdSolicRec]), 2);
+  if EstaVazio(Trim(aIdSolicRec)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['idSolicRec']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aIdSolicRec);
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    SolicitacaoCompleta.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointLocRec }
+
+function TACBrPixEndPointLocRec.GetLocationCompleta: TACBrPIXRecLocation;
+begin
+  if (not Assigned(fLocationCompleta)) then
+    fLocationCompleta := TACBrPIXRecLocation.Create;
+  Result := fLocationCompleta;
+end;
+
+function TACBrPixEndPointLocRec.GetLocationsConsultadas: TACBrPIXRecLocConsultadas;
+begin
+  if (not Assigned(fLocationsConsultadas)) then
+    fLocationsConsultadas := TACBrPIXRecLocConsultadas.Create;
+  Result := fLocationsConsultadas;
+end;
+
+function TACBrPixEndPointLocRec.GetLocationGerada: TACBrPIXRecLocationGerada;
+begin
+  if (not Assigned(fLocationGerada)) then
+    fLocationGerada := TACBrPIXRecLocationGerada.Create;
+  Result := fLocationGerada;
+end;
+
+constructor TACBrPixEndPointLocRec.Create(AOwner: TACBrPSP);
+begin
+  if (aOwner = nil) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPNaoAtribuido));
+
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointLocRec;
+end;
+
+destructor TACBrPixEndPointLocRec.Destroy;
+begin
+  if Assigned(fLocationGerada) then
+    fLocationGerada.Free;
+  if Assigned(fLocationCompleta) then
+    fLocationCompleta.Free;
+  if Assigned(fLocationsConsultadas) then
+    fLocationsConsultadas.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointLocRec.Clear;
+begin
+  if Assigned(fLocationGerada) then
+    fLocationGerada.Clear;
+  if Assigned(fLocationCompleta) then
+    fLocationCompleta.Clear;
+  if Assigned(fLocationsConsultadas) then
+    fLocationsConsultadas.Clear;
+end;
+
+function TACBrPixEndPointLocRec.CriarLocation: Boolean;
+var
+  ep: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('CriarLocation', 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  ep := ChttpMethodPOST;
+  fPSP.AcessarEndPoint(ep, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_CREATED);
+
+  if Result then
+    LocationGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointLocRec.DesvincularLocation(aId: Integer): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  if EstaZerado(aId) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['Id']);
+    
+  Clear;
+  RegistrarLog(Format('DesvincularLocation(Id: %d)', [aId]), 2);
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(IntToStr(aId));
+  fPSP.URLPathParams.Add('idRec');
+  fPSP.AcessarEndPoint(ChttpMethodDELETE, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    LocationCompleta.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointLocRec.ConsultarLocation(const aId: Integer): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  if EstaZerado(aId) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['Id']);
+
+  Clear; 
+  RegistrarLog(Format('ConsultarLocation(%d)', [aId]), 2);
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(IntToStr(aId));
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    LocationCompleta.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointLocRec.ConsultarLocations(const aInicio: TDateTime;
+  const aFim: TDateTime; const idRecPresente: Boolean; const aConvenio: String;
+  const aPagAtual: Integer; const aItensPorPagina: Integer): Boolean;
+var
+  s, e: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarLocations(%s, %s, %s, %s, %s, %s)',
+    [FormatDateTimeBr(aInicio), FormatDateTimeBr(aFim), BoolToStr(idRecPresente),
+     aConvenio, IntToStr(aPagAtual), IntToStr(aItensPorPagina)]), 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  with fPSP.URLQueryParams do
+  begin
+    Values['inicio'] := DateTimeToIso8601(aInicio);
+    Values['fim'] := DateTimeToIso8601(aFim);
+    //Values['idRecPresente'] := IfThen(idRecPresente, 'true', 'false');
+
+    if NaoEstaVazio(aConvenio) then
+        Values['convenio'] := aConvenio;
+
+    if (aPagAtual > 0) then
+      Values['paginacao.paginaAtual'] := IntToStr(aPagAtual);
+
+    if (aItensPorPagina > 0) then
+      Values['paginacao.itensPorPagina'] := IntToStr(aItensPorPagina);
+  end;
+
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    LocationsConsultadas.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointCobR }
+
+function TACBrPixEndPointCobR.GetCobRCompleta: TACBrPIXCobRCompleta;
+begin
+  if not Assigned(fCobRCompleta) then
+    fCobRCompleta := TACBrPIXCobRCompleta.Create;
+  Result := fCobRCompleta;
+end;
+
+function TACBrPixEndPointCobR.GetCobRGerada: TACBrPIXCobRGerada;
+begin
+  if not Assigned(fCobRGerada) then
+    fCobRGerada := TACBrPIXCobRGerada.Create;
+  Result := fCobRGerada;
+end;
+
+function TACBrPixEndPointCobR.GetCobRRevisada: TACBrPIXCobRRevisada;
+begin
+  if not Assigned(fCobRRevisada) then
+    fCobRRevisada := TACBrPIXCobRRevisada.Create;
+  Result := fCobRRevisada;
+end;
+
+function TACBrPixEndPointCobR.GetCobRSolicitada: TACBrPIXCobRSolicitada;
+begin
+  if not Assigned(fCobRSolicitada) then
+    fCobRSolicitada := TACBrPIXCobRSolicitada.Create;
+  Result := fCobRSolicitada;
+end;
+
+function TACBrPixEndPointCobR.GetCobsRConsultadas: TACBrPIXCobsRConsultadas;
+begin
+  if not Assigned(fCobsRConsultadas) then
+    fCobsRConsultadas := TACBrPIXCobsRConsultadas.Create;
+  Result := fCobsRConsultadas;
+end;
+
+constructor TACBrPixEndPointCobR.Create(aOwner: TACBrPSP);
+begin
+  if (aOwner = nil) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPNaoAtribuido));
+
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointCobR;
+end;
+
+destructor TACBrPixEndPointCobR.Destroy;
+begin
+  if Assigned(fCobRGerada) then
+    fCobRGerada.Free;
+  if Assigned(fCobRRevisada) then
+    fCobRRevisada.Free;
+  if Assigned(fCobRCompleta) then
+    fCobRCompleta.Free;
+  if Assigned(fCobRSolicitada) then
+    fCobRSolicitada.Free;
+  if Assigned(fCobsRConsultadas) then
+    fCobsRConsultadas.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointCobR.Clear;
+begin
+  inherited Clear;
+  if Assigned(fCobRGerada) then
+    fCobRGerada.Clear;
+  if Assigned(fCobRRevisada) then
+    fCobRRevisada.Clear;
+  if Assigned(fCobRCompleta) then
+    fCobRCompleta.Clear;
+  if Assigned(fCobRSolicitada) then
+    fCobRSolicitada.Clear;
+  if Assigned(fCobsRConsultadas) then
+    fCobsRConsultadas.Clear;
+end;
+
+function TACBrPixEndPointCobR.CriarCobranca(const TxId: String): Boolean;
+var
+  Body, ep: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('CriarCobrancaRecorrente(txid: %s)', [TxId]), 2);
+
+  if (not Assigned(fCobRSolicitada)) or fCobRSolicitada.IsEmpty then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['CobRSolicitada']);
+
+  Body := Trim(CobRSolicitada.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  if NaoEstaVazio(TxId) then
+  begin
+    ep := ChttpMethodPUT;
+    fPSP.URLPathParams.Add(TxId);
+  end
+  else
+    ep := ChttpMethodPOST;
+
+  fPSP.ConfigurarBody(ep, EndPoint, Body);
+  WriteStrToStream(fPSP.Http.Document, Body);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ep, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_CREATED);
+
+  if Result then
+    CobRGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointCobR.RevisarCobranca(const TxId: String): Boolean;
+var
+  Body: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('RevisarCobrancaRecorrente(txId: %s)', [TxId]), 2);
+
+  if EstaVazio(Trim(TxId)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['txid']);
+
+  if (not Assigned(fCobRRevisada)) or fCobRRevisada.IsEmpty then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['CobRRevisada']);
+
+  Body := Trim(CobRRevisada.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(TxId);
+  fPSP.ConfigurarBody(ChttpMethodPATCH, EndPoint, Body);
+  WriteStrToStream(fPSP.Http.Document, Body);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ChttpMethodPATCH, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    CobRGerada.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointCobR.ConsultarCobranca(const TxId: String): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarCobrancaRecorrente(txId: %s)', [TxId]), 2);
+  if EstaVazio(Trim(TxId)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['txid']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(TxId);
+
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    CobRCompleta.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointCobR.SolicitarRetentativa(const TxId: String; const aDataLiquidacao: TDateTime): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('SolicitarRetentativa(txId: %s; data: %s)', [TxId, FormatDateBr(aDataLiquidacao)]), 2);
+  if EstaVazio(Trim(TxId)) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['txid']);
+  if EstaZerado(aDataLiquidacao) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['DataLiquidacao']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(TxId);
+  fPSP.URLPathParams.Add('retentativa');
+  fPSP.URLPathParams.Add(FormatDateBr(aDataLiquidacao, 'YYYY-MM-DD'));
+
+  fPSP.AcessarEndPoint(ChttpMethodPOST, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_CREATED);
+
+  if Result then
+    CobRCompleta.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointCobR.ConsultarCobrancas(aInicio: TDateTime; aFim: TDateTime;
+  const idRec: String; const aCpfCnpj: String;
+  const aStatus: TACBrPIXStatusRegistroCobranca; const aConvenio: String;
+  const aPagAtual: Integer; const aItensPorPagina: Integer): Boolean;
+var
+  s, e: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarCobrancasRecorrentes(%s, %s, %s, %s, %s, %s, %s, %s)',
+    [FormatDateTimeBr(aInicio), FormatDateTimeBr(aFim), idRec, aCpfCnpj,
+     PIXStatusRegistroCobrancaToString(aStatus), aConvenio, IntToStr(aPagAtual),
+     IntToStr(aItensPorPagina)]), 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  with fPSP.URLQueryParams do
+  begin
+    Values['inicio'] := DateTimeToIso8601(aInicio);
+    Values['fim'] := DateTimeToIso8601(aFim);
+
+    if NaoEstaVazio(idRec) then
+      Values['idRec'] := idRec;
+
+    s := OnlyNumber(aCpfCnpj);
+    if NaoEstaVazio(s) then
+    begin
+      e := ValidarCNPJouCPF(s);
+      if NaoEstaVazio(e) then
+        raise EACBrPixException.Create(ACBrStr(e));
+
+      if (Length(s) < 12) then
+        Values['cpf'] := s
+      else
+        Values['cnpj'] := s;
+    end;
+
+    if NaoEstaVazio(aConvenio) then
+        Values['convenio'] := aConvenio;
+
+    if (aStatus <> srcNENHUM) then
+      Values['status'] := PIXStatusRegistroCobrancaToString(aStatus);
+
+    if (aPagAtual > 0) then
+      Values['paginacao.paginaAtual'] := IntToStr(aPagAtual);
+
+    if (aItensPorPagina > 0) then
+      Values['paginacao.itensPorPagina'] := IntToStr(aItensPorPagina);
+  end;
+
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    CobsRConsultadas.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointWebhook }
+
+function TACBrPixEndPointWebhook.GetWebhookConsultado: TACBrPIXWebhookCobResponse;
+begin
+  if not Assigned(fWebhookConsultado) then
+    fWebhookConsultado := TACBrPIXWebhookCobResponse.Create;
+  Result := fWebhookConsultado;
+end;
+
+function TACBrPixEndPointWebhook.GetWebhooksConsultados: TACBrPIXWebhookConsultados;
+begin
+  if not Assigned(fWebhooksConsultados) then
+    fWebhooksConsultados := TACBrPIXWebhookConsultados.Create;
+  Result := fWebhooksConsultados;
+end;
+
+function TACBrPixEndPointWebhook.GetWebhookSolicitado: TACBrPIXWebhookRequest;
+begin
+  if not Assigned(fWebhookSolicitado) then
+    fWebhookSolicitado := TACBrPIXWebhookRequest.Create;
+  Result := fWebhookSolicitado;
+end;
+
+constructor TACBrPixEndPointWebhook.Create(AOwner: TACBrPSP);
+begin
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointWebhook;
+end;
+
+destructor TACBrPixEndPointWebhook.Destroy;
+begin
+  if Assigned(fWebhookConsultado) then
+    fWebhookConsultado.Free;
+  if Assigned(fWebhookSolicitado) then
+    fWebhookSolicitado.Free;
+  if Assigned(fWebhooksConsultados) then
+    fWebhooksConsultados.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointWebhook.Clear;
+begin
+  inherited Clear;
+  if Assigned(fWebhookConsultado) then
+    fWebhookConsultado.Clear;
+  if Assigned(fWebhookSolicitado) then
+    fWebhookSolicitado.Clear;
+  if Assigned(fWebhooksConsultados) then
+    fWebhooksConsultados.Clear;
+end;
+
+function TACBrPixEndPointWebhook.CancelarWebhook(aChave: String): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('CancelarWebhook(aChave: %s)', [aChave]), 2);
+  if EstaVazio(aChave) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['Chave']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aChave);
+  fPSP.AcessarEndPoint(ChttpMethodDELETE, EndPoint, ResultCode, RespostaHttp);
+
+  Result := (ResultCode = HTTP_NO_CONTENT);
+
+  if not Result then
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhook.ConsultarWebhook(aChave: String): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarWebhook(aChave: %s)', [aChave]), 2);
+  if EstaVazio(aChave) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['Chave']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aChave);
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    WebhookConsultado.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhook.ConsultarWebhooks(aInicio: TDateTime; aFim: TDateTime;
+  const aPagAtual: Integer; const aItensPorPagina: Integer): Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConsultarWebhooks(Inicio: %s, Fim: %s, PagAtual: %d, ItensPorPag: %d)',
+    [FormatDateTimeBr(aInicio), FormatDateTimeBr(aFim), aPagAtual, aItensPorPagina]), 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  with fPSP.URLQueryParams do
+  begin
+    Values['inicio'] := DateTimeToIso8601(aInicio);
+    Values['fim'] := DateTimeToIso8601(aFim);
+
+    if NaoEstaZerado(aPagAtual) then
+      Values['paginacao.paginaAtual'] := IntToStr(aPagAtual);
+
+    if NaoEstaZerado(aItensPorPagina) then
+      Values['paginacao.itensPorPagina'] := IntToStr(aItensPorPagina);
+  end;
+
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    WebhooksConsultados.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhook.ConfigurarWebhook(aChave: String): Boolean;
+var
+  Body: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog(Format('ConfigurarWebhook(aChave: %s)', [aChave]), 2);
+  if EstaVazio(aChave) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['Chave']);
+
+  if (not Assigned(fWebhookSolicitado)) or fWebhookSolicitado.IsEmpty then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['WebhookSolicitado']);
+
+  Body := Trim(WebhookSolicitado.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(aChave);
+  fPSP.ConfigurarBody(ChttpMethodPUT, EndPoint, Body);
+  WriteStrToStream(fPSP.Http.Document, Body);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ChttpMethodPUT, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if not Result then
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointWebhookRec }
+
+function TACBrPixEndPointWebhookRec.GetWebhookRecConsultado: TACBrPIXWebhookResponse;
+begin
+  if not Assigned(fWebhookRecConsultado) then
+    fWebhookRecConsultado := TACBrPIXWebhookResponse.Create;
+  Result := fWebhookRecConsultado;
+end;
+
+function TACBrPixEndPointWebhookRec.GetWebhookRecSolicitado: TACBrPIXWebhookRequest;
+begin
+  if not Assigned(fWebhookRecSolicitado) then
+    fWebhookRecSolicitado := TACBrPIXWebhookRequest.Create;
+  Result := fWebhookRecSolicitado;
+end;
+
+constructor TACBrPixEndPointWebhookRec.Create(AOwner: TACBrPSP);
+begin
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointWebhookRec;
+end;
+
+destructor TACBrPixEndPointWebhookRec.Destroy;
+begin
+  if Assigned(fWebhookRecConsultado) then
+    fWebhookRecConsultado.Free;
+  if Assigned(fWebhookRecSolicitado) then
+    fWebhookRecSolicitado.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointWebhookRec.Clear;
+begin
+  inherited Clear;
+  if Assigned(fWebhookRecConsultado) then
+    fWebhookRecConsultado.Clear;
+  if Assigned(fWebhookRecSolicitado) then
+    fWebhookRecSolicitado.Clear;
+end;
+
+function TACBrPixEndPointWebhookRec.CancelarWebhookRec: Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('CancelarWebhookRec', 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.AcessarEndPoint(ChttpMethodDELETE, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_NO_CONTENT);
+
+  if not Result then
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhookRec.ConsultarWebhookRec: Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('ConsultarWebhookRec', 2);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    WebhookRecConsultado.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhookRec.ConfigurarWebhookRec: Boolean;
+var
+  Body: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('ConfigurarWebhookRec', 2);
+
+  if (not Assigned(fWebhookRecSolicitado)) or fWebhookRecSolicitado.IsEmpty then;
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['WebhookRecSolicitado']);
+
+  Body := Trim(WebhookRecSolicitado.AsJSON);
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(fPSP.ChavePIX);
+
+  fPSP.ConfigurarBody(ChttpMethodPUT, EndPoint, Body);
+  WriteStrToStream(fPSP.Http.Document, Body);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ChttpMethodPUT, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if not Result then
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+{ TACBrPixEndPointWebhookCobR }
+
+function TACBrPixEndPointWebhookCobR.GetWebhookCobRConsultado: TACBrPIXWebhookResponse;
+begin
+  if not Assigned(fWebhookCobRConsultado) then
+    fWebhookCobRConsultado := TACBrPIXWebhookResponse.Create;
+  Result := fWebhookCobRConsultado;
+end;
+
+function TACBrPixEndPointWebhookCobR.GetWebhookCobRSolicitado: TACBrPIXWebhookRequest;
+begin
+  if not Assigned(fWebhookCobRSolicitado) then
+    fWebhookCobRSolicitado := TACBrPIXWebhookRequest.Create;
+  Result := fWebhookCobRSolicitado;
+end;
+
+constructor TACBrPixEndPointWebhookCobR.Create(AOwner: TACBrPSP);
+begin
+  if (AOwner = nil) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPNaoAtribuido));
+
+  inherited Create(AOwner);
+  fpEndPoint := cEndPointWebhookCobR;
+end;
+
+destructor TACBrPixEndPointWebhookCobR.Destroy;
+begin
+  if Assigned(fWebhookCobRConsultado) then
+    fWebhookCobRConsultado.Free;
+  if Assigned(fWebhookCobRSolicitado) then
+    fWebhookCobRSolicitado.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPixEndPointWebhookCobR.Clear;
+begin
+  inherited Clear;
+  if Assigned(fWebhookCobRConsultado) then
+    fWebhookCobRConsultado.Clear;
+  if Assigned(fWebhookCobRSolicitado) then
+    fWebhookCobRSolicitado.Clear;
+end;
+
+function TACBrPixEndPointWebhookCobR.CancelarWebhookCobR: Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('CancelarWebhookCobR', 2);
+  if EstaVazio(fPSP.ChavePIX) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPChavePIX));
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(fPSP.ChavePIX);
+  fPSP.AcessarEndPoint(ChttpMethodDELETE, EndPoint, ResultCode, RespostaHttp);
+
+  Result := (ResultCode = HTTP_NO_CONTENT);
+
+  if not Result then
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhookCobR.ConsultarWebhookCobR: Boolean;
+var
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('ConsultarWebhookCobR', 2);
+  if EstaVazio(fPSP.ChavePIX) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPChavePIX));
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(fPSP.ChavePIX);
+  fPSP.AcessarEndPoint(ChttpMethodGET, EndPoint, ResultCode, RespostaHttp);
+
+  Result := (ResultCode = HTTP_OK);
+
+  if Result then
+    WebhookCobRConsultado.AsJSON := String(RespostaHttp)
+  else
+    fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
+end;
+
+function TACBrPixEndPointWebhookCobR.ConfigurarWebhookCobR: Boolean;
+var
+  Body: String;
+  RespostaHttp: AnsiString;
+  ResultCode: Integer;
+begin
+  RegistrarLog('ConfigurarWebhookCobR', 2);
+  if EstaVazio(fPSP.ChavePIX) then
+    raise EACBrPixException.Create(ACBrStr(sErroPSPChavePIX));
+
+  Body := EmptyStr;
+  if Assigned(fWebhookCobRSolicitado) and (not fWebhookCobRSolicitado.IsEmpty) then
+    Body := Trim(WebhookCobRSolicitado.AsJSON);
+
+  if EstaVazio(Body) then
+    raise EACBrPixException.CreateFmt(ACBrStr(sErroObjetoNaoPrenchido), ['WebhookCobRSolicitado']);
+
+  Clear;
+  fPSP.PrepararHTTP;
+  fPSP.URLPathParams.Add(fPSP.ChavePIX);
+
+  fPSP.ConfigurarBody(ChttpMethodPUT, EndPoint, Body);
+  WriteStrToStream(fPSP.Http.Document, Body);
+  fPSP.Http.MimeType := CContentTypeApplicationJSon;
+  fPSP.AcessarEndPoint(ChttpMethodPUT, EndPoint, ResultCode, RespostaHttp);
+  Result := (ResultCode = HTTP_OK);
+
+  if not Result then
     fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
 end;
 
@@ -992,9 +2358,10 @@ begin
   Result := fPSP.NivelLog;
 end;
 
-procedure TACBrPixEndPoint.RegistrarLog(const ALinha: String);
+procedure TACBrPixEndPoint.RegistrarLog(const ALinha: String; aNivelMin: Integer);
 begin
-  fPSP.RegistrarLog(ALinha);
+  if (NivelLog >= aNivelMin) then
+    fPSP.RegistrarLog(ALinha);
 end;
 
 constructor TACBrPixEndPoint.Create(AOwner: TACBrPSP);
@@ -1188,7 +2555,7 @@ begin
   if (Trim(e2eid) = '') then
     raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['e2eid']);
 
-  if (Trim(idDevolucao) = '') then
+  if (Trim(idDevolucao) = '') and Assigned(fPSP) and fPSP.IsBacen then
     raise EACBrPixException.CreateFmt(ACBrStr(sErroParametroInvalido), ['idDevolucao']);
 
   Clear;
@@ -1206,6 +2573,18 @@ begin
 end;
 
 { TACBrPixEndPointCob }
+
+procedure TACBrPixEndPointCob.VerificarCopiaECola;
+begin
+  try
+    if EstaVazio(Trim(CobGerada.pixCopiaECola)) and Assigned(fPSP.ACBrPixCD) and
+       NaoEstaVazio(CobGerada.location) and
+       NaoEstaVazio(fPSP.ACBrPixCD.Recebedor.Nome) and
+       NaoEstaVazio(fPSP.ACBrPixCD.Recebedor.Cidade) then
+      CobGerada.pixCopiaECola := fPSP.ACBrPixCD.GerarQRCodeDinamico(CobGerada.location);
+  except
+  end;
+end;
 
 constructor TACBrPixEndPointCob.Create(AOwner: TACBrPSP);
 begin
@@ -1279,7 +2658,10 @@ begin
   Result := (ResultCode = HTTP_CREATED);
 
   if Result then
-    fCobGerada.AsJSON := String(RespostaHttp)
+  begin
+    fCobGerada.AsJSON := String(RespostaHttp);
+    VerificarCopiaECola;
+  end
   else
     fPSP.TratarRetornoComErro(ResultCode, RespostaHttp, Problema);
 end;
@@ -1457,8 +2839,15 @@ begin
   fHttpSend.OutputStream := fHttpRespStream;
 
   fepPix := TACBrPixEndPointPix.Create(Self);
+  fepRec := TACBrPixEndPointRec.Create(Self);
   fepCob := TACBrPixEndPointCob.Create(Self);
   fepCobV := TACBrPixEndPointCobV.Create(Self);
+  fepCobR := TACBrPixEndPointCobR.Create(Self);
+  fepLocRec := TACBrPixEndPointLocRec.Create(Self);
+  fepSolicRec := TACBrPixEndPointSolicRec.Create(Self);
+  fepWebhook := TACBrPixEndPointWebhook.Create(Self);
+  fepWebhookRec := TACBrPixEndPointWebhookRec.Create(Self);
+  fepWebhookCobR := TACBrPixEndPointWebhookCobR.Create(Self);
   fURLQueryParams := TACBrQueryParams.Create;
   fURLPathParams := TStringList.Create;
   fScopes := [scCobWrite, scCobRead, scPixWrite, scPixRead];
@@ -1476,8 +2865,15 @@ begin
   fHttpSend.Free;
   fHttpRespStream.Free;
   fepPix.Free;
+  fepRec.Free;
   fepCob.Free;
   fepCobV.Free;
+  fepCobR.Free;
+  fepLocRec.Free;
+  fepSolicRec.Free;
+  fepWebhook.Free;
+  fepWebhookRec.Free;
+  fepWebhookCobR.Free;
   fURLQueryParams.Free;
   fURLPathParams.Free;
 
@@ -1489,8 +2885,15 @@ begin
   fHttpSend.Clear;
   fURLQueryParams.Clear;
   fepPix.Clear;
+  fepRec.Clear;
   fepCob.Clear;
   fepCobV.Clear;
+  fepCobR.Clear;
+  fepLocRec.Clear;
+  fepSolicRec.Clear;
+  fepWebhook.Clear;
+  fepWebhookRec.Clear;
+  fepWebhookCobR.Clear;
 end;
 
 procedure TACBrPSP.SetACBrPixCD(AValue: TACBrPixCD);
@@ -1539,10 +2942,10 @@ begin
   raise E;
 end;
 
-procedure TACBrPSP.RegistrarLog(const ALinha: String);
+procedure TACBrPSP.RegistrarLog(const ALinha: String; aNivelLog: Integer);
 begin
   if Assigned(fPixCD) then
-    fPixCD.RegistrarLog(ALinha);
+    fPixCD.RegistrarLog(ALinha, aNivelLog);
 end;
 
 function TACBrPSP.GetClientID: String;
@@ -1780,14 +3183,26 @@ begin
     scCobRead: Result := 'cob.read';
     scCobVWrite: Result := 'cobv.write';
     scCobVRead: Result := 'cobv.read';
+    scCobRWrite: Result := 'cobr.write';
+    scCobRRead: Result := 'cobr.read';
     scLoteCobVWrite: Result := 'lotecobv.write';
     scLoteCobVRead: Result := 'lotecobv.read';
     scPixWrite: Result := 'pix.write';
     scPixRead: Result := 'pix.read';
     scWebhookWrite: Result := 'webhook.write';
     scWebhookRead: Result := 'webhook.read';
+    scWebhookRecWrite: Result := 'webhookrec.write';
+    scWebhookRecRead: Result := 'webhookrec.read';
+    scWebhookCobRWrite: Result := 'webhookcobr.write';
+    scWebhookCobRRead: Result := 'webhookcobr.read';
     scPayloadLocationWrite: Result := 'payloadlocation.write';
     scPayloadLocationRead: Result := 'payloadlocation.read';
+    scPayloadLocationRecWrite: Result := 'payloadlocationrec.write';
+    scPayloadLocationRecRead: Result := 'payloadlocationrec.read';
+    scRecWrite: Result := 'rec.write';
+    scRecRead: Result := 'rec.read';
+    scSolicRecWrite: Result := 'solicrec.write';
+    scSolicRecRead: Result := 'solicrec.read';
   end;
 end;
 
@@ -1906,7 +3321,7 @@ end;
 function TACBrPSP.TransmitirHttp(const AMethod, AURL: String; out
   ResultCode: Integer; out RespostaHttp: AnsiString): Boolean;
 var
-  vMethod, vURL, vLocation, vReqHeader: String;
+  vMethod, vURL, vLocation, vReqHeader, wCertLog: String;
   vHttpBody, vMimeType: AnsiString;
   ContRedir: Integer;
 
@@ -1917,16 +3332,20 @@ var
     ChamarEventoQuandoTransmitirHttp(vURL, vMethod);
     if (NivelLog > 2) then
     begin
-      RegistrarLog('  Req.Headers:'+ sLineBreak + vReqHeader);
+      RegistrarLog('  Req.Headers:'+ sLineBreak + fHTTPSend.Headers.Text);
       RegistrarLog('  Req.Body:'+ sLineBreak + vHttpBody);
     end;
 
-    if (NivelLog > 3) then
-      RegistrarLog(sLineBreak +
-        'Http.Sock.SSL.CertificateFile: ' + Http.Sock.SSL.CertificateFile + sLineBreak +
-        'Http.Sock.SSL.PrivateKeyFile: ' + Http.Sock.SSL.PrivateKeyFile + sLineBreak +
-        'Http.Sock.SSL.Certificate: ' + Http.Sock.SSL.Certificate + sLineBreak +
-        'Http.Sock.SSL.PrivateKey: ' + Http.Sock.SSL.PrivateKey + sLineBreak);
+    wCertLog :=
+      IfThen(NaoEstaVazio(Http.Sock.SSL.PFX), 'Http.Sock.SSL.PFX: ' + Http.Sock.SSL.PFX + sLineBreak) +
+      IfThen(NaoEstaVazio(Http.Sock.SSL.PrivateKey), 'Http.Sock.SSL.PrivateKey: ' + Http.Sock.SSL.PrivateKey + sLineBreak) +
+      IfThen(NaoEstaVazio(Http.Sock.SSL.Certificate), 'Http.Sock.SSL.Certificate: ' + Http.Sock.SSL.Certificate + sLineBreak) +
+      IfThen(NaoEstaVazio(Http.Sock.SSL.PrivateKeyFile), 'Http.Sock.SSL.PrivateKeyFile: ' + Http.Sock.SSL.PrivateKeyFile + sLineBreak) +
+      IfThen(NaoEstaVazio(Http.Sock.SSL.CertificateFile), 'Http.Sock.SSL.CertificateFile: ' + Http.Sock.SSL.CertificateFile + sLineBreak);
+
+    // Registra o log apenas se uma das propriedades estiverem configuradas
+    if NaoEstaVazio(wCertLog) then
+      RegistrarLog(sLineBreak + wCertLog, 4);
 
     fHttpRespStream.Clear;
     Result := fHttpSend.HTTPMethod(vMethod, vURL);  // HTTP call
@@ -2362,7 +3781,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TACBrPixCD.RegistrarLog(const ALinha: String);
+procedure TACBrPixCD.RegistrarLog(const ALinha: String; aNivelLog: Integer);
 var
   Tratado: Boolean;
 begin
@@ -2370,7 +3789,7 @@ begin
   if Assigned(fQuandoGravarLog) then
     fQuandoGravarLog(ALinha, Tratado);
 
-  if not Tratado then
+  if not Tratado and (NivelLog >= aNivelLog) then
     GravarLogEmArquivo(ALinha);
 end;
 

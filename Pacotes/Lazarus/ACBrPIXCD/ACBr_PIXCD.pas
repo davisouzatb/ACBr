@@ -22,8 +22,11 @@ uses
   ACBrPIXSchemasCobsConsultadas, ACBrPIXSchemasCobV, 
   ACBrPIXSchemasCobsVConsultadas, ACBrPIXSchemasLoteCobV, 
   ACBrPIXSchemasParametrosConsultaLote, ACBrPIXSchemasLotesCobVConsultadas, 
-  ACBrShipaySchemas, ACBrSchemasMatera, ACBrSchemasGate2All, ACBrPIXPSPC6Bank, 
-  LazarusPackageIntf;
+  ACBrPIXSchemasWebhook, ACBrPIXSchemasRecAtualizacao, 
+  ACBrPIXSchemasRecParticipantes, ACBrPIXSchemasRecBase, ACBrPIXSchemasRec, 
+  ACBrPIXSchemasSolicRec, ACBrPIXSchemasCobR, ACBrShipaySchemas, 
+  ACBrSchemasMatera, ACBrSchemasGate2All, ACBrPIXPSPC6Bank, ACBrPIXPSPAppLess, 
+  ACBrSchemasAppLess, LazarusPackageIntf;
 
 implementation
 

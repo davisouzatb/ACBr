@@ -180,7 +180,7 @@ type
 
 const
   TTipoDataPeriodoArrayStrings: array[TpcteTipoDataPeriodo] of string = ('0',
-    '1', '2', '3', '4', 'N');
+    '1', '2', '3', '4', '-1');
 
 type
   TpcteTipoHorarioIntervalo = (thSemHorario, thNoHorario, thAteHorario,
@@ -188,7 +188,7 @@ type
 
 const
   TTipoHorarioIntervaloArrayStrings: array[TpcteTipoHorarioIntervalo]
-     of string = ('0', '1', '2', '3', '4', 'N');
+     of string = ('0', '1', '2', '3', '4', '-1');
 
 type
   TpcteTipoDocumento = (tdDeclaracao, tdDutoviario, tdCFeSAT, tdNFCe, tdOutros);
@@ -318,6 +318,18 @@ type
 const
   TtpPrestArrayStrings: array[TtpPrest] of string = ('1', '2');
 
+type
+  TclassDuto = (tcdNenhum, tcdGasoduto, tcdMineroduto, tcdOleoduto);
+
+const
+  TclassDutoArrayStrings: array[TclassDuto] of string = ('', '1', '2', '3');
+
+type
+  TtpContratacao = (tcNenhum, tcPontaPonto, tcCapacidadeEntrada, tcCapacidadeSaida);
+
+const
+  TtpContratacaoArrayStrings: array[TtpContratacao] of string = ('', '1', '2', '3');
+
 {
   Declaração das funções de conversão
 }
@@ -438,11 +450,16 @@ function tpMotivoToDesc(const t: TtpMotivo): string;
 function tpPrestToStr(const t: TtpPrest): string;
 function StrTotpPrest(out ok: boolean; const s: string): TtpPrest;
 
+function classDutoToStr(const t: TclassDuto): string;
+function StrToclassDuto(out ok: boolean; const s: string): TclassDuto;
+
+function tpContratacaoToStr(const t: TtpContratacao): string;
+function StrTotpContratacao(out ok: boolean; const s: string): TtpContratacao;
+
 implementation
 
 uses
   typinfo;
-
 
 function ModeloNFToStr(const t: TpcteModeloNF): string;
 begin
@@ -756,28 +773,28 @@ end;
 
 function TpDataPeriodoToStr(const t: TpcteTipoDataPeriodo): string;
 begin
-  result := EnumeradoToStr(t, ['0','1','2','3','4','N'],
+  result := EnumeradoToStr(t, ['0','1','2','3','4','-1'],
                               [tdSemData, tdNaData, tdAteData, tdApartirData,
                                tdNoPeriodo, tdNaoInformado]);
 end;
 
 function StrToTpDataPeriodo(out ok: boolean; const s: string): TpcteTipoDataPeriodo;
 begin
-  result := StrToEnumerado(ok, s, ['0','1','2','3','4','N'],
+  result := StrToEnumerado(ok, s, ['0','1','2','3','4','-1'],
                                   [tdSemData, tdNaData, tdAteData, tdApartirData,
                                    tdNoPeriodo, tdNaoInformado]);
 end;
 
 function TpHorarioIntervaloToStr(const t: TpcteTipoHorarioIntervalo): string;
 begin
-  result := EnumeradoToStr(t, ['0','1','2','3','4','N'],
+  result := EnumeradoToStr(t, ['0','1','2','3','4','-1'],
                               [thSemHorario, thNoHorario, thAteHorario,
                                thApartirHorario, thNoIntervalo, thNaoInformado]);
 end;
 
 function StrToTpHorarioIntervalo(out ok: boolean; const s: string): TpcteTipoHorarioIntervalo;
 begin
-  result := StrToEnumerado(ok, s, ['0','1','2','3','4','N'],
+  result := StrToEnumerado(ok, s, ['0','1','2','3','4','-1'],
                                   [thSemHorario, thNoHorario, thAteHorario,
                                    thApartirHorario, thNoIntervalo, thNaoInformado]);
 end;
@@ -1095,6 +1112,46 @@ function StrTotpPrest(out ok: boolean; const s: string): TtpPrest;
 begin
   result := StrToEnumerado(ok, s, ['1', '2'],
     [tpTotal, tpParcial]);
+end;
+
+function classDutoToStr(const t: TclassDuto): string;
+begin
+  Result := TclassDutoArrayStrings[t];
+end;
+
+function StrToclassDuto(out ok: boolean; const s: string): TclassDuto;
+var
+  idx: TclassDuto;
+begin
+  for idx:= Low(TclassDutoArrayStrings) to High(TclassDutoArrayStrings) do
+  begin
+    if(TclassDutoArrayStrings[idx] = s)then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TclassDuto: %s', [s]);
+end;
+
+function tpContratacaoToStr(const t: TtpContratacao): string;
+begin
+  Result := TtpContratacaoArrayStrings[t];
+end;
+
+function StrTotpContratacao(out ok: boolean; const s: string): TtpContratacao;
+var
+  idx: TtpContratacao;
+begin
+  for idx:= Low(TtpContratacaoArrayStrings) to High(TtpContratacaoArrayStrings) do
+  begin
+    if(TtpContratacaoArrayStrings[idx] = s)then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TtpContratacao: %s', [s]);
 end;
 
 initialization

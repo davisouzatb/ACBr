@@ -45,6 +45,113 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+26/07/2025
+-- ACBrBPeXmlWriter --
+[*] Ajuste nas condições para gerar o grupo gRed.
+   Por: Italo Giurizzato Junior
+
+24/07/2025
+-- Diversos --
+[*] #TK-7370: Implementado a versão 1.06 da NT da Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+18/07/2025
+-- ACBrBPeXmlWriter --
+[*] Correção no tamanho mínimo e máximo da tag idCSRT.
+   Por: Italo Giurizzato Junior
+
+17/06/2025
+-- ACBrBPeWebServices --
+[*] #TK-7205: Melhorias no Consultar visando salvar o XML do evento retornado 
+    levando em consideração da data/hora de emissão do evento.
+  Por: Luiz Alberto da Silva Lope
+
+11/06/2025
+-- ACBrBPeXmlWriter --
+[*] Correção no nome da constante e inclusão de uma nova constante.
+   Por: Italo Giurizzato Junior
+
+09/06/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a versão 1.05 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+06/06/2025
+-- ACBrBPeBilhetes --
+[+] Implementado os parâmetros: ManterPDFSalvo e sBCC no método: EnviarEmail.
+  Por: Mateus Brunelli/Italo Giurizzato Junior
+
+26/05/2025
+-- Diversos --
+[*] O campo cCredPres que antes era do tipo Integer agora é do tipo TcCredPres.
+  Por: Italo Giurizzato Junior
+
+21/05/2025
+-- Diversos --
+[*] Alteração visando usar a unit ACBrDFe.Conversao que contem os tipos e funções
+    da Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+20/05/2025
+-- ACBrBPeEnvEvento --
+[-] Comentado a chamada a uma unit que ainda não esta disponível.
+  Por: Italo Giurizzato Junior
+[*] Ajustes necessários para deixar em conformidade com a versão 1.02 dos Schemas.
+  Por: Italo Giurizzato Junior
+
+28/04/2025
+[*] Ajustes necessários para deixar em conformidade com a versão 1.01a dos Schemas.
+  Por: Italo Giurizzato Junior
+
+23/04/2025
+-- ACBrBPeWebServices --
+[*] #TK-6785: Adiciona chamada a rotina AjustarOpcoes no envio de eventos do BP-e.
+  Por: Diego Folieni
+
+16/04/2025
+-- Diversos --
+[*] Ajustes necessários para deixar em conformidade com a NT2025/001 versão 1.01.
+-- Diversos --
+[*] #TK-6831: Ajustes necessários para deixar em conformidade com a NT2025/001.
+  Por: Italo Giurizzato Junior
+
+02/04/2025
+-- Diversos --
+[*] #TK-5814: Ajustes nas units: ACBrBPeIniReader e ACBrBPeIniWrite que
+    são ser responsáveis por ler e gerar o arquivo INI para atender a Reforma
+    Tributária.
+    Refatorado a função GetURLQRCode para que a mesma receba a classe TBPe em 
+    vez de diversos parâmetros de entrada.
+    Implementado a propriedade de configuração: SalvarEvento (valor padrão False)
+    agora ao salvar o XML *-procEventoCTe o componente vai checar o valor dessa 
+    propriedade.
+    Alterado a URL do QR-Code de MG.
+  Por: Italo Giurizzato Junior
+
+08/03/2025
+-- ACBrBPeClass/ACBrBPeXmlReader/ACBrBPeXmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+27/02/2025
+-- ACBrBPeIniReader/ACBrBPeIniWriter --
+[*] O conteúdo das funções: GerarBPeIni e LerArqIni foram migrados para units
+    especializadas em gerar e ler o arquivo INI que contem informações do BPe.
+  Por: Italo Giurizzato Junior
+-- ACBrBPeXmlWriter --
+[*] #TK-5814: Alteração visando contemplar a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+
+14/02/2025
+-- ACBrBPeClass/ACBrBPeConsts --
+[+] Inclusão de novas contantes e ajustes nas novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+10/02/2025
+-- ACBrBPeClass --
+[+] Inclusão das novas classes para atender a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
 08/01/2025
 -- Diversos --
 [*] Ajustes na geração do XML de eventos para usar o ACBrXmlDocument.

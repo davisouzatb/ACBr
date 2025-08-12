@@ -38,6 +38,7 @@ interface
 
 uses
   SysUtils, Classes,
+  ACBrDFe.Conversao,
   ACBrXmlBase, ACBrXmlDocument,
   ACBrNFSeXProviderBase, ACBrNFSeXWebservicesResponse;
 
@@ -50,9 +51,11 @@ type
 
     procedure Configuracao; override;
 
-    procedure LerCancelamento(const ANode: TACBrXmlNode; const Response: TNFSeWebServiceResponse);
+    procedure LerCancelamento(const ANode: TACBrXmlNode;
+      const Response: TNFSeWebServiceResponse); virtual;
 
-    procedure LerSubstituicao(const ANode: TACBrXmlNode; const Response: TNFSeWebServiceResponse);
+    procedure LerSubstituicao(const ANode: TACBrXmlNode;
+      const Response: TNFSeWebServiceResponse);
 
     function PreencherNotaRespostaConsultaLoteRps(Node, parentNode: TACBrXmlNode;
       Response: TNFSeConsultaLoteRpsResponse): Boolean;
@@ -1530,7 +1533,7 @@ procedure TACBrNFSeProviderABRASFv2.PrepararConsultaNFSeServicoPrestado(
   Response: TNFSeConsultaNFSeResponse);
 var
   aParams: TNFSeParamsResponse;
-  XmlConsulta, NameSpace, Prefixo, PrefixoTS: string;
+  XmlConsulta, NameSpace, Prefixo, PrefixoTS, TagPeriodo: string;
 begin
   Prefixo := '';
   PrefixoTS := '';
@@ -1578,16 +1581,21 @@ begin
   else
     XmlConsulta := '';
 
+  if Response.InfConsultaNFSe.tpPeriodo = tpEmissao then
+    TagPeriodo := 'PeriodoEmissao'
+  else
+    TagPeriodo := 'PeriodoCompetencia';
+
   if (Response.InfConsultaNFSe.DataInicial > 0) and (Response.InfConsultaNFSe.DataFinal > 0) then
     XmlConsulta := XmlConsulta +
-                     '<' + Prefixo + 'PeriodoEmissao>' +
-                       '<' + PrefixoTS + 'DataInicial>' +
+                     '<' + Prefixo + TagPeriodo + '>' +
+                       '<' + Prefixo + 'DataInicial>' +
                           FormatDateTime('yyyy-mm-dd', Response.InfConsultaNFSe.DataInicial) +
-                       '</' + PrefixoTS + 'DataInicial>' +
-                       '<' + PrefixoTS + 'DataFinal>' +
+                       '</' + Prefixo + 'DataInicial>' +
+                       '<' + Prefixo + 'DataFinal>' +
                           FormatDateTime('yyyy-mm-dd', Response.InfConsultaNFSe.DataFinal) +
-                       '</' + PrefixoTS + 'DataFinal>' +
-                     '</' + Prefixo + 'PeriodoEmissao>';
+                       '</' + Prefixo + 'DataFinal>' +
+                     '</' + Prefixo + TagPeriodo + '>';
 
   if NaoEstaVAzio(Response.InfConsultaNFSe.CNPJTomador) then
   begin
@@ -1791,7 +1799,7 @@ procedure TACBrNFSeProviderABRASFv2.PrepararConsultaNFSeServicoTomado(
   Response: TNFSeConsultaNFSeResponse);
 var
   aParams: TNFSeParamsResponse;
-  XmlConsulta, NameSpace, Prefixo, PrefixoTS: string;
+  XmlConsulta, NameSpace, Prefixo, PrefixoTS, TagPeriodo: string;
 begin
   Prefixo := '';
   PrefixoTS := '';
@@ -1839,16 +1847,21 @@ begin
   else
     XmlConsulta := '';
 
+  if Response.InfConsultaNFSe.tpPeriodo = tpEmissao then
+    TagPeriodo := 'PeriodoEmissao'
+  else
+    TagPeriodo := 'PeriodoCompetencia';
+
   if (Response.InfConsultaNFSe.DataInicial > 0) and (Response.InfConsultaNFSe.DataFinal > 0) then
     XmlConsulta := XmlConsulta +
-                     '<' + Prefixo + 'PeriodoEmissao>' +
-                       '<' + PrefixoTS + 'DataInicial>' +
+                     '<' + Prefixo + TagPeriodo + '>' +
+                       '<' + Prefixo + 'DataInicial>' +
                           FormatDateTime('yyyy-mm-dd', Response.InfConsultaNFSe.DataInicial) +
-                       '</' + PrefixoTS + 'DataInicial>' +
-                       '<' + PrefixoTS + 'DataFinal>' +
+                       '</' + Prefixo + 'DataInicial>' +
+                       '<' + Prefixo + 'DataFinal>' +
                           FormatDateTime('yyyy-mm-dd', Response.InfConsultaNFSe.DataFinal) +
-                       '</' + PrefixoTS + 'DataFinal>' +
-                     '</' + Prefixo + 'PeriodoEmissao>';
+                       '</' + Prefixo + 'DataFinal>' +
+                     '</' + Prefixo + TagPeriodo + '>';
 
   if NaoEstaVAzio(Response.InfConsultaNFSe.CNPJPrestador) then
   begin
@@ -2369,7 +2382,7 @@ begin
                             SepararDados(Response.ArquivoRetorno, 'DataHora', True) +
                          '</Cancelamento>';
 
-        SalvarXmlCancelamento(Ret.Pedido.InfID.ID + '-procCancNFSe', xCancelamento);
+        SalvarXmlCancelamento(Ret.Pedido.InfID.ID + '-procCancNFSe', xCancelamento, Response.PathNome);
       end
       else
       begin
@@ -2559,12 +2572,14 @@ begin
     if Assigned(AuxNode) then
     begin
       Response.DataCanc := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('DataHora'), FpFormatoDataHora);
-      Response.DescSituacao := '';
+
+      Response.SucessoCanc := Response.DataCanc > 0;
     end;
 
-    if Response.DataCanc > 0 then
-      Response.DescSituacao := 'Nota Cancelada';
+    Response.DescSituacao := '';
 
+    if (Response.DataCanc > 0) and (Response.SucessoCanc) then
+      Response.DescSituacao := 'Nota Cancelada';
   end;
 end;
 

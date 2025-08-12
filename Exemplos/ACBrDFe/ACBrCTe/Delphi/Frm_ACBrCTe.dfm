@@ -1366,7 +1366,7 @@ object frmACBrCTe: TfrmACBrCTe
     TabOrder = 1
     object pgcBotoes: TPageControl
       Left = 1
-      Top = 1
+      Top = 41
       Width = 567
       Height = 197
       ActivePage = tsEnvios
@@ -1376,8 +1376,8 @@ object frmACBrCTe: TfrmACBrCTe
         Caption = 'Envios'
         ImageIndex = 2
         object btnValidarRegrasNegocio: TButton
-          Left = 9
-          Top = 71
+          Left = 7
+          Top = 40
           Width = 177
           Height = 25
           Caption = 'Validar Regras de Neg'#243'cio'
@@ -1394,8 +1394,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnGerarXMLClick
         end
         object btnGerarPDF: TButton
-          Left = 375
-          Top = 102
+          Left = 373
+          Top = 71
           Width = 177
           Height = 25
           Caption = 'Gerar PDF'
@@ -1403,8 +1403,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnGerarPDFClick
         end
         object btnValidarXML: TButton
-          Left = 192
-          Top = 71
+          Left = 190
+          Top = 40
           Width = 177
           Height = 25
           Caption = 'Validar XML'
@@ -1412,8 +1412,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnValidarXMLClick
         end
         object btnImprimir: TButton
-          Left = 192
-          Top = 102
+          Left = 190
+          Top = 71
           Width = 177
           Height = 25
           Caption = 'Imprimir DACTE'
@@ -1421,8 +1421,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnImprimirClick
         end
         object btnEnviarEmail: TButton
-          Left = 9
-          Top = 133
+          Left = 7
+          Top = 102
           Width = 177
           Height = 25
           Caption = 'Enviar CTe Email'
@@ -1430,8 +1430,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnEnviarEmailClick
         end
         object btnAdicionarProtocolo: TButton
-          Left = 9
-          Top = 102
+          Left = 7
+          Top = 71
           Width = 177
           Height = 25
           Caption = 'Adicionar Protocolo ao XML'
@@ -1448,8 +1448,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnCarregarXMLEnviarClick
         end
         object btnValidarAssinatura: TButton
-          Left = 375
-          Top = 71
+          Left = 373
+          Top = 40
           Width = 177
           Height = 25
           Caption = 'Validar Assinatura'
@@ -1465,24 +1465,6 @@ object frmACBrCTe: TfrmACBrCTe
           TabOrder = 9
           OnClick = btnCriarEnviarSincronoClick
         end
-        object btnGerarArqINI: TButton
-          Left = 9
-          Top = 40
-          Width = 177
-          Height = 25
-          Caption = 'Gerar Arquivo INI'
-          TabOrder = 10
-          OnClick = btnGerarArqINIClick
-        end
-        object btnLerArqINI: TButton
-          Left = 192
-          Top = 40
-          Width = 177
-          Height = 25
-          Caption = 'Ler Arquivo INI/Gerar XML'
-          TabOrder = 11
-          OnClick = btnLerArqINIClick
-        end
       end
       object tsConsultas: TTabSheet
         Caption = 'Consultas'
@@ -1497,8 +1479,8 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnConsultarClick
         end
         object btnConsultarChave: TButton
-          Left = 8
-          Top = 40
+          Left = 374
+          Top = 9
           Width = 177
           Height = 25
           Caption = 'Consultar pela Chave'
@@ -1506,7 +1488,7 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnConsultarChaveClick
         end
         object btnConsCad: TButton
-          Left = 192
+          Left = 8
           Top = 40
           Width = 177
           Height = 25
@@ -1514,22 +1496,13 @@ object frmACBrCTe: TfrmACBrCTe
           TabOrder = 2
           OnClick = btnConsCadClick
         end
-        object btnConsultarRecibo: TButton
-          Left = 376
-          Top = 8
-          Width = 177
-          Height = 25
-          Caption = 'Consultar Recibo Lote'
-          TabOrder = 3
-          OnClick = btnConsultarReciboClick
-        end
         object btnStatusServ: TButton
           Left = 8
           Top = 9
           Width = 177
           Height = 25
           Caption = ' Status de Servi'#231'o'
-          TabOrder = 4
+          TabOrder = 3
           OnClick = btnStatusServClick
         end
       end
@@ -1648,31 +1621,22 @@ object frmACBrCTe: TfrmACBrCTe
       object tsInutilizacao: TTabSheet
         Caption = 'Inutiliza'#231#227'o'
         ImageIndex = 5
-        object btnInutilizar: TButton
+        object btnInutilizarImprimir: TButton
           Left = 8
           Top = 9
           Width = 177
           Height = 25
-          Caption = 'Inutilizar Numera'#231#227'o'
-          TabOrder = 0
-          OnClick = btnInutilizarClick
-        end
-        object btnInutilizarImprimir: TButton
-          Left = 191
-          Top = 9
-          Width = 177
-          Height = 25
           Caption = 'Inutilizar Imprimir'
-          TabOrder = 1
+          TabOrder = 0
           OnClick = btnInutilizarImprimirClick
         end
         object btnGerarPDFInut: TButton
-          Left = 374
+          Left = 194
           Top = 9
           Width = 177
           Height = 25
           Caption = 'Gerar PDF Inutiliza'#231#227'o'
-          TabOrder = 2
+          TabOrder = 1
           OnClick = btnGerarPDFInutClick
         end
       end
@@ -1707,13 +1671,35 @@ object frmACBrCTe: TfrmACBrCTe
           OnClick = btnDistrDFePorChaveClick
         end
       end
+      object tsOutros: TTabSheet
+        Caption = 'Outros'
+        ImageIndex = 5
+        object btnGerarArqINI: TButton
+          Left = 186
+          Top = 3
+          Width = 177
+          Height = 25
+          Caption = 'Gerar Arquivo INI'
+          TabOrder = 0
+          OnClick = btnGerarArqINIClick
+        end
+        object btnLerArqINI: TButton
+          Left = 3
+          Top = 3
+          Width = 177
+          Height = 25
+          Caption = 'Ler Arquivo INI/Gerar XML'
+          TabOrder = 1
+          OnClick = btnLerArqINIClick
+        end
+      end
     end
     object pgRespostas: TPageControl
       Left = 1
-      Top = 198
+      Top = 238
       Width = 567
-      Height = 413
-      ActivePage = Dados
+      Height = 373
+      ActivePage = TabSheet5
       Align = alClient
       TabOrder = 1
       object TabSheet5: TTabSheet
@@ -1722,7 +1708,7 @@ object frmACBrCTe: TfrmACBrCTe
           Left = 0
           Top = 0
           Width = 559
-          Height = 385
+          Height = 345
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1735,11 +1721,11 @@ object frmACBrCTe: TfrmACBrCTe
           Left = 0
           Top = 0
           Width = 559
-          Height = 385
+          Height = 345
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000C6390000CA2700000000000000000000000000000000000000000000
+            4C000000C6390000A82300000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1753,7 +1739,7 @@ object frmACBrCTe: TfrmACBrCTe
           Left = 0
           Top = 0
           Width = 559
-          Height = 385
+          Height = 345
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1766,7 +1752,7 @@ object frmACBrCTe: TfrmACBrCTe
           Left = 0
           Top = 0
           Width = 559
-          Height = 385
+          Height = 345
           Align = alClient
           Indent = 19
           TabOrder = 0
@@ -1779,7 +1765,7 @@ object frmACBrCTe: TfrmACBrCTe
           Left = 0
           Top = 0
           Width = 559
-          Height = 385
+          Height = 345
           Align = alClient
           ScrollBars = ssVertical
           TabOrder = 0
@@ -1792,7 +1778,7 @@ object frmACBrCTe: TfrmACBrCTe
           Left = 0
           Top = 0
           Width = 559
-          Height = 385
+          Height = 345
           Align = alClient
           Lines.Strings = (
             '')
@@ -1800,6 +1786,26 @@ object frmACBrCTe: TfrmACBrCTe
           TabOrder = 0
         end
       end
+    end
+    object rgReformaTributaria: TRadioGroup
+      Left = 1
+      Top = 1
+      Width = 567
+      Height = 40
+      Align = alTop
+      Caption = 'Gera os campos da ReformaTributaria'
+      Columns = 2
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ItemIndex = 1
+      Items.Strings = (
+        'Sim'
+        'N'#227'o')
+      ParentFont = False
+      TabOrder = 2
     end
   end
   object ACBrMail1: TACBrMail
@@ -1811,7 +1817,7 @@ object frmACBrCTe: TfrmACBrCTe
     DefaultCharset = UTF_8
     IDECharset = CP1252
     Left = 330
-    Top = 287
+    Top = 335
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = '*-nfe.XML'
@@ -1820,7 +1826,7 @@ object frmACBrCTe: TfrmACBrCTe
       'dos os Arquivos (*.*)|*.*'
     Title = 'Selecione a NFe'
     Left = 427
-    Top = 287
+    Top = 335
   end
   object ACBrCTe1: TACBrCTe
     MAIL = ACBrMail1
@@ -1838,7 +1844,7 @@ object frmACBrCTe: TfrmACBrCTe
     Configuracoes.RespTec.IdCSRT = 0
     DACTE = ACBrCTeDACTeRL1
     Left = 330
-    Top = 239
+    Top = 279
   end
   object ACBrCTeDACTeRL1: TACBrCTeDACTeRL
     Sistema = 'Projeto ACBr - www.projetoacbr.com.br'
@@ -1870,6 +1876,6 @@ object frmACBrCTe: TfrmACBrCTe
     ImprimeDescPorc = False
     PrintDialog = True
     Left = 430
-    Top = 238
+    Top = 278
   end
 end

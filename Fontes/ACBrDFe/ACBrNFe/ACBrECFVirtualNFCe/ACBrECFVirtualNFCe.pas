@@ -752,23 +752,11 @@ begin
           if NotasFiscais.Items[0].NFe.Det[i].Prod.cProd <> cItemCancelado then
           begin
             if fpCupom.DescAcresSubtotal > 0 then
-            begin
-              NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro := NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro + ItDescAcre[i];
-              if NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC > 0 then
-              begin
-                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC   := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC + ItDescAcre[i];
-                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vICMS := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC * (NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.pICMS/100);
-              end;
-            end
+              NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro :=
+                NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro + ItDescAcre[i]
             else
-            begin
-              NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc := NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc + ItDescAcre[i];
-              if NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC > 0 then
-              begin
-                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC   := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC - ItDescAcre[i];
-                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vICMS := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC * (NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.pICMS/100);
-              end;
-            end;
+              NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc :=
+                NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc + ItDescAcre[i];
           end;
         end;
       end;

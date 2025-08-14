@@ -43,6 +43,22 @@ Símbolo : Significado
 [-]     : Correção de Bug (assim esperamos)
 
 
+13/08/2025
+-- ACBrNFSeXProviderABRASFv1/ACBrNFSeXProviderABRASFv2/ACBrNFSeXProviderBase --
+-- PadraoNacional.Provider --
+[*] #TK-7422: Ajustes visando a leitura da propriedade PathNome.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXWebservicesResponse --
+[*] Alteração visando não limpar a propriedade PathNome.
+   Por: Italo Giurizzato Junior
+
+12/08/2025
+-- ACBrNFSeXServicos --
+[*] Alterado de https para http a URL da cidade Jurinu/SP.
+   Por: Italo Giurizzato Junior
+[*] A cidade Teresopolis/RJ trocou de provedor, agora é Fiorilli.
+   Por: MagoSchmidt
+
 11/08/2025
 -- ACBrNFSeXConfiguracoes/AssessorPublico.Provider --
 [*] #TK-7432: Criado a propriedade de configuração CodigoImobiliario dentro de Emitente.

@@ -1000,6 +1000,8 @@ begin
       OnlyNumber(NFe.Retirada.fone), DSC_FONE));
     Result.AppendChild(AddNode(tcStr, 'F14', 'email', 01, 60, 0,
       NFe.Retirada.Email, DSC_EMAIL));
+    Result.AppendChild(AddNode(tcStr, 'F15', 'IE', 02, 14, 0,
+      OnlyNumber(NFe.Retirada.IE), DSC_IE));
   end;
 end;
 

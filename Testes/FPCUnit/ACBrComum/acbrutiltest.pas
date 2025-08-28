@@ -9,7 +9,7 @@ uses
   {$ifdef FPC}
   LConvEncoding,
   {$endif}
-  ACBrTests.Util;
+  ACBrTests.Util, ACBrBase;
 
 
 const
@@ -608,7 +608,18 @@ type
     procedure Decode64AndDeCompressGZip;
   end;
 
+  { ACBrURITeste }
 
+  ACBrURITeste = class(TTestCase)
+  private
+    fURI: TACBrURI;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure SetURI1;
+    procedure SetURI2;
+  end;
 
 implementation
 
@@ -909,6 +920,58 @@ begin
   ResultDeCompress := UnZip( DecodeBase64(fTituloCompressGZipAndEncoded64) );
 
   CheckEquals(ResultDeCompress, fTituloACBr);
+end;
+
+{ ACBrURITeste }
+
+procedure ACBrURITeste.SetUp;
+begin
+  inherited SetUp;
+  fURI := TACBrURI.Create;
+end;
+
+procedure ACBrURITeste.TearDown;
+begin
+  fURI.Free;
+  inherited TearDown;
+end;
+
+procedure ACBrURITeste.SetURI1;
+var
+  s: String;
+begin
+  s := 'app://payment/input?currencyCode=986&transactionId=1&amount=100&operation=VENDA';
+  fURI.URI := s;
+  CheckEquals(fURI.Scheme, 'app');
+  CheckEquals(fURI.Authority, 'payment');
+  CheckEquals(fURI.Path, 'input');
+  CheckEquals(fURI.Params.Count, 4);
+  CheckEquals(fURI.Params.Items[0].Nome,'currencyCode');
+  CheckEquals(fURI.Params.Items[0].AsString,'986');
+  CheckEquals(fURI.Params.Items[1].Nome,'transactionId');
+  CheckEquals(fURI.Params.Items[1].AsString,'1');
+  CheckEquals(fURI.Params.Items[2].Nome,'amount');
+  CheckEquals(fURI.Params.Items[2].AsString,'100');
+  CheckEquals(fURI.Params.Items[3].Nome,'operation');
+  CheckEquals(fURI.Params.Items[3].AsString,'VENDA');
+  CheckEquals(fURI.URI, s);
+end;
+
+procedure ACBrURITeste.SetURI2;
+var
+  s: String;
+begin
+  s := 'app://confirmation/confirmation?confirmationTransactionId=0000000000.0000.000000.0000.REDE-SUB&transactionStatus=CONFIRMADO_AUTOMATICO';
+  fURI.URI := s;
+  CheckEquals(fURI.Scheme, 'app');
+  CheckEquals(fURI.Authority, 'confirmation');
+  CheckEquals(fURI.Path, 'confirmation');
+  CheckEquals(fURI.Params.Count, 2);
+  CheckEquals(fURI.Params.Items[0].Nome,'confirmationTransactionId');
+  CheckEquals(fURI.Params.Items[0].AsString,'0000000000.0000.000000.0000.REDE-SUB');
+  CheckEquals(fURI.Params.Items[1].Nome,'transactionStatus');
+  CheckEquals(fURI.Params.Items[1].AsString,'CONFIRMADO_AUTOMATICO');
+  CheckEquals(fURI.URI, s);
 end;
 
 { ComparaValorTest }
@@ -3120,6 +3183,7 @@ initialization
   _RegisterTest('ACBrComum.ACBrUtil', EAN13Test);
   _RegisterTest('ACBrComum.ACBrUtil', ComparaValorTest);
   _RegisterTest('ACBrComum.ACBrUtil', ZipUnzip);
+  _RegisterTest('ACBrComum.ACBrBase', ACBrURITeste);
   //TODO: WriteToTXT, WriteLog,
 end.
 

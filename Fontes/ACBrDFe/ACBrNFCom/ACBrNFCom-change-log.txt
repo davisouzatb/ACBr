@@ -43,6 +43,16 @@ Símbolo : Significado
 [-]     : Correção de Bug (assim esperamos)
 
 
+19/08/2025
+-- Diversos --
+[*] O campo cClassTrib deixa de ser enumerado e passa a ser string.
+   Por: Italo Giurizzato Junior
+
+15/08/2025
+-- ACBrNFComXmlWriter --
+[*] #TK-7508: Ajustes na formatação no conteúdo do atributo: nItemAnt.
+   Por: jfelipetdsoft
+
 28/07/2025
 -- ACBrNFComWebServices/ACBrNFComEnvEvento/ACBrNFComRetConsSit/ACBrNFComRetEnvEvento --
 [*] #TK-7412: Ajustes para realizar corretamente a leitura do retorno de evento.

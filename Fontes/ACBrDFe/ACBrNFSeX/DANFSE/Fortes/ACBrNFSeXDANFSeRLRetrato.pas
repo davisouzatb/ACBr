@@ -502,6 +502,9 @@ begin
         ACBrStr(Servico.xItemListaServico));
     end;
 
+    if Servico.CodigoNBS <> '' then
+      rlmCodServico.Lines.Append('Código NBS: ' + Servico.CodigoNBS);
+
     if fpDANFSe.Atividade <> '' then
       rlmCodServico.Lines.Append('Atividade: ' + fpDANFSe.Atividade);
 
@@ -525,6 +528,7 @@ begin
   With fpNFSe do
   begin
     rllRegimeEspecial.Caption := ACBrStr(FProvider.RegimeEspecialTributacaoDescricao(RegimeEspecialTributacao));
+    RLLabel54.Visible := rllRegimeEspecial.Caption  <> '';
     rllNatOperacao.Lines.Text := ACBrStr(FProvider.NaturezaOperacaoDescricao(NaturezaOperacao));
     MostrarNaturezaOperacao := rllNatOperacao.Caption <> '';
     RLLabel137.Visible := MostrarNaturezaOperacao;

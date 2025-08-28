@@ -1301,7 +1301,7 @@ begin
 
   Result.AppendChild(AddNode(tcStr, 'I30', 'xPed', 01, 15, 0,
     NFe.Det[i].Prod.xPed, DSC_XPED));
-  Result.AppendChild(AddNode(tcStr, 'I31', 'nItemPed', 06, 06, 0,
+  Result.AppendChild(AddNode(tcStr, 'I31', 'nItemPed', 01, 06, 0,
     OnlyNumber(NFe.Det[i].Prod.nItemPed), DSC_NITEMPED));
   Result.AppendChild(AddNode(tcStr, 'I70', 'nFCI', 36, 36, 0,
     NFe.Det[i].Prod.nFCI, DSC_NFCI));
@@ -4140,7 +4140,7 @@ begin
                                               CSTISToStr(ISel.CSTIS), DSC_CST));
 
   Result.AppendChild(AddNode(tcStr, 'UB04', 'cClassTribIS', 6, 6, 1,
-                         cClassTribISToStr(ISel.cClassTribIS), DSC_CCLASSTRIB));
+                                            ISel.cClassTribIS, DSC_CCLASSTRIB));
 
   if (ISel.vBCIS > 0) or (ISel.pIS > 0) or (ISel.uTrib <> '') or
      (ISel.qTrib > 0) or (ISel.vIS > 0) then
@@ -4173,16 +4173,16 @@ begin
   Result := nil;
   FpGerarGrupoIBSCBSTot := False;
 
-  if (IBSCBS.CST <> cstNenhum) and (IBSCBS.cClassTrib <> ctNenhum) then
+  if (IBSCBS.CST <> cstNenhum) and (IBSCBS.cClassTrib <> '') then
   begin
     FpGerarGrupoIBSCBSTot := True;
     Result := FDocument.CreateElement('IBSCBS');
 
-    Result.AppendChild(AddNode(tcStr, 'UB12', 'CST', 3, 3, 0,
+    Result.AppendChild(AddNode(tcStr, 'UB12', 'CST', 3, 3, 1,
                                           CSTIBSCBSToStr(IBSCBS.CST), DSC_CST));
 
-    Result.AppendChild(AddNode(tcStr, 'UB13', 'cClassTrib', 6, 6, 0,
-                           cClassTribToStr(IBSCBS.cClassTrib), DSC_CCLASSTRIB));
+    Result.AppendChild(AddNode(tcStr, 'UB13', 'cClassTrib', 6, 6, 1,
+                                            IBSCBS.cClassTrib, DSC_CCLASSTRIB));
 
     case IBSCBS.CST of
       cst000, cst200, cst220, cst510:
@@ -4359,7 +4359,7 @@ begin
                                   CSTIBSCBSToStr(TribRegular.CSTReg), DSC_CST));
 
   Result.AppendChild(AddNode(tcStr, '#57', 'cClassTribReg', 6, 6, 1,
-                   cClassTribToStr(TribRegular.cClassTribReg), DSC_CCLASSTRIB));
+                                    TribRegular.cClassTribReg, DSC_CCLASSTRIB));
 
   Result.AppendChild(AddNode(tcDe4, '#58', 'pAliqEfetRegIBSUF', 1, 7, 1,
                                      TribRegular.pAliqEfetRegIBSUF, DSC_PALIQ));

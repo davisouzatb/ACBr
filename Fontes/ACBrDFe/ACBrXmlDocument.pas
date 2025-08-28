@@ -394,8 +394,15 @@ begin
 end;
 
 function TACBrXmlNode.GetContent: string;
+var
+  con: xmlCharPtr;
 begin
-  Result := UTF8ToNativeString(AnsiString(xmlNodeGetContent(FXmlNode)));
+  con := xmlNodeGetContent(FXmlNode);
+  try
+    Result := UTF8ToNativeString(AnsiString(con));
+  finally
+    xmlFree(con);
+  end;
 end;
 
 function TACBrXmlNode.GetInnerXml: string;
@@ -448,7 +455,7 @@ var
   CDataValue: string;
   CDataNode: TACBrXmlNode;
 begin
-  if pos('CDATA', AContent) > 0 then
+  if pos('<![CDATA[', AContent) > 0 then
   begin
     CDataValue := RetornarConteudoEntre(AContent, '<![CDATA[', ']]>');
     CDataNode := FXmlDoc.CreateCDATA(CDataValue);
@@ -749,8 +756,15 @@ begin
 end;
 
 function TACBrXmlAttribute.GetContent: string;
+var
+  con: xmlCharPtr;
 begin
-  Result := UTF8ToNativeString(AnsiString(xmlGetNoNsProp(FParentNode.FXmlNode, xmlAttInternal^.Name)));
+  con := xmlGetNoNsProp(FParentNode.FXmlNode, xmlAttInternal^.Name);
+  try
+    Result := UTF8ToNativeString(AnsiString(con));
+  finally
+    xmlFree(con);
+  end;
 end;
 
 procedure TACBrXmlAttribute.SetName(AName: string);

@@ -450,7 +450,7 @@ begin
           FfrxJPEGExport.ShowDialog    := False;
           FfrxJPEGExport.ShowProgress  := True;
           FfrxJPEGExport.Monochrome    := True;
-          FfrxJPEGExport.SeparateFiles := True;
+          FfrxJPEGExport.SeparateFiles := CalcularNomeArquivoPDFIndividual;
           FfrxJPEGExport.JPEGQuality   := 200;
           FfrxJPEGExport.Resolution    := 160;
           FfrxReport.Export(FfrxJPEGExport);

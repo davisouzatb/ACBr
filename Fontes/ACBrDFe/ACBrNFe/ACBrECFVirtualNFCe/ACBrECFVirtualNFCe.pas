@@ -416,18 +416,18 @@ begin
       begin
         fsvTotTrib := fsvTotTrib + Det.Items[i].Imposto.vTotTrib;
         fsvBC := fsvBC + Det.Items[i].Imposto.ICMS.vBC;
-        fsvICMS := fsvICMS + Det.Items[i].Imposto.ICMS.vICMS;
+        fsvICMS := fsvICMS + RoundABNT(Det.Items[i].Imposto.ICMS.vICMS,2);
         fsvBCST := fsvBCST + Det.Items[i].Imposto.ICMS.vBCST;
-        fsvST := fsvST + Det.Items[i].Imposto.ICMS.vICMSST;
+        fsvST := fsvST + RoundABNT(Det.Items[i].Imposto.ICMS.vICMSST,2);
         fsvProd := fsvProd + Det.Items[i].Prod.vProd;
-        fsvFrete := fsvFrete + Det.Items[i].Prod.vFrete;
-        fsvSeg := fsvSeg + Det.Items[i].Prod.vSeg;
+        fsvFrete := fsvFrete + RoundABNT(Det.Items[i].Prod.vFrete,2);
+        fsvSeg := fsvSeg + RoundABNT(Det.Items[i].Prod.vSeg,2);
         fsvDesc := fsvDesc + Det.Items[i].Prod.vDesc;
-        fsvII := fsvII + Det.Items[i].Imposto.II.vII;
-        fsvIPI := fsvIPI + Det.Items[i].Imposto.IPI.vIPI;
-        fsvPIS := fsvPIS + Det.Items[i].Imposto.PIS.vPIS;
-        fsvCOFINS := fsvCOFINS + Det.Items[i].Imposto.COFINS.vCOFINS;
-        fsvOutro := fsvOutro + Det.Items[i].Prod.vOutro;
+        fsvII := fsvII + RoundABNT(Det.Items[i].Imposto.II.vII,2);
+        fsvIPI := fsvIPI + RoundABNT(Det.Items[i].Imposto.IPI.vIPI,2);
+        fsvPIS := fsvPIS + RoundABNT(Det.Items[i].Imposto.PIS.vPIS,2);
+        fsvCOFINS := fsvCOFINS + RoundABNT(Det.Items[i].Imposto.COFINS.vCOFINS,2);
+        fsvOutro := fsvOutro + RoundABNT(Det.Items[i].Prod.vOutro,2);
       end;
     end;
   end;
@@ -752,11 +752,23 @@ begin
           if NotasFiscais.Items[0].NFe.Det[i].Prod.cProd <> cItemCancelado then
           begin
             if fpCupom.DescAcresSubtotal > 0 then
-              NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro :=
-                NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro + ItDescAcre[i]
+            begin
+              NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro := NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro + ItDescAcre[i];
+              if NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC > 0 then
+              begin
+                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC   := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC + ItDescAcre[i];
+                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vICMS := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC * (NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.pICMS/100);
+              end;
+            end
             else
-              NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc :=
-                NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc + ItDescAcre[i];
+            begin
+              NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc := NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc + ItDescAcre[i];
+              if NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC > 0 then
+              begin
+                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC   := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC - ItDescAcre[i];
+                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vICMS := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC * (NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.pICMS/100);
+              end;
+            end;
           end;
         end;
       end;

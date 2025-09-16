@@ -95,6 +95,7 @@ type
     function AddHeaderParam(AParamName, AParamValue: String): TBoletoWSREST;
     function ClearHeaderParams(): TBoletoWSREST;
     property Headers:TStringList read FPHeaders;
+    function NovoTokenAutenticacao(var AToken: String; var AValidadeToken: TDateTime; const ANewForceToken: Boolean = False): Boolean; override;
   end;
 
     { TRetornoEnvioREST }  //Implementar Retornos em JSON
@@ -391,16 +392,27 @@ begin
   Result := FPDadosMsg;
 end;
 
+function TBoletoWSREST.NovoTokenAutenticacao(var AToken: String; var AValidadeToken: TDateTime; const ANewForceToken: Boolean): Boolean;
+begin
+  OAuth.ForceNewToken;
+  Result := GerarTokenAutenticacao <> '';
+  AToken         := OAuth.Token;
+  AValidadeToken := OAuth.Expire;
+end;
+
 function TBoletoWSREST.Enviar: Boolean;
 begin
   try
     BoletoWS.RetornoBanco.CodRetorno := 0;
     BoletoWS.RetornoBanco.Msg        := '';
+
+    DefinirProxy;
+
     DefinirAuthorization;
     DefinirURL;
     DefinirContentType;
     DefinirCertificado;
-    DefinirProxy;
+
 
     //Grava json gerado
     BoletoWS.DoLog('Comando Enviar: ' + ClassName, logSimples);

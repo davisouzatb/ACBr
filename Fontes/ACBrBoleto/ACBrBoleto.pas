@@ -1009,8 +1009,10 @@ type
   end;
 
   { TACBrWebService }
-  TACBrWebServiceOnAntesAutenticar  = procedure(var aToken: String; var aValidadeToken: TDateTime) of object;
-  TACBrWebServiceOnDepoisAutenticar = procedure(const aToken: String; const aValidadeToken: TDateTime) of object;
+  TACBrWebServiceOnAntesAutenticar   = procedure(var AToken: String; var AValidadeToken: TDateTime) of object;
+  TACBrWebServiceOnDepoisAutenticar  = procedure(const AToken: String; const AValidadeToken: TDateTime) of object;
+  TACBrWebServiceOnPrecisaAutenticar = procedure(var AToken: String; var AValidadeToken: TDateTime) of object;
+
   {$IFDEF RTL230_UP}
   [ComponentPlatformsAttribute(piacbrAllPlatforms)]
   {$ENDIF RTL230_UP}
@@ -1516,6 +1518,7 @@ type
     fPrefixArqRemessa : string;
     fOnAntesAutenticar:  TACBrWebServiceOnAntesAutenticar;
     fOnDepoisAutenticar: TACBrWebServiceOnDepoisAutenticar;
+    fOnPrecisaAutenticar: TACBrWebServiceOnPrecisaAutenticar;
     FKeySoftwareHouse: String;
 
     procedure SetACBrBoletoFC(const Value: TACBrBoletoFCClass);
@@ -1578,6 +1581,7 @@ type
 
     function EnviarBoleto: Boolean; deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o método Enviar' {$ENDIF};
     function Enviar: Boolean;
+    function GerarTokenAutenticacao( out AToken: String; out AValidadeToken: TDateTime) : Boolean;
 
     function GetOcorrenciasRemessa() : TACBrOcorrenciasRemessa;
   	function GetOcorrenciasRetorno() : TACBrOcorrenciasRetorno;
@@ -1609,9 +1613,11 @@ type
     property RemoveAcentosArqRemessa: Boolean    read fRemoveAcentosArqRemessa write fRemoveAcentosArqRemessa default False;
     property LerNossoNumeroCompleto : Boolean    read fLerNossoNumeroCompleto write fLerNossoNumeroCompleto default False;
     property Configuracoes: TConfiguracoes       read fConfiguracoes          write fConfiguracoes;
-    property OnAntesAutenticar : TACBrWebServiceOnAntesAutenticar  read fOnAntesAutenticar  write fOnAntesAutenticar;
-    property OnDepoisAutenticar: TACBrWebServiceOnDepoisAutenticar read fOnDepoisAutenticar write fOnDepoisAutenticar;
     property KeySoftwareHouse: String 			     read FKeySoftwareHouse 	    write FKeySoftwareHouse;
+    property OnAntesAutenticar   : TACBrWebServiceOnAntesAutenticar    read fOnAntesAutenticar    write fOnAntesAutenticar;
+    property OnDepoisAutenticar  : TACBrWebServiceOnDepoisAutenticar   read fOnDepoisAutenticar   write fOnDepoisAutenticar;
+    property OnPrecisaAutenticar : TACBrWebServiceOnPrecisaAutenticar  read fOnPrecisaAutenticar  write fOnPrecisaAutenticar;
+
 
   end;
 
@@ -3664,6 +3670,21 @@ begin
    end;
 end;
 
+function TACBrBoleto.GerarTokenAutenticacao(out AToken: String; out AValidadeToken: TDateTime): Boolean;
+var
+  LBoletoWS: TBoletoWS;
+  LBoletoWSClass : TBoletoWSClass;
+begin
+  LBoletoWS      := TBoletoWS.Create(Self);
+  LBoletoWSClass := TBoletoWSClass.Create(LBoletoWS);
+
+  try
+    Result := LBoletoWS.NovoTokenAutenticacao(AToken, AValidadeToken);
+  finally
+    LBoletoWS.Free;
+  end;
+end;
+
 procedure TACBrBoleto.LerRetorno(AStream: TStream);
 var
   LListaRetorno: TStringList;
@@ -5295,6 +5316,7 @@ var
   Linha, rCedente, rCNPJCPF :String;
   rCodEmpresa               :String;
 begin
+  Titulo := nil;
   //ErroAbstract('LerRetorno400');
 
   //Utiliza o layout padrão para leitura de retorno CNAB400
@@ -5374,116 +5396,118 @@ begin
          Continue;
 
        Titulo := ACBrBanco.ACBrBoleto.CriarTituloNaLista;
-
-       with Titulo do
+       if Assigned(Titulo) then
        begin
-          SeuNumero                   := copy(Linha,38,25);
-          NumeroDocumento             := copy(Linha,117,10);
-          OcorrenciaOriginal.Tipo     := CodOcorrenciaToTipo(StrToIntDef(
-                                         copy(Linha,109,2),0));
+         with Titulo do
+         begin
+            SeuNumero                   := copy(Linha,38,25);
+            NumeroDocumento             := copy(Linha,117,10);
+            OcorrenciaOriginal.Tipo     := CodOcorrenciaToTipo(StrToIntDef(
+                                           copy(Linha,109,2),0));
 
-          CodOcorrencia := StrToIntDef(IfThen(copy(Linha,109,2) = '  ','00',copy(Linha,109,2)),0);
+            CodOcorrencia := StrToIntDef(IfThen(copy(Linha,109,2) = '  ','00',copy(Linha,109,2)),0);
 
-          //-|Se a ocorrencia for igual a 19 - Confirmação de Receb. de Protesto
-          //-|Verifica o motivo na posição 295 - A = Aceite , D = Desprezado
-          if(CodOcorrencia = 19)then
-           begin
-             CodMotivo_19:= copy(Linha,295,1);
-             if(CodMotivo_19 = 'A')then
-              begin
-                MotivoRejeicaoComando.Add(copy(Linha,295,1));
-                DescricaoMotivoRejeicaoComando.Add('A - Aceito');
-              end
-             else
-              begin
-                MotivoRejeicaoComando.Add(copy(Linha,295,1));
-                DescricaoMotivoRejeicaoComando.Add('D - Desprezado');
-              end;
-           end
-          else
-           begin
-             MotivoLinha := 319;
-             for i := 0 to 4 do
+            //-|Se a ocorrencia for igual a 19 - Confirmação de Receb. de Protesto
+            //-|Verifica o motivo na posição 295 - A = Aceite , D = Desprezado
+            if(CodOcorrencia = 19)then
              begin
-                CodMotivo := IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2));
+               CodMotivo_19:= copy(Linha,295,1);
+               if(CodMotivo_19 = 'A')then
+                begin
+                  MotivoRejeicaoComando.Add(copy(Linha,295,1));
+                  DescricaoMotivoRejeicaoComando.Add('A - Aceito');
+                end
+               else
+                begin
+                  MotivoRejeicaoComando.Add(copy(Linha,295,1));
+                  DescricaoMotivoRejeicaoComando.Add('D - Desprezado');
+                end;
+             end
+            else
+             begin
+               MotivoLinha := 319;
+               for i := 0 to 4 do
+               begin
+                  CodMotivo := IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2));
 
-                {Se for o primeiro motivo}
-                if (i = 0) then
-                 begin
-                   {Somente estas ocorrencias possuem motivos 00}
-                   if(CodOcorrencia in [02, 06, 09, 10, 12, 13, 14, 15, 17, 33])then
-                    begin
-                      MotivoRejeicaoComando.Add(IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2)));
-                      if VarIsNumeric(CodMotivo) then
-                        DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,Integer(CodMotivo)))
-                      else
-                        DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,VarToStr(CodMotivo)));
-                    end
-                   else
-                    begin
-                      if(CodMotivo = 0)then
-                       begin
-                         MotivoRejeicaoComando.Add('00');
-                         DescricaoMotivoRejeicaoComando.Add('Sem Motivo');
-                       end
-                      else
-                       begin
-                         MotivoRejeicaoComando.Add(IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2)));
-                         if VarIsNumeric(CodMotivo) then
-                            DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,Integer(CodMotivo)))
-                          else
-                            DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,VarToStr(CodMotivo)));
-                       end;
-                    end;
-                 end
-                else
-                 begin
-                   //Apos o 1º motivo os 00 significam que não existe mais motivo
-                  if (not(VarIsNumeric(CodMotivo)) or (CodMotivo <> 0)) then
+                  {Se for o primeiro motivo}
+                  if (i = 0) then
                    begin
-                      MotivoRejeicaoComando.Add(IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2)));
-                      if VarIsNumeric(CodMotivo) then
-                        DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,Integer(CodMotivo)))
-                      else
-                        DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,VarToStr(CodMotivo)));
+                     {Somente estas ocorrencias possuem motivos 00}
+                     if(CodOcorrencia in [02, 06, 09, 10, 12, 13, 14, 15, 17, 33])then
+                      begin
+                        MotivoRejeicaoComando.Add(IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2)));
+                        if VarIsNumeric(CodMotivo) then
+                          DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,Integer(CodMotivo)))
+                        else
+                          DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,VarToStr(CodMotivo)));
+                      end
+                     else
+                      begin
+                        if(CodMotivo = 0)then
+                         begin
+                           MotivoRejeicaoComando.Add('00');
+                           DescricaoMotivoRejeicaoComando.Add('Sem Motivo');
+                         end
+                        else
+                         begin
+                           MotivoRejeicaoComando.Add(IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2)));
+                           if VarIsNumeric(CodMotivo) then
+                              DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,Integer(CodMotivo)))
+                            else
+                              DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,VarToStr(CodMotivo)));
+                         end;
+                      end;
+                   end
+                  else
+                   begin
+                     //Apos o 1º motivo os 00 significam que não existe mais motivo
+                    if (not(VarIsNumeric(CodMotivo)) or (CodMotivo <> 0)) then
+                     begin
+                        MotivoRejeicaoComando.Add(IfThen(copy(Linha,MotivoLinha,2) = '  ','00',copy(Linha,MotivoLinha,2)));
+                        if VarIsNumeric(CodMotivo) then
+                          DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,Integer(CodMotivo)))
+                        else
+                          DescricaoMotivoRejeicaoComando.Add(CodMotivoRejeicaoToDescricao(OcorrenciaOriginal.Tipo,VarToStr(CodMotivo)));
+                     end;
                    end;
-                 end;
 
-                MotivoLinha := MotivoLinha + 2; //Incrementa a coluna dos motivos
+                  MotivoLinha := MotivoLinha + 2; //Incrementa a coluna dos motivos
+               end;
              end;
-           end;
 
-          if (StrToIntDef(Copy(Linha,111,6),0) > 0) then
-            DataOcorrencia := StringToDateTimeDef( Copy(Linha,111,2)+'/'+
-                                                 Copy(Linha,113,2)+'/'+
-                                                 Copy(Linha,115,2),0, 'DD/MM/YY' );
-          if (StrToIntDef(Copy(Linha,147,6),0) > 0) then
-             Vencimento := StringToDateTimeDef( Copy(Linha,147,2)+'/'+
-                                                Copy(Linha,149,2)+'/'+
-                                                Copy(Linha,151,2),0, 'DD/MM/YY' );
+            if (StrToIntDef(Copy(Linha,111,6),0) > 0) then
+              DataOcorrencia := StringToDateTimeDef( Copy(Linha,111,2)+'/'+
+                                                   Copy(Linha,113,2)+'/'+
+                                                   Copy(Linha,115,2),0, 'DD/MM/YY' );
+            if (StrToIntDef(Copy(Linha,147,6),0) > 0) then
+               Vencimento := StringToDateTimeDef( Copy(Linha,147,2)+'/'+
+                                                  Copy(Linha,149,2)+'/'+
+                                                  Copy(Linha,151,2),0, 'DD/MM/YY' );
 
-          ValorDocumento       := StrToFloatDef(Copy(Linha,153,13),0)/100;
-          ValorIOF             := StrToFloatDef(Copy(Linha,215,13),0)/100;
-          ValorAbatimento      := StrToFloatDef(Copy(Linha,228,13),0)/100;
-          ValorDesconto        := StrToFloatDef(Copy(Linha,241,13),0)/100;
-          ValorMoraJuros       := StrToFloatDef(Copy(Linha,267,13),0)/100;
-          ValorOutrosCreditos  := StrToFloatDef(Copy(Linha,280,13),0)/100;
-          ValorRecebido        := StrToFloatDef(Copy(Linha,254,13),0)/100;
-          ValorPago            := StrToFloatDef(Copy(Linha,254,13),0)/100;
-          NossoNumero          := DefineNossoNumeroRetorno(Linha);
-          Carteira             := Copy(Linha,DefinePosicaoCarteiraRetorno,3);
-          ValorDespesaCobranca := StrToFloatDef(Copy(Linha,176,13),0)/100;
-          ValorOutrasDespesas  := StrToFloatDef(Copy(Linha,189,13),0)/100;
+            ValorDocumento       := StrToFloatDef(Copy(Linha,153,13),0)/100;
+            ValorIOF             := StrToFloatDef(Copy(Linha,215,13),0)/100;
+            ValorAbatimento      := StrToFloatDef(Copy(Linha,228,13),0)/100;
+            ValorDesconto        := StrToFloatDef(Copy(Linha,241,13),0)/100;
+            ValorMoraJuros       := StrToFloatDef(Copy(Linha,267,13),0)/100;
+            ValorOutrosCreditos  := StrToFloatDef(Copy(Linha,280,13),0)/100;
+            ValorRecebido        := StrToFloatDef(Copy(Linha,254,13),0)/100;
+            ValorPago            := StrToFloatDef(Copy(Linha,254,13),0)/100;
+            NossoNumero          := DefineNossoNumeroRetorno(Linha);
+            Carteira             := Copy(Linha,DefinePosicaoCarteiraRetorno,3);
+            ValorDespesaCobranca := StrToFloatDef(Copy(Linha,176,13),0)/100;
+            ValorOutrasDespesas  := StrToFloatDef(Copy(Linha,189,13),0)/100;
 
-          // informações do local de pagamento
-          Liquidacao.Banco      := StrToIntDef(Copy(Linha,166,3), -1);
-          Liquidacao.Agencia    := Copy(Linha,169,4);
-          Liquidacao.Origem     := '';
+            // informações do local de pagamento
+            Liquidacao.Banco      := StrToIntDef(Copy(Linha,166,3), -1);
+            Liquidacao.Agencia    := Copy(Linha,169,4);
+            Liquidacao.Origem     := '';
 
-          if (StrToIntDef(Copy(Linha,296,6),0) > 0) then
-             DataCredito:= StringToDateTimeDef( Copy(Linha,296,2)+'/'+
-                                                Copy(Linha,298,2)+'/'+
-                                                Copy(Linha,300,2),0, 'DD/MM/YY' );
+            if (StrToIntDef(Copy(Linha,296,6),0) > 0) then
+               DataCredito:= StringToDateTimeDef( Copy(Linha,296,2)+'/'+
+                                                  Copy(Linha,298,2)+'/'+
+                                                  Copy(Linha,300,2),0, 'DD/MM/YY' );
+         end;
        end;
      end;
   end;

@@ -598,7 +598,10 @@ type
                               mtvSuspensaoPagamentoServidorNaoRecadastrado,               // 39
                               mtvExercicioOutroOrgaoEmpregadoCedido,                      // 40
                               mtvQualificacaoAfastamentoSuspencaoArt17_MP1116_2022,       // 41
-                              mtvQualificacaoAfastamentoSuspencaoArt19_MP1116_2022);      // 42
+                              mtvQualificacaoAfastamentoSuspencaoArt19_MP1116_2022,       // 42
+                              mtvLicencaMaternidadeProrrogacao60DiasLei15156_2025,        // 43
+                              mtvSuspensaoContratualAjuizamentoRescisaoIndireta,          // 44
+                              mtvSuspensaoContratualAjuizamentoInqueritoFaltaGrave);      // 45
 
   tpTpAcidTransito        = (tpatAtropelamento, tpatColisao, tpatOutros, tpatNao);
 
@@ -648,11 +651,11 @@ type
 
   tpNacProf               = (ttpProfissionalBrasileiro, ttpProfissionalEstrangeiro);
 
-  TVersaoeSocial          = ({ve02_04_01, ve02_04_02, ve02_05_00, }veS01_00_00, veS01_01_00, veS01_02_00, veS01_03_00);
+  TVersaoeSocial          = (ve02_04_01, ve02_04_02, ve02_05_00, veS01_00_00, veS01_01_00, veS01_02_00, veS01_03_00);
 const
-  TVersaoeSocialArrayStrings : array[TVersaoeSocial] of string = ({'02_04_01', '02_04_02', '02_05_00', }'S01_00_00', 'S01_01_00', 'S01_02_00', 'S01_03_00');
-  TVersaoeSocialSchemasArrayStrings : array[TVersaoeSocial] of string = ({'v02_04_01', 'v02_04_02', 'v02_05_00', }'v_S_01_00_00', 'v_S_01_01_00', 'v_S_01_02_00', 'v_S_01_03_00');
-  TVersaoeSocialArrayReals : array[TVersaoeSocial] of Real = ({2.0401, 2.0402, 2.0500, }10.0000, 10.1000, 10.2000, 10.3000);
+  TVersaoeSocialArrayStrings : array[TVersaoeSocial] of string = ('02_04_01', '02_04_02', '02_05_00', 'S01_00_00', 'S01_01_00', 'S01_02_00', 'S01_03_00');
+  TVersaoeSocialSchemasArrayStrings : array[TVersaoeSocial] of string = ('v02_04_01', 'v02_04_02', 'v02_05_00', 'v_S_01_00_00', 'v_S_01_01_00', 'v_S_01_02_00', 'v_S_01_03_00');
+  TVersaoeSocialArrayReals : array[TVersaoeSocial] of Real = (2.0401, 2.0402, 2.0500, 10.0000, 10.1000, 10.2000, 10.3000);
 
 type
 
@@ -1360,14 +1363,15 @@ const
 
   TMotivoAlteracaoCargoFuncao: array[0..3] of string = ('1', '2', '3', '9');
 
-  TMotivoAfastamento: array[1..38] of string = ('01', '03', '05', '06', '07',
+  TMotivoAfastamento: array[1..41] of string = ('01', '03', '05', '06', '07',
                                                 '08', '10', '11', '12', '13',
                                                 '14', '15', '16', '17', '18',
                                                 '19', '20', '21', '22', '23',
                                                 '24', '25', '26', '27', '28',
                                                 '29', '30', '31', '33', '34',
                                                 '35', '36', '37', '38', '39',
-                                                '40', '41', '42');
+                                                '40', '41', '42', '43', '44',
+                                                '45');
 
   TGenericosString0_1 : array[0..1] of string = ('0','1' );
   TGenericosString0_2 : array[0..2] of string = ('0','1','2' );
@@ -2593,7 +2597,7 @@ begin
     veS01_02_00: result := 10.2000;
     veS01_03_00: result := 10.3000;
   else
-    result := 0;
+    result := 10.3000;
   end;
 end;
 
@@ -2617,7 +2621,7 @@ begin
     result := veS01_03_00
   else
   begin
-    result := veS01_02_00;
+    result := veS01_03_00;
     ok := False;
   end;
 end;

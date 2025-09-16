@@ -44,7 +44,8 @@ uses
   SysUtils, 
   Classes, 
   ACBrBase,
-  pcnConversao, 
+  pcnConversao,
+  pcteConversaoCTe,
   ACBrCTe.Classes,
   ACBrCTeDACTEClass, 
   RLTypes;

@@ -43,6 +43,24 @@ Símbolo : Significado
 [-]     : Correção de Bug (assim esperamos)
 
 
+06/10/2025
+-- Diversos --
+[*] Ajustes diversos no componente visando a NT 2025/001 versão 1.10
+   Por: Italo Giurizzato Junior
+
+23/09/2025
+-- ACBrNFComXmlWriter --
+[*] Possível solução para geração dos campos vCredPres e vCredPresCondSus.
+   Por: Italo Giurizzato Junior
+
+22/09/2025
+-- ACBrNFComEnvEvento.pas --
+[-] Correção para compilar e instalar.
+   Por: Italo Giurizzato Junior
+-- Diversos --
+[*] Ajustes diversos no componente visando a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
 19/08/2025
 -- Diversos --
 [*] O campo cClassTrib deixa de ser enumerado e passa a ser string.

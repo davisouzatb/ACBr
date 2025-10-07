@@ -48,6 +48,50 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+07/10/2025
+-- ACBrBoletoW_Banrisul --
+[-] Correção do codigo de protesto. (DiasDeProtesto enviado apenas qdo codigo = 1)
+    ACBr-8164 - https://www.projetoacbr.com.br/forum/topic/86259-boleto-banrisul-api-instru%C3%A7%C3%A3o-de-protesto-com-problema/
+	Por: MGWare Dev / Validado: Daniel de Morais InfoCotidano
+
+03/10/2025
+-- ACBrBoletoW_Bradesco --
+[-] correção dias protesto
+	Por: Daniel de Morais
+
+30/09/2025
+-- ACBrBoletoW_Bradesco --
+[+] ACBr-8117 - Juros e Multa quando hibrido / juros ou multa convencional. ambos do portal.
+	Por: Daniel de Morais
+
+29/09/2025
+--ACBrBoletoWS.Rest.pas, ACBrBoletoWS.pas--
+[-] Correção na classe base dos novos metodos de controle da oauth
+	ACBr-8121 - https://www.projetoacbr.com.br/forum/topic/85885-autentica%C3%A7%C3%A3o-api-boleto-banco-inter-parou-de-funcionar-ao-atualizar-acbrlibboleto/
+	Por: Victor H. Gonzales Pandaaa	
+
+26/09/2025
+--ACBrBoleto--
+[*] Ajustes na leitura do cedente.ini ler UseCertificateHttp
+	ACBr-8077 - https://www.projetoacbr.com.br/forum/topic/85885-autentica%C3%A7%C3%A3o-api-boleto-banco-inter-parou-de-funcionar-ao-atualizar-acbrlibboleto/
+	Por: Daniel de Morais InfoCotidiano
+
+24/09/2025
+--ACBrBoletoW_Santander_API, ACBrBoletoRet_Santander_API--
+[*] Ajustes do retorno quando consulta Detalhe sem IndicadorPix.
+	Ajuste no envio consulta detalhe sandbox. que difere de producao.
+	Por: Daniel de Morais InfoCotidiano, Victor H. Gonzales Pandaaa
+	
+22/09/2025
+--ACBrBoleto--
+[*] Ajustes dos nomes dos metodos
+	Por: Victor H. Gonzales Pandaaa
+
+18/09/2025
+-- ACBrBoleto -- 
+[+] Inclusão do evento OnQuantoAlterarBanco.
+    por: Elias Cesar
+
 15/09/2025
 -- ACBrBancoBradesco  --
 [*] ACBr-583 Ajustado para ler retorno 66 LIquidado Qrcode

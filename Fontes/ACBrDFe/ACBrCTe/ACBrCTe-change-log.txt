@@ -44,6 +44,22 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+06/10/2025
+-- Diversos --
+[*] Ajustes diversos no componente visando a NT 2025/001 versão 1.10
+   Por: Italo Giurizzato Junior
+
+25/09/2025
+-- ACBrCTeDACTEClass --
+[-] Ajustes para poder compilar e instalar.
+   Por: Italo Giurizzato Junior
+-- ACBrCTeWebServices --
+[-] Ajustes para poder compilar e instalar.
+   Por: Italo Giurizzato Junior
+-- Diversos --
+[*] Ajustes diversos no componente visando a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
 04/09/2025
 -- ACBrCTeConhecimentos --
 [*] #ACBr 7995: Possível solução para a leitura de XML com formatação UTF-8 BOM.

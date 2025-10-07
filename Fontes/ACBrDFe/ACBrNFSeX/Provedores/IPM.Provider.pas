@@ -171,6 +171,7 @@ implementation
 
 uses
   synacode,
+  ACBrDFe.Conversao,
   ACBrUtil.Base, ACBrUtil.Strings, ACBrUtil.XMLHTML, ACBrUtil.FilesIO, ACBrUtil.DateTime,
   ACBrDFeException,
   ACBrNFSeX, ACBrNFSeXConfiguracoes, ACBrNFSeXConsts, ACBrJSON,
@@ -1708,6 +1709,9 @@ begin
 
   AMSGaux := SeparaDados(AMSG, 'EnviarLoteRpsEnvio');
 
+  if FPConfiguracoes.WebServices.AmbienteCodigo = 2 then
+    AMSGaux := '<EnvioTeste>1</EnvioTeste>' + AMSGaux;
+
   Request := '<net:EnviarLoteRpsEnvio>';
   Request := Request + AMSGaux;
   Request := Request + '</net:EnviarLoteRpsEnvio>';
@@ -1725,6 +1729,9 @@ begin
 
   AMSGaux := SeparaDados(AMSG, 'EnviarLoteRpsSincronoEnvio');
 
+  if FPConfiguracoes.WebServices.AmbienteCodigo = 2 then
+    AMSGaux := '<EnvioTeste>1</EnvioTeste>' + AMSGaux;
+
   Request := '<net:EnviarLoteRpsSincronoEnvio>';
   Request := Request + AMSGaux;
   Request := Request + '</net:EnviarLoteRpsSincronoEnvio>';
@@ -1740,6 +1747,9 @@ begin
   FPMsgOrig := AMSG;
 
   AMSGaux := SeparaDados(AMSG, 'GerarNfseEnvio');
+
+  if FPConfiguracoes.WebServices.AmbienteCodigo = 2 then
+    AMSGaux := '<EnvioTeste>1</EnvioTeste>' + AMSGaux;
 
   Request := '<net:GerarNfseEnvio>';
   Request := Request + AMSGaux;
@@ -1849,6 +1859,9 @@ begin
 
   AMSGaux := SeparaDados(AMSG, 'SubstituirNfseEnvio');
 
+  if FPConfiguracoes.WebServices.AmbienteCodigo = 2 then
+    AMSGaux := '<EnvioTeste>1</EnvioTeste>' + AMSGaux;
+
   Request := '<net:SubstituirNfseEnvio>';
   Request := Request + AMSGaux;
   Request := Request + '</net:SubstituirNfseEnvio>';
@@ -1928,6 +1941,8 @@ begin
   ConfigWebServices.AtribVerLote := '';
 
   ConfigMsgDados.GerarPrestadorLoteRps := True;
+
+  SetNomeXSD('nfse_rt.xsd');
 end;
 
 function TACBrNFSeProviderIPM204.CriarGeradorXml(

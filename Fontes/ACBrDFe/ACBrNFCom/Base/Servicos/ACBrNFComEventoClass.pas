@@ -45,8 +45,9 @@ uses
   {$IFEND}
   ACBrBase,
   ACBrXmlBase,
-//  ACBrDFeConversao,
+  ACBrDFe.Conversao,
   pcnConversao,
+//  ACBrDFeConversao,
   ACBrNFComConversao;
 
 type

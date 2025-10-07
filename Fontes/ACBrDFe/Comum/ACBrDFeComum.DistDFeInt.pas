@@ -38,6 +38,8 @@ interface
 
 uses
   SysUtils, Classes,
+  ACBrXmlBase,
+  ACBrDFe.Conversao,
   pcnConversao;
 
 type
@@ -127,10 +129,10 @@ begin
   if FpGerarcUFAutor then
     xUFAutor := '<cUFAutor>' + IntToStr(cUFAutor) + '</cUFAutor>';
 
-  if Length(CNPJCPF) = 14 then
-    xDoc := '<CNPJ>' + CNPJCPF + '</CNPJ>'
+  if Length(OnlyAlphaNum(CNPJCPF)) = 14 then
+    xDoc := '<CNPJ>' + OnlyAlphaNum(CNPJCPF) + '</CNPJ>'
   else
-    xDoc := '<CPF>' + CNPJCPF + '</CPF>';
+    xDoc := '<CPF>' + OnlyNumber(CNPJCPF) + '</CPF>';
 
   if NSU = '' then
   begin
@@ -154,7 +156,7 @@ begin
 
   Result := sTagGrupoMsgIni +
               '<distDFeInt ' + FpNameSpace + ' versao="' + FpVersao + '">' +
-                '<tpAmb>' + tpAmbToStr(tpAmb) + '</tpAmb>' +
+                '<tpAmb>' + TpAmbToStr(tpAmb) + '</tpAmb>' +
                 xUFAutor +
                 xDoc +
                 xConsulta +

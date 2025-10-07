@@ -994,6 +994,9 @@ begin
   frxReport.ShowProgress             := MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
 
+  if NaoEstaVazio(Trim(DAMDFEClassOwner.NomeDocumento)) then
+    frxReport.FileName := Trim(DAMDFEClassOwner.NomeDocumento);
+
   // Define a impressora
   if NaoEstaVazio(frxReport.PrintOptions.Printer) then
     frxReport.PrintOptions.Printer := Impressora;
@@ -1315,7 +1318,8 @@ begin
 	    FieldByName('vCarga').AsCurrency := vCarga;
     end;
 
-    FieldByName('URL').AsString := TACBrMDFe(ACBrMDFe).GetURLConsulta(FMDFe.Ide.cUF, FMDFe.Ide.tpAmb, FMDFe.infMDFe.versao);
+    FieldByName('URL').AsString := 'https://dfe-portal.sefazvirtual.rs.gov.br/MDFe/consulta';
+                //TACBrMDFe(ACBrMDFe).GetURLConsulta(FMDFe.Ide.cUF, FMDFe.Ide.tpAmb, FMDFe.infMDFe.versao);
 
     // Incluido por Paulo Hostert em 18/11/2014.
     wObs := FMDFe.infAdic.infCpl;

@@ -42,6 +42,88 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+29/09/2025
+-- Conam.GravarXml/Conam.LerXml/Conam.Provider --
+[*] #ACBr-8105 Ajustes para leitura de um lote de notas no retorno do ConsultarLote.
+   Por: Italo Giurizzato Junior
+
+25/09/2025
+-- ACBrNFSeXServicos --
+[*] #ACBr-8110 A cidade Cruzeiro do Sul/RS trocou de provedor, agora é Fiorilli.
+   Por: 3R Paulo
+[*] #ACBr-8107 A cidade Goiânia/GO trocou de provedor, agora é ISSNet versão 2.04.
+   Por: Sandro Andre Reghelin
+[*] #ACBr-8100 Alterado as URLs da cidade Belém/PA.
+   Por: VFADev
+
+24/09/2025
+-- Giap.GravarXml --
+[*] #ACBr-8089 Alteração visando respeitar a quebra de linha.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml_ABRASFv2/SimplISS.GravarXml/SimplISS.LerXml/SimplISS.Provider --
+[*] #ACBr-8086 Alteração visando gerar o campo OutrasInformações no lugar esperado
+    pelo provedor (infelizmente não segue o padrão).
+   Por: Wesley Lamb/Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] #ACBr-8084 A cidade Paranatinga/MT trocou de provedor, agora é Agili.
+   Por: rizzotec
+[*] #ACBr-8087 Alterado as URLs da cidade Boa Esperança/MG, o provedor continua o mesmo.
+   Por: Vinício Rocha
+[*] #ACBr-8090 Alterado o Params da cidade Nobres.
+   Por: Diego Reckziegel
+-- EloTech.LerXml --
+[*] #ACBR-8097 - Substituída procedure LerINISecaoServicos pela LerINISecaoItens, sobrescrevendo o método padrão e corrigindo a geração dos itens de serviços em duplicidade - https://www.projetoacbr.com.br/forum/topic/85962-acbrlibnfse-ponta-grossa/
+    Por: Renato Rubinho
+
+22/09/2025
+-- SigISSWeb.Provider --
+[*] Ajuste para não salvar o XML com 2 encoding.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] #ACBr-8074 A cidade Vinhedo/SP trocou de provedor, agora é Intertec.
+   Por: jaidomini
+
+19/09/2025
+-- ACBrNFSeXServicos --
+[+] #ACBr-8066 Incluida a cidade Porto dos Gauchos/MT, o provedor é Agili.
+   Por: Diego Reckziegel
+[*] #ACBr-8067 A cidade Xinguara/PA trocou de provedor, agora é Desenvolve versão 2.03
+   Por: Valter Digital
+[*] #ACBr-8068 A cidade Perdões/MG trocou de provedor, agora é GestaoISS versão 2.02
+   Por: Natanael Sanches
+[*] #ACBr-8072 Alterado as URLs da cidade Junqueiropolis/SP, o provedor continua o mesmo.
+   Por: Weber de Paula
+
+18/09/2025
+-- ACBrNFSeXLerXml/IPM.Provider --
+[*] Incluida a leitura do campo xPais na seção Servico e acrescentado a tag opcinal
+    no provedor IPM versão 2.04 na montagem do Soap para informar se é envio de teste 
+    ou não.
+   Por: Italo Giurizzato Junior
+-- Pronim.GravarXml --
+[*] #ACBr-8063 Alterado o operador lógico de and para or na condição que defini se
+    o valor de NrOcorrAliquota vai ser 1.
+   Por: Italo Giurizzato Junior
+-- IPM.Provider/IPM.GravarXml --
+[*] Alterações visando a geração no XML do RPS (versão 2 layout ABRASF) com o grupo
+    IBSCBS.
+   Por: Italo Giurizzato Junior
+-- IPM.LerXml --
+[*] #ACBr-8060 Alterado a quantidade de digitos do ItemListaServico de 5 para 4.
+   Por: Fabio Tellini
+-- ACBrNFSeXServicos --
+[*] #ACBr-8064 A cidade Belém/PA trocou de provedor, agora é DSF versão 2.03
+   Por: VFADev
+[*] #ACBr-8062 A cidade Tunapolis/SC trocou de provedor, agora é IPM versão 1.00
+   Por: Wesley Lamb/Lux.sistemas
+[*] #ACBr-8059 Alterado o Params das cidades de Sorriso e Nobres.
+[*] #ACBr-8061 Acrescentado o Params para a cidade de Rio Verde/GO.
+   Por: Diego Reckziegel
+-- Agili.GravarXml --
+[*] #ACBr-8059 Removido a linha que defini que a formatação do ItemListaServico,
+    não pode ter formatação, uma vez que cada cidade formata de uma forma diferente.
+   Por: Diego Reckziegel
+
 15/09/2025
 -- Giap.Provider --
 [*] #ACBr-8049 Corrigido a leitura do código de verificação e da data de emissão.

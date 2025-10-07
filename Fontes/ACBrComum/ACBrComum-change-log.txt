@@ -37,6 +37,38 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+29/09/2025
+-- ACBrUtil.FilesIO --
+[*] Implementado a função CarregarArquivo, retorna o conteudo do arquivo como sendo
+    uma string.
+  Por: Italo Giurizzato Junior
+
+25/09/2025
+-- ACBrJSON --
+[-] Ajuste para que 'TACBrJSONArray.Items[const AIndex: Integer]: String' não
+    dispare A.V. se elemento do Vetor for Nulo
+    (por: DSA)
+
+24/09/2025
+-- ACBrJSON --
+[*] Melhora CreateJsonObject visando padronização da resposta.
+  Por: Diego Folieni
+-- ACBrUtil.FilesIO --
+[*] Remove o Parser de StringIsJSON.
+  Por: Diego Folieni
+
+18/09/2025
+-- ACBrJSON --
+[*] Remove atribuição desnecessária
+   Por: Diego Folieni
+[-] Correção para compilação em Delphi 7.
+  por: Elias Cesar
+[-] Ajuste visando sanar vazamento de memória quando Parse de string inválida
+  Por: Diego Folieni
+-- ACBrUtil, ACBrUtil.FilesIO --
+[*] Melhora StringISJSON e renomeia rotina para LerArquivoOuString
+  Por: Diego Folieni
+
 16/09/2025
 -- ACBrUtil, ACBrUtil.FilesIO --
 [+] Adiciona rotinas para ler arquivo JSON ou String

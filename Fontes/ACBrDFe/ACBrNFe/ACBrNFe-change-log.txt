@@ -44,7 +44,58 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+29/09/2025
+-- ACBrNFe.XMLReader --
+[-] Ajuste visando corrigir AV ao carregar XML somente com o xCampo.
+  Por: Diego Folieni
+-- ACBrNFeWebServices --
+[*] A unit passou as novas units ACBrDFeComum.DistDFeInt e ACBrDFeComum.RetDistDFeInt.
+  Por: Italo Giurizzato Junior
+
+26/09/2025
+-- ACBrNFeWebServices --
+[*] Possível solução para salvar os XMLs retornados pela consulta com a versão correta.
+   Por: Italo Giurizzato Junior
+-- ACBrNFe.XmlWriter --
+[*] Correção no tamanho mínimo do cProdANVISA
+   Por: Renato Rubinho
+
+23/09/2025
+-- ACBrNFe.XmlWriter --
+[*] Possível solução para geração dos campos vCredPres e vCredPresCondSus.
+   Por: Italo Giurizzato Junior
+
+22/09/2025
+-- ACBrNFe.XmlWriter --
+[*] Alterado o valor padrão da propriedade: AjustarTagNro para False visando não
+    ajustar o conteudo da tag nro (numero do endereço).
+   Por: Italo Giurizzato Junior
+
+20/09/2025
+-- ACBrNFeNotasFiscais --
+[*] Correção para evitar vazamento de memória.
+   Por: Italo Giurizzato Junior
+
+19/09/2025
+-- ACBrNFe.ValidarRegasdeNegocio --
+[*] Alteração na validação da regra 321 por conta da Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+18/09/2025
+-- ACBrNFe.ValidarRegasdeNegocio --
+[*] Melhorias na comparação da unit Regras de Negócios.
+   Por: Waldir Paim
+
+18/09/2025
+-- ACBrNFe.JSONReader, ACBrNFe.EnvEvento --
+[*] Altera nome da função usada para LerArquivoOuString no JSON.
+   Por: Diego Folieni
+
 16/09/2025
+-- Diversos --
+[+] Implementado a unit ACBrNFe.ValidarRegrasdeNegocio, Implementado os Eventos:
+    CancelamentoGenerico, PagIntegLibCredPresAdq, SolicApropCredPres e DestItemConsPessoal.
+   Por: Italo Giurizzato Junior
 -- ACBrNFeNotasFiscais, ACBrNFe.JSONReader, ACBrNFe.JSONWriter, ACBrNFe.EnvEvento --
 [+] Adiciona leitura e geração de arquivo JSON com os dados de uma NFe e de um evento
    Por: Diego Folieni

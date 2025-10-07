@@ -38,7 +38,7 @@ interface
 
 uses
   Classes, SysUtils, IniFiles, synachar,
-  ACBrBase, ACBrLibConfig, ACBrPIXCD, ACBrPIXPSPBancoDoBrasil, ACBrPIXPSPPixPDV, ACBrPIXBase, ACBrLibPIXCDDataModule;
+  ACBrBase, ACBrLibConfig, ACBrPIXCD, ACBrPIXPSPBancoDoBrasil, ACBrPIXPSPPixPDV, ACBrPIXBase, ACBrLibPIXCDDataModule, ACBrPIXPSPBradesco;
 
 type
 
@@ -229,7 +229,6 @@ type
     FArqPFX: String;
     FSenhaPFX: AnsiString;
     FBBAPIVersao: TACBrBBAPIVersao;
-    FAPIVersion: TACBrPIXAPIVersion;
 
     public
     Constructor Create;
@@ -246,7 +245,6 @@ type
     property ArqPFX: String read FArqPFX write FArqPFX;
     property SenhaPFX: AnsiString read FSenhaPFX write FSenhaPFX;
     property BBAPIVersao: TACBrBBAPIVersao read FBBAPIVersao write FBBAPIVersao;
-    property APIVersion: TACBrPIXAPIVersion read FAPIVersion write FAPIVersion;
   end;
 
   { TPIXCDGerenciaNetConfig }
@@ -296,7 +294,6 @@ type
     FClientSecret: String;
     FArqChavePrivada: String;
     FArqCertificado: String;
-    FAPIVersion: TACBrPIXAPIVersion;
 
     public
     constructor Create;
@@ -309,7 +306,6 @@ type
     property ClientSecret: String read FClientSecret write FClientSecret;
     property ArqChavePrivada: String read FArqChavePrivada write FArqChavePrivada;
     property ArqCertificado: String read FArqCertificado write FArqCertificado;
-    property APIVersion: TACBrPIXAPIVersion read FAPIVersion write FAPIVersion;
   end;
 
   { TPIXCDPagSeguroConfig }
@@ -359,7 +355,6 @@ type
     FConsumerSecret: String;
     FArqCertificadoPFX: String;
     FSenhaCertificadoPFX: AnsiString;
-    FAPIVersion: TACBrPIXAPIVersion;
 
     public
     constructor Create;
@@ -372,7 +367,6 @@ type
     property ConsumerSecret: String read FConsumerSecret write FConsumerSecret;
     property ArqCertificadoPFX: String read FArqCertificadoPFX write FArqCertificadoPFX;
     property SenhaCertificadoPFX: AnsiString read FSenhaCertificadoPFX write FSenhaCertificadoPFX;
-    property APIVersion: TACBrPIXAPIVersion read FAPIVersion write FAPIVersion;
   end;
 
   { TPIXCDShipayConfig }
@@ -399,7 +393,6 @@ type
     FTokenSandbox: String;
     FArqChavePrivada: String;
     FArqCertificado: String;
-    FAPIVersion: TACBrPIXAPIVersion;
 
     public
     constructor Create;
@@ -412,7 +405,6 @@ type
     property TokenSandbox: String read FTokenSandbox write FTokenSandbox;
     property ArqChavePrivada: String read FArqChavePrivada write FArqChavePrivada;
     property ArqCertificado: String read FArqCertificado write FArqCertificado;
-    property APIVersion: TACBrPIXAPIVersion read FAPIVersion write FAPIVersion;
   end;
 
   { TPIXCDSicrediConfig }
@@ -422,7 +414,6 @@ type
     FClientSecret: String;
     FArqChavePrivada: String;
     FArqCertificado: String;
-    FAPIVersion: TACBrPIXAPIVersion;
 
     public
     constructor Create;
@@ -435,7 +426,6 @@ type
     property ClientSecret: String read FClientSecret write FClientSecret;
     property ArqChavePrivada: String read FArqChavePrivada write FArqChavePrivada;
     property ArqCertificado: String read FArqCertificado write FArqCertificado;
-    property APIVersion: TACBrPIXAPIVersion read FAPIVersion write FAPIVersion;
   end;
 
   {TPIXCDBradescoConfig}
@@ -447,6 +437,7 @@ type
     FSenhaPFX: AnsiString;
     FArqChavePrivada: String;
     FArqCertificado: String;
+    FAPIVersao: TACBrBradescoAPIVersao;
 
     public
     constructor Create;
@@ -461,6 +452,7 @@ type
     property SenhaPFX: AnsiString read FSenhaPFX write FSenhaPFX;
     property ArqChavePrivada: String read FArqChavePrivada write FArqChavePrivada;
     property ArqCertificado: String read FArqCertificado write FArqCertificado;
+    property APIVersao: TACBrBradescoAPIVersao read FAPIVersao write FAPIVersao;
   end;
 
   { TPIXCDConfig }
@@ -809,6 +801,7 @@ begin
   FSenhaPFX := EmptyStr;
   FArqChavePrivada := EmptyStr;
   FArqCertificado := EmptyStr;
+  FAPIVersao:= TACBrBradescoAPIVersao.braVersao1;
   FSessaoPSP := CSessaoPIXCDBradescoConfig;
 end;
 
@@ -822,6 +815,7 @@ begin
   SenhaPFX := AIni.ReadString(CSessaoPIXCDBradescoConfig, CChaveSenhaPFXBradesco, SenhaPFX);
   ArqChavePrivada := AIni.ReadString(CSessaoPIXCDBradescoConfig, CChaveArqChavePrivadaBradesco, ArqChavePrivada);
   ArqCertificado := AIni.ReadString(CSessaoPIXCDBradescoConfig, CChaveArqCertificadoBradesco, ArqCertificado);
+  APIVersao := TACBrBradescoAPIVersao(AIni.ReadInteger(CSessaoPIXCDBradescoConfig, CChaveBradescoAPIVersao, Integer(APIVersao)));
 end;
 
 procedure TPIXCDBradescoConfig.GravarIni(const AIni: TCustomIniFile);
@@ -834,6 +828,7 @@ begin
   AIni.WriteString(CSessaoPIXCDBradescoConfig, CChaveSenhaPFXBradesco, SenhaPFX);
   AIni.WriteString(CSessaoPIXCDBradescoConfig, CChaveArqChavePrivadaBradesco, ArqChavePrivada);
   AIni.WriteString(CSessaoPIXCDBradescoConfig, CChaveArqCertificadoBradesco, ArqCertificado);
+  AIni.WriteInteger(CSessaoPIXCDBradescoConfig, CChaveBradescoAPIVersao, Integer(APIVersao));
 end;
 
 { TPIXCDSicrediConfig }
@@ -845,7 +840,6 @@ begin
   FClientSecret := EmptyStr;
   FArqChavePrivada := EmptyStr;
   FArqCertificado := EmptyStr;
-  FAPIVersion:= ver262;
   FSessaoPSP := CSessaoPIXCDSicrediConfig;
 end;
 
@@ -857,7 +851,6 @@ begin
   ClientSecret := AIni.ReadString(CSessaoPIXCDSicrediConfig, CChaveClientSecretSicredi, ClientSecret);
   ArqChavePrivada := AIni.ReadString(CSessaoPIXCDSicrediConfig, CChaveArqChavePrivadaSicredi, ArqChavePrivada);
   ArqCertificado := AIni.ReadString(CSessaoPIXCDSicrediConfig, CChaveArqCertificadoSicredi, ArqCertificado);
-  APIVersion := TACBrPIXAPIVersion(AIni.ReadInteger(CSessaoPIXCDSicrediConfig, CChaveAPIVersionSicredi, Integer(APIVersion)));
 end;
 
 procedure TPIXCDSicrediConfig.GravarIni(const AIni: TCustomIniFile);
@@ -868,7 +861,6 @@ begin
   AIni.WriteString(CSessaoPIXCDSicrediConfig, CChaveClientSecretSicredi, ClientSecret);
   AIni.WriteString(CSessaoPIXCDSicrediConfig, CChaveArqChavePrivadaSicredi, ArqChavePrivada);
   AIni.WriteString(CSessaoPIXCDSicrediConfig, CChaveArqCertificadoSicredi, ArqCertificado);
-  AIni.WriteInteger(CSessaoPIXCDSicrediConfig, CChaveAPIVersionSicredi, Integer(APIVersion));
 end;
 
 { TPIXCDSiccobConfig }
@@ -880,7 +872,6 @@ begin
   FTokenSandbox := EmptyStr;
   FArqChavePrivada := EmptyStr;
   FArqCertificado := EmptyStr;
-  FAPIVersion := ver262;
   FSessaoPSP := CSessaoPIXCDSicoobConfig;
 end;
 
@@ -892,7 +883,6 @@ begin
   TokenSandbox := AIni.ReadString(CSessaoPIXCDSicoobConfig, CChaveTokenSandboxSicoob, TokenSandbox);
   ArqChavePrivada := AIni.ReadString(CSessaoPIXCDSicoobConfig, CChaveArqChavePrivadaSicoob, ArqChavePrivada);
   ArqCertificado := AIni.ReadString(CSessaoPIXCDSicoobConfig, CChaveArqCertificadoSicoob, ArqCertificado);
-  APIVersion := TACBrPIXAPIVersion(AIni.ReadInteger(CSessaoPIXCDSicoobConfig, CChaveAPIVersionSicoob, Integer(APIVersion)));
 end;
 
 procedure TPIXCDSiccobConfig.GravarIni(const AIni: TCustomIniFile);
@@ -903,7 +893,6 @@ begin
   AIni.WriteString(CSessaoPIXCDSicoobConfig, CChaveTokenSandboxSicoob, TokenSandbox);
   Aini.WriteString(CSessaoPIXCDSicoobConfig, CChaveArqChavePrivadaSicoob, ArqChavePrivada);
   AIni.WriteString(CSessaoPIXCDSicoobConfig, CChaveArqCertificadoSicoob, ArqCertificado);
-  AIni.WriteInteger(CSessaoPIXCDSicoobConfig, CChaveAPIVersionSicoob, Integer(APIVersion));
 end;
 
 { TPIXCDShipayConfig }
@@ -941,7 +930,6 @@ begin
   FConsumerSecret := EmptyStr;
   FArqCertificadoPFX := EmptyStr;
   FSenhaCertificadoPFX := EmptyStr;
-  FAPIVersion:= ver262;
   FSessaoPSP := CSessaoPIXCDSantanderConfig;
 end;
 
@@ -953,7 +941,6 @@ begin
   ConsumerSecret := AIni.ReadString(CSessaoPIXCDSantanderConfig, CChaveConsumerSecretSantander, ConsumerSecret);
   ArqCertificadoPFX := AIni.ReadString(CSessaoPIXCDSantanderConfig, CChaveArqCertificadoPFXSantander, ArqCertificadoPFX);
   SenhaCertificadoPFX := AIni.ReadString(CSessaoPIXCDSantanderConfig, CChaveSenhaCertificadoPFXSantander, SenhaCertificadoPFX);
-  APIVersion := TACBrPIXAPIVersion(AIni.ReadInteger(CSessaoPIXCDSantanderConfig, CChaveAPIVersionSantander, Integer(APIVersion)));
 end;
 
 procedure TPIXCDSantanderConfig.GravarIni(const AIni: TCustomIniFile);
@@ -964,7 +951,6 @@ begin
   AIni.WriteString(CSessaoPIXCDSantanderConfig, CChaveConsumerSecretSantander, ConsumerSecret);
   AIni.WriteString(CSessaoPIXCDSantanderConfig, CChaveArqCertificadoPFXSantander, ArqCertificadoPFX);
   AIni.WriteString(CSessaoPIXCDSantanderConfig, CChaveSenhaCertificadoPFXSantander, SenhaCertificadoPFX);
-  AIni.WriteInteger(CSessaoPIXCDSantanderConfig, CChaveAPIVersionSantander, Integer(APIVersion));
 end;
 
 { TPIXCDPixPDVConfig }
@@ -1037,7 +1023,6 @@ begin
   FClientSecret := EmptyStr;
   FArqChavePrivada := EmptyStr;
   FArqCertificado := EmptyStr;
-  FAPIVersion:= ver262;
   FSessaoPSP := CSessaoPIXCDItauConfig;
 end;
 
@@ -1049,7 +1034,6 @@ begin
   ClientSecret := AIni.ReadString(CSessaoPIXCDItauConfig, CChaveClientSecretItau, ClientSecret);
   ArqChavePrivada := AIni.ReadString(CSessaoPIXCDItauConfig, CChaveArqChavePrivadaItau, ArqChavePrivada);
   ArqCertificado := AIni.ReadString(CSessaoPIXCDItauConfig, CChaveArqCertificadoItau, ArqCertificado);
-  APIVersion := TACBrPIXAPIVersion(AIni.ReadInteger(CSessaoPIXCDItauConfig, CChaveAPIVersionItau, Integer(APIVersion)));
 end;
 
 procedure TPIXCDItauConfig.GravarIni(const AIni: TCustomIniFile);
@@ -1060,7 +1044,6 @@ begin
   AIni.WriteString(CSessaoPIXCDItauConfig, CChaveClientSecretItau, ClientSecret);
   AIni.WriteString(CSessaoPIXCDItauConfig, CChaveArqChavePrivadaItau, ArqChavePrivada);
   AIni.WriteString(CSessaoPIXCDItauConfig, CChaveArqCertificadoItau, ArqCertificado);
-  AIni.WriteInteger(CSessaoPIXCDItauConfig, CChaveAPIVersionItau, Integer(APIVersion));
 end;
 
 { TPIXCDInterConfig }
@@ -1137,7 +1120,6 @@ begin
   FArqPFX := EmptyStr;
   FSenhaPFX := EmptyStr;
   FBBAPIVersao := TACBrBBAPIVersao.apiVersao1;
-  FAPIVersion := ver262;
   FSessaoPSP := CSessaoPIXCDBancoBrasilConfig;
 end;
 
@@ -1153,7 +1135,6 @@ begin
   ArqPFX := AIni.ReadString(CSessaoPIXCDBancoBrasilConfig, CChaveArqPFXBancoBrasil, ArqPFX);
   SenhaPFX := AIni.ReadString(CSessaoPIXCDBancoBrasilConfig, CChaveSenhaPFXBancoBrasil, SenhaPFX);
   BBAPIVersao := TACBrBBAPIVersao(AIni.ReadInteger(CSessaoPIXCDBancoBrasilConfig, CChaveBBAPIVersaoBancoBrasil, Integer(BBAPIVersao)));
-  APIVersion := TACBrPIXAPIVersion(AIni.ReadInteger(CSessaoPIXCDBancoBrasilConfig, CChaveAPIVersionBancoBrasil, Integer(APIVersion)));
 end;
 
 procedure TPIXCDBancoDoBrasilConfig.GravarIni(const AIni: TCustomIniFile);
@@ -1168,7 +1149,6 @@ begin
   AIni.WriteString(CSessaoPIXCDBancoBrasilConfig, CChaveArqPFXBancoBrasil, ArqPFX);
   AIni.WriteString(CSessaoPIXCDBancoBrasilConfig, CChaveSenhaPFXBancoBrasil, SenhaPFX);
   AIni.WriteInteger(CSessaoPIXCDBancoBrasilConfig, CChaveBBAPIVersaoBancoBrasil, Integer(BBAPIVersao));
-  AIni.WriteInteger(CSessaoPIXCDBancoBrasilConfig, CChaveAPIVersionBancoBrasil, Integer(APIVersion));
 end;
 
 { TPIXCDAilosConfig }

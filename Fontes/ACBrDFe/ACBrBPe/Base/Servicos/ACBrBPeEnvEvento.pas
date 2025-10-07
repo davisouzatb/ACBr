@@ -47,10 +47,12 @@ uses
   ACBrBase,
   pcnConversao,
   pcnSignature,
+  ACBrXmlBase,
+  ACBrDFe.Conversao,
+//  ACBrDFeComum.SignatureClass,
   ACBrBPeClass,
   ACBrBPeEventoClass,
   ACBrBPeConsts,
-  ACBrXmlBase,
   ACBrXmlWriter,
   ACBrXmlDocument;
 
@@ -122,8 +124,6 @@ type
     function Gerar_IBSCBS_gIBSCBS_gIBSUFMunCBS_gRed(Red: TgRed): TACBrXmlNode;
 
     function Gerar_IBSCBS_gIBSCBS_gTribRegular(gTribRegular: TgTribRegular): TACBrXmlNode;
-    function Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(gIBSCredPres: TgIBSCBSCredPres;
-      const Grupo: string): TACBrXmlNode;
   public
     constructor Create;
     destructor Destroy; override;
@@ -152,7 +152,6 @@ uses
   ACBrUtil.FilesIO,
   ACBrUtil.DateTime,
   ACBrBPeRetEnvEvento,
-  ACBrDFe.Conversao,
   ACBrBPeConversao;
 
 { TEventoBPe }
@@ -536,6 +535,9 @@ begin
     Result.AppendChild(AddNode(tcStr, '#2', 'cClassTrib', 6, 6, 1,
                                             IBSCBS.cClassTrib, DSC_CCLASSTRIB));
 
+    Result.AppendChild(AddNode(tcStr, '#3', 'indDoacao', 1, 1, 0,
+              pcnConversao.TIndicadorExToStr(IBSCBS.indDoacao), DSC_INDDOACAO));
+
     if IBSCBS.gIBSCBS.vBC > 0 then
       Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
   end;
@@ -555,12 +557,6 @@ begin
 
   if gIBSCBS.gTribRegular.pAliqEfetRegIBSUF > 0 then
     Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gTribRegular(gIBSCBS.gTribRegular));
-
-  if gIBSCBS.gIBSCredPres.pCredPres > 0 then
-    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(gIBSCBS.gIBSCredPres, 'gIBSCredPres'));
-
-  if gIBSCBS.gCBSCredPres.pCredPres > 0 then
-    Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(gIBSCBS.gCBSCredPres, 'gCBSCredPres'));
 end;
 
 function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSUF(
@@ -711,25 +707,6 @@ begin
 
   Result.AppendChild(AddNode(tcDe2, '#63', 'vTribRegCBS', 1, 15, 1,
                                        gTribRegular.vTribRegCBS, DSC_VTRIBREG));
-end;
-
-function TEventoBPe.Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(
-  gIBSCredPres: TgIBSCBSCredPres; const Grupo: string): TACBrXmlNode;
-begin
-  Result := FDocument.CreateElement(Grupo);
-
-  Result.AppendChild(AddNode(tcStr, '#63', 'cCredPres', 2, 2, 1,
-                        cCredPresToStr(gIBSCredPres.cCredPres), DSC_CCREDPRES));
-
-  Result.AppendChild(AddNode(tcDe4, '#64', 'pCredPres', 1, 7, 1,
-                                        gIBSCredPres.pCredPres, DSC_PCREDPRES));
-
-  if gIBSCredPres.vCredPres > 0 then
-    Result.AppendChild(AddNode(tcDe2, '#65', 'vCredPres', 1, 15, 1,
-                                         gIBSCredPres.vCredPres, DSC_VCREDPRES))
-  else
-    Result.AppendChild(AddNode(tcDe2, '#66', 'vCredPresCondSus', 1, 15, 1,
-                          gIBSCredPres.vCredPresCondSus, DSC_VCREDPRESCONDSUS));
 end;
 
 end.

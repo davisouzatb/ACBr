@@ -1516,12 +1516,14 @@ type
     fConfiguracoes: TConfiguracoes;
     fListaConsultaRetornoWeb: TListaACBrBoletoRetornoWS;
     fPrefixArqRemessa : string;
+    fOnQuandoAlterarBanco: TNotifyEvent;
     fOnAntesAutenticar:  TACBrWebServiceOnAntesAutenticar;
     fOnDepoisAutenticar: TACBrWebServiceOnDepoisAutenticar;
     fOnPrecisaAutenticar: TACBrWebServiceOnPrecisaAutenticar;
     FKeySoftwareHouse: String;
 
     procedure SetACBrBoletoFC(const Value: TACBrBoletoFCClass);
+    procedure SetBanco(AValue: TACBrBanco);
     procedure SetMAIL(AValue: TACBrMail);
 
   protected
@@ -1596,7 +1598,7 @@ type
     property MAIL  : TACBrMail read FMAIL write SetMAIL;
 
     property Homologacao    : Boolean            read fHomologacao            write fHomologacao default False;
-    property Banco          : TACBrBanco         read fBanco                  write fBanco;
+    property Banco          : TACBrBanco         read fBanco                  write SetBanco;
     property Cedente        : TACBrCedente       read fCedente                write fCedente ;
     property PrefixArqRemessa : String           read fPrefixArqRemessa       write fPrefixArqRemessa;
     property NomeArqRemessa : String             read fNomeArqRemessa         write fNomeArqRemessa;
@@ -1617,8 +1619,7 @@ type
     property OnAntesAutenticar   : TACBrWebServiceOnAntesAutenticar    read fOnAntesAutenticar    write fOnAntesAutenticar;
     property OnDepoisAutenticar  : TACBrWebServiceOnDepoisAutenticar   read fOnDepoisAutenticar   write fOnDepoisAutenticar;
     property OnPrecisaAutenticar : TACBrWebServiceOnPrecisaAutenticar  read fOnPrecisaAutenticar  write fOnPrecisaAutenticar;
-
-
+    property OnQuandoAlterarBanco: TNotifyEvent read fOnQuandoAlterarBanco write fOnQuandoAlterarBanco;
   end;
 
   {TACBrBoletoFCClass}
@@ -3103,6 +3104,8 @@ begin
    {$ENDIF}
    FOnAntesAutenticar  := nil;
    FOnDepoisAutenticar := nil;
+   fOnPrecisaAutenticar := nil;
+   fOnQuandoAlterarBanco := nil;
 end;
 
 destructor TACBrBoleto.Destroy;
@@ -3137,6 +3140,12 @@ begin
          Value.ACBrBoleto := self ;
       end ;
    end ;
+end;
+
+procedure TACBrBoleto.SetBanco(AValue: TACBrBanco);
+begin
+  if (fBanco = AValue) then Exit;
+  fBanco := AValue;
 end;
 
 procedure TACBrBoleto.SetMAIL(AValue: TACBrMail);
@@ -4169,6 +4178,7 @@ begin
         CedenteWS.IndicadorPix              := IniBoletos.ReadBool(CWebService,'IndicadorPix', CedenteWS.IndicadorPix);
         CedenteWS.Scope                     := IniBoletos.ReadString(CWebService,'Scope', CedenteWS.Scope);
 
+        Configuracoes.WebService.UseCertificateHTTP := IniBoletos.ReadBool(CWebService,'UseCertificateHTTP', Configuracoes.WebService.UseCertificateHTTP);
         Configuracoes.WebService.Ambiente   := TTipoAmbienteWS(IniBoletos.ReadInteger(CWebService,'Ambiente', Integer(Configuracoes.WebService.Ambiente)));
         Configuracoes.WebService.SSLHttpLib := TSSLHttpLib(IniBoletos.ReadInteger(CWebService,'SSLHttpLib', Integer(Configuracoes.WebService.SSLHttpLib)));
         Configuracoes.WebService.SSLCryptLib := TSSLCryptLib( IniBoletos.ReadInteger(CWebService,'SSLCryptLib',Integer(Configuracoes.WebService.SSLCryptLib)));
@@ -4902,6 +4912,9 @@ begin
    end;
 
    fTipoCobranca := AValue;
+
+  if Assigned(fACBrBoleto.fOnQuandoAlterarBanco) then
+    fACBrBoleto.fOnQuandoAlterarBanco(Self);
 end;
 
 function TACBrBanco.TipoOcorrenciaToDescricao( const TipoOcorrencia: TACBrTipoOcorrencia) : String;

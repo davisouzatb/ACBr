@@ -47,6 +47,31 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+03/10/2025
+-- ACBrPIXCD --
+[-] Ajuste do parametro Validade para 'out' no momento de gerar o Token.
+    por: Julio Cavalcanti
+
+01/10/2025
+-- ACBrPixPSPBradesco --
+[+] Criada propriedade para definir as versões de URL do Bradesco.
+    por: Elias Cesar
+
+25/09/2025
+-- ACBrPIXCD --
+[*] Alteração do evento OnQuandoAlterarPSP para a classe ACBrPIXCD.
+    por: Elias Cesar
+
+24/09/2025
+-- ACBrPIXPSPItau --
+[*] Alteração para utilizar url v2 ao renovar o certificado.
+    por: João Adorivan
+
+18/09/2025
+-- ACBrPIXCD --
+[+] Inclusão dos eventos OnPrecisaAutenticar e OnQuandoAlterarPSP.
+    por: Elias Cesar
+
 19/08/2025
 -- ACBrSchemasAppLess --
 [-] Correção da propriedade customerSocialName.

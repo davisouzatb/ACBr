@@ -41,6 +41,19 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+29/09/2025
+-- ACBrLibBoletoDataModule.pas --
+[-] TK-8121 Ajustados metodos oauth
+	Por: Victor H. Gonzales Pandaaa
+	Testado: Daniel Morais C# 
+
+22/09/2025
+-- ACBrLibBoletoBase, ACBrLibBoletoRespostas, ACBrLibBoletoStaticImport, ACBrLibBoletoStaticImportMT,ACBrLibBoletoMT,
+ACBrLibBoletoST, ACBrLibBoletoDataModule, ACBrLibBoletoDataModule, ACBrLibBoleto.lpr --
+[+] TK-7983 Novos Metodos InformaToken e GerarToken
+	Por: Julio Cavalcanti 
+	Rev.: Elias César, Antonio Carlos, Daniel de Morais InfoCotidiano, Victor Hugo Gonzales Pandaaa
+	
 
 26/05/2025
 -- ACBrLibBoletoRespostas --

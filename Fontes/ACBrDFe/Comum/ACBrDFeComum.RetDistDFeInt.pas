@@ -45,6 +45,7 @@ uses
   {$IfEnd}
   ACBrBase,
   ACBrDFe,
+  ACBrDFe.Conversao,
   pcnConversao,
   ACBrXmlBase,
   ACBrXmlDocument;
@@ -186,17 +187,17 @@ type
     FnProt: string;
     FcSitDFe: TSituacaoDFe;
   public
-    property chDFe: string            read FchDFe    write FchDFe;
-    property CNPJCPF: string          read FCNPJCPF  write FCNPJCPF;
-    property xNome: string            read FxNome    write FxNome;
-    property IE: string               read FIE       write FIE;
-    property dhEmi: TDateTime         read FdhEmi    write FdhEmi;
-    property tpNF: TpcnTipoNFe        read FtpNF     write FtpNF;
-    property vNF: Currency            read FvNF      write FvNF;
-    property digVal: string           read FdigVal   write FdigVal;
-    property dhRecbto: TDateTime      read FdhRecbto write FdhRecbto;
-    property nProt: string            read FnProt    write FnProt;
-    property cSitDFe: TSituacaoDFe    read FcSitDFe  write FcSitDFe;
+    property chDFe: string         read FchDFe    write FchDFe;
+    property CNPJCPF: string       read FCNPJCPF  write FCNPJCPF;
+    property xNome: string         read FxNome    write FxNome;
+    property IE: string            read FIE       write FIE;
+    property dhEmi: TDateTime      read FdhEmi    write FdhEmi;
+    property tpNF: TpcnTipoNFe     read FtpNF     write FtpNF;
+    property vNF: Currency         read FvNF      write FvNF;
+    property digVal: string        read FdigVal   write FdigVal;
+    property dhRecbto: TDateTime   read FdhRecbto write FdhRecbto;
+    property nProt: string         read FnProt    write FnProt;
+    property cSitDFe: TSituacaoDFe read FcSitDFe  write FcSitDFe;
   end;
 
   TresEvento = class(TObject)
@@ -346,6 +347,7 @@ type
       const AtpDFe: string = 'NFe'): Boolean;
     function GerarPathDistribuicao(AItem :TdocZipCollectionItem): string;
     function GerarNomeArquivo(AItem :TdocZipCollectionItem): string;
+    procedure CarregarArquivo(Const CaminhoArquivo: string);
 
     property versao: string            read Fversao   write Fversao;
     property tpAmb: TpcnTipoAmbiente   read FtpAmb    write FtpAmb;
@@ -365,6 +367,7 @@ implementation
 
 uses 
   synacode,
+  StrUtils,
   ACBrDFeException,
   ACBrUtil.Strings, ACBrUtil.XMLHTML, ACBrUtil.FilesIO;
 
@@ -471,6 +474,11 @@ end;
 
 { TRetDistDFeInt }
 
+procedure TRetDistDFeInt.CarregarArquivo(const CaminhoArquivo: string);
+begin
+  XmlRetorno := ACBrUtil.FilesIO.CarregarArquivo(CaminhoArquivo);
+end;
+
 constructor TRetDistDFeInt.Create(AOwner: TACBrDFe; const AtpDFe: string);
 begin
   inherited Create;
@@ -572,11 +580,17 @@ end;
 
 procedure TRetDistDFeInt.LerGrupo_total(const ANode: TACBrXmlNode;
   Indice: Integer);
+var
+  ICMSTot: TACBrXmlNode;
 begin
   if not Assigned(ANode) then Exit;
 
+  ICMSTot := ANode.Childrens.FindAnyNs('ICMSTot');
+  if not Assigned(ICMSTot) then
+    Exit;
+
   // Leitura do valor da nota fiscal - NF-e
-  docZip[Indice].resDFe.vNF := ObterConteudoTag(ANode.Childrens.FindAnyNs('vNF'), tcDe2);
+  docZip[Indice].resDFe.vNF := ObterConteudoTag(ICMSTot.Childrens.FindAnyNs('vNF'), tcDe2);
 end;
 
 procedure TRetDistDFeInt.LerGrupo_vPrest(const ANode: TACBrXmlNode;
@@ -628,7 +642,7 @@ begin
 
     if Assigned(AuxNode) then
     begin
-      docZip[Indice].resDFe.chDFe := ObterConteudoTag(AuxNode.Attributes.Items['Id']);
+      docZip[Indice].resDFe.chDFe := RightStr(ObterConteudoTag(AuxNode.Attributes.Items['Id']), 44);
 
       LerGrupo_ide(AuxNode.Childrens.FindAnyNs('ide'), Indice);
       LerGrupo_emit(AuxNode.Childrens.FindAnyNs('emit'), Indice);

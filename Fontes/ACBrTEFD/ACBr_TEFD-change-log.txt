@@ -45,6 +45,44 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+03/10/2025
+-- ACBrTEFScopeAPI --
+[*] Ajuste para chamar evento TransacaoEmAndamento, quando está no Fluxo do QRCode
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=85617
+    (por: DSA)
+
+-- ACBrTEFDestaxaComum --
+[*] Alteração ao chamar evento OnExibirMensagem no método ProcessarResposta.
+    por: Elias Cesar
+
+25/09/2025
+-- ACBrTEFAPI --
+[*] Remoção de Warning em 'TACBrTEFAPI.VersaoAPI'
+
+-- ACBrTEFDClass --
+[*] Ajuste em 'TACBrTEFDClass.FinalizarRequisicao', para se necessário, ajustar
+    os valores de Req.Header e Req.ID, após a chamada de 'OnAntesFinalizarRequisicao'
+    (por: DSA)
+
+-- ACBrTEFAPIDestaxa, ACBrTEFAPIDestaxaComum --
+[*] Ajuste para mapear
+    DestaxaResposta.transacao_codigo_vespague -> TACBrTEFResp.Finalizacao
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=85845
+
+-- ACBrTEFAPIAditum --
+[-] Atribuição da propriedade Sucesso corretamente
+[+] Adicionado transações com PIX
+[+] Adicionado exibição do QrCode na tela
+[+] Leitura dos campos para emissão de NFCe(NFCeSAT.CNPJCredenciadora, NFCeSAT.Bandeira, NFCeSAT.Autorizacao, EndToEndID)
+[+] Ao efetuar reimpressão, perguntar NSU caso não esteja carregado na UltimaRespostaTEF.NSU
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=85787
+    (por: André Moraes e Robert Marx e DSA)
+
+24/09/2025
+-- ACBrTEFAPIScope --
+[*] Correção na função EfetuarAdministrativa para operação Recarga de Celular
+    Por: Antonio Carlos Junior
+
 05/09/2025
 -- ACBrTEFAPIStoneAutoTEF --
 [*] Método 'EfetuarPix', renomeado para 'EnviarPix'

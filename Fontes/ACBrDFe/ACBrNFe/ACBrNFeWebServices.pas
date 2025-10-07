@@ -39,6 +39,8 @@ interface
 
 uses
   Classes, SysUtils, dateutils,
+  ACBrXmlBase,
+  ACBrDFe.Conversao,
   ACBrDFe, ACBrDFeWebService,
   ACBrDFeUtil,
   blcksock, synacode,
@@ -53,7 +55,9 @@ uses
   ACBrNFe.Consts,
   ACBrNFe.EnvEvento,
   ACBrNFe.RetEnvEvento,
-  pcnDistDFeInt, pcnRetDistDFeInt,
+//  pcnDistDFeInt, pcnRetDistDFeInt,
+  ACBrDFeComum.DistDFeInt,
+  ACBrDFeComum.RetDistDFeInt,
   ACBrDFeComum.RetEnvio,
   ACBrNFeNotasFiscais, ACBrNFeConfiguracoes;
 
@@ -520,6 +524,7 @@ type
 
   TDistribuicaoDFe = class(TNFeWebService)
   private
+    FOwner: TACBrDFe;
     FcUFAutor: integer;
     FCNPJCPF: String;
     FultNSU: String;
@@ -633,7 +638,6 @@ implementation
 
 uses
   StrUtils, Math,
-  ACBrXmlBase,
   ACBrUtil.Base, ACBrUtil.Strings, ACBrUtil.DateTime, ACBrUtil.XMLHTML,
   ACBrUtil.FilesIO,
   ACBrCompress, ACBrNFe, ACBrConsts,
@@ -805,9 +809,9 @@ end;
 
 procedure TNFeStatusServico.DefinirServicoEAction;
 var
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   if (FPConfiguracoesNFe.Geral.VersaoDF >= ve400) then
   begin
@@ -1036,7 +1040,7 @@ var
   VerServ: Double;
   Modelo: TpcnModeloDF;
   ok: Boolean;
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
   if FNotasFiscais.Count > 0 then    // Tem NFe ? Se SIM, use as informações do XML
   begin
@@ -1063,7 +1067,7 @@ begin
     FPLayout := LayNfeRecepcao;
 
   // Configuração correta ao enviar para o SVC
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   case Emissao of
     teSVCAN: xUF := 'SVC-AN';
@@ -1506,7 +1510,7 @@ var
   VerServ: Double;
   ok: Boolean;
   Modelo: TpcnModeloDF;
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
   if FNotasFiscais.Count > 0 then    // Tem NFe ? Se SIM, use as informações do XML
   begin
@@ -1533,7 +1537,7 @@ begin
     FPLayout := LayNfeRetRecepcao;
 
   // Configuração correta ao enviar para o SVC
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   case Emissao of
     teSVCAN: xUF := 'SVC-AN';
@@ -1888,7 +1892,7 @@ var
   VerServ: Double;
   ok: Boolean;
   Modelo: TpcnModeloDF;
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
   if FNotasFiscais.Count > 0 then    // Tem NFe ? Se SIM, use as informações do XML
   begin
@@ -1915,7 +1919,7 @@ begin
     FPLayout := LayNfeRetRecepcao;
 
   // Configuração correta ao enviar para o SVC
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   case Emissao of
     teSVCAN: xUF := 'SVC-AN';
@@ -2083,7 +2087,7 @@ procedure TNFeConsulta.DefinirURL;
 var
   VerServ: Double;
   Modelo, xUF: String;
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
   FPVersaoServico := '';
   FPURL  := '';
@@ -2098,7 +2102,7 @@ begin
 
   // Se a nota foi enviada para o SVC a consulta tem que ser realizada no SVC e
   // não na SEFAZ-Autorizadora
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   case Emissao of
     teSVCAN: xUF := 'SVC-AN';
@@ -2122,9 +2126,9 @@ end;
 
 procedure TNFeConsulta.DefinirServicoEAction;
 var
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   if (FPConfiguracoesNFe.Geral.VersaoDF >= ve400) then
   begin
@@ -2181,7 +2185,7 @@ end;
 
 function TNFeConsulta.TratarResposta: Boolean;
 
-procedure SalvarEventos(Retorno: string);
+procedure SalvarEventos(Retorno, Versao: string);
 var
   aEvento, aProcEvento, aIDEvento, sPathEvento, sCNPJCPF: string;
   DhEvt: TDateTime;
@@ -2198,7 +2202,7 @@ begin
 
     Retorno := Copy(Retorno, Fim + 1, Length(Retorno));
 
-    aProcEvento := '<procEventoNFe versao="' + FVersao + '" xmlns="' + ACBRNFE_NAMESPACE + '">' +
+    aProcEvento := '<procEventoNFe versao="' + Versao + '" xmlns="' + ACBRNFE_NAMESPACE + '">' +
                       SeparaDados(aEvento, 'procEventoNFe') +
                    '</procEventoNFe>';
 
@@ -2227,7 +2231,7 @@ end;
 var
   NFeRetorno: TRetConsSitNFe;
   SalvarXML, NFCancelada, Atualiza: Boolean;
-  aEventos, sPathNFe, NomeXMLSalvo: String;
+  aEventos, sPathNFe, NomeXMLSalvo, VersaoEventos: string;
   AProcNFe: TProcNFe;
   I, J, Inicio, Fim: integer;
   dhEmissao: TDateTime;
@@ -2506,13 +2510,14 @@ begin
                 Fim    := Pos('</retConsSitNFe', FPRetWS) -1;
 
                 aEventos := Copy(FPRetWS, Inicio, Fim - Inicio + 1);
+                VersaoEventos := RetornarConteudoEntre(aEventos, 'versao="', '"');
 
                 FRetNFeDFe := '<' + ENCODING_UTF8 + '>' +
                               '<NFeDFe>' +
                                '<procNFe versao="' + FVersao + '">' +
                                  SeparaDados(XMLOriginal, 'nfeProc') +
                                '</procNFe>' +
-                               '<procEventoNFe versao="' + FVersao + '">' +
+                               '<procEventoNFe versao="' + VersaoEventos + '">' +
                                  aEventos +
                                '</procEventoNFe>' +
                               '</NFeDFe>';
@@ -2549,7 +2554,7 @@ begin
 
                   // Salva o XML de eventos retornados ao consultar um NF-e
                   if ExtrairEventos then
-                    SalvarEventos(aEventos);
+                    SalvarEventos(aEventos, VersaoEventos);
                 end;
               end;
 
@@ -2567,9 +2572,10 @@ begin
           Fim    := Pos('</retConsSitNFe', FPRetWS) -1;
 
           aEventos := Copy(FPRetWS, Inicio, Fim - Inicio + 1);
+          VersaoEventos := RetornarConteudoEntre(aEventos, 'versao="', '"');
 
           // Salva o XML de eventos retornados ao consultar um NF-e
-          SalvarEventos(aEventos);
+          SalvarEventos(aEventos, VersaoEventos);
         end;
       end;
     end;
@@ -2693,9 +2699,9 @@ end;
 procedure TNFeInutilizacao.DefinirServicoEAction;
 var
   ok: Boolean;
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   if (FPConfiguracoesNFe.Geral.VersaoDF >= ve400) then
   begin
@@ -3086,7 +3092,7 @@ procedure TNFeEnvEvento.DefinirURL;
 var
   UF, Modelo : String;
   VerServ: Double;
-  Emissao: TACBrTipoEmissao;
+  Emissao: TpcnTipoEmissao;
 begin
   { Verificação necessária pois somente os eventos de Cancelamento e CCe serão tratados pela SEFAZ do estado
     os outros eventos como manifestacao de destinatários serão tratados diretamente pela RFB }
@@ -3099,7 +3105,7 @@ begin
   FIE      := FEvento.Evento.Items[0].InfEvento.detEvento.IE;
 
   // Configuração correta ao enviar para o SVC
-  Emissao := TACBrTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
+  Emissao := TpcnTipoEmissao(FPConfiguracoesNFe.Geral.FormaEmissao);
 
   case Emissao of
     teSVCAN: UF := 'SVC-AN';
@@ -3222,10 +3228,15 @@ begin
         infEvento.nSeqEvento := FEvento.Evento[I].InfEvento.nSeqEvento;
         infEvento.versaoEvento := FEvento.Evento[I].InfEvento.versaoEvento;
 
+        infEvento.detEvento.cOrgaoAutor := FEvento.Evento[I].InfEvento.detEvento.cOrgaoAutor;
+        infEvento.detEvento.tpAutor := FEvento.Evento[I].InfEvento.detEvento.tpAutor;
+        infEvento.detEvento.verAplic := FEvento.Evento[I].InfEvento.detEvento.verAplic;
+
         case InfEvento.tpEvento of
           teCCe:
           begin
             SchemaEventoNFe := schEnvCCe;
+
             infEvento.detEvento.xCorrecao := FEvento.Evento[I].InfEvento.detEvento.xCorrecao;
             infEvento.detEvento.xCondUso := FEvento.Evento[I].InfEvento.detEvento.xCondUso;
           end;
@@ -3233,6 +3244,7 @@ begin
           teCancelamento:
           begin
             SchemaEventoNFe := schcancNFe;
+
             infEvento.detEvento.nProt := FEvento.Evento[I].InfEvento.detEvento.nProt;
             infEvento.detEvento.xJust := FEvento.Evento[I].InfEvento.detEvento.xJust;
           end;
@@ -3240,9 +3252,7 @@ begin
           teCancSubst:
           begin
             SchemaEventoNFe := schCancSubst;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[I].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.tpAutor := FEvento.Evento[I].InfEvento.detEvento.tpAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[I].InfEvento.detEvento.verAplic;
+
             infEvento.detEvento.nProt := FEvento.Evento[I].InfEvento.detEvento.nProt;
             infEvento.detEvento.xJust := FEvento.Evento[I].InfEvento.detEvento.xJust;
             infEvento.detEvento.chNFeRef := FEvento.Evento[I].InfEvento.detEvento.chNFeRef;
@@ -3267,9 +3277,7 @@ begin
           teEPECNFe:
           begin
             SchemaEventoNFe := schEnvEPEC;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[I].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.tpAutor := FEvento.Evento[I].InfEvento.detEvento.tpAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[I].InfEvento.detEvento.verAplic;
+
             infEvento.detEvento.dhEmi := FEvento.Evento[I].InfEvento.detEvento.dhEmi;
             infEvento.detEvento.tpNF := FEvento.Evento[I].InfEvento.detEvento.tpNF;
             infEvento.detEvento.IE := FEvento.Evento[I].InfEvento.detEvento.IE;
@@ -3292,14 +3300,14 @@ begin
             else
               SchemaEventoNFe := schPedProrrog2;
 
-            infEvento.detEvento.nProt := FEvento.Evento[i].InfEvento.detEvento.nProt;
+            infEvento.detEvento.nProt := FEvento.Evento[I].InfEvento.detEvento.nProt;
 
-            for j := 0 to FEvento.Evento.Items[i].InfEvento.detEvento.itemPedido.count - 1 do
+            for j := 0 to FEvento.Evento.Items[I].InfEvento.detEvento.itemPedido.count - 1 do
             begin
               with infEvento.detEvento.itemPedido.New do
               begin
-                numItem := FEvento.Evento[i].InfEvento.detEvento.itemPedido.Items[j].numItem;
-                qtdeItem := FEvento.Evento[i].InfEvento.detEvento.itemPedido.Items[j].qtdeItem;
+                numItem := FEvento.Evento[I].InfEvento.detEvento.itemPedido.Items[j].numItem;
+                qtdeItem := FEvento.Evento[I].InfEvento.detEvento.itemPedido.Items[j].qtdeItem;
               end;
             end;
 
@@ -3313,98 +3321,88 @@ begin
             else
               SchemaEventoNFe := schCanPedProrrog2;
 
-            infEvento.detEvento.idPedidoCancelado := FEvento.Evento[i].InfEvento.detEvento.idPedidoCancelado;
-            infEvento.detEvento.nProt := FEvento.Evento[i].InfEvento.detEvento.nProt;
+            infEvento.detEvento.idPedidoCancelado := FEvento.Evento[I].InfEvento.detEvento.idPedidoCancelado;
+            infEvento.detEvento.nProt := FEvento.Evento[I].InfEvento.detEvento.nProt;
           end;
 
           teComprEntregaNFe:
           begin
             SchemaEventoNFe := schCompEntrega;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[i].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.tpAutor := FEvento.Evento[i].InfEvento.detEvento.tpAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
-            infEvento.detEvento.dhEntrega := FEvento.Evento[i].InfEvento.detEvento.dhEntrega;
-            infEvento.detEvento.nDoc := FEvento.Evento[i].InfEvento.detEvento.nDoc;
-            infEvento.detEvento.xNome := FEvento.Evento[i].InfEvento.detEvento.xNome;
-            infEvento.detEvento.latGPS := FEvento.Evento[i].InfEvento.detEvento.latGPS;
-            infEvento.detEvento.longGPS := FEvento.Evento[i].InfEvento.detEvento.longGPS;
-            infEvento.detEvento.hashComprovante := FEvento.Evento[i].InfEvento.detEvento.hashComprovante;
-            infEvento.detEvento.dhHashComprovante := FEvento.Evento[i].InfEvento.detEvento.dhHashComprovante;
+
+            infEvento.detEvento.dhEntrega := FEvento.Evento[I].InfEvento.detEvento.dhEntrega;
+            infEvento.detEvento.nDoc := FEvento.Evento[I].InfEvento.detEvento.nDoc;
+            infEvento.detEvento.xNome := FEvento.Evento[I].InfEvento.detEvento.xNome;
+            infEvento.detEvento.latGPS := FEvento.Evento[I].InfEvento.detEvento.latGPS;
+            infEvento.detEvento.longGPS := FEvento.Evento[I].InfEvento.detEvento.longGPS;
+            infEvento.detEvento.hashComprovante := FEvento.Evento[I].InfEvento.detEvento.hashComprovante;
+            infEvento.detEvento.dhHashComprovante := FEvento.Evento[I].InfEvento.detEvento.dhHashComprovante;
           end;
 
           teCancComprEntregaNFe:
           begin
             SchemaEventoNFe := schCancCompEntrega;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[i].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.tpAutor := FEvento.Evento[i].InfEvento.detEvento.tpAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
-            infEvento.detEvento.nProtEvento := FEvento.Evento[i].InfEvento.detEvento.nProtEvento;
+
+            infEvento.detEvento.nProtEvento := FEvento.Evento[I].InfEvento.detEvento.nProtEvento;
           end;
 
           teAtorInteressadoNFe:
           begin
             SchemaEventoNFe := schAtorInteressadoNFe;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[i].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.tpAutor := FEvento.Evento[i].InfEvento.detEvento.tpAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
 
-            for j := 0 to FEvento.Evento.Items[i].InfEvento.detEvento.autXML.count - 1 do
+            for j := 0 to FEvento.Evento[I].InfEvento.detEvento.autXML.count - 1 do
             begin
               with infEvento.detEvento.autXML.New do
               begin
-                CNPJCPF := FEvento.Evento[i].InfEvento.detEvento.autXML[j].CNPJCPF;
+                CNPJCPF := FEvento.Evento[I].InfEvento.detEvento.autXML[j].CNPJCPF;
               end;
             end;
 
-            infEvento.detEvento.tpAutorizacao := FEvento.Evento[i].InfEvento.detEvento.tpAutorizacao;
-            infEvento.detEvento.xCondUso := FEvento.Evento[i].InfEvento.detEvento.xCondUso;
+            infEvento.detEvento.tpAutorizacao := FEvento.Evento[I].InfEvento.detEvento.tpAutorizacao;
+            infEvento.detEvento.xCondUso := FEvento.Evento[I].InfEvento.detEvento.xCondUso;
           end;
 
           teInsucessoEntregaNFe:
           begin
             SchemaEventoNFe := schInsucessoEntregaNFe;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[i].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
-            infEvento.detEvento.dhTentativaEntrega := FEvento.Evento[i].InfEvento.detEvento.dhTentativaEntrega;
-            infEvento.detEvento.nTentativa := FEvento.Evento[i].InfEvento.detEvento.nTentativa;
-            infEvento.detEvento.tpMotivo := FEvento.Evento[i].InfEvento.detEvento.tpMotivo;
-            infEvento.detEvento.xJustMotivo := FEvento.Evento[i].InfEvento.detEvento.xJustMotivo;
-            infEvento.detEvento.latGPS := FEvento.Evento[i].InfEvento.detEvento.latGPS;
-            infEvento.detEvento.longGPS := FEvento.Evento[i].InfEvento.detEvento.longGPS;
-            infEvento.detEvento.hashTentativaEntrega := FEvento.Evento[i].InfEvento.detEvento.hashTentativaEntrega;
-            infEvento.detEvento.dhHashTentativaEntrega := FEvento.Evento[i].InfEvento.detEvento.dhHashTentativaEntrega;
-            infEvento.detEvento.UF := FEvento.Evento[i].InfEvento.detEvento.UF;
+
+            infEvento.detEvento.dhTentativaEntrega := FEvento.Evento[I].InfEvento.detEvento.dhTentativaEntrega;
+            infEvento.detEvento.nTentativa := FEvento.Evento[I].InfEvento.detEvento.nTentativa;
+            infEvento.detEvento.tpMotivo := FEvento.Evento[I].InfEvento.detEvento.tpMotivo;
+            infEvento.detEvento.xJustMotivo := FEvento.Evento[I].InfEvento.detEvento.xJustMotivo;
+            infEvento.detEvento.latGPS := FEvento.Evento[I].InfEvento.detEvento.latGPS;
+            infEvento.detEvento.longGPS := FEvento.Evento[I].InfEvento.detEvento.longGPS;
+            infEvento.detEvento.hashTentativaEntrega := FEvento.Evento[I].InfEvento.detEvento.hashTentativaEntrega;
+            infEvento.detEvento.dhHashTentativaEntrega := FEvento.Evento[I].InfEvento.detEvento.dhHashTentativaEntrega;
+            infEvento.detEvento.UF := FEvento.Evento[I].InfEvento.detEvento.UF;
           end;
 
           teCancInsucessoEntregaNFe:
           begin
             SchemaEventoNFe := schCancInsucessoEntregaNFe;
-            infEvento.detEvento.cOrgaoAutor := FEvento.Evento[i].InfEvento.detEvento.cOrgaoAutor;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
-            infEvento.detEvento.nProtEvento := FEvento.Evento[i].InfEvento.detEvento.nProtEvento;
+
+            infEvento.detEvento.nProtEvento := FEvento.Evento[I].InfEvento.detEvento.nProtEvento;
           end;
 
           teConcFinanceira:
           begin
             SchemaEventoNFe := schConcFinanceira;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
 
-            for j := 0 to FEvento.Evento.Items[i].InfEvento.detEvento.detPag.count - 1 do
+            for j := 0 to FEvento.Evento[I].InfEvento.detEvento.detPag.count - 1 do
             begin
               with infEvento.detEvento.detPag.New do
               begin
-                indPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].indPag;
-                tPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].tPag;
-                xPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].xPag;
-                vPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].vPag;
-                dPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].dPag;
-                CNPJPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].CNPJPag;
-                UFPag := FEvento.Evento[i].InfEvento.detEvento.detPag[j].UFPag;
-                CNPJIF := FEvento.Evento[i].InfEvento.detEvento.detPag[j].CNPJIF;
-                tBand := FEvento.Evento[i].InfEvento.detEvento.detPag[j].tBand;
-                cAut := FEvento.Evento[i].InfEvento.detEvento.detPag[j].cAut;
-                CNPJReceb := FEvento.Evento[i].InfEvento.detEvento.detPag[j].CNPJReceb;
-                UFReceb := FEvento.Evento[i].InfEvento.detEvento.detPag[j].UFReceb;
+                indPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].indPag;
+                tPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].tPag;
+                xPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].xPag;
+                vPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].vPag;
+                dPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].dPag;
+                CNPJPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].CNPJPag;
+                UFPag := FEvento.Evento[I].InfEvento.detEvento.detPag[j].UFPag;
+                CNPJIF := FEvento.Evento[I].InfEvento.detEvento.detPag[j].CNPJIF;
+                tBand := FEvento.Evento[I].InfEvento.detEvento.detPag[j].tBand;
+                cAut := FEvento.Evento[I].InfEvento.detEvento.detPag[j].cAut;
+                CNPJReceb := FEvento.Evento[I].InfEvento.detEvento.detPag[j].CNPJReceb;
+                UFReceb := FEvento.Evento[I].InfEvento.detEvento.detPag[j].UFReceb;
               end;
             end;
           end;
@@ -3412,8 +3410,92 @@ begin
           teCancConcFinanceira:
           begin
             SchemaEventoNFe := schCancConcFinanceira;
-            infEvento.detEvento.verAplic := FEvento.Evento[i].InfEvento.detEvento.verAplic;
-            infEvento.detEvento.nProtEvento := FEvento.Evento[i].InfEvento.detEvento.nProtEvento;
+
+            infEvento.detEvento.nProtEvento := FEvento.Evento[I].InfEvento.detEvento.nProtEvento;
+          end;
+
+          teCancGenerico:
+          begin
+            SchemaEventoNFe := schCancGenerico;
+
+          end;
+
+          tePagIntegLibCredPresAdq:
+          begin
+            SchemaEventoNFe := schPagIntegLibCredPresAdq;
+
+          end;
+
+          teImporALCZFM:
+          begin
+            SchemaEventoNFe := schImporALCZFM;
+
+          end;
+
+          tePerecPerdaRouboFurtoTranspContratFornec:
+          begin
+            SchemaEventoNFe := schPerecPerdaRouboFurtoTranspContratFornec;
+
+          end;
+
+          teFornecNaoRealizPagAntec:
+          begin
+            SchemaEventoNFe := schFornecNaoRealizPagAntec;
+
+          end;
+
+          teSolicApropCredPres:
+          begin
+            SchemaEventoNFe := schSolicApropCredPres;
+
+          end;
+
+          teDestItemConsPessoal:
+          begin
+            SchemaEventoNFe := schDestItemConsPessoal;
+
+          end;
+
+          tePerecPerdaRouboFurtoTranspContratAqu:
+          begin
+            SchemaEventoNFe := schPerecPerdaRouboFurtoTranspContratAqu;
+
+          end;
+
+          teAceiteDebitoApuracaoNotaCredito:
+          begin
+            SchemaEventoNFe := schAceiteDebitoApuracaoNotaCredito;
+
+          end;
+
+          teImobilizacaoItem:
+          begin
+            SchemaEventoNFe := schImobilizacaoItem;
+
+          end;
+
+          teSolicApropCredCombustivel:
+          begin
+            SchemaEventoNFe := schSolicApropCredCombustivel;
+
+          end;
+
+          teSolicApropCredBensServicos:
+          begin
+            SchemaEventoNFe := schSolicApropCredBensServicos;
+
+          end;
+
+          teManifPedTransfCredIBSSucessao:
+          begin
+            SchemaEventoNFe := schManifPedTransfCredIBSSucessao;
+
+          end;
+
+          teManifPedTransfCredCBSSucessao:
+          begin
+            SchemaEventoNFe := schManifPedTransfCredCBSSucessao;
+
           end;
         end;
       end;
@@ -3759,6 +3841,8 @@ end;
 constructor TDistribuicaoDFe.Create(AOwner: TACBrDFe);
 begin
   inherited Create(AOwner);
+
+  FOwner := AOwner;
 end;
 
 destructor TDistribuicaoDFe.Destroy;
@@ -3783,7 +3867,7 @@ begin
   if Assigned(FretDistDFeInt) then
     FretDistDFeInt.Free;
 
-  FretDistDFeInt := TRetDistDFeInt.Create('NFe');
+  FretDistDFeInt := TRetDistDFeInt.Create(FOwner, 'NFe');
 
   if Assigned(FlistaArqs) then
     FlistaArqs.Free;
@@ -3837,10 +3921,11 @@ begin
     DistDFeInt.NSU := trim(FNSU);
     DistDFeInt.Chave := trim(FchNFe);
 
-    AjustarOpcoes( DistDFeInt.Gerador.Opcoes );
-    DistDFeInt.GerarXML;
+    FPDadosMsg := DistDFeInt.GerarXML;
+//    AjustarOpcoes( DistDFeInt.Gerador.Opcoes );
+//    DistDFeInt.GerarXML;
 
-    FPDadosMsg := DistDFeInt.Gerador.ArquivoFormatoXML;
+//    FPDadosMsg := DistDFeInt.Gerador.ArquivoFormatoXML;
   finally
     DistDFeInt.Free;
   end;
@@ -3858,7 +3943,8 @@ begin
 
   // Processando em UTF8, para poder gravar arquivo corretamente //
   //A função UTF8ToNativeString deve ser removida quando for refatorado para usar ACBrXMLDocument
-  FretDistDFeInt.Leitor.Arquivo := UTF8ToNativeString(ParseText(FPRetWS));
+//  FretDistDFeInt.Leitor.Arquivo := UTF8ToNativeString(ParseText(FPRetWS));
+  FretDistDFeInt.XmlRetorno := FPRetWS;
   FretDistDFeInt.LerXml;
 
   for I := 0 to FretDistDFeInt.docZip.Count - 1 do

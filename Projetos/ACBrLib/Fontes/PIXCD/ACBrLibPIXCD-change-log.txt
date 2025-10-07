@@ -42,6 +42,22 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+07/10/2025
+-- ACBrLibPIXCDConfig, ACBrLibPIXCDDataModule, ACBrLibPIXCDConsts  --
+[*] Remoção da propriedade APIVersion de todos os PSPs da lib.
+    por: Julio Cavalcanti
+
+06/10/2025
+-- ACBrLibPIXCDConfig, ACBrLibPIXCDDataModule, ACBrLibPIXCDConsts  --
+[+] Inclusão de propriedade APIVersao para o PSP Bradesco
+    por: Julio Cavalcanti
+
+30/09/2025
+-- ACBrLibPIXCD --
+[+] Inclusão dos métodos GerarToken e InformarToken, responsáveis por possibilitar
+    a autenticação dos PSPs de forma manual através da Lib.
+    por: Elias Cesar
+
 13/08/2025
 -- ACBrLibPIXCD --
 [+] Inclusão de novo método para gerar QrCode estático com chave pix.

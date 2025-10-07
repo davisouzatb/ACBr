@@ -249,7 +249,8 @@ uses
 constructor TNFeXmlWriter.Create(AOwner: TNFe);
 begin
   inherited Create;
-  Opcoes.AjustarTagNro := True;
+
+  Opcoes.AjustarTagNro := False;
   Opcoes.GerarTagIPIparaNaoTributado := True;
   Opcoes.NormatizarMunicipios := False;
   Opcoes.PathArquivoMunicipios := '';
@@ -259,6 +260,7 @@ begin
   Opcoes.CamposFatObrigatorios := True;
   Opcoes.FForcarGerarTagRejeicao938 := fgtNunca;
   Opcoes.FForcarGerarTagRejeicao906 := fgtNunca;
+
   FNFe := AOwner;
 end;
 
@@ -870,12 +872,9 @@ begin
   else
     Result.AppendChild(AddNodeCNPJCPF('E02', 'E03', NFe.Dest.CNPJCPF, IsNFe));
 
-  if NFe.Ide.tpAmb = pcnConversao.taProducao then
-    Result.AppendChild(AddNode(tcStr, 'E04', 'xNome', 02, 60,
-      IfThen(IsNFe, 1, 0), NFe.Dest.xNome, DSC_XNOME))
-  else
-    Result.AppendChild(AddNode(tcStr, 'E04', 'xNome', 02, 60,
-      IfThen(IsNFe, 1, 0), HOM_NOME_DEST, DSC_XNOME));
+  if (NFe.Ide.tpAmb = pcnConversao.taHomologacao) then
+    NFe.Dest.xNome := HOM_NOME_DEST;
+  Result.AppendChild(AddNode(tcStr, 'E04', 'xNome', 02, 60, IfThen(IsNFe, 1, 0), NFe.Dest.xNome, DSC_XNOME));
 
   if IsNFe then
     (**)Result.AppendChild(GerarDestEnderDest(UF))
@@ -1195,13 +1194,9 @@ begin
   Result.AppendChild(AddNode(tcStr, 'I03a', 'cBarra', 3, 30, 0,
     NFe.Det[i].Prod.cBarra, DSC_CBARRA));
 
-  if (NFe.Det[i].Prod.nItem = 1) and (NFe.Ide.tpAmb = pcnConversao.taHomologacao) and
-     (NFe.ide.modelo = 65) then
-    Result.AppendChild(AddNode(tcStr, 'I04', 'xProd', 1, 120, 1,
-      HOM_XPROD, DSC_XPROD))
-  else
-    Result.AppendChild(AddNode(tcStr, 'I04', 'xProd', 1, 120, 1,
-      NFe.Det[i].Prod.xProd, DSC_XPROD));
+  if (NFe.Det[i].Prod.nItem = 1) and (NFe.Ide.tpAmb = pcnConversao.taHomologacao) and (NFe.ide.modelo = 65) then
+    NFe.Det[i].Prod.xProd := HOM_XPROD;
+  Result.AppendChild(AddNode(tcStr, 'I04', 'xProd', 1, 120, 1,NFe.Det[i].Prod.xProd, DSC_XPROD));
 
   Result.AppendChild(AddNode(tcStr, 'I05', 'NCM', 02, 08,
     IfThen(NFe.infNFe.Versao >= 2, 1, 0), NFe.Det[i].Prod.NCM, DSC_NCM));
@@ -1609,7 +1604,7 @@ begin
     if NFe.infNFe.Versao >= 4 then
     begin
       Result[j].AppendChild(AddNode(tcStr, 'K01a', 'cProdANVISA',
-        13, 013, 1, NFe.Det[i].Prod.med[j].cProdANVISA, DSC_CPRODANVISA));
+        06, 013, 1, NFe.Det[i].Prod.med[j].cProdANVISA, DSC_CPRODANVISA));
       Result[j].AppendChild(AddNode(tcStr, 'K01b', 'xMotivoIsencao',
         01, 255, 0, NFe.Det[i].Prod.med[j].xMotivoIsencao, DSC_CPRODANVISA));
     end;
@@ -4231,19 +4226,18 @@ begin
   Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSUF(IBSCBS.gIBSUF));
   Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSMun(IBSCBS.gIBSMun));
 
-  // Tag definida como opcional até que todas as SEFAZ estejam adequadas a NT 2025/001 v1.20
-  Result.AppendChild(AddNode(tcDe2, 'UB35', 'vIBS', 1, 15, 0,
-                                                      IBSCBS.vIBS, DSC_VIBS));
+  Result.AppendChild(AddNode(tcDe2, 'UB35', 'vIBS', 1, 15, 1,
+                                                        IBSCBS.vIBS, DSC_VIBS));
 
   Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gCBS(IBSCBS.gCBS));
 
-  if IBSCBS.gTribRegular.pAliqEfetRegIBSUF > 0 then
+  if IBSCBS.gTribRegular.CSTReg <> cstNenhum then
     Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gTribRegular(IBSCBS.gTribRegular));
 
-  if IBSCBS.gIBSCredPres.pCredPres > 0 then
+  if IBSCBS.gIBSCredPres.cCredPres <> cpNenhum then
     Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(IBSCBS.gIBSCredPres, 'gIBSCredPres'));
 
-  if IBSCBS.gCBSCredPres.pCredPres > 0 then
+  if IBSCBS.gCBSCredPres.cCredPres <> cpNenhum then
     Result.AppendChild(Gerar_IBSCBS_gIBSCBS_gIBSCBSCredPres(IBSCBS.gCBSCredPres, 'gCBSCredPres'));
 
   if (IBSCBS.gTribCompraGov.pAliqIBSUF > 0) and (NFe.Ide.gCompraGov.tpEnteGov <> tcgNenhum) then
@@ -4389,12 +4383,12 @@ begin
   Result.AppendChild(AddNode(tcDe4, 'UB57', 'pCredPres', 1, 7, 1,
                                          IBSCredPres.pCredPres, DSC_PCREDPRES));
 
-  if IBSCredPres.vCredPres > 0 then
-    Result.AppendChild(AddNode(tcDe2, 'UB58', 'vCredPres', 1, 15, 1,
-                                          IBSCredPres.vCredPres, DSC_VCREDPRES))
-  else
+  if IBSCredPres.vCredPresCondSus > 0 then
     Result.AppendChild(AddNode(tcDe2, 'UB59', 'vCredPresCondSus', 1, 15, 1,
-                           IBSCredPres.vCredPresCondSus, DSC_VCREDPRESCONDSUS));
+                            IBSCredPres.vCredPresCondSus, DSC_VCREDPRESCONDSUS))
+  else
+    Result.AppendChild(AddNode(tcDe2, 'UB58', 'vCredPres', 1, 15, 1,
+                                         IBSCredPres.vCredPres, DSC_VCREDPRES));
 end;
 
 function TNFeXmlWriter.Gerar_IBSCBS_gIBSCBS_gTribCompraGov(

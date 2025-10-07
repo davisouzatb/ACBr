@@ -63,6 +63,11 @@ type
 
 implementation
 
+uses
+  SysUtils,
+  frxClass,
+  frxDsgnIntf;
+
 {$IFDEF FPC}
 { THBufDataset }
 
@@ -75,5 +80,29 @@ begin
   TBufDataset(Self).Open;
 end;
 {$ENDIF}
+
+procedure RemoveExportPDFDup;
+var
+  LCount, I: Integer;
+begin
+  //Remove do menu, exportações de PDF "duplicadas"
+  //FastReport varre a aplicação por RTTI buscando TfrxPDFExport
+  //Para cada TfrxPDFExport é criado um item no menu
+  //Este processo varre os plugins de exportação deixando apenas 1 (o ultimo) TfrxPDFExport por rtti
+  //Inserir na chamada do metodo Imprimir do Relatório
+  //proposto por Marcos R Weimer / compatibilizado por BigWings
+  LCount := 0;
+
+  for i := Pred(frxExportFilters.Count) downto 0 do
+  begin
+    if AnsiUpperCase(frxExportFilters[i].Filter.ClassName) = 'TFRXPDFEXPORT' then
+    begin
+      if LCount > 0 then
+        frxExportFilters.Delete(i)
+      else
+        Inc(LCount);
+    end;
+  end;
+end;
 
 end.

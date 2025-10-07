@@ -1,0 +1,35 @@
+name: acbrlibnfe
+description: "Programa Exemplo ACBrLibNFe em Flutter"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fluttertoast: ^8.0.9
+  cupertino_icons: ^1.0.8
+  # Dependências para garantir a importação correta do diretório Schemas
+  path_provider:
+  archive:
+  shared_preferences:
+  crypto:
+  # Dependência para importação do certificado pfx
+  file_picker:
+  # Dependências para conversão de pdf em imagem
+  pdfx:
+  image:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/

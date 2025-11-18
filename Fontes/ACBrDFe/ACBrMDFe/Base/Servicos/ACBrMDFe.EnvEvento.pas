@@ -44,12 +44,14 @@ uses
    System.Contnrs,
   {$IfEnd}
   ACBrDFeConsts,
+  ACBrXmlBase,
+  ACBrDFe.Conversao,
   pcnConversao,
   pcnSignature,
+//  ACBrDFeComum.SignatureClass,
   ACBrMDFe.Consts,
   ACBrMDFe.EventoClass,
   ACBrBase,
-  ACBrXmlBase,
   ACBrXmlWriter,
   ACBrXmlDocument;
 

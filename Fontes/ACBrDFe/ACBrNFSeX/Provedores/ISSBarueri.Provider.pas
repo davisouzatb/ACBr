@@ -38,7 +38,8 @@ interface
 uses
   SysUtils, Classes, Variants,
   ACBrBase, ACBrDFeSSL,
-  ACBrXmlBase, ACBrXmlDocument,
+  ACBrXmlBase,
+  ACBrXmlDocument,
   ACBrNFSeXNotasFiscais,
   ACBrNFSeXClass, ACBrNFSeXConversao,
   ACBrNFSeXGravarXml, ACBrNFSeXLerXml,
@@ -120,6 +121,7 @@ implementation
 
 uses
   synacode, synautil,
+  ACBrDFe.Conversao,
   ACBrConsts,
   ACBrUtil.Base, ACBrUtil.DateTime, ACBrUtil.Strings, ACBrUtil.XMLHTML,
   ACBrDFeException,
@@ -474,7 +476,7 @@ var
   Registro1, Registro9, AIdentificacaoRemessa: string;
   Nota: TNotaFiscal;
   ValorServicos, ValorTotalRetencoes: Double;
-  I: Integer;
+  I, TotalLinhas: Integer;
 begin
   Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
   ValorServicos := 0;
@@ -499,21 +501,40 @@ begin
                    'PMB002'+
                    PadLeft(AIdentificacaoRemessa, 11, '0') + CRLF;
 
+      // Inclui no total de linhas o Registro 1
+      TotalLinhas := 1;
     end;
 
+    // Informação contida no Registro 2
     ValorServicos := ValorServicos +
                      Nota.NFSe.Servico.Valores.ValorServicos;
+    Inc(TotalLinhas);
 
+    // Informações contidas no Registro 3
     ValorTotalRetencoes := ValorTotalRetencoes +
                            Nota.NFSe.Servico.Valores.ValorIr +
                            Nota.NFSe.Servico.Valores.ValorPis +
                            Nota.NFSe.Servico.Valores.ValorCofins +
                            Nota.NFSe.Servico.Valores.ValorCsll;
 
+    if Nota.NFSe.Servico.Valores.ValorIr > 0 then
+      Inc(TotalLinhas);
+
+    if Nota.NFSe.Servico.Valores.ValorPis > 0 then
+      Inc(TotalLinhas);
+
+    if Nota.NFSe.Servico.Valores.ValorCofins > 0 then
+      Inc(TotalLinhas);
+
+    if Nota.NFSe.Servico.Valores.ValorCsll > 0 then
+      Inc(TotalLinhas);
   end;
 
+  // Inclui no total de linhas o Registro 9
+  Inc(TotalLinhas);
+
   Registro9 := '9' +
-        PadRight(IntToStr(TACBrNFSeX(FAOwner).NotasFiscais.Count + 2), 7, ' ') +
+        PadLeft(IntToStr(TotalLinhas), 7, '0') +
         PadLeft(FloatToStr(ValorServicos * 100), 15, '0') +
         PadLeft(FloatToStr(ValorTotalRetencoes * 100), 15, '0') + CRLF;
 

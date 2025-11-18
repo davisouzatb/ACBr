@@ -208,7 +208,9 @@ implementation
 
 uses
   pcteConversaoCTe,
-  ACBrDFeUtil, ACBrImage, ACBrDelphiZXingQRCode, ACBrValidador;
+  ACBrDFe.Conversao,
+  ACBrDFeUtil, ACBrImage, ACBrDelphiZXingQRCode, ACBrValidador, 
+  ACBrUtil.FR;
 
 function CollateBr(Str: string): string;
 var
@@ -1263,6 +1265,7 @@ end;
 
 procedure TACBrCTeDACTEFR.ImprimirDACTe(ACTE: TCTe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReport(ACTE) then
   begin
     if MostraPreview then
@@ -1308,6 +1311,7 @@ end;
 
 procedure TACBrCTeDACTEFR.ImprimirEVENTO(ACTE: TCTe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReportEvento then
   begin
     if MostraPreview then
@@ -1353,6 +1357,7 @@ end;
 
 procedure TACBrCTeDACTEFR.ImprimirINUTILIZACAO(ACTE: TCTe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReportInutilizacao then
   begin
     if MostraPreview then
@@ -1475,14 +1480,18 @@ begin
   else
     raise EACBrCTeDACTEFR.Create('Caminho do arquivo de impressão do DACTE não assinalado.');
 
-  frxReport.PrintOptions.Copies := NumCopias;
-  frxReport.PrintOptions.ShowDialog := MostraSetup;
+
   frxReport.ShowProgress := MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
 
   // Define a impressora
-  if NaoEstaVazio(frxReport.PrintOptions.Printer) then
+  if EstaVazio(Impressora) then
+    SetDefaultPrinter(frxReport)
+  else
     frxReport.PrintOptions.Printer := Impressora;
+
+  frxReport.PrintOptions.Copies := NumCopias;
+  frxReport.PrintOptions.ShowDialog := MostraSetup;
 
   if Assigned(ACTE) then
   begin
@@ -1534,14 +1543,18 @@ begin
   else
     raise EACBrCTeDACTEFR.Create('Caminho do arquivo de impressão do EVENTO não assinalado.');
 
-  frxReport.PrintOptions.Copies := NumCopias;
-  frxReport.PrintOptions.ShowDialog := MostraSetup;
+
   frxReport.ShowProgress := MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
 
   // Define a impressora
-  if NaoEstaVazio(frxReport.PrintOptions.Printer) then
+  if EstaVazio(Impressora) then
+    SetDefaultPrinter(frxReport)
+  else
     frxReport.PrintOptions.Printer := Impressora;
+
+  frxReport.PrintOptions.Copies := NumCopias;
+  frxReport.PrintOptions.ShowDialog := MostraSetup;
 
   // preparar relatorio
   if Assigned(ACBrCTe) then
@@ -1581,14 +1594,16 @@ begin
   else
     raise EACBrCTeDACTEFR.Create('Caminho do arquivo de impressão do INUTILIZAÇÃO não assinalado.');
 
-  frxReport.PrintOptions.Copies := NumCopias;
-  frxReport.PrintOptions.ShowDialog := MostraSetup;
   frxReport.ShowProgress := MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
 
   // Define a impressora
-  if NaoEstaVazio(frxReport.PrintOptions.Printer) then
+  if EstaVazio(Impressora) then
+    SetDefaultPrinter(frxReport)
+  else
     frxReport.PrintOptions.Printer := Impressora;
+  frxReport.PrintOptions.Copies := NumCopias;
+  frxReport.PrintOptions.ShowDialog := MostraSetup;
 
   // preparar relatorio
   if Assigned(ACBrCTe) then

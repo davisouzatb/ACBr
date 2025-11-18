@@ -48,6 +48,103 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+13/11/2025
+-- ACBrBoleto,ACBrBancoBradescoMoneyPlus  --
+[*] Criado metodo para definir posições agencia, agenciadv, conta e contadv nos retornos
+   TK-7463/ACBr-478 https://www.projetoacbr.com.br/forum/topic/84729-extra%C3%A7%C3%A3o-incorreta-de-ag%C3%AAncia-e-conta-no-retorno-cnab-400-do-banco-274-moneyplus-gera-erro-na-valida%C3%A7%C3%A3o/
+   Por Daniel Sonda, Daniel de Morais InfoCotidiano.
+
+11/11/2025
+-- ACBrBoletoRet_Inter_API.pas --
+[*] Ajustado DataBaixa qdo status igual a Recebido, Cancelado, Pago
+   ACBr-8212 https://www.projetoacbr.com.br/forum/profile/121385-jo%C3%A3o-vitor-bogo
+   Por João Vitor Bogo, Daniel Morais
+
+11/11/2025
+-- ACBrBancoCredisan.pas --
+[-] Ajustado ValorMoraMes e PercentualMulta conforme manual.
+   ACBr-8276 https://www.projetoacbr.com.br/forum/topic/86769-ajuste-gera%C3%A7%C3%A3o-arquivo-cnb400-credisan/
+   Por Dayvison Reis_12476, SAC Emilyonline
+
+11/11/2025
+-- ACBrBoleto.pas --
+[-] Adicionado a propriedade boletoVencido (filtro) na leitura do arquivo ini de consulta que não estava implementado.
+   ACBr-8371 https://www.projetoacbr.com.br/forum/topic/87196-erro-na-consulta-movimenta%C3%A7%C3%A3o-sicoob-api
+   Por Daniel de Morais
+
+10/11/2025
+-- ACBrBancoBrasil.pas --
+[*] Quando convenio for maior que 6, colocado a condição se TipoPagamento for igual tpNao_Aceita_Valor_Divergente, gera "N" posição 394
+   ACBr-8358 https://www.projetoacbr.com.br/forum/topic/87136-erro-na-remessa-do-boleto-banco-do-brasil-cnab400/#comment-565536
+   Por Daniel de Morais, Eric Bortoleto 
+
+03/11/2025
+-- ACBrBancoSicoob.pas --
+[*] Removido  a linha Cedente.CodigoCedente:= rConta+rDigitoConta quando lerCedenteRetorno, pois o codigo cedente não é este montado.
+   ACBr-8296 https://www.projetoacbr.com.br/forum/topic/86876-propriedade-tamanhoconta-banco-sicoob/?&_rid=1706#findComment-564244
+   Por EasySoft Sistemas
+
+29/10/2025
+-- ACBrBoletoRet_BancoBrasil_API --
+[-] Correção do nossoNumero API devolvendo dv entre convenio e nossonumero.
+   ACBr-8296 https://discord.com/channels/798697718800318484/800736352420364320/1432315134692294716
+   Por Ederson Selvati
+   
+29/10/2025
+-- ACBrBancoSicoob, ACBrBoletoW_Sicoob_V3.pas --
+[*] Se Informado CodTransmissao (NumeroContrato), vai ser alimentado com ele na LinhaDigitvel e Barras 
+   ACBr-8307 https://www.projetoacbr.com.br/forum/topic/86792-erro-c%C3%B3d-barrasdv-do-nosso-n%C3%BAmero-na-emiss%C3%A3o-via-sicoob-api-v3-para-carteira-9
+   https://svn.code.sf.net/p/acbr/code/tools/Bancos/Recebimento/756-Sicoob/Linha%20digitavel%20Carteira%209.pdf
+   Por Daniel de Morais InfoCotidiano 
+
+24/10/2025
+-- ACBrBancoSofisa --
+[*] Adicionado codigo ocorrencia retorno 01, entrada confirmada cip
+   ACBr-8268 https://www.projetoacbr.com.br/forum/topic/86689-inclu%C3%ADdo-tratamento-para-novo-tipo-de-retorno-sofisa/
+   Por Lucas Pechebelok Hernandes
+
+24/10/2025
+-- ACBrBoletoW_Santander_API--
+[*] Adicionado as especies de documento disponibilidado na API, mantendo compatibilidade com o cnab
+   ACBr-8275 https://www.projetoacbr.com.br/forum/topic/86758-peculiaridade-boleto-santander-pagador-e-cobrador-mesma-ra%C3%ADz-cnpj
+   Por Daniel de Morais InfoCotidiano
+   
+22/10/2025
+-- ACBrBoleto --
+[*] Ajustado verificação do arquivo de retorno no header arquivo posição 143 conforme manual
+   ACBr-8206 https://www.projetoacbr.com.br/forum/topic/86710-banco-amazonia-remessa-de-retorno-n%C3%A3o-%C3%A9-um-arquivo-de-retorno-de-cobran%C3%A7a-com-layout-cnab240-v%C3%A1lido/
+   Por Daniel de Morais InfoCotidiano
+
+20/10/2025
+-- ACBrBoletoRet_Itau_API --
+[*] Ajustado retorno francesinhas array de operacoes de cobranca 
+   ACBr-8206 https://www.projetoacbr.com.br/forum/topic/86306-api-cobran%C3%A7a-ita%C3%BA-movimenta%C3%A7%C3%A3o/?_rid=8941
+   Por Luciano Rodrigues Pereira 
+
+14/10/2025
+-- ACBrBancoCredisan --
+[*] Ajustado decimais morajuros e tamanhoconta para 7.
+   ACBr-8165 https://www.projetoacbr.com.br/forum/topic/86263-banco-credisan-remessa-com-juros-montado-sem-0-a-esquerda/
+   Por Victor H. Gonzales Pandaaaa / Daniel de Morais InfoCotidiano
+
+10/10/2025
+-- ACBrBoletoRet_BancoBrasil_API --
+[*] Preenchida url do boleto nas propriedades de retorno do envio da cobrança do BB via API
+   Por Renato Rubinho
+
+09/10/2025
+-- ACBrBancoItau --
+[*] Implementado o metodo LerNossoNumeroCompleto no Itau CNAB400
+    ACBr-8155 - https://www.projetoacbr.com.br/forum/topic/86236-trazer-o-nosso-numero-completo-no-retorno-itau/#comment-560567
+	Por: Daniel de Morais InfoCotidano
+
+
+08/10/2025
+-- ACBrBancoSicoob --
+[-] Quando carteira 9, CNAB 240 segmento P posicao 58, informar "1!
+    ACBr-8174 - https://www.projetoacbr.com.br/forum/topic/85963-sicoob-cnab-240-como-configurar-carteira-e-id-neg%C3%B3cio-na-homologa%C3%A7%C3%A3o/
+	Por: Daniel de Morais InfoCotidano
+	
 07/10/2025
 -- ACBrBoletoW_Banrisul --
 [-] Correção do codigo de protesto. (DiasDeProtesto enviado apenas qdo codigo = 1)

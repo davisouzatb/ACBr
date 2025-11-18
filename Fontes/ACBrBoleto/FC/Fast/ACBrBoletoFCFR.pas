@@ -107,7 +107,8 @@ type
 implementation
 
 uses
-  ACBrUtil.Base, ACBrUtil.Strings, ACBrImage, ACBrBancoBanestes, ACBrDelphiZXingQRCode;
+  ACBrUtil.Base, ACBrUtil.Strings, ACBrImage, ACBrBancoBanestes, ACBrDelphiZXingQRCode,
+  ACBrUtil.FR;
 
 { TdmACBrBoletoFCFR }
 
@@ -363,6 +364,7 @@ end;
 
 procedure TACBrBoletoFCFR.Imprimir;
 begin
+  RemoveExportFastReportPDFDuplicate;
   inherited Imprimir; // Verifica se a lista de boletos está vazia
   FcdsBanco.EmptyDataSet;
   FcdsCedente.EmptyDataSet;
@@ -371,13 +373,17 @@ begin
   if PreparaRelatorio then
   begin
     FfrxReport.Preview := CustomPreview;
-    FfrxReport.PrintOptions.ShowDialog := (MostrarSetup) and (not FModoThread);
-    FfrxReport.PrintOptions.Copies := NumCopias;
+
     if TituloPreview <> '' then
       FfrxReport.ReportOptions.Name := TituloPreview;
 
-    if Length(Impressora) > 0 then
+    if EstaVazio(Impressora) then
+      SetDefaultPrinter(FfrxReport)
+    else
       FfrxReport.PrintOptions.Printer := Impressora;
+
+    FfrxReport.PrintOptions.ShowDialog := (MostrarSetup) and (not FModoThread);
+    FfrxReport.PrintOptions.Copies := NumCopias;
 
     case Filtro of
       fiPDF, fiNenhum:

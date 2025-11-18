@@ -183,8 +183,12 @@ end;
 
 function TNFSeW_Aspec.GerarLocalPrestacaoServico: TACBrJSONObject;
 begin
-  Result := TACBrJSONObject.Create
-              .AddPair('codIBGE', StrToInt(NFSe.Tomador.Endereco.CodigoMunicipio));
+  if nfse.LogradouLocalPrestacaoServico = llpPrestador then
+     Result := TACBrJSONObject.Create
+                 .AddPair('codIBGE', StrToInt(NFSe.Prestador.Endereco.CodigoMunicipio))
+  else
+   Result := TACBrJSONObject.Create
+                 .AddPair('codIBGE', StrToInt(NFSe.Tomador.Endereco.CodigoMunicipio))
 end;
 
 function TNFSeW_Aspec.GerarServicos: TACBrJSONObject;

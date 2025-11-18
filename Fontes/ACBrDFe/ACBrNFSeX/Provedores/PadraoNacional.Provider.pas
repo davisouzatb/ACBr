@@ -39,6 +39,7 @@ interface
 uses
   SysUtils, Classes, Variants,
   ACBrJSON, ACBrDFeSSL,
+  ACBrBase,
   ACBrXmlBase,
   ACBrXmlDocument,
   ACBrNFSeXNotasFiscais,
@@ -51,6 +52,8 @@ uses
 
 type
   TACBrNFSeXWebservicePadraoNacional = class(TACBrNFSeXWebserviceRest)
+  protected
+    procedure SetHeaders(aHeaderReq: THTTPHeader); override;
   public
     function GerarNFSe(const ACabecalho, AMSG: string): string; override;
     function ConsultarNFSePorRps(const ACabecalho, AMSG: string): string; override;
@@ -59,6 +62,7 @@ type
     function ConsultarEvento(const ACabecalho, AMSG: string): string; override;
     function ConsultarDFe(const ACabecalho, AMSG: string): string; override;
     function ConsultarParam(const ACabecalho, AMSG: string): string; override;
+    function ObterDANFSE(const ACabecalho, AMSG: string): string; override;
 
     function TratarXmlRetornado(const aXML: string): string; override;
   end;
@@ -97,6 +101,9 @@ type
     procedure PrepararConsultarParam(Response: TNFSeConsultarParamResponse); override;
     procedure TratarRetornoConsultarParam(Response: TNFSeConsultarParamResponse); override;
 
+    procedure PrepararObterDANFSE(Response: TNFSeObterDANFSEResponse); override;
+    procedure TratarRetornoObterDANFSE(Response: TNFSeObterDANFSEResponse); override;
+
     procedure ProcessarMensagemDeErros(LJson: TACBrJSONObject;
                                      Response: TNFSeWebserviceResponse;
                                      const AListTag: string = 'Erros');
@@ -121,17 +128,23 @@ uses
 { TACBrNFSeProviderPadraoNacional }
 
 procedure TACBrNFSeProviderPadraoNacional.Configuracao;
+var
+  VersaoDFe: string;
 begin
   inherited Configuracao;
 
+  VersaoDFe := VersaoNFSeToStr(TACBrNFSeX(FAOwner).Configuracoes.Geral.Versao);
+
   with ConfigGeral do
   begin
+    QuebradeLinha := '|';
     ModoEnvio := meUnitario;
     ConsultaLote := False;
     FormatoArqEnvio := tfaJson;
     FormatoArqRetorno := tfaJson;
     FormatoArqEnvioSoap := tfaJson;
     FormatoArqRetornoSoap := tfaJson;
+    UseAuthorizationHeader := ConfigGeral.Params.TemParametro('UseToken');
 
     ServicosDisponibilizados.EnviarUnitario := True;
     ServicosDisponibilizados.ConsultarNfseChave := True;
@@ -140,14 +153,16 @@ begin
     ServicosDisponibilizados.ConsultarEvento := True;
     ServicosDisponibilizados.ConsultarDFe := True;
     ServicosDisponibilizados.ConsultarParam := True;
+    ServicosDisponibilizados.ObterDANFSE := True;
 
     Particularidades.AtendeReformaTributaria := True;
   end;
 
   with ConfigWebServices do
   begin
-    VersaoDados := '1.00';
-    VersaoAtrib := '1.00';
+    VersaoDados := VersaoDFe;
+    VersaoAtrib := VersaoDFe;
+
     AtribVerLote := 'versao';
   end;
 
@@ -176,11 +191,11 @@ begin
 
   with ConfigSchemas do
   begin
-    GerarNFSe := 'DPS_v1.00.xsd';
-    ConsultarNFSe := 'DPS_v1.00.xsd';
-    ConsultarNFSeRps := 'DPS_v1.00.xsd';
-    EnviarEvento := 'pedRegEvento_v1.00.xsd';
-    ConsultarEvento := 'DPS_v1.00.xsd';
+    GerarNFSe := 'DPS_v' + VersaoDFe + '.xsd';
+    ConsultarNFSe := 'DPS_v' + VersaoDFe + '.xsd';
+    ConsultarNFSeRps := 'DPS_v' + VersaoDFe + '.xsd';
+    EnviarEvento := 'pedRegEvento_v' + VersaoDFe + '.xsd';
+    ConsultarEvento := 'DPS_v' + VersaoDFe + '.xsd';
   end;
 end;
 
@@ -521,13 +536,20 @@ begin
     AErro.Descricao := ACBrStr(Desc118);
     Exit;
   end;
-
-  Response.Metodo := tmConsultarNFSePorChave;
-
+{
   if Response.InfConsultaNFSe.tpRetorno = trXml then
-    FpPath := '/nfse/' + Response.InfConsultaNFSe.ChaveNFSe
+  begin
+    FpPath := '/nfse/' + Response.InfConsultaNFSe.ChaveNFSe;
+    Response.Metodo := tmConsultarNFSePorChave;
+  end
   else
+  begin
     FpPath := '/danfse/' + Response.InfConsultaNFSe.ChaveNFSe;
+    Response.Metodo := tmConsultarParam;
+  end;
+}
+  FpPath := '/nfse/' + Response.InfConsultaNFSe.ChaveNFSe;
+  Response.Metodo := tmConsultarNFSePorChave;
 
   Response.ArquivoEnvio := FpPath;
   FpMethod := 'GET';
@@ -626,7 +648,7 @@ procedure TACBrNFSeProviderPadraoNacional.PrepararEnviarEvento(
   Response: TNFSeEnviarEventoResponse);
 var
   AErro: TNFSeEventoCollectionItem;
-  xEvento, xUF, xAutorEvento, IdAttr, xCamposEvento, nomeArq: string;
+  xEvento, xUF, xAutorEvento, IdAttr, xCamposEvento, nomeArq, CnpjCpf: string;
 begin
   with Response.InfEvento.pedRegEvento do
   begin
@@ -641,16 +663,17 @@ begin
 
     xUF := TACBrNFSeX(FAOwner).Configuracoes.WebServices.UF;
 
-    if Length(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ) < 14 then
+    CnpjCpf := OnlyAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
+    if Length(CnpjCpf) < 14 then
     begin
       xAutorEvento := '<CPFAutor>' +
-                        TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ +
+                        CnpjCpf +
                       '</CPFAutor>';
     end
     else
     begin
       xAutorEvento := '<CNPJAutor>' +
-                        TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ +
+                        CnpjCpf +
                       '</CNPJAutor>';
     end;
 
@@ -665,7 +688,7 @@ begin
                          '<xMotivo>' + xMotivo + '</xMotivo>';
 
       teCancelamentoSubstituicao:
-        xCamposEvento := '<cMotivo>' + IntToStr(cMotivo) + '</cMotivo>' +
+        xCamposEvento := '<cMotivo>' + Formatfloat('00', cMotivo) + '</cMotivo>' +
                          '<xMotivo>' + xMotivo + '</xMotivo>' +
                          '<chSubstituta>' + chSubstituta + '</chSubstituta>';
 
@@ -784,6 +807,7 @@ begin
             Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
             Response.idEvento := IDEvento;
             Response.tpEvento := StrTotpEvento(Ok, Copy(IDEvento, 51, 6));
+            Response.XmlRetorno := EventoXml;
 
             case Response.tpEvento of
               teCancelamento:
@@ -1101,7 +1125,7 @@ begin
                 Response.nSeqEvento := ObterConteudoTag(ANode.Childrens.FindAnyNs('nSeqEvento'), tcInt);
                 Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
                 Response.idEvento := IDEvento;
-                Response.tpEvento := StrTotpEvento(Ok, Copy(IDEvento, 51, 6));
+                Response.tpEvento := StrTotpEvento(Ok, 'e' + Copy(IDEvento, 51, 6));
 
                 ANode := ANode.Childrens.FindAnyNs('pedRegEvento');
                 ANode := ANode.Childrens.FindAnyNs('infPedReg');
@@ -1148,14 +1172,15 @@ end;
 procedure TACBrNFSeProviderPadraoNacional.PrepararConsultarParam(
   Response: TNFSeConsultarParamResponse);
 var
-  CodSer, Compet, NumBenef: string;
+  CodSer, Compet, Compet2, NumBenef: string;
 begin
-  FpPath := '/parametros_municipais/' + IntToStr(Response.CodigoMunicipio);
+  FpPath := '/parametrizacao/' + IntToStr(Response.CodigoMunicipio);
 
   CodSer := OnlyNumber(Response.CodigoServico);
   CodSer := Copy(CodSer, 1, 2) + '.' + Copy(CodSer, 3, 2) + '.' +
             Copy(CodSer, 5, 2) + '.' + Copy(CodSer, 7, 3);
   Compet := FormatDateTime('MM-DD-YYYY', Response.Competencia);
+  Compet2 := FormatDateTime('YYYY-MM-DD', Response.Competencia);
   NumBenef := Response.NumeroBeneficio;
 
   case Response.tpParamMunic of
@@ -1186,24 +1211,24 @@ var
   Document, JSon, JsonE, JsonI: TACBrJSONObject;
   JSonItem, JSonRetMun: TACBrJSONArray;
   i, j: Integer;
-  xCodServ: string;
+  xCodServ, aValor: string;
 
   procedure LerHistorico(Json: TACBrJSONObject);
   var
     JSonItem: TACBrJSONArray;
     i: Integer;
   begin
-    JSonItem := Json.AsJSONArray['hist'];
+    JSonItem := Json.AsJSONArray['historico'];
 
     for i := 0 to JSonItem.Count-1 do
     begin
       JsonI := JSonItem.ItemAsJSONObject[i];
 
       Response.Parametros.Add('Data Inicial: ' +
-        DateTimeToStr(JsonI.AsISODate['dtIni']));
+        DateTimeToStr(JsonI.AsISODate['dataInicioVigencia']));
 
       Response.Parametros.Add('Data Final: ' +
-        DateTimeToStr(JsonI.AsISODate['dtFim']));
+        DateTimeToStr(JsonI.AsISODate['dataFimVigencia']));
     end;
   end;
 begin
@@ -1243,11 +1268,17 @@ begin
         begin
           JsonI := JSonItem.ItemAsJSONObject[i];
 
+          Response.Parametros.Add(ACBrStr('Insidencia: ' +
+            JsonI.AsString['Incidencia']));
+
           Response.Parametros.Add(ACBrStr('Alíquota: ' +
-            JsonI.AsString['aliq']));
+            JsonI.AsString['Aliq']));
 
           Response.Parametros.Add('Data Inicial: ' +
-            DateTimeToStr(JsonI.AsISODate['dtIni']));
+            DateTimeToStr(JsonI.AsISODate['DtIni']));
+
+          Response.Parametros.Add('Data Final: ' +
+            DateTimeToStr(JsonI.AsISODate['DtFim']));
         end;
       end;
 
@@ -1256,14 +1287,26 @@ begin
 
       if Json <> nil then
       begin
-        Response.Parametros.Add('Aderente ao Ambiente Nacional: ' +
-          JSon.AsString['aderenteAmbienteNacional']);
+        aValor := JSon.AsString['aderenteAmbienteNacional'];
+        if aValor = '1' then
+          aValor := aValor + ' - Sim'
+        else
+          aValor := aValor + ' - Não';
+        Response.Parametros.Add('Aderente ao Ambiente Nacional: ' + aValor);
 
-        Response.Parametros.Add('Aderente ao Emissor Nacional: ' +
-          JSon.AsString['aderenteEmissorNacional']);
+        aValor := JSon.AsString['aderenteEmissorNacional'];
+        if aValor = '1' then
+          aValor := aValor + ' - Sim'
+        else
+          aValor := aValor + ' - Não';
+        Response.Parametros.Add('Aderente ao Emissor Nacional: ' + aValor);
 
-        Response.Parametros.Add('Aderente ao MAN: ' +
-          JSon.AsString['aderenteMAN']);
+        aValor := JSon.AsString['aderenteMAN'];
+        if aValor = '1' then
+          aValor := aValor + ' - Sim'
+        else
+          aValor := aValor + ' - Não';
+        Response.Parametros.Add('Aderente ao MAN: ' + aValor);
 
         Response.Parametros.Add('orig Cad: ' +
           JSon.AsString['origCad']);
@@ -1272,43 +1315,48 @@ begin
           JSon.AsString['permiteAproveitametoDeCreditos']));
       end;
 
+      // Retorno da Consulta Parâmetros Municipais - Regimes Especiais
+
       // Retorno da Consulta Parâmetros Municipais - Retenções
       JSon := Document.AsJSONObject['retencoes'];
 
       if Json <> nil then
       begin
-        JsonE := JSon.AsJSONObject['art6'];
+        JsonE := JSon.AsJSONObject['artigoSexto'];
 
-        Response.Parametros.Add('Habilitado: ' +
-          JsonE.AsString['habilitado']);
+        if JsonE <> nil then
+        begin
+          Response.Parametros.Add('Habilitado: ' +
+            JsonE.AsString['habilitado']);
 
-        LerHistorico(JsonE);
+          LerHistorico(JsonE);
+        end;
 
-        JSonRetMun := JSon.AsJSONArray['retMun'];
+        JSonRetMun := JSon.AsJSONArray['retencoesMunicipais'];
 
         for i := 0 to JSonRetMun.Count-1 do
         begin
           JsonI := JSonRetMun.ItemAsJSONObject[i];
 
           Response.Parametros.Add(ACBrStr('Descrição: ' +
-            JsonI.AsString['desc']));
+            JsonI.AsString['descricao']));
 
           Response.Parametros.Add('Data Inicial: ' +
-            DateTimeToStr(JsonI.AsISODate['dtIni']));
+            DateTimeToStr(JsonI.AsISODate['dataInicioVigencia']));
 
           Response.Parametros.Add('Data Final: ' +
-            DateTimeToStr(JsonI.AsISODate['dtFim']));
+            DateTimeToStr(JsonI.AsISODate['dataFimVigencia']));
 
           // Falta ler o tpRet
 
-          JSonItem := JsonI.AsJSONArray['serv'];
+          JSonItem := JsonI.AsJSONArray['servicos'];
 
           for j := 0 to JSonItem.Count-1 do
           begin
             JsonI := JSonItem.ItemAsJSONObject[j];
 
             Response.Parametros.Add(ACBrStr('Código: ' +
-              JsonI.AsString['codigo']));
+              JsonI.AsString['codigoCompleto']));
 
             LerHistorico(JsonI);
           end;
@@ -1329,6 +1377,9 @@ begin
           LerHistorico(JsonI);
         end;
       end;
+
+      // Retorno da Consulta Parâmetros Municipais - Beneficios
+
     except
       on E:Exception do
       begin
@@ -1340,6 +1391,53 @@ begin
   finally
     FreeAndNil(Document);
   end;
+end;
+
+procedure TACBrNFSeProviderPadraoNacional.PrepararObterDANFSE(
+  Response: TNFSeObterDANFSEResponse);
+var
+  AErro: TNFSeEventoCollectionItem;
+begin
+  if EstaVazio(Response.ChaveNFSe) then
+  begin
+    AErro := Response.Erros.New;
+    AErro.Codigo := Cod118;
+    AErro.Descricao := ACBrStr(Desc118);
+    Exit;
+  end;
+
+  FpPath := '/danfse/' + Response.ChaveNFSe;
+  Response.Metodo := tmObterDANFSE;
+
+  Response.ArquivoEnvio := FpPath;
+  FpMethod := 'GET';
+end;
+
+procedure TACBrNFSeProviderPadraoNacional.TratarRetornoObterDANFSE(
+  Response: TNFSeObterDANFSEResponse);
+var
+  AErro: TNFSeEventoCollectionItem;
+begin
+  if Response.ArquivoRetorno = '' then
+  begin
+    AErro := Response.Erros.New;
+    AErro.Codigo := Cod201;
+    AErro.Descricao := ACBrStr(Desc201);
+    Exit
+  end;
+
+  if Pos('"title":"Not Found","status":404', Response.ArquivoRetorno) > 0 then
+  begin
+    AErro := Response.Erros.New;
+    AErro.Codigo := Cod214;
+    AErro.Descricao := ACBrStr(Desc214);
+    Exit
+  end;
+
+  Response.Sucesso := (Response.Erros.Count = 0);
+
+  if Response.Sucesso then
+    SalvarPDFNfse(Response.ChaveNFSe, Response.ArquivoRetorno);
 end;
 
 procedure TACBrNFSeProviderPadraoNacional.ValidarSchema(
@@ -1495,6 +1593,31 @@ begin
   Request := AMSG;
 
   Result := Executar('', Request, [], []);
+end;
+
+function TACBrNFSeXWebservicePadraoNacional.ObterDANFSE(const ACabecalho,
+  AMSG: string): string;
+var
+  Request: string;
+begin
+  FPMsgOrig := AMSG;
+
+  Request := AMSG;
+
+  Result := Executar('', Request, [], []);
+end;
+
+procedure TACBrNFSeXWebservicePadraoNacional.SetHeaders(
+  aHeaderReq: THTTPHeader);
+var
+  Auth: string;
+begin
+  if TACBrNFSeX(FPDFeOwner).Provider.ConfigGeral.UseAuthorizationHeader then
+  begin
+    Auth := TConfiguracoesNFSe(FPConfiguracoes).Geral.Emitente.WSChaveAcesso;
+
+    aHeaderReq.AddHeader('token', Auth);
+  end;
 end;
 
 function TACBrNFSeXWebservicePadraoNacional.TratarXmlRetornado(

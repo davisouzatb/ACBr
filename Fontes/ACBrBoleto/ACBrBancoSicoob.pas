@@ -37,7 +37,7 @@ unit ACBrBancoSicoob;
 interface
 
 uses
-  Classes, SysUtils, ACBrBoleto, ACBrBoletoConversao, ACBrUtil.Base;
+  Classes, SysUtils, ACBrBoleto, ACBrBoletoConversao, ACBrUtil.Base, Math;
 
 type
 
@@ -72,7 +72,7 @@ type
 
 implementation
 
-uses  StrUtils, Variants, math,
+uses  StrUtils, Variants,
       {$IFDEF COMPILER6_UP} DateUtils {$ELSE} ACBrD5, FileCtrl {$ENDIF},
       ACBrUtil.FilesIO, ACBrUtil.Strings, ACBrUtil.DateTime;
 
@@ -176,6 +176,7 @@ function TACBrBancoSicoob.MontarCodigoBarras(const ACBrTitulo : TACBrTitulo): St
 var
   CodigoBarras, FatorVencimento, DigitoCodBarras, ANossoNumero,ACarteira :String;
   CampoLivre : String;
+  LCodigoTransmissao : String;
 begin
 
     FatorVencimento := CalcularFatorVencimento(ACBrTitulo.Vencimento);
@@ -190,7 +191,13 @@ begin
     if ACarteira = '9' then
     begin
       {Montando Campo Livre - Nova Carteira}
-      CampoLivre    := PadLeft(trim(ACBrTitulo.ACBrBoleto.Cedente.CodigoCedente), 9, '0') +
+      LCodigoTransmissao := ACBrTitulo.ACBrBoleto.Cedente.CodigoTransmissao;
+      if EstaVazio(LCodigoTransmissao) then
+        LCodigoTransmissao := ACBrTitulo.ACBrBoleto.Cedente.CodigoCedente;
+
+      LCodigoTransmissao := PadLeft(Trim(LCodigoTransmissao), 9, '0');
+
+      CampoLivre    := LCodigoTransmissao +
                        PadLeft(Copy(ANossoNumero,1,9), 9, '0') +
                        PadLeft(trim(ACBrTitulo.ACBrBoleto.Cedente.Modalidade), 2, '0');
     end else
@@ -525,7 +532,6 @@ begin
        Cedente.AgenciaDigito:= '0';
        Cedente.Conta   := rConta;
        Cedente.ContaDigito:= rDigitoConta;
-       Cedente.CodigoCedente:= rConta+rDigitoConta;
      end;
      Cedente.Conta := RemoveZerosEsquerda(Cedente.Conta);
 
@@ -843,7 +849,7 @@ var AEspecieTitulo, ATipoInscricao, ATipoOcorrencia, ATipoBoleto, ADataMoraJuros
     K: Integer;
     ACodProtesto: Char;
    DataProtestoNegativacao: string;
-   DiasProtestoNegativacao: string;
+   DiasProtestoNegativacao, LCarteira: string;
 begin
   if ( ACBrTitulo.NossoNumero <> IntToStrZero(0, length(ACBrTitulo.NossoNumero)) ) then
     NossoNum  := RemoveString('-', MontarCampoNossoNumero(ACBrTitulo))
@@ -1043,6 +1049,8 @@ begin
         strCarteiraEnvio := '2'
       else
         strCarteiraEnvio := '1';
+     {se a carteira for 9 ou 1, precisa sair seg P Posição 58 "1"}
+     LCarteira := ifthen(ACBrTitulo.Carteira='9','1', ACBrTitulo.Carteira) ;
 
       fpValorTotalDocs:= fpValorTotalDocs  + ValorDocumento;
       Result:= IntToStrZero(ACBrBanco.Numero, 3)                             + //1 a 3 - Código do banco
@@ -1069,7 +1077,7 @@ begin
                         Space(5);
 
                Result := Result                                           +
-                         PadRight(Carteira, 1)                            + // 58 a 58 carteira
+                         PadRight(LCarteira, 1)                            + // 58 a 58 carteira
                          '0'                                              + // 59 Forma de cadastramento no banco
                          ' '                                              + // 60 Brancos
                          ATipoBoleto                                      + // 61 Identificação da emissão do boleto

@@ -1,12 +1,18 @@
 package com.acbr.nfe.acbrlibnfe.demo.configuracoes;
 
+/**
+ * Fragment para configuração de email automático de NFe.
+ * 
+ * @author ACBr Team
+ */
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
@@ -25,8 +31,8 @@ public class ConfiguracoesEmailFragment extends Fragment {
     private EditText txtSenha;
     private EditText txtHost;
     private EditText txtPorta;
-    private CheckBox ckbSSL;
-    private CheckBox ckbTLS;
+    private MaterialSwitch ckbSSL;
+    private MaterialSwitch ckbTLS;
     private Button btnSalvarConfiguracoesEmail;
     private Button btnCarregarConfiguracoesEmail;
 
@@ -62,9 +68,13 @@ public class ConfiguracoesEmailFragment extends Fragment {
             }
         });
 
-        carregarConfiguracoesEmail();
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        carregarConfiguracoesEmail();
     }
 
     private void salvarConfiguracoesEmail() {

@@ -1,12 +1,18 @@
 package com.acbr.nfe.acbrlibnfe.demo.configuracoes;
 
+/**
+ * Fragment para configuração do DANFE (layout e impressão).
+ * 
+ * @author ACBr Team
+ */
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -36,10 +42,10 @@ public class ConfiguracoesDocumentoAuxiliarFragment extends Fragment {
     private EditText txtEspacos;
     private EditText txtBuffer;
     private EditText txtLinhasPular;
-    private CheckBox chkControlePorta;
-    private CheckBox chkCortarPapel;
-    private CheckBox chkTraduzirTags;
-    private CheckBox chkIgnorarTags;
+    private MaterialSwitch chkControlePorta;
+    private MaterialSwitch chkCortarPapel;
+    private MaterialSwitch chkTraduzirTags;
+    private MaterialSwitch chkIgnorarTags;
     private Button btnSalvarConfiguracoesDocumentoAuxiliar;
     private Button btnCarregarConfiguracoesDocumentoAuxiliar;
 
@@ -94,9 +100,13 @@ public class ConfiguracoesDocumentoAuxiliarFragment extends Fragment {
             }
         });
 
-        carregarConfiguracoesDocumentoAuxiliar();
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        carregarConfiguracoesDocumentoAuxiliar();
     }
 
     private void salvarConfiguracoesDocumentoAuxiliar() {

@@ -91,6 +91,8 @@ implementation
 
 uses
   ACBrUtil.XMLHTML,
+  ACBrUtil.FilesIO,
+  ACBrDFe.Conversao,
   ACBrDFeException, ACBrNFSeX,
   Actcon.GravarXml, Actcon.LerXml;
 
@@ -372,9 +374,9 @@ begin
   Result := inherited GetSchemaPath;
 
   if ConfigGeral.Ambiente = taProducao then
-    Result := Result + ConfigGeral.CodIBGE + '\Producao\'
+    Result := PathWithDelim(Result + 'Producao')
   else
-    Result := Result + ConfigGeral.CodIBGE + '\Homologacao\';
+    Result := PathWithDelim(Result + 'Homologacao');
 end;
 
 { TACBrNFSeProviderActcon202 }

@@ -147,9 +147,9 @@ implementation
 
 uses
   ACBrUtil.Base, 
-  pcnConversao, 
-  ACBrXmlBase, 
+  ACBrXmlBase,
   ACBrDFe.Conversao,
+  pcnConversao,
   pcteConversaoCTe;
 
 { TCTeXmlReader }
@@ -768,7 +768,9 @@ begin
   FCTe.Ide.dhCont := ObterConteudo(ANode.Childrens.FindAnyNs('dhCont'), tcDatHor);
   FCTe.Ide.xJust := ObterConteudo(ANode.Childrens.FindAnyNs('xJust'), tcStr);
 
-  FCTe.Ide.IndIEToma := StrToindIEDest(OK, ObterConteudo(ANode.Childrens.FindAnyNs('indIEToma'), tcStr));
+  sAux := ObterConteudo(ANode.Childrens.FindAnyNs('indIEToma'), tcStr);
+  if sAux <> '' then
+    FCTe.Ide.IndIEToma := StrToindIEDest(OK, sAux);
 
   FCTe.Ide.dhSaidaOrig := ObterConteudo(ANode.Childrens.FindAnyNs('dhSaidaOrig'), tcDatHor);
   FCTe.Ide.dhChegadaDest := ObterConteudo(ANode.Childrens.FindAnyNs('dhChegadaDest'), tcDatHor);
@@ -1775,6 +1777,9 @@ begin
 end;
 
 procedure TCTeXmlReader.Ler_Toma(ANode: TACBrXmlNode);
+var
+  lAux: String;
+  OK: Boolean;
 begin
   if not Assigned(ANode) then exit;
 
@@ -1784,6 +1789,10 @@ begin
   FCTe.toma.xFant := ObterConteudo(ANode.Childrens.FindAnyNs('xFant'), tcStr);
   FCTe.toma.fone := ObterConteudo(ANode.Childrens.FindAnyNs('fone'), tcStr);
   FCTe.toma.email := ObterConteudo(ANode.Childrens.FindAnyNs('email'), tcStr);
+
+  lAux := ObterConteudo(ANode.Childrens.FindAnyNs('indIEToma'), tcStr);
+  if lAux <> '' then
+    FCte.toma.indIEToma := StrToindIEDest(OK, lAux);
 
   Ler_TomaEnderToma(ANode.Childrens.FindAnyNs('enderToma'));
 end;
@@ -2131,6 +2140,7 @@ begin
   IBSCBS.indDoacao := StrToTIndicadorEx(ok, ObterConteudo(ANode.Childrens.Find('indDoacao'), tcStr));
 
   Ler_IBSCBS_gIBSCBS(ANode.Childrens.Find('gIBSCBS'), IBSCBS.gIBSCBS);
+  Ler_gEstornoCred(ANode.Childrens.Find('gEstornoCred'), IBSCBS.gEstornoCred);
 end;
 
 procedure TCTeXmlReader.Ler_IBSCBS_gIBSCBS(const ANode: TACBrXmlNode; gIBSCBS: TgIBSCBS);
@@ -2145,7 +2155,6 @@ begin
   Ler_gCBS(ANode.Childrens.Find('gCBS'), gIBSCBS.gCBS);
   Ler_gIBSCBS_gTribRegular(ANode.Childrens.Find('gTribRegular'), gIBSCBS.gTribRegular);
   Ler_gTribCompraGov(ANode.Childrens.Find('gTribCompraGov'), gIBSCBS.gTribCompraGov);
-  Ler_gEstornoCred(ANode.Childrens.Find('gEstornoCred'), gIBSCBS.gEstornoCred);
 end;
 
 procedure TCTeXmlReader.Ler_gIBSUF(const ANode: TACBrXmlNode; gIBSUF: TgIBSUFValores);

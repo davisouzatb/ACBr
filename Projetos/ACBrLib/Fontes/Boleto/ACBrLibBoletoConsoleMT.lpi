@@ -23,7 +23,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <RevisionNr Value="1"/>
-      <BuildNr Value="50"/>
+      <BuildNr Value="60"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrLibBoleto - Biblioteca para geração de Arquivos de Remessa e Retorno, e impressão de Boletos" InternalName="ACBrLibBoleto" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="ACBrLibBoleto" ProductVersion="1.0.0.0"/>
     </VersionInfo>
@@ -197,7 +197,11 @@
 -dNOREPORT
 -dMT
 -Xd
--XPaarch64-linux-android-"/>
+-XPaarch64-linux-android-
+-k-z
+-kcommon-page-size=16384
+-k-z
+-kmax-page-size=16384"/>
           </Other>
         </CompilerOptions>
       </Item5>

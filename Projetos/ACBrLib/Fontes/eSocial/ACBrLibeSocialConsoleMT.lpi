@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="172"/>
+      <BuildNr Value="180"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBreSocial - Biblioteca para envio, consulta do eSocial" InternalName="ACBrLibeSocial" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="eSocial" ProductVersion="0.0.1.30"/>
     </VersionInfo>
@@ -191,7 +191,11 @@
 -dNOGUI
 -dMT
 -Xd
--XPaarch64-linux-android-"/>
+-XPaarch64-linux-android-
+-k-z
+-kcommon-page-size=16384
+-k-z
+-kmax-page-size=16384"/>
           </Other>
         </CompilerOptions>
       </Item5>

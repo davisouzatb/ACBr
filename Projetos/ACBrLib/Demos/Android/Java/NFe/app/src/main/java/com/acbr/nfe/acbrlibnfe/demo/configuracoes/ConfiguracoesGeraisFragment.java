@@ -1,12 +1,18 @@
 package com.acbr.nfe.acbrlibnfe.demo.configuracoes;
 
+/**
+ * Fragment para configurações gerais da ACBrLibNFe.
+ * 
+ * @author ACBr Team
+ */
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -27,10 +33,10 @@ public class ConfiguracoesGeraisFragment extends Fragment {
     private ACBrLibNFe ACBrNFe;
     private NfeApplication application;
 
-    private CheckBox ckbAtualizarXML;
-    private CheckBox ckbExibirErroSchema;
-    private CheckBox ckbRetirarAcentos;
-    private CheckBox ckbSalvar;
+    private MaterialSwitch ckbAtualizarXML;
+    private MaterialSwitch ckbExibirErroSchema;
+    private MaterialSwitch ckbRetirarAcentos;
+    private MaterialSwitch ckbSalvar;
     private EditText txtFormatoAlerta;
     private EditText txtLogs;
     private EditText txtSchemaPath;
@@ -88,9 +94,13 @@ public class ConfiguracoesGeraisFragment extends Fragment {
             }
         });
 
-        carregarConfiguracoesGerais();
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        carregarConfiguracoesGerais();
     }
 
     private void salvarConfiguracoesGerais() {

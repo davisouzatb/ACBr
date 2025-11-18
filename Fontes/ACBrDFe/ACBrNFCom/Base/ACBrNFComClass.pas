@@ -209,7 +209,6 @@ type
     FgCBS: TgCBSValores;
     FgTribRegular: TgTribRegular;
     FgTribCompraGov: TgTribCompraGov;
-    FgEstornoCred: TgEstornoCred;
   public
     constructor Create;
     destructor Destroy; override;
@@ -221,7 +220,6 @@ type
     property gCBS: TgCBSValores read FgCBS write FgCBS;
     property gTribRegular: TgTribRegular read FgTribRegular write FgTribRegular;
     property gTribCompraGov: TgTribCompraGov read FgTribCompraGov write FgTribCompraGov;
-    property gEstornoCred: TgEstornoCred read FgEstornoCred write FgEstornoCred;
   end;
 
   { TIBSCBS }
@@ -232,6 +230,7 @@ type
     FcClassTrib: string;
     FindDoacao: TIndicadorEx;
     FgIBSCBS: TgIBSCBS;
+    FgEstornoCred: TgEstornoCred;
   public
     constructor Create;
     destructor Destroy; override;
@@ -240,6 +239,7 @@ type
     property cClassTrib: string read FcClassTrib write FcClassTrib;
     property indDoacao: TIndicadorEx read FindDoacao write FindDoacao;
     property gIBSCBS: TgIBSCBS read FgIBSCBS write FgIBSCBS;
+    property gEstornoCred: TgEstornoCred read FgEstornoCred write FgEstornoCred;
   end;
 
   { TgIBSUFTot }
@@ -410,6 +410,8 @@ type
     FUF: string;
     Ffone: string;
     Femail: string;
+    FcPais: Integer;
+    FxPais: string;
   public
     procedure Assign(Source: TEndereco);
 
@@ -423,6 +425,8 @@ type
     property UF: string read FUF write FUF;
     property fone: string read Ffone write Ffone;
     property email: string read Femail write Femail;
+    property cPais: Integer read FcPais write FcPais;
+    property xPais: string read FxPais write FxPais;
   end;
 
   { TEmit }
@@ -1449,6 +1453,8 @@ begin
   CEP := Source.CEP;
   fone := Source.fone;
   email := Source.email;
+  cPais := Source.cPais;
+  xPais := Source.xPais;
 end;
 
 { TDest }
@@ -1958,7 +1964,6 @@ begin
   FgCBS := TgCBSValores.Create;
   FgTribRegular := TgTribRegular.Create;
   FgTribCompraGov := TgTribCompraGov.Create;
-  FgEstornoCred := TgEstornoCred.Create;
 end;
 
 destructor TgIBSCBS.Destroy;
@@ -1968,7 +1973,6 @@ begin
   FgCBS.Free;
   FgTribRegular.Free;
   FgTribCompraGov.Free;
-  FgEstornoCred.Free;
 
   inherited Destroy;
 end;
@@ -1980,11 +1984,13 @@ begin
   inherited Create;
 
   FgIBSCBS := TgIBSCBS.Create;
+  FgEstornoCred := TgEstornoCred.Create;
 end;
 
 destructor TIBSCBS.Destroy;
 begin
   FgIBSCBS.Free;
+  FgEstornoCred.Free;
 
   inherited Destroy;
 end;

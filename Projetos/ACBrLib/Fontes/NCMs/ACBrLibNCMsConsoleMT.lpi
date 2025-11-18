@@ -20,7 +20,7 @@
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="248"/>
+      <BuildNr Value="255"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrNCMs - Biblioteca para consulta de NCMs" InternalName="ACBrLibNCMs" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductVersion="0.0.0.0"/>
     </VersionInfo>
@@ -192,7 +192,11 @@
 -dNOGUI
 -dMT
 -Xd
--XPaarch64-linux-android-"/>
+-XPaarch64-linux-android-
+-k-z
+-kcommon-page-size=16384
+-k-z
+-kmax-page-size=16384"/>
           </Other>
         </CompilerOptions>
       </Item5>

@@ -1,12 +1,22 @@
 package com.acbr.nfe.acbrlibnfe.demo.comandos;
 
+/**
+ * Fragment para consulta de status e situação de NFe na SEFAZ.
+ * 
+ * Consulta por chave de acesso, cadastro de contribuintes e status do serviço.
+ * Exibe protocolo de autorização e eventos vinculados.
+ * 
+ * @author ACBr Team
+ */
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.fragment.app.Fragment;
 
@@ -19,12 +29,12 @@ public class ComandosConsultaNFeFragment extends Fragment {
 
     private ACBrLibNFe ACBrNFe;
 
-    private EditText txtRespostaConsulta;
-    private EditText txtXMLNFe;
-    private EditText txtNumeroRecibo;
-    private EditText txtUFConsultarCadastro;
-    private EditText txtDocumentoConsultarCadastro;
-    private EditText txtConsultarChave;
+    private TextInputEditText txtRespostaConsulta;
+    private TextInputEditText txtXMLNFe;
+    private TextInputEditText txtNumeroRecibo;
+    private TextInputEditText txtUFConsultarCadastro;
+    private TextInputEditText txtDocumentoConsultarCadastro;
+    private TextInputEditText txtConsultarChave;
     private Button btnStatusServico;
     private Button btnConsultarRecibo;
     private Button btnConsultaXml;
@@ -36,8 +46,6 @@ public class ComandosConsultaNFeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comandos_consulta_nfe, container, false);
-
-        ACBrNFe = ACBrLibHelper.getInstance("");
 
         txtRespostaConsulta = view.findViewById(R.id.txtRespostaConsulta);
         txtXMLNFe = view.findViewById(R.id.txtXMLNFe);
@@ -97,6 +105,12 @@ public class ComandosConsultaNFeFragment extends Fragment {
 
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ACBrNFe = ACBrLibHelper.getInstance("");
     }
 
     public void statusServico() {

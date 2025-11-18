@@ -42,6 +42,19 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+13/11/2025
+-- ACBrLibNFSeBase --
+[-] ACBr-8300 - Ajuste visando correta devolução das informações no buffer de resposta do enviar evento.
+   Por: Diego Folieni
+
+09/10/2025
+-- ACBrLibNFSeConsoleMT.lpi, ACBrLibNFSeConsoleMTDemo.lpi --
+[+] TK-7487 - Habilita 16KB de alinhamento nos LPI console da ACBrLibNFSe, obs: para ndk <=r22b
+   Adiciona flags de linker -k-z" common-page-size=16384" e -k-z" max-page-size=16384" 
+   no perfil de compilação android-arm64-v8a para resolver problemas de alinhamento de página e compatibilizar com Android 15+.
+   
+   Por: doszapro
+
 22/07/2025
 -- ACBrLibNFSeConfig.pas, ACBrLibNFSeConsts.pas --
 [+] Expoe a propriedade DataCompetenciaCompleta na ACBrLib

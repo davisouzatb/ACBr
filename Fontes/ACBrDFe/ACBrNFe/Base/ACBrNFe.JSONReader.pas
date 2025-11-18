@@ -37,7 +37,7 @@ unit ACBrNFe.JSONReader;
 interface
 
 uses
-  Classes, SysUtils, ACBrJSON, ACBrNFe.Classes, pcnConversao, pcnConversaoNFe;
+  Classes, SysUtils, ACBrJSON, ACBrNFe.Classes;
 
 type
   { TNFeJSONReader }
@@ -161,7 +161,7 @@ uses
   ACBrUtil.Base,
   ACBrUtil.Strings,
   ACBrUtil.FilesIO,
-  ACBrDFe.Conversao;
+  ACBrDFe.Conversao, pcnConversao, pcnConversaoNFe;
 
 { TNFeJSONReader }
 
@@ -1825,8 +1825,8 @@ begin
   Ler_IBSCBS_gIBSCBS_gIBSMun(AJSONObject.AsJSONObject['gIBSMun'], AGIBSCBS.gIBSMun);
   Ler_IBSCBS_gIBSCBS_gCBS(AJSONObject.AsJSONObject['gCBS'], AGIBSCBS.gCBS);
   Ler_IBSCBS_gIBSCBS_gTribRegular(AJSONObject.AsJSONObject['gTribRegular'], AGIBSCBS.gTribRegular);
-  Ler_IBSCBS_gIBSCBS_gIBSCBSCredPres(AJSONObject.AsJSONObject['gIBSCredPres'], AGIBSCBS.gIBSCredPres);
-  Ler_IBSCBS_gIBSCBS_gIBSCBSCredPres(AJSONObject.AsJSONObject['gCBSCredPres'], AGIBSCBS.gCBSCredPres);
+//  Ler_IBSCBS_gIBSCBS_gIBSCBSCredPres(AJSONObject.AsJSONObject['gIBSCredPres'], AGIBSCBS.gIBSCredPres);
+//  Ler_IBSCBS_gIBSCBS_gIBSCBSCredPres(AJSONObject.AsJSONObject['gCBSCredPres'], AGIBSCBS.gCBSCredPres);
   Ler_IBSCBS_gIBSCBS_gTribCompraGov(AJSONObject.AsJSONObject['gTribCompraGov'], AGIBSCBS.gTribCompraGov);
 end;
 
@@ -1997,7 +1997,7 @@ begin
   if not Assigned(AJSONObject) then
     Exit;
 
-  AGIBSCredPres.cCredPres := StrTocCredPres(AJSONObject.AsString['cCredPres']);
+//  AGIBSCredPres.cCredPres := StrTocCredPres(AJSONObject.AsString['cCredPres']);
   AGIBSCredPres.pCredPres := AJSONObject.AsFloat['pCredPres'];
   AGIBSCredPres.vCredPres := AJSONObject.AsFloat['vCredPres'];
   AGIBSCredPres.vCredPresCondSus := AJSONObject.AsFloat['vCredPresCondSus'];

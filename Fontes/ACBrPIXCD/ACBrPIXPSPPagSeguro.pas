@@ -1,38 +1,38 @@
 {******************************************************************************}
 { Projeto: Componentes ACBr                                                    }
-{  Biblioteca multiplataforma de componentes Delphi para intera√ß√£o com equipa- }
-{ mentos de Automa√ß√£o Comercial utilizados no Brasil                           }
+{  Biblioteca multiplataforma de componentes Delphi para interaÁ„o com equipa- }
+{ mentos de AutomaÁ„o Comercial utilizados no Brasil                           }
 {                                                                              }
 { Direitos Autorais Reservados (c) 2022 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
-{  Voc√™ pode obter a √∫ltima vers√£o desse arquivo na pagina do  Projeto ACBr    }
+{  VocÍ pode obter a ˙ltima vers„o desse arquivo na pagina do  Projeto ACBr    }
 { Componentes localizado em      http://www.sourceforge.net/projects/acbr      }
 {                                                                              }
-{  Esta biblioteca √© software livre; voc√™ pode redistribu√≠-la e/ou modific√°-la }
-{ sob os termos da Licen√ßa P√∫blica Geral Menor do GNU conforme publicada pela  }
-{ Free Software Foundation; tanto a vers√£o 2.1 da Licen√ßa, ou (a seu crit√©rio) }
-{ qualquer vers√£o posterior.                                                   }
+{  Esta biblioteca È software livre; vocÍ pode redistribuÌ-la e/ou modific·-la }
+{ sob os termos da LicenÁa P˙blica Geral Menor do GNU conforme publicada pela  }
+{ Free Software Foundation; tanto a vers„o 2.1 da LicenÁa, ou (a seu critÈrio) }
+{ qualquer vers„o posterior.                                                   }
 {                                                                              }
-{  Esta biblioteca √© distribu√≠da na expectativa de que seja √∫til, por√©m, SEM   }
-{ NENHUMA GARANTIA; nem mesmo a garantia impl√≠cita de COMERCIABILIDADE OU      }
-{ ADEQUA√á√ÉO A UMA FINALIDADE ESPEC√çFICA. Consulte a Licen√ßa P√∫blica Geral Menor}
-{ do GNU para mais detalhes. (Arquivo LICEN√áA.TXT ou LICENSE.TXT)              }
+{  Esta biblioteca È distribuÌda na expectativa de que seja ˙til, porÈm, SEM   }
+{ NENHUMA GARANTIA; nem mesmo a garantia implÌcita de COMERCIABILIDADE OU      }
+{ ADEQUA«√O A UMA FINALIDADE ESPECÕFICA. Consulte a LicenÁa P˙blica Geral Menor}
+{ do GNU para mais detalhes. (Arquivo LICEN«A.TXT ou LICENSE.TXT)              }
 {                                                                              }
-{  Voc√™ deve ter recebido uma c√≥pia da Licen√ßa P√∫blica Geral Menor do GNU junto}
-{ com esta biblioteca; se n√£o, escreva para a Free Software Foundation, Inc.,  }
-{ no endere√ßo 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.          }
-{ Voc√™ tamb√©m pode obter uma copia da licen√ßa em:                              }
+{  VocÍ deve ter recebido uma cÛpia da LicenÁa P˙blica Geral Menor do GNU junto}
+{ com esta biblioteca; se n„o, escreva para a Free Software Foundation, Inc.,  }
+{ no endereÁo 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.          }
+{ VocÍ tambÈm pode obter uma copia da licenÁa em:                              }
 { http://www.opensource.org/licenses/lgpl-license.php                          }
 {                                                                              }
-{ Daniel Sim√µes de Almeida - daniel@projetoacbr.com.br - www.projetoacbr.com.br}
-{       Rua Coronel Aureliano de Camargo, 963 - Tatu√≠ - SP - 18270-170         }
+{ Daniel Simıes de Almeida - daniel@projetoacbr.com.br - www.projetoacbr.com.br}
+{       Rua Coronel Aureliano de Camargo, 963 - TatuÌ - SP - 18270-170         }
 {******************************************************************************}
 
 (*
 
-  Documenta√ß√£o:
+  DocumentaÁ„o:
   - https://dev.pagseguro.uol.com.br/reference/pix-intro
 
 *)
@@ -50,14 +50,19 @@ uses
 
 const
   cPagSeguroURLProducao = 'https://secure.api.pagseguro.com';
+  cPagSeguroURLProducaoNoAuth = 'https://api.pagseguro.com';
   cPagSeguroURLSandbox = 'https://secure.sandbox.api.pagseguro.com';
+  cPagSeguroURLSandboxNoAuth = 'https://sandbox.api.pagseguro.com';
   cPagSeguroURLPay = 'https://sandbox.api.pagseguro.com/pix';
+  cPagSeguroPathCredentials = '/oauth2/application';
   cPagSeguroPathAuth = '/pix/oauth2';
+  cPagSeguroPathChallenge = '/oauth2/token';
+  cPagSeguroPathCertificate = '/certificates';
   cPagSeguroPathAPIPix = '/instant-payments';
   cPagSeguroEndPointPay = '/pay';
 
 resourcestring
-  sPagSeguroErroTokenPay = 'Token para simular pagamento n√£o informado';
+  sPagSeguroErroTokenPay = 'Token para simular pagamento n„o informado';
 
 type
 
@@ -75,11 +80,16 @@ type
     procedure ConfigurarHeaders(const aMethod, aURL: String); override;
     procedure ConfigurarAutenticacao(const aMethod, aEndPoint: String); override;
     function ObterURLAmbiente(const aAmbiente: TACBrPixCDAmbiente): String; override;
+    function ObterURLAmbienteNoAuth(const aAmbiente: TACBrPixCDAmbiente): String;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Autenticar; override;
 
     function SimularPagamentoPIX(const aTxID: String): Boolean;
+
+    function SolicitarCredenciais(const aNomeAplicacao: String; var aClientID: String; var aClientSecret: String): Boolean;
+    function SolicitarDesafioCertificado: String;
+    function SolicitarCertificado(const aToken: String; aChallenge: String): String;
   published
     property TokenPay: String read fTokenPay write fTokenPay;
   end;
@@ -87,15 +97,15 @@ type
 implementation
 
 uses
-  synautil, DateUtils,
-  ACBrJSON, ACBrUtil.Base, ACBrUtil.Strings, ACBrPIXUtil;
+  synacode, synautil, DateUtils, ACBrJSON,
+  ACBrUtil.Base, ACBrUtil.Strings, ACBrPIXUtil;
 
 { TACBrPSPPagSeguro }
 
 procedure TACBrPSPPagSeguro.QuandoAcessarEndPoint(const aEndPoint: String;
   var aURL: String; var aMethod: String);
 begin
-  // PagSeguro n√£o possui POST para endpoint /cob
+  // PagSeguro n„o possui POST para endpoint /cob
    if (LowerCase(aEndPoint) = cEndPointCob) and (UpperCase(aMethod) = ChttpMethodPOST) then
   begin
     aMethod := ChttpMethodPUT;
@@ -137,6 +147,13 @@ begin
     Result := cPagSeguroURLProducao + cPagSeguroPathAPIPix
   else
     Result := cPagSeguroURLSandbox + cPagSeguroPathAPIPix;
+end;
+
+function TACBrPSPPagSeguro.ObterURLAmbienteNoAuth(const aAmbiente: TACBrPixCDAmbiente): String;
+begin
+  Result := cPagSeguroURLSandboxNoAuth;
+  if (aAmbiente = ambProducao) then
+    Result := cPagSeguroURLProducaoNoAuth;
 end;
 
 constructor TACBrPSPPagSeguro.Create(AOwner: TComponent);
@@ -230,6 +247,133 @@ begin
   Result := (wResultCode = HTTP_OK);
   if (not (wResultCode = HTTP_OK)) then
     DispararExcecao(EACBrPixHttpException.CreateFmt(sErroHttp, [Http.ResultCode, ChttpMethodPOST, aURL]));
+end;
+
+function TACBrPSPPagSeguro.SolicitarCredenciais(const aNomeAplicacao: String;
+  var aClientID: String; var aClientSecret: String): Boolean;
+var
+  aURL: String;
+  jo, js: TACBrJSONObject;
+  wResultCode: Integer;
+  wRespostaHttp: AnsiString;
+begin
+  Result := False;
+  VerificarPIXCDAtribuido;
+
+  if EstaVazio(TokenPay) then
+    DispararExcecao(EACBrPSPException.Create(ACBrStr(sPagSeguroErroTokenPay)));
+
+  LimparHTTP;
+  Http.Protocol := '1.1';
+  Http.Headers.Add(ChttpHeaderAuthorization + ChttpAuthorizationBearer + ' ' + TokenPay);
+  Http.MimeType := CContentTypeApplicationJSon;
+
+  aURL := ObterURLAmbienteNoAuth(ACBrPixCD.Ambiente) + cPagSeguroPathCredentials;
+  jo := TACBrJSONObject.Create;
+  try
+    jo.AddPair('name', aNomeAplicacao);
+    WriteStrToStream(Http.Document, jo.ToJSON);
+  finally
+    jo.Free;
+  end;
+
+  Result := TransmitirHttp(ChttpMethodPOST, aURL, wResultCode, wRespostaHttp);
+  Result := Result and (wResultCode = HTTP_CREATED);
+
+  if not Result then
+    DispararExcecao(EACBrPixHttpException.CreateFmt(sErroHttp, [Http.ResultCode, ChttpMethodPOST, aURL]));
+
+  try
+    js := TACBrJSONObject.Parse(wRespostaHttp);
+    js.Value('client_id', aClientID)
+      .Value('client_secret', aClientSecret);
+  finally
+    if Assigned(js) then
+      js.Free;
+  end;
+end;
+
+function TACBrPSPPagSeguro.SolicitarDesafioCertificado: String;
+var
+  aURL: String;
+  js: TACBrJSONObject;
+  wBody: String;
+  wRespostaHttp: AnsiString;
+  wResultCode: Integer;
+begin
+
+  VerificarPIXCDAtribuido;
+
+  if EstaVazio(TokenPay) then
+    DispararExcecao(EACBrPSPException.Create(ACBrStr(sPagSeguroErroTokenPay)));
+
+  aURL := cPagSeguroURLSandboxNoAuth;
+  if (ACBrPixCD.Ambiente = ambProducao) then
+    aURL := cPagSeguroURLProducaoNoAuth;
+
+  aURL := aURL + cPagSeguroPathChallenge;
+
+  js := TACBrJSONObject.Create;
+  try
+    js.AddPair('grant_type', 'challenge');
+    js.AddPair('scope', 'certificate.create');
+    wBody := js.ToJSON;
+  finally
+    js.Free;
+  end;
+
+  LimparHTTP;
+  Http.Headers.Insert(0, ChttpHeaderAuthorization + ChttpAuthorizationBearer+' '+TokenPay);
+
+  WriteStrToStream(Http.Document, wBody);
+  Http.MimeType := CContentTypeApplicationJSon;
+  Http.Protocol := '1.1';
+
+  TransmitirHttp(ChttpMethodPOST, aURL, wResultCode, wRespostaHttp);
+
+  Result := EmptyStr;
+  if (wResultCode = HTTP_OK) then
+    Result := StreamToAnsiString(Http.OutputStream)
+  else
+    DispararExcecao(EACBrPixHttpException.CreateFmt( sErroHttp,
+      [Http.ResultCode, ChttpMethodPOST, aURL]));
+
+end;
+
+function TACBrPSPPagSeguro.SolicitarCertificado(const aToken: String; aChallenge: String): String;
+var
+  aURL: String;
+  wRespostaHttp: AnsiString;
+  wResultCode: Integer;
+begin
+
+  VerificarPIXCDAtribuido;
+
+  if EstaVazio(aToken) then
+    DispararExcecao(EACBrPSPException.Create(ACBrStr(sPagSeguroErroTokenPay)));
+
+  aURL := cPagSeguroURLSandboxNoAuth;
+  if (ACBrPixCD.Ambiente = ambProducao) then
+    aURL := cPagSeguroURLProducaoNoAuth;
+
+  aURL := aURL + cPagSeguroPathCertificate;
+
+  LimparHTTP;
+  Http.Headers.Insert(0, ChttpHeaderAuthorization + ChttpAuthorizationBearer+' '+aToken);
+  Http.Headers.Insert(1, 'X_CHALLENGE'+' '+aChallenge);
+
+  Http.MimeType := CContentTypeApplicationJSon;
+  Http.Protocol := '1.1';
+
+  TransmitirHttp(ChttpMethodPOST, aURL, wResultCode, wRespostaHttp);
+
+  Result := EmptyStr;
+  if (wResultCode in [HTTP_OK, HTTP_CREATED]) then
+    Result := StreamToAnsiString(Http.OutputStream)
+  else
+    DispararExcecao(EACBrPixHttpException.CreateFmt( sErroHttp,
+      [Http.ResultCode, ChttpMethodPOST, aURL]));
+
 end;
 
 end.

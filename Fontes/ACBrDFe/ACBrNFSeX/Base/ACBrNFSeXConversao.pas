@@ -55,7 +55,7 @@ type
                      stNFSeEnvioWebService, stNFSeGerarToken,
                      stNFSeConsultarEvento, stNFSeConsultarDFe,
                      stNFSeConsultarParam, stNFSeConsultarSeqRps,
-                     stNFSeConsultarLinkNFSe);
+                     stNFSeConsultarLinkNFSe, stNFSEObterDANFSE);
 
   TLayout =(loABRASF, loProprio);
 
@@ -181,7 +181,7 @@ type
              tmAbrirSessao, tmFecharSessao, tmTeste, tmTodos,
              tmGerarToken, tmEnviarEvento, tmConsultarEvento, tmConsultarDFe,
              tmConsultarParam, tmConsultarSeqRps, tmConsultarLinkNFSe,
-             tmConsultarNFSePorChave);
+             tmConsultarNFSePorChave, tmObterDANFSE);
 
 const
   TMetodoArrayStrings: array[TMetodo] of string = ('Recepcionar Lote Assíncrono',
@@ -193,7 +193,7 @@ const
     'Fechar Sessão', 'Teste', 'Todos', 'Gerar Token', 'Enviar Evento',
     'Consultar Evento', 'Consultar DFe', 'Consultar Parâmetros',
     'Consultar Sequencia de Rps', 'Consultar Link da NFSe',
-    'Consultar NFSe Por Chave');
+    'Consultar NFSe Por Chave', 'Obter DANFSE');
 
 type
   TmodoEnvio = (meAutomatico, meLoteAssincrono, meLoteSincrono, meUnitario,
@@ -395,7 +395,7 @@ const
 
 type
   TmdPrestacao = (mpDesconhecido, mpTransfronteirico, mpConsumoBrasil,
-                  mpPresencaComercialExterior, mpMovimentoTempPessoasFisicas);
+                  mpMovimentoTempPessoasFisicas, mpConsumoExterior);
 
 const
   TmdPrestacaoArrayStrings: array[TmdPrestacao] of string = ('0', '1', '2',
@@ -501,10 +501,10 @@ const
   TtpRetISSQNArrayStrings: array[TtpRetISSQN] of string = ('1', '2', '3');
 
 type
-  TtpBM = (tbAliquota, tbReducaoBC, tbIsencao);
+  TtpBM = (tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota);
 
 const
-  TtpBMArrayStrings: array[TtpBM] of string = ('1', '2', '3');
+  TtpBMArrayStrings: array[TtpBM] of string = ('1', '2', '3', '4');
 
 type
   TtpSusp = (tsNenhum, tsDecisaoJudicial, tsProcessoAdm);
@@ -594,10 +594,10 @@ const
     'Beneficios');
 
 type
-  TLayoutNFSe = (lnfsProvedor, lnfsPadraoNacionalv1);
+  TLayoutNFSe = (lnfsProvedor, lnfsPadraoNacionalv1, lnfsPadraoNacionalv101);
 
 const
-  TLayoutNFSeArrayStrings: array[TLayoutNFSe] of string = ('0', '1');
+  TLayoutNFSeArrayStrings: array[TLayoutNFSe] of string = ('0', '1', '2');
 
 type
   TNaoNIF = (tnnNaoInformado, tnnDispensado, tnnNaoExigencia);
@@ -617,6 +617,15 @@ type
 const
   TLogradouroLocalPrestacaoServicoArrayStrings: array[TLogradouroLocalPrestacaoServico] of string =
     ('1', '2');
+
+type
+  TcMotivoEmisTI = (meNenhum, meImportacao, meObrigadoEmitir, meEmitidoPorRecusa,
+    meEmitidoPorRejeitar);
+
+const
+  TcMotivoEmisTIArrayStrings: array[TcMotivoEmisTI] of string =
+    ('', '1', '2', '3', '4');
+
 
 // Reforma Tributária
 
@@ -844,6 +853,9 @@ function StrToLocalPrestacao(out ok: boolean; const s: string): TLocalPrestacao;
 
 function LogradouroLocalPrestacaoServicoToStr(t: TLogradouroLocalPrestacaoServico): string;
 function StrToLogradouroLocalPrestacaoServico(const s: string): TLogradouroLocalPrestacaoServico;
+
+function cMotivoEmisTIToStr(t: TcMotivoEmisTI): string;
+function StrTocMotivoEmisTI(const s: string): TcMotivoEmisTI;
 
 // Reforma Tributária
 function finNFSeToStr(const t: TfinNFSe): string;
@@ -5454,7 +5466,6 @@ var
       4202008: CodTOM := '8039'; // Balneario Camboriu/SC';
       4202057: CodTOM := '5549'; // Balneario Barra Do Sul/SC';
       4202073: CodTOM := '0890'; // Balneario Gaivota/SC';
-      4220000: CodTOM := '1192'; // Balneario Rincão/SC';
       4202081: CodTOM := '0892'; // Bandeirante/SC';
       4202099: CodTOM := '0894'; // Barra Bonita/SC';
       4202107: CodTOM := '8041'; // Barra Velha/SC';
@@ -5720,6 +5731,7 @@ var
       4219606: CodTOM := '8385'; // Xavantina/SC';
       4219705: CodTOM := '8387'; // Xaxim/SC';
       4219853: CodTOM := '0950'; // Zortea/SC';
+      4220000: CodTOM := '1192'; // Balneario Rincão/SC';
    end;
  end;
 
@@ -6744,7 +6756,7 @@ begin
   else if (ACodigo >= 3300100) and (ACodigo <= 3306305) then P33
   else if (ACodigo >= 3500105) and (ACodigo <= 3557303) then P35
   else if (ACodigo >= 4100103) and (ACodigo <= 4128807) then P41
-  else if (ACodigo >= 4200051) and (ACodigo <= 4219853) then P42
+  else if (ACodigo >= 4200051) and (ACodigo <= 4220000) then P42
   else if (ACodigo >= 4300034) and (ACodigo <= 4323804) then P43
   else if (ACodigo >= 5000203) and (ACodigo <= 5008404) then P50
   else if (ACodigo >= 5100102) and (ACodigo <= 5108956) then P51
@@ -12364,7 +12376,7 @@ begin
       while (i < list.count) and (Result = '') do
       begin
         if pos(cCodigo, List[i]) > 0 then
-          Result := Trim(stringReplace(list[i], ccodigo, '', []));
+          Result := ACBrStr(Trim(stringReplace(list[i], ccodigo, '', [])));
         inc(i);
       end;
     finally
@@ -12489,7 +12501,7 @@ begin
                         'Gerar Token', 'Enviar Evento', 'Consultar Evento',
                         'Consultar DFe', 'Consultar Parâmetros',
                         'Consultar Sequencia de Rps', 'Consultar Link da NFSe',
-                        'Consultar NFSe Por Chave'],
+                        'Consultar NFSe Por Chave', 'Obter DANFSE'],
                        [tmRecepcionar, tmConsultarSituacao, tmConsultarLote,
                         tmConsultarNFSePorRps, tmConsultarNFSe,
                         tmConsultarNFSePorFaixa, tmConsultarNFSeServicoPrestado,
@@ -12498,7 +12510,8 @@ begin
                         tmAbrirSessao, tmFecharSessao, tmTeste, tmTodos,
                         tmGerarToken, tmEnviarEvento, tmConsultarEvento,
                         tmConsultarDFe, tmConsultarParam, tmConsultarSeqRps,
-                        tmConsultarLinkNFSe, tmConsultarNFSePorChave]);
+                        tmConsultarLinkNFSe, tmConsultarNFSePorChave,
+                        tmObterDANFSE]);
 end;
 
 function ModoEnvioToStr(const t: TmodoEnvio): string;
@@ -12906,7 +12919,7 @@ begin
   result := EnumeradoToStr(t,
                            ['0', '1', '2', '3', '4'],
                            [mpDesconhecido, mpTransfronteirico, mpConsumoBrasil,
-                   mpPresencaComercialExterior, mpMovimentoTempPessoasFisicas]);
+                             mpMovimentoTempPessoasFisicas, mpConsumoExterior]);
 end;
 
 function StrTomdPrestacao(out ok: Boolean; const s: string): TmdPrestacao;
@@ -12914,7 +12927,7 @@ begin
   result := StrToEnumerado(ok, s,
                            ['0', '1', '2', '3', '4'],
                            [mpDesconhecido, mpTransfronteirico, mpConsumoBrasil,
-                   mpPresencaComercialExterior, mpMovimentoTempPessoasFisicas]);
+                             mpMovimentoTempPessoasFisicas, mpConsumoExterior]);
 end;
 
 function vincPrestToStr(const t: TvincPrest): string;
@@ -13128,15 +13141,15 @@ end;
 function tpBMToStr(const t: TtpBM): string;
 begin
   result := EnumeradoToStr(t,
-                           ['1', '2', '3'],
-                           [tbAliquota, tbReducaoBC, tbIsencao]);
+                           ['1', '2', '3', '4'],
+                           [tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota]);
 end;
 
 function StrTotpBM(out ok: Boolean; const s: string): TtpBM;
 begin
   result := StrToEnumerado(ok, s,
-                           ['1', '2', '3'],
-                           [tbAliquota, tbReducaoBC, tbIsencao]);
+                           ['1', '2', '3', '4'],
+                           [tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota]);
 end;
 
 function tpSuspToStr(const t: TtpSusp): string;
@@ -13321,13 +13334,16 @@ end;
 function StrToLayoutNFSe(out ok: boolean; const s: string): TLayoutNFSe;
 begin
   Result := StrToEnumerado(OK, s,
-                           ['0', '1'],
-                           [lnfsProvedor, lnfsPadraoNacionalv1]);
+                           ['0', '1', '2'],
+                           [lnfsProvedor, lnfsPadraoNacionalv1,
+                            lnfsPadraoNacionalv101]);
 end;
 
 function LayoutNFSeToStr(const t: TLayoutNFSe): string;
 begin
-  Result := EnumeradoToStr(t, ['0', '1'], [lnfsProvedor, lnfsPadraoNacionalv1]);
+  Result := EnumeradoToStr(t, ['0', '1', '2'],
+                              [lnfsProvedor, lnfsPadraoNacionalv1,
+                               lnfsPadraoNacionalv101]);
 end;
 
 function StrToNaoNIF(out ok: boolean; const s: string): TNaoNIF;
@@ -13438,6 +13454,26 @@ begin
     end;
   end;
   raise EACBrException.CreateFmt('Valor string inválido para TLogradouroLocalPrestacaoServico: %s', [s]);
+end;
+
+function cMotivoEmisTIToStr(t: TcMotivoEmisTI): string;
+begin
+  Result := TcMotivoEmisTIArrayStrings[t];
+end;
+
+function StrTocMotivoEmisTI(const s: string): TcMotivoEmisTI;
+var
+  idx: TcMotivoEmisTI;
+begin
+  for idx:= Low(TcMotivoEmisTIArrayStrings) to High(TcMotivoEmisTIArrayStrings) do
+  begin
+    if (TcMotivoEmisTIArrayStrings[idx] = s) then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TcMotivoEmisTI: %s', [s]);
 end;
 
 // Reforma Tributária

@@ -1,12 +1,22 @@
 package com.acbr.nfe.acbrlibnfe.demo.comandos;
 
+/**
+ * Fragment para inutilização de numeração de NFe na SEFAZ.
+ * 
+ * Permite inutilizar número único ou sequência. Requer CNPJ, série,
+ * numeração e justificativa (min. 15 caracteres).
+ * 
+ * @author ACBr Team
+ */
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.fragment.app.Fragment;
 
@@ -19,14 +29,14 @@ public class ComandosInutilizacaoNFeFragment extends Fragment {
 
     private ACBrLibNFe ACBrNFe;
 
-    private EditText txtRespostaInutilizacao;
-    private EditText txtCNPJInutilizarNumeracao;
-    private EditText txtJustificativaInutilizarNumeracao;
-    private EditText txtAnoInutilizarNumeracao;
-    private EditText txtModeloInutilizarNumeracao;
-    private EditText txtSerieInutilizarNumeracao;
-    private EditText txtNumeroInicialInutilizarNumeracao;
-    private EditText txtNumeroFinalInutilizarNumeracao;
+    private TextInputEditText txtRespostaInutilizacao;
+    private TextInputEditText txtCNPJInutilizarNumeracao;
+    private TextInputEditText txtJustificativaInutilizarNumeracao;
+    private TextInputEditText txtAnoInutilizarNumeracao;
+    private TextInputEditText txtModeloInutilizarNumeracao;
+    private TextInputEditText txtSerieInutilizarNumeracao;
+    private TextInputEditText txtNumeroInicialInutilizarNumeracao;
+    private TextInputEditText txtNumeroFinalInutilizarNumeracao;
     private Button btnInutilizarNumeracao;
     private Button btnLimparRespostaInutilizacao;
 
@@ -34,8 +44,6 @@ public class ComandosInutilizacaoNFeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comandos_inutilizacao_nfe, container, false);
-
-        ACBrNFe = ACBrLibHelper.getInstance("");
 
         txtRespostaInutilizacao = view.findViewById(R.id.txtRespostaInutilizacao);
         txtCNPJInutilizarNumeracao = view.findViewById(R.id.txtCNPJInutilizarNumeracao);
@@ -63,6 +71,12 @@ public class ComandosInutilizacaoNFeFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ACBrNFe = ACBrLibHelper.getInstance("");
     }
 
     public void inutilizarNumeracao() {

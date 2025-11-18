@@ -42,6 +42,13 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+09/10/2025
+-- ACBrLibNFeConsoleMT.lpi, ACBrLibNFeConsoleMTDemo.lpi --
+[+] TK-7487 - Habilita 16KB de alinhamento nos LPI console da ACBrLibNFe, obs: para ndk <=r22b
+   Adiciona flags de linker -k-z" common-page-size=16384" e -k-z" max-page-size=16384" 
+   no perfil de compilação android-arm64-v8a para resolver problemas de alinhamento de página e compatibilizar com Android 15+.
+   Por: doszapro
+
 01/10/2025
 -- ACBrLibNFeBase.pas --
 [-] Atualização de pcn para ACBrXMLDocuments da distribuição DFe gerou modificação no codigo. Realizada correção.

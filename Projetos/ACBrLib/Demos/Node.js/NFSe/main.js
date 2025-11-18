@@ -1,5 +1,6 @@
 const path = require("path");
 const os = require("os");
+const dotenv = require('dotenv')
 
 // ACBrLibNFSeMT é exportado como default
 const ACBrLibNFSeMT = require("@projetoacbr/acbrlib-nfse-node/dist/src").default;
@@ -27,7 +28,7 @@ const ACBrLibNFSeMT = require("@projetoacbr/acbrlib-nfse-node/dist/src").default
 // copie a pasta Schemas para a pasta data/Schemas
 
 
-const pathACBrLibNFSe = path.resolve(__dirname, 'lib', os.platform() === 'win32' ? 'ACBrLibNFSe64.dll' : 'libacbrnfse64.so');
+const pathACBrLibNFSe = path.resolve(__dirname, 'lib', os.platform() === 'win32' ? 'ACBrNFSe64.dll' : 'libacbrnfse64.so');
 const eArqConfig = path.resolve(__dirname, "data", "config", "acbrlib.ini");
 const eChaveCrypt = "";
 const pathCert = path.resolve(__dirname, "data", "cert", "cert.pfx");
@@ -40,6 +41,8 @@ let nfse = new ACBrLibNFSeMT(pathACBrLibNFSe, eArqConfig, eChaveCrypt);
 
 let inicio = 2;
 
+
+dotenv.config({ path: path.resolve(__dirname, '.env') })
 try {
 
   let senha = process.env.PFX_PASSWORD;

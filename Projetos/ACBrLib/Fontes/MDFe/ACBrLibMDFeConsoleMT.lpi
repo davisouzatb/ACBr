@@ -23,7 +23,7 @@
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="2"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="334"/>
+      <BuildNr Value="342"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrMDFe - BIblioteca para emissão e impressão de Manifesto de Documentos Fiscais Eletrônicos" InternalName="ACBrLibMDFe" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="ACBrMDFe " ProductVersion="0.0.0.1"/>
     </VersionInfo>
@@ -197,7 +197,11 @@
 -dNOREPORT
 -dMT
 -Xd
--XPaarch64-linux-android-"/>
+-XPaarch64-linux-android-
+-k-z
+-kcommon-page-size=16384
+-k-z
+-kmax-page-size=16384"/>
           </Other>
         </CompilerOptions>
       </Item5>

@@ -41,7 +41,6 @@ uses
   IniFiles,
   ACBrXmlBase,
   ACBrDFe.Conversao,
-  pcnConversao,
   ACBrNF3eClass,
   ACBrNF3eConversao,
   ACBrDFeComum.Proc;
@@ -193,13 +192,13 @@ var
   Ok: Boolean;
 begin
   sSecao := 'ide';
-  Ide.tpAmb   := StrToTipoAmbiente(OK, AINIRec.ReadString(sSecao, 'tpAmb', IntToStr(Ambiente)));
+  Ide.tpAmb   := StrToTipoAmbiente(AINIRec.ReadString(sSecao, 'tpAmb', IntToStr(Ambiente)));
   Ide.modelo := AINIRec.ReadInteger(sSecao, 'Modelo', 62);
   Ide.serie := AINIRec.ReadInteger(sSecao, 'Serie', 1);
   Ide.nNF := AINIRec.ReadInteger(sSecao, 'nNF', 0);
   Ide.cNF := AINIRec.ReadInteger(sSecao, 'cNF', 0);
   Ide.dhEmi := StringToDateTime(AINIRec.ReadString(sSecao, 'dhEmi', '0'));
-  Ide.tpEmis  := StrToTipoEmissao(OK, AINIRec.ReadString(sSecao, 'tpEmis', IntToStr(tpEmis)));
+  Ide.tpEmis  := StrToTipoEmissao(AINIRec.ReadString(sSecao, 'tpEmis', IntToStr(tpEmis)));
   Ide.nSiteAutoriz := StrToSiteAutorizator(AINIRec.ReadString(sSecao, 'nSiteAutoriz', '0'));
   Ide.finNF3e := StrToFinNF3e(AINIRec.ReadString(sSecao, 'finNF3e', '0'));
   Ide.verProc := AINIRec.ReadString(sSecao, 'verProc', 'ACBrNFCom');
@@ -1106,7 +1105,7 @@ begin
   sSecao := 'procNF3e';
   if AINIRec.SectionExists(sSecao) then
   begin
-    procNF3e.tpAmb := StrToTipoAmbiente(ok, AINIRec.ReadString(sSecao, 'tpAmb', ''));
+    procNF3e.tpAmb := StrToTipoAmbiente(AINIRec.ReadString(sSecao, 'tpAmb', ''));
     procNF3e.verAplic := AINIRec.ReadString(sSecao, 'verAplic', '');
     procNF3e.chDFe := AINIRec.ReadString(sSecao, 'chNF3e', '');
     procNF3e.dhRecbto := AINIRec.ReadDateTime(sSecao, 'dhRecbto', 0);
@@ -1123,16 +1122,16 @@ end;
 procedure TNF3eIniReader.Ler_IBSCBS(AINIRec: TMemIniFile; IBSCBS: TIBSCBS; Idx1, Idx2: Integer);
 var
   sSecao: string;
-  ok: Boolean;
 begin
   sSecao := 'IBSCBS' + IntToStrZero(Idx1, 2) + IntToStrZero(Idx2, 3);
+
   if AINIRec.SectionExists(sSecao) then
   begin
-    IBSCBS.CST := StrToCSTIBSCBS(AINIRec.ReadString(sSecao, 'CST', '000'));
-    IBSCBS.cClassTrib := AINIRec.ReadString(sSecao, 'cClassTrib', '000001');
-    IBSCBS.indDoacao := StrToTIndicadorEx(ok, AINIRec.ReadString(sSecao, 'indDoacao', ''));
-
+    IBSCBS.CST := StrToCSTIBSCBS(AINIRec.ReadString(sSecao, 'CST', ''));
+    IBSCBS.cClassTrib := AINIRec.ReadString(sSecao, 'cClassTrib', '');
+    IBSCBS.indDoacao := StrToTIndicadorEx(AINIRec.ReadString(sSecao, 'indDoacao', ''));
     Ler_IBSCBS_gIBSCBS(AINIRec, IBSCBS.gIBSCBS, Idx1, Idx2);
+    Ler_gEstornoCred(AINIRec, IBSCBS.gEstornoCred, Idx1, Idx2);
   end;
 end;
 
@@ -1141,6 +1140,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gIBSCBS' + IntToStrZero(Idx1, 2) + IntToStrZero(Idx2, 3);
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gIBSCBS.vBC := StringToFloatDef( AINIRec.ReadString(sSecao,'vBC','') ,0);
@@ -1151,7 +1151,6 @@ begin
     Ler_gCBS(AINIRec, gIBSCBS.gCBS, Idx1, Idx2);
     Ler_gTribReg(AINIRec, gIBSCBS.gTribRegular, Idx1, Idx2);
     Ler_gTribCompraGov(AINIRec, gIBSCBS.gTribCompraGov, Idx1, Idx2);
-    Ler_gEstornoCred(AINIRec, gIBSCBS.gEstornoCred, Idx1, Idx2);
   end;
 end;
 
@@ -1161,6 +1160,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gIBSUF' + IntToStrZero(Idx1, 2) + IntToStrZero(Idx2, 3);
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gIBSUF.pIBS := StringToFloatDef( AINIRec.ReadString(sSecao,'pIBSUF','') ,0);
@@ -1182,6 +1182,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gIBSMun' + IntToStrZero(Idx1, 2) + IntToStrZero(Idx2, 3);
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gIBSMun.pIBS := StringToFloatDef( AINIRec.ReadString(sSecao,'pIBSMun','') ,0);
@@ -1202,6 +1203,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gCBS' + IntToStrZero(Idx1, 2) + IntToStrZero(Idx2, 3);
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gCBS.pCBS := StringToFloatDef( AINIRec.ReadString(sSecao,'pCBS','') ,0);
@@ -1224,14 +1226,17 @@ var
 begin
   sSecao := 'gTribRegular' + IntToStrZero(Idx1, 2) + IntToStrZero(Idx2, 3);
 
-  gTribRegular.CSTReg := StrToCSTIBSCBS(AINIRec.ReadString(sSecao, 'CSTReg', '000'));
-  gTribRegular.cClassTribReg := AINIRec.ReadString(sSecao, 'cClassTribReg', '000001');
-  gTribRegular.pAliqEfetRegIBSUF := StringToFloatDef( AINIRec.ReadString(sSecao,'pAliqEfetRegIBSUF','') ,0);
-  gTribRegular.vTribRegIBSUF := StringToFloatDef( AINIRec.ReadString(sSecao,'vTribRegIBSUF','') ,0);
-  gTribRegular.pAliqEfetRegIBSMun := StringToFloatDef( AINIRec.ReadString(sSecao,'pAliqEfetRegIBSMun','') ,0);
-  gTribRegular.vTribRegIBSMun := StringToFloatDef( AINIRec.ReadString(sSecao,'vTribRegIBSMun','') ,0);
-  gTribRegular.pAliqEfetRegCBS := StringToFloatDef( AINIRec.ReadString(sSecao,'pAliqEfetRegCBS','') ,0);
-  gTribRegular.vTribRegCBS := StringToFloatDef( AINIRec.ReadString(sSecao,'vTribRegCBS','') ,0);
+  if AINIRec.SectionExists(sSecao) then
+  begin
+    gTribRegular.CSTReg := StrToCSTIBSCBS(AINIRec.ReadString(sSecao, 'CSTReg', ''));
+    gTribRegular.cClassTribReg := AINIRec.ReadString(sSecao, 'cClassTribReg', '');
+    gTribRegular.pAliqEfetRegIBSUF := StringToFloatDef( AINIRec.ReadString(sSecao,'pAliqEfetRegIBSUF','') ,0);
+    gTribRegular.vTribRegIBSUF := StringToFloatDef( AINIRec.ReadString(sSecao,'vTribRegIBSUF','') ,0);
+    gTribRegular.pAliqEfetRegIBSMun := StringToFloatDef( AINIRec.ReadString(sSecao,'pAliqEfetRegIBSMun','') ,0);
+    gTribRegular.vTribRegIBSMun := StringToFloatDef( AINIRec.ReadString(sSecao,'vTribRegIBSMun','') ,0);
+    gTribRegular.pAliqEfetRegCBS := StringToFloatDef( AINIRec.ReadString(sSecao,'pAliqEfetRegCBS','') ,0);
+    gTribRegular.vTribRegCBS := StringToFloatDef( AINIRec.ReadString(sSecao,'vTribRegCBS','') ,0);
+  end;
 end;
 
 procedure TNF3eIniReader.Ler_gTribCompraGov(AINIRec: TMemIniFile;
@@ -1275,6 +1280,7 @@ var
   sSecao: string;
 begin
   sSecao := 'IBSCBSTot';
+
   if AINIRec.SectionExists(sSecao) then
   begin
     IBSCBSTot.vBCIBSCBS := StringToFloatDef( AINIRec.ReadString(sSecao,'vBCIBSCBS','') ,0);
@@ -1291,6 +1297,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gIBS';
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gIBS.vIBS := StringToFloatDef( AINIRec.ReadString(sSecao,'vIBS','') ,0);
@@ -1306,6 +1313,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gIBSUFTot';
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gIBSUFTot.vDif := StringToFloatDef( AINIRec.ReadString(sSecao,'vDif','') ,0);
@@ -1320,6 +1328,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gIBSMunTot';
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gIBSMunTot.vDif := StringToFloatDef( AINIRec.ReadString(sSecao,'vDif','') ,0);
@@ -1334,6 +1343,7 @@ var
   sSecao: string;
 begin
   sSecao := 'gCBSTot';
+
   if AINIRec.SectionExists(sSecao) then
   begin
     gCBS.vDif := StringToFloatDef( AINIRec.ReadString(sSecao,'vDif','') ,0);

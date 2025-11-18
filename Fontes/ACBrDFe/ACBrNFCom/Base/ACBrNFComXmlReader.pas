@@ -38,9 +38,9 @@ interface
 
 uses
   Classes, SysUtils,
-  pcnConversao,
   ACBrXmlBase,
   ACBrDFe.Conversao,
+  pcnConversao,
   ACBrXmlDocument,
   ACBrXmlReader,
   ACBrNFComClass;
@@ -202,7 +202,7 @@ begin
 
   if not Assigned(ANodeAux) then Exit;
 
-  NFCom.procNFCom.tpAmb := StrToTipoAmbiente(ok, ObterConteudo(ANodeAux.Childrens.FindAnyNs('tpAmb'), tcStr));
+  NFCom.procNFCom.tpAmb := StrToTipoAmbiente(ObterConteudo(ANodeAux.Childrens.FindAnyNs('tpAmb'), tcStr));
   NFCom.procNFCom.verAplic := ObterConteudo(ANodeAux.Childrens.FindAnyNs('verAplic'), tcStr);
   NFCom.procNFCom.chDFe := ObterConteudo(ANodeAux.Childrens.FindAnyNs('chNFCom'), tcStr);
   NFCom.procNFCom.dhRecbto := ObterConteudo(ANodeAux.Childrens.FindAnyNs('dhRecbto'), tcDatHor);
@@ -257,14 +257,14 @@ begin
   if not Assigned(ANode) then Exit;
 
   NFCom.ide.cUF := ObterConteudo(ANode.Childrens.FindAnyNs('cUF'), tcInt);
-  NFCom.Ide.tpAmb := StrToTipoAmbiente(ok, ObterConteudo(ANode.Childrens.FindAnyNs('tpAmb'), tcStr));
+  NFCom.Ide.tpAmb := StrToTipoAmbiente(ObterConteudo(ANode.Childrens.FindAnyNs('tpAmb'), tcStr));
   NFCom.ide.modelo := ObterConteudo(ANode.Childrens.FindAnyNs('mod'), tcInt);
   NFCom.ide.serie := ObterConteudo(ANode.Childrens.FindAnyNs('serie'), tcInt);
   NFCom.ide.nNF := ObterConteudo(ANode.Childrens.FindAnyNs('nNF'), tcInt);
   NFCom.ide.cNF := ObterConteudo(ANode.Childrens.FindAnyNs('cNF'), tcInt);
   NFCom.Ide.cDV := ObterConteudo(ANode.Childrens.FindAnyNs('cDV'), tcInt);
   NFCom.ide.dhEmi := ObterConteudo(ANode.Childrens.FindAnyNs('dhEmi'), tcDatHor);
-  NFCom.Ide.tpEmis := StrToTipoEmissao(ok, ObterConteudo(ANode.Childrens.FindAnyNs('tpEmis'), tcStr));
+  NFCom.Ide.tpEmis := StrToTipoEmissao(ObterConteudo(ANode.Childrens.FindAnyNs('tpEmis'), tcStr));
   NFCom.Ide.nSiteAutoriz := StrToSiteAutorizator(ObterConteudo(ANode.Childrens.FindAnyNs('nSiteAutoriz'), tcStr));
   NFCom.ide.cMunFG := ObterConteudo(ANode.Childrens.FindAnyNs('cMunFG'), tcInt);
   NFCom.Ide.finNFCom := StrToFinNFCom(ObterConteudo(ANode.Childrens.FindAnyNs('finNFCom'), tcStr));
@@ -352,6 +352,8 @@ begin
   NFCom.Dest.enderDest.UF := ObterConteudo(ANode.Childrens.FindAnyNs('UF'), tcStr);
   NFCom.Dest.enderDest.fone := ObterConteudo(ANode.Childrens.FindAnyNs('fone'), tcStr);
   NFCom.Dest.enderDest.email := ObterConteudo(ANode.Childrens.FindAnyNs('email'), tcStr);
+  NFCom.Dest.enderDest.cPais := ObterConteudo(ANode.Childrens.FindAnyNs('cPais'), tcInt);
+  NFCom.Dest.enderDest.xPais := ObterConteudo(ANode.Childrens.FindAnyNs('xPais'), tcStr);
 end;
 
 procedure TNFComXmlReader.Ler_Assinante(const ANode: TACBrXmlNode);
@@ -846,6 +848,7 @@ begin
   IBSCBS.indDoacao := pcnConversao.StrToTIndicadorEx(ok, ObterConteudo(ANode.Childrens.Find('indDoacao'), tcStr));
 
   Ler_IBSCBS_gIBSCBS(ANode.Childrens.Find('gIBSCBS'), IBSCBS.gIBSCBS);
+  Ler_gEstornoCred(ANode.Childrens.Find('gEstornoCred'), IBSCBS.gEstornoCred);
 end;
 
 procedure TNFComXmlReader.Ler_IBSCBS_gIBSCBS(const ANode: TACBrXmlNode; gIBSCBS: TgIBSCBS);
@@ -860,7 +863,6 @@ begin
   Ler_gCBS(ANode.Childrens.Find('gCBS'), gIBSCBS.gCBS);
   Ler_gIBSCBS_gTribRegular(ANode.Childrens.Find('gTribRegular'), gIBSCBS.gTribRegular);
   Ler_gTribCompraGov(ANode.Childrens.Find('gTribCompraGov'), gIBSCBS.gTribCompraGov);
-  Ler_gEstornoCred(ANode.Childrens.Find('gEstornoCred'), gIBSCBS.gEstornoCred);
 end;
 
 procedure TNFComXmlReader.Ler_gIBSUF(const ANode: TACBrXmlNode; gIBSUF: TgIBSUFValores);

@@ -78,6 +78,7 @@ type
 implementation
 
 uses
+  ACBrDFe.Conversao,
   ACBrUtil.XMLHTML,
   ACBrDFeException, ACBrNFSeX, ACBrNFSeXConfiguracoes,
   ACBrNFSeXNotasFiscais, ISSe.GravarXml, ISSe.LerXml;
@@ -168,7 +169,7 @@ begin
   FPMsgOrig := AMSG;
 
   Request := '<ws:EnviarLoteRps>';
-  Request := Request + '<xml>' + XmlToStr(AMSG) + '</xml>';
+  Request := Request + '<xml>' + IncluirCDATA(AMSG) + '</xml>';
   Request := Request + '</ws:EnviarLoteRps>';
 
   Result := Executar(SoapAction + '#EnviarLoteRps', Request,
@@ -184,7 +185,7 @@ begin
   FPMsgOrig := AMSG;
 
   Request := '<ws:EnviarLoteRpsSincrono>';
-  Request := Request + '<xml>' + XmlToStr(AMSG) + '</xml>';
+  Request := Request + '<xml>' + IncluirCDATA(AMSG) + '</xml>';
   Request := Request + '</ws:EnviarLoteRpsSincrono>';
 
   Result := Executar(SoapAction + '#EnviarLoteRpsSincrono', Request,
@@ -200,7 +201,7 @@ begin
   FPMsgOrig := AMSG;
 
   Request := '<ws:GerarNfse>';
-  Request := Request + '<xml>' + XmlToStr(AMSG) + '</xml>';
+  Request := Request + '<xml>' + IncluirCDATA(AMSG) + '</xml>';
   Request := Request + '</ws:GerarNfse>';
 
   Result := Executar(SoapAction + '#GerarNfse', Request,
@@ -324,6 +325,7 @@ function TACBrNFSeXWebserviceISSe201.TratarXmlRetornado(
 begin
   Result := inherited TratarXmlRetornado(aXML);
 
+  Result := RemoverCDATA(Result);
   Result := ParseText(Result);
   Result := RemoverDeclaracaoXML(Result);
   Result := RemoverIdentacao(Result);

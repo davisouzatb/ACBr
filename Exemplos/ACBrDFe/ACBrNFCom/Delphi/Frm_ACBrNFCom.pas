@@ -584,8 +584,8 @@ begin
           IBSCBS.gIBSCBS.gTribCompraGov.vTribCBS := 50;
 
           // Estorno de Crédito
-          IBSCBS.gIBSCBS.gEstornoCred.vIBSEstCred := 0;
-          IBSCBS.gIBSCBS.gEstornoCred.vCBSEstCred := 0;
+          IBSCBS.gEstornoCred.vIBSEstCred := 0;
+          IBSCBS.gEstornoCred.vCBSEstCred := 0;
         end;
       end;
 
@@ -1774,7 +1774,7 @@ begin
   with ACBrNFCom1.Configuracoes.WebServices do
   begin
     UF         := cbUF.Text;
-    Ambiente   := StrToTipoAmbiente(Ok,IntToStr(rgTipoAmb.ItemIndex+1));
+    Ambiente   := StrToTipoAmbiente(IntToStr(rgTipoAmb.ItemIndex+1));
     Visualizar := cbxVisualizar.Checked;
     Salvar     := cbxSalvarSOAP.Checked;
 

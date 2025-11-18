@@ -67,6 +67,7 @@ const
 
   cContentTypeUTF8 = 'charset=utf-8';
   cContentTypeTextPlain = 'text/plain';
+  cContentTypeApplicationXml = 'application/xml';
   cContentTypeApplicationJSon = 'application/json';
   cContentTypeApplicationWwwFormUrlEncoded = 'application/x-www-form-urlencoded';
 
@@ -395,6 +396,7 @@ function URLWithDelim(aURL: String): String;
 function URLWithoutDelim(aURL: String): String;
 
 function GetHeaderValue(const aValue: String; aStringList: TStringList): String;
+procedure SetHeaderValue(const aKey, aValue: String; aStringList: TStringList);
 
 function ContentIsCompressed(aHeader: TStringList): Boolean;
 function StreamToAnsiString(aStream: TStream): AnsiString;
@@ -521,6 +523,12 @@ begin
       Result := Trim(Copy(LinhaHeader, Length(u)+1, Length(LinhaHeader)));
     Inc(i);
   end;
+end;
+
+procedure SetHeaderValue(const aKey, aValue: String; aStringList: TStringList);
+begin
+  if Assigned(aStringList) and NaoEstaVazio(aKey) and NaoEstaVazio(aValue) then
+    aStringList.Add(aKey + ': ' + aValue);
 end;
 
 function ContentIsCompressed(aHeader: TStringList): Boolean;
@@ -1201,6 +1209,7 @@ var
    i, ContaRedirecionamentos: Integer;
    ce: THttpContentEncodingCompress;
    AddUTF8InHeader: Boolean;
+   wCertLog, wBody: AnsiString;
 begin
   {$IFDEF UPDATE_SCREEN_CURSOR}
    OldCursor := Screen.Cursor;
@@ -1244,10 +1253,11 @@ begin
     if Assigned(OnAntesAbrirHTTP) then
       OnAntesAbrirHTTP(fURL);
 
-    // DEBUG //
-    //HTTPSend.Document.SaveToFile( '_HttpSend.txt' );
     RegistrarLog('HTTPMethod( ' + Method + ', URL: ' + fURL + ' )');
     RegistrarLog(' - Req.Headers: ' + HTTPSend.Headers.Text, 3);
+    wBody := StreamToAnsiString(HTTPSend.Document);
+    if NaoEstaVazio(wBody) then
+      RegistrarLog(' - Req.Body: ' + sLineBreak + wBody);
 
     if (FTimeOut > 0) then
     begin
@@ -1261,13 +1271,19 @@ begin
         HTTPTunnelTimeout := FTimeOut;
       end;
     end;
-           
+
     ConfigurarAutenticacao_mTLS(Method, fURL);
-    RegistrarLog(sLineBreak +
-      'Http.Sock.SSL.Certificate: ' + HTTPSend.Sock.SSL.Certificate + sLineBreak +
-      'Http.Sock.SSL.PrivateKey: ' + HTTPSend.Sock.SSL.PrivateKey + sLineBreak +
-      'Http.Sock.SSL.CertificateFile: ' + HTTPSend.Sock.SSL.CertificateFile + sLineBreak +
-      'Http.Sock.SSL.PrivateKeyFile: ' + HTTPSend.Sock.SSL.PrivateKeyFile + sLineBreak, 4);
+    wCertLog :=
+      IfThen(NaoEstaVazio(HTTPSend.Sock.SSL.PFXfile), 'Http.Sock.SSL.PFXfile: ' + HTTPSend.Sock.SSL.PFXfile + sLineBreak) +
+      IfThen(NaoEstaVazio(HTTPSend.Sock.SSL.PFX), Format('Http.Sock.SSL.PFX: -- %d bytes --', [LengthNativeString(HTTPSend.Sock.SSL.PFX)]) + sLineBreak) +
+      IfThen(NaoEstaVazio(HTTPSend.Sock.SSL.PrivateKey), Format('Http.Sock.SSL.PrivateKey: -- %d bytes --', [LengthNativeString(HTTPSend.Sock.SSL.PrivateKey)]) + sLineBreak) +
+      IfThen(NaoEstaVazio(HTTPSend.Sock.SSL.Certificate), Format('Http.Sock.SSL.Certificate: -- %d bytes --', [LengthNativeString(HTTPSend.Sock.SSL.Certificate)]) + sLineBreak) +
+      IfThen(NaoEstaVazio(HTTPSend.Sock.SSL.PrivateKeyFile), 'Http.Sock.SSL.PrivateKeyFile: ' + HTTPSend.Sock.SSL.PrivateKeyFile + sLineBreak) +
+      IfThen(NaoEstaVazio(HTTPSend.Sock.SSL.CertificateFile), 'Http.Sock.SSL.CertificateFile: ' + HTTPSend.Sock.SSL.CertificateFile + sLineBreak);
+
+    // Registra o log apenas se uma das propriedades estiverem configuradas
+    if NaoEstaVazio(wCertLog) then
+      RegistrarLog(sLineBreak + wCertLog, 4);
 
     HeadersOld := HTTPSend.Headers.Text;
     HTTPSend.HTTPMethod(Method, fURL);

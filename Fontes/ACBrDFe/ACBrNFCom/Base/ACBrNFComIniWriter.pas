@@ -92,7 +92,7 @@ type
       Idx: Integer);
     procedure Gerar_IBSCBS_gIBSCBS_gTribCompraGov(AINIRec: TMemIniFile; gTribCompraGov: TgTribCompraGov;
       Idx: Integer);
-    procedure Gerar_IBSCBS_gIBSCBS_gEstornoCred(AINIRec: TMemIniFile; gEstornoCred: TgEstornoCred;
+    procedure Gerar_IBSCBS_gEstornoCred(AINIRec: TMemIniFile; gEstornoCred: TgEstornoCred;
       Idx: Integer);
 
     procedure Gerar_IBSCBSTot(AINIRec: TMemIniFile; IBSCBSTot: TIBSCBSTot);
@@ -248,6 +248,8 @@ begin
   AINIRec.WriteString(sSecao, 'UF', Dest.EnderDest.UF);
   AINIRec.WriteString(sSecao, 'fone', Dest.EnderDest.fone);
   AINIRec.WriteString(sSecao, 'email', Dest.EnderDest.email);
+  AINIRec.WriteInteger(sSecao, 'cPais', Dest.EnderDest.cPais);
+  AINIRec.WriteString(sSecao, 'xPais', Dest.EnderDest.xPais);
 end;
 
 procedure TNFComIniWriter.Gerar_Assinante(AINIRec: TMemIniFile;
@@ -658,6 +660,9 @@ begin
 
     if IBSCBS.gIBSCBS.vBC > 0 then
       Gerar_IBSCBS_gIBSCBS(AINIRec, IBSCBS.gIBSCBS, Idx);
+
+    if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) then
+      Gerar_IBSCBS_gEstornoCred(AINIRec, IBSCBS.gEstornoCred, Idx);
   end;
 end;
 
@@ -679,9 +684,6 @@ begin
 
   if gIBSCBS.gTribCompraGov.pAliqIBSUF > 0 then
     Gerar_IBSCBS_gIBSCBS_gTribCompraGov(AINIRec, gIBSCBS.gTribCompraGov, Idx);
-
-  if (gIBSCBS.gEstornoCred.vIBSEstCred > 0) or (gIBSCBS.gEstornoCred.vCBSEstCred > 0) then
-    Gerar_IBSCBS_gIBSCBS_gEstornoCred(AINIRec, gIBSCBS.gEstornoCred, Idx);
 end;
 
 procedure TNFComIniWriter.Gerar_IBSCBS_gIBSCBS_gIBSUF(AINIRec: TMemIniFile;
@@ -773,7 +775,7 @@ begin
   AINIRec.WriteFloat(sSecao, 'vTribCBS', gTribCompraGov.vTribCBS);
 end;
 
-procedure TNFComIniWriter.Gerar_IBSCBS_gIBSCBS_gEstornoCred(
+procedure TNFComIniWriter.Gerar_IBSCBS_gEstornoCred(
   AINIRec: TMemIniFile; gEstornoCred: TgEstornoCred; Idx: Integer);
 var
   sSecao: string;

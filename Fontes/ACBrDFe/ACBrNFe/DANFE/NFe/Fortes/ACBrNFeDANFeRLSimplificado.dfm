@@ -7,11 +7,10 @@ inherited frlDANFeRLSimplificado: TfrlDANFeRLSimplificado
   Font.Height = -8
   Font.Name = 'Arial'
   Font.Style = [fsBold]
-  TextHeight = 10
   inherited RLNFe: TRLReport
     Tag = 1
-    Left = 656
-    Top = -527
+    Left = 10
+    Top = 10
     Width = 340
     Height = 1890
     AllowedBands = [btHeader, btDetail, btSummary, btFooter]

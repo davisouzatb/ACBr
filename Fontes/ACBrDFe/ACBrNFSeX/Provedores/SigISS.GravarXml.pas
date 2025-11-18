@@ -38,7 +38,8 @@ interface
 
 uses
   SysUtils, Classes, StrUtils,
-  ACBrXmlBase, ACBrXmlDocument,
+  ACBrXmlBase,
+  ACBrXmlDocument,
   ACBrNFSeXGravarXml;
 
 type
@@ -81,6 +82,7 @@ type
 implementation
 
 uses
+  ACBrDFe.Conversao,
   ACBrUtil.Strings,
   ACBrNFSeXConversao,
   ACBrNFSeXConsts;
@@ -125,7 +127,7 @@ begin
                                                        NFSe.id_sis_legado, ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'servico', 1, 15, 1,
-                       OnlyNumber(NFSe.Servico.CodigoTributacaoMunicipio), ''));
+                                OnlyNumber(NFSe.Servico.ItemListaServico), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'codigo_obra', 1, 15, 0,
                                    NFSe.ConstrucaoCivil.CodigoObra, DSC_COBRA));
@@ -143,7 +145,8 @@ begin
                                          NFSe.Servico.Valores.BaseCalculo, ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'descricaoNF', 1, 150, 1,
-                                               NFSe.Servico.Discriminacao, ''));
+    StringReplace(NFSe.Servico.Discriminacao, Opcoes.QuebraLinha,
+                          FpAOwner.ConfigGeral.QuebradeLinha, [rfReplaceAll])));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'tomador_tipo', 1, 1, 1,
          FpAOwner.TipoPessoaToStr(NFSe.Tomador.IdentificacaoTomador.Tipo), ''));
@@ -350,7 +353,7 @@ begin
                                             NFSE.Servico.Valores.Aliquota, ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'servico', 1, 15, 1,
-                       OnlyNumber(NFSe.Servico.CodigoTributacaoMunicipio), ''));
+                                OnlyNumber(NFSe.Servico.ItemListaServico), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'codigo_obra', 1, 15, 0,
                                    NFSe.ConstrucaoCivil.CodigoObra, DSC_COBRA));
@@ -402,7 +405,8 @@ begin
                                 NFSe.Servico.MunicipioIncidencia, DSC_MUNINCI));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'descricaoNF', 1, 150, 1,
-                                               NFSe.Servico.Discriminacao, ''));
+    StringReplace(NFSe.Servico.Discriminacao, Opcoes.QuebraLinha,
+                          FpAOwner.ConfigGeral.QuebradeLinha, [rfReplaceAll])));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'tomador_tipo', 1, 1, 1,
          FpAOwner.TipoPessoaToStr(NFSe.Tomador.IdentificacaoTomador.Tipo), ''));

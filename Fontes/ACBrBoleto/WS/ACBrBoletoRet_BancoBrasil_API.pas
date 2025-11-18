@@ -169,6 +169,7 @@ begin
           begin
             ARetornoWS.DadosRet.IDBoleto.CodBarras      := LJsonObject.AsString['codigoBarraNumerico'];
             ARetornoWS.DadosRet.IDBoleto.LinhaDig       := LJsonObject.AsString['linhaDigitavel'];
+            ARetornoWS.DadosRet.IDBoleto.URL            := LJsonObject.AsString['urlImagemBoleto'];
             ARetornoWS.DadosRet.IDBoleto.NossoNum       := LJsonObject.AsString['numero'];
 
             if ARetornoWS.DadosRet.IDBoleto.NossoNum = '' then
@@ -176,10 +177,11 @@ begin
 
             ARetornoWS.DadosRet.TituloRet.CodBarras     := ARetornoWS.DadosRet.IDBoleto.CodBarras;
             ARetornoWS.DadosRet.TituloRet.LinhaDig      := ARetornoWS.DadosRet.IDBoleto.LinhaDig;
+            ARetornoWS.DadosRet.TituloRet.URL           := ARetornoWS.DadosRet.IDBoleto.URL;
             ARetornoWS.DadosRet.TituloRet.NossoNumero   := ARetornoWS.DadosRet.IDBoleto.NossoNum;
             ARetornoWS.DadosRet.TituloRet.Carteira      := LJsonObject.AsString['numeroCarteira'];
             ARetornoWS.DadosRet.TituloRet.Modalidade    := LJsonObject.AsInteger['numeroVariacaoCarteira'];
-            ARetornoWS.DadosRet.TituloRet.CodigoCliente := LJsonObject.AsFloat['codigoCliente'];
+            ARetornoWS.DadosRet.TituloRet.CodigoCliente := FloatToStr(LJsonObject.AsFloat['codigoCliente']);
             ARetornoWS.DadosRet.TituloRet.Contrato      := LJsonObject.AsString['numeroContratoCobranca'];
             ARetornoWS.DadosRet.TituloRet.NossoNumeroCorrespondente  := TrataNossoNumero(LJsonObject.AsString['numero']);
 
@@ -196,10 +198,8 @@ begin
             ARetornoWS.DadosRet.IDBoleto.LinhaDig       := LJsonObject.AsString['codigoLinhaDigitavel'];
             ARetornoWS.DadosRet.IDBoleto.NossoNum       := LJsonObject.AsString['id'];
 
-            if EstaVazio(ARetornoWS.DadosRet.IDBoleto.NossoNum) and NaoEstaVazio(ARetornoWS.DadosRet.IDBoleto.LinhaDig) then
-              ARetornoWS.DadosRet.IDBoleto.NossoNum := '000'
-                                                      + Copy(ARetornoWS.DadosRet.IDBoleto.LinhaDig,12,7)
-                                                      + Copy(ARetornoWS.DadosRet.IDBoleto.LinhaDig,20,10);
+            if EstaVazio(ARetornoWS.DadosRet.IDBoleto.NossoNum) and NaoEstaVazio(ARetornoWS.DadosRet.IDBoleto.CodBarras) then
+              ARetornoWS.DadosRet.IDBoleto.NossoNum := '000'+Copy(ARetornoWS.DadosRet.IDBoleto.CodBarras,26,17);
 
             ARetornoWS.DadosRet.TituloRet.CodBarras     := ARetornoWS.DadosRet.IDBoleto.CodBarras;
             ARetornoWS.DadosRet.TituloRet.LinhaDig      := ARetornoWS.DadosRet.IDBoleto.LinhaDig;
@@ -415,6 +415,7 @@ begin
 
             LListaRetorno.DadosRet.IDBoleto.CodBarras      := '';
             LListaRetorno.DadosRet.IDBoleto.LinhaDig       := '';
+            LListaRetorno.DadosRet.IDBoleto.URL            := '';
             LListaRetorno.DadosRet.IDBoleto.NossoNum       := LItemObject.AsString['numeroBoletoBB'];
 
             if LListaRetorno.DadosRet.IDBoleto.NossoNum = '' then
@@ -422,7 +423,7 @@ begin
 
             LListaRetorno.DadosRet.TituloRet.CodBarras      := LListaRetorno.DadosRet.IDBoleto.CodBarras;
             LListaRetorno.DadosRet.TituloRet.LinhaDig       := LListaRetorno.DadosRet.IDBoleto.LinhaDig;
-
+            LListaRetorno.DadosRet.TituloRet.URL            := LListaRetorno.DadosRet.IDBoleto.URL;
 
             LListaRetorno.DadosRet.TituloRet.NossoNumero                := LListaRetorno.DadosRet.IDBoleto.NossoNum;
             LListaRetorno.DadosRet.TituloRet.NossoNumeroCorrespondente  := TrataNossoNumero(LListaRetorno.DadosRet.IDBoleto.NossoNum);

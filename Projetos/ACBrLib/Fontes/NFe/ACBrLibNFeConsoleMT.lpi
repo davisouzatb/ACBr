@@ -23,7 +23,7 @@
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="4"/>
       <RevisionNr Value="7"/>
-      <BuildNr Value="363"/>
+      <BuildNr Value="374"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrNFe - BIblioteca para emissão e impressão de nota fiscal eletrônica" InternalName="ACBrLibNFE" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="ACBrNFe " ProductVersion="0.4.6.0"/>
     </VersionInfo>
@@ -197,7 +197,11 @@
 -dNOREPORT
 -dMT
 -Xd
--XPaarch64-linux-android-"/>
+-XPaarch64-linux-android-
+-k-z
+-kcommon-page-size=16384
+-k-z
+-kmax-page-size=16384"/>
           </Other>
         </CompilerOptions>
       </Item5>

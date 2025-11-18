@@ -352,14 +352,9 @@ var
   LMensagemRejeicao: TACBrBoletoRejeicao;
   LSituacao, LRetorno, LMovimento : string;
   I, LCodigoSolicitacao, LIdArquivo: Integer;
-  aJsonString:String;
   IDArquivos: TACBrJSONArray;
-  LStream : TStringStream;
-  LCT     : TCompressType;
-  LMeuArq : TStringList;
 begin
   Result := True;
-  LStream  := TStringStream.Create('');
 
   ListaRetorno := ACBrBoleto.CriarRetornoWebNaLista;
   ListaRetorno.HTTPResultCode := HTTPResultCode;
@@ -373,9 +368,8 @@ begin
 
   if RetWS <> '' then
   begin
-
+    AJSon := TACBrJSONObject.Parse(RetWS);
     try
-      AJSon := TACBrJSONObject.Parse(RetWS);
       try
 
         if HTTPResultCode >= 400 then
@@ -408,9 +402,8 @@ begin
         //retorna quando tiver sucesso
         if (ListaRetorno.ListaRejeicao.Count = 0) then
         begin
-          aJsonString := aJson.ToJSON;
-         if (ACBrBoleto.Configuracoes.WebService.Operacao = tpConsulta) then
-         begin
+          if (ACBrBoleto.Configuracoes.WebService.Operacao = tpConsulta) then
+          begin
            {Solicitar a movimentação da carteira de cobrança registrada para beneficiário informado}
            if ((LIdArquivo=0) and (LCodigoSolicitacao=0)) then
            begin
@@ -427,7 +420,6 @@ begin
                   if I > 0 then
                      ListaRetorno := ACBrBoleto.CriarRetornoWebNaLista;
                   ListaRetorno.DadosRet.TituloRet.NossoNumeroCorrespondente := IDArquivos.Items[I]
-                 // ListaRetorno.ListaArquivosConsultaMovimentacao.Add(IDArquivos.Items[I]);
                 end;
               end;
            end
@@ -435,17 +427,9 @@ begin
            begin
               if aJson.AsJSONObject['resultado'].AsString['arquivo'] <> EmptyStr then
               begin
-                AJsonBoletosArray := TACBrJSONArray.Create;
+                LRetorno := String(UTF8ToNativeString(unzip( DecodeBase64(aJson.AsJSONObject['resultado'].AsString['arquivo']))));
+                AJsonBoletosArray := TACBrJSONArray.Parse( LRetorno );
                 try
-                  (*
-                  LMeuArq := TStringList.Create();
-                  LMeuArq.LoadFromFile('C:\ACBr\Exemplos\ACBrBoleto\Delphi\SicoobBase64Liquidados.txt');
-                  LRetorno := String(UTF8ToNativeString(unzip( DecodeBase64(LMeuArq.Text))));
-                  LMeuArq.Free;
-                  *)
-
-                  LRetorno := String(UTF8ToNativeString(unzip( DecodeBase64(aJson.AsJSONObject['resultado'].AsString['arquivo']))));
-                  AJsonBoletosArray := AJsonBoletosArray.Parse( LRetorno );
                   for I := 0 to Pred(AJsonBoletosArray.Count) do
                   begin
                     if I > 0 then
@@ -580,22 +564,16 @@ begin
                     ListaRetorno.DadosRet.TituloRet.ValorPago                   := AJSonObject.AsCurrency['valorNominal'];
                     ListaRetorno.DadosRet.TituloRet.DataBaixa                   := DateBancoobToDateTime( AJSonObject.asString['dataHoraSituacao'])
                  end;
-
-
             end;
-
            end;
-         end
+          end
         end;
-
-      finally
-        AJson.free;
+      except
+        Result := False;
       end;
-
-    except
-      Result := False;
+    finally
+      AJson.free;
     end;
-
   end;
 end;
 

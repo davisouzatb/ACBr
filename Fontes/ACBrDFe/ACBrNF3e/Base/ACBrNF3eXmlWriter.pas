@@ -2288,8 +2288,11 @@ begin
     Result.AppendChild(AddNode(tcStr, '#3', 'indDoacao', 1, 1, 0,
               pcnConversao.TIndicadorExToStr(IBSCBS.indDoacao), DSC_INDDOACAO));
 
-    if IBSCBS.gIBSCBS.vBC > 0 then
+    if IBSCBS.CST in [cst000, cst510, cst830] then
       Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
+
+    if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) then
+      Result.AppendChild(Gerar_gEstornoCred(IBSCBS.gEstornoCred));
   end;
 end;
 
@@ -2314,9 +2317,6 @@ begin
 
   if (gIBSCBS.gTribCompraGov.pAliqIBSUF > 0) and (NF3e.Ide.gCompraGov.tpEnteGov <> tcgNenhum) then
     Result.AppendChild(Gerar_gTribCompraGov(gIBSCBS.gTribCompraGov));
-
-  if (gIBSCBS.gEstornoCred.vIBSEstCred > 0) or (gIBSCBS.gEstornoCred.vCBSEstCred > 0) then
-    Result.AppendChild(Gerar_gEstornoCred(gIBSCBS.gEstornoCred));
 end;
 
 function TNF3eXmlWriter.Gerar_IBSCBS_gIBSCBS_gIBSUF(
@@ -2510,6 +2510,8 @@ end;
 
 function TNF3eXmlWriter.Gerar_IBSCBSTot(IBSCBSTot: TIBSCBSTot): TACBrXmlNode;
 begin
+  Result := nil;
+
   if FpGerarGrupoIBSCBSTot then
   begin
     Result := FDocument.CreateElement('IBSCBSTot');
@@ -2519,7 +2521,9 @@ begin
 
     Result.AppendChild(Gerar_IBSCBSTot_gIBS(IBSCBSTot.gIBS));
     Result.AppendChild(Gerar_IBSCBSTot_gCBS(IBSCBSTot.gCBS));
-    Result.AppendChild(Gerar_IBSCBSTot_gEstornoCred(IBSCBSTot.gEstornoCred));
+
+    if (IBSCBSTot.gEstornoCred.vIBSEstCred > 0) or (IBSCBSTot.gEstornoCred.vCBSEstCred > 0) then
+      Result.AppendChild(Gerar_IBSCBSTot_gEstornoCred(IBSCBSTot.gEstornoCred));
   end;
 end;
 

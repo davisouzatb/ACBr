@@ -220,6 +220,7 @@ type
     FidNota: string;
     FidRps: string;
     FLink: string;
+    FStatus: Integer;
     FProtocolo: string;
     FNumeroRps: string;
     FSerieRps: string;
@@ -262,6 +263,7 @@ type
     property idNota: string read FidNota write FidNota;
     property idRps: string read FidRps write FidRps;
     property Link: string read FLink write FLink;
+    property Status: Integer read FStatus write FStatus;
     property Protocolo: string read FProtocolo write FProtocolo;
     property NumeroRps: string read FNumeroRps write FNumeroRps;
     property SerieRps: string read FSerieRps write FSerieRps;
@@ -541,6 +543,22 @@ type
     property CPFCNPJRemetente: string read FCPFCNPJRemetente write FCPFCNPJRemetente;
     property NroUltimoRps: Integer read FNroUltimoRps write FNroUltimoRps;
   end;
+
+  TNFSeObterDANFSEResponse = class(TNFSeWebServiceResponse)
+  private
+    FMetodo: TMetodo;
+    FChaveNFSe: string;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure Clear; override;
+
+    property Metodo: TMetodo read FMetodo write FMetodo;
+    property ChaveNFSe: string read FChaveNFSe write FChaveNFSe;
+  end;
+
+
 
 implementation
 
@@ -1112,6 +1130,7 @@ end;
 procedure TNFSeConsultaLinkNFSeResponse.Clear;
 begin
   inherited Clear;
+
   FMetodo := tmConsultarLinkNFSe;
 
   if Assigned(FInfConsultaLinkNFSe) then
@@ -1131,6 +1150,29 @@ destructor TNFSeConsultaLinkNFSeResponse.Destroy;
 begin
   if Assigned(FInfConsultaLinkNFSe) then
     FreeAndNil(FInfConsultaLinkNFSe);
+
+  inherited;
+end;
+
+{ TNFSeObterDANFSEResponse }
+
+procedure TNFSeObterDANFSEResponse.Clear;
+begin
+  inherited Clear;
+
+  FMetodo := tmObterDANFSE;
+  FChaveNFSe := '';
+end;
+
+constructor TNFSeObterDANFSEResponse.Create;
+begin
+  inherited Create;
+
+  Clear;
+end;
+
+destructor TNFSeObterDANFSEResponse.Destroy;
+begin
 
   inherited;
 end;

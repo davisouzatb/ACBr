@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="?android:attr/colorBackground"
+    tools:context=".configuracoes.ConfiguracoesFragment">
+
+    <!-- Área de texto simples para configurações -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp"
+        android:background="?android:attr/colorBackground"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/editExportedConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:textColor="?attr/colorOnSurface"
+            android:textIsSelectable="true"
+            android:background="?android:attr/colorBackground"
+            android:padding="8dp"
+            android:text="Carregando configurações..." />
+
+    </ScrollView>
+
+    <!-- Botão arredondado -->
+    <Button
+        android:id="@+id/btnExportarConfig"
+        style="@style/AppButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Atualizar Config" />
+
+</LinearLayout>

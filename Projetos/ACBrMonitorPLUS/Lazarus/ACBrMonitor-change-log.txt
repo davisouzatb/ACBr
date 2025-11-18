@@ -44,6 +44,19 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+12/11/2025
+--- ExtratoAPI ---
+[+] ACBR-8222 - Implementação do ExtratoAPI
+    Por: Renato Rubinho
+--- DoACBrExtratoAPIUnit ---
+[+] ACBR-8222 - Implementado método para listar os bancos implementados para consulta
+    Por: Renato Rubinho
+
+23/10/2025
+-- DoACBrNFSeUnit --
+[*] Melhora o comando NFSe.GerarLoteRPS para permitir lote com mais de um RPS.
+  Por: Diego Folieni
+
 29/09/2025
 -- DoACBrCTeUnit/DoACBrNFeUnit --
 [*] Ajustes para realizar a compilação.

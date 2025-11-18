@@ -38,6 +38,24 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+12/11/2020
+-- pcnCIOT/pcnCIOTW_Pamcard --
+[*] Mais alguns ajustes para funcionar o integrador Pamcard.
+  Por: Centrodata Sistemas
+-- pcnCIOTW_Pamcard --
+[-] Correção no tipo da tag viagem.parcelaxx.valor.
+  Por: Centrodata Sistemas
+
+30/10/2020
+-- ACBrCIOTWebServices/pcnCIOTW_Pamcard --
+[*] Mais alguns ajustes para funcionar o integrador Pamcard.
+  Por: Centrodata Sistemas
+
+22/10/2020
+-- Diversos --
+[*] Ajustes para funcionar o integrador Pamcard.
+  Por: Centrodata Sistemas
+
 19/11/2024
 -- pcnCIOT/pcnCIOTW_eFrete/pcnRetEnvCIOT --
 [-] Correção tanto na geração quanto na leitura do retorno.

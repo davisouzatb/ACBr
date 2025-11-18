@@ -284,6 +284,9 @@ begin
 
   FDocument.Clear();
 
+  {
+    o BPe TA vai ser diferenciado pelo Modal que é aereo.
+  }
   if BPe.ide.tpBPe = tbBPeTM then
     BPeNode := FDocument.CreateElement('BPeTM', 'http://www.portalfiscal.inf.br/bpe')
   else
@@ -1561,8 +1564,22 @@ begin
     Result.AppendChild(AddNode(tcStr, '#3', 'indDoacao', 1, 1, 0,
               pcnConversao.TIndicadorExToStr(IBSCBS.indDoacao), DSC_INDDOACAO));
 
-    if IBSCBS.gIBSCBS.vBC > 0 then
-      Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
+    case ModeloDF of
+      moBPe:
+        if IBSCBS.CST in [cst000, cst200, cst222] then
+          Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
+
+      moBPeTM:
+        if IBSCBS.CST in [cst000, cst200] then
+          Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
+
+      moBPeTA:
+        if IBSCBS.CST in [cst000, cst200, cst222] then
+          Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
+    end;
+
+    if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) then
+      Result.AppendChild(Gerar_gEstornoCred(IBSCBS.gEstornoCred));
   end;
 end;
 
@@ -1587,9 +1604,6 @@ begin
 
   if (gIBSCBS.gTribCompraGov.pAliqIBSUF > 0) and (BPe.Ide.gCompraGov.tpEnteGov <> tcgNenhum) then
     Result.AppendChild(Gerar_gTribCompraGov(gIBSCBS.gTribCompraGov));
-
-  if (gIBSCBS.gEstornoCred.vIBSEstCred > 0) or (gIBSCBS.gEstornoCred.vCBSEstCred > 0) then
-    Result.AppendChild(Gerar_gEstornoCred(gIBSCBS.gEstornoCred));
 end;
 
 function TBPeXmlWriter.Gerar_IBSCBS_gIBSCBS_gIBSUF(
@@ -1794,7 +1808,9 @@ begin
 
     Result.AppendChild(Gerar_IBSCBSTot_gIBS(IBSCBSTot.gIBS));
     Result.AppendChild(Gerar_IBSCBSTot_gCBS(IBSCBSTot.gCBS));
-    Result.AppendChild(Gerar_IBSCBSTot_gEstornoCred(IBSCBSTot.gEstornoCred));
+
+    if (IBSCBSTot.gEstornoCred.vIBSEstCred > 0) or (IBSCBSTot.gEstornoCred.vCBSEstCred > 0) then
+      Result.AppendChild(Gerar_IBSCBSTot_gEstornoCred(IBSCBSTot.gEstornoCred));
   end;
 end;
 

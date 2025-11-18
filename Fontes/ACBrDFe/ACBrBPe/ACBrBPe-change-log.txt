@@ -45,6 +45,20 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+11/10/2025
+-- Diversos --
+[*] Mais ajustes para a correta geração/leitura do arquivo XML e INI.
+   Por: Italo Giurizzato Junior
+
+08/10/2025
+-- ACBrBPeConversao/ACBrBPeXmlWriter --
+[*] Ajustes para gerar o grupo gIBSCBS em função dos CST permitidos.
+   Por: Italo Giurizzato Junior
+
+-- ACBrBPeIniReader --
+[*] Ajustes para não gerar o grupo gTribRegular de forma indevida.
+   Por: Italo Giurizzato Junior
+
 06/10/2025
 -- Diversos --
 [*] Ajustes diversos no componente visando a NT 2025/001 versão 1.10

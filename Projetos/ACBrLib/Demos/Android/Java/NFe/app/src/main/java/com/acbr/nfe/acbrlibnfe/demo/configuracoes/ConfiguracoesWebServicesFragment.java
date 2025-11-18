@@ -1,12 +1,18 @@
 package com.acbr.nfe.acbrlibnfe.demo.configuracoes;
 
+/**
+ * Fragment para configuração de webservices SEFAZ e RFB.
+ * 
+ * @author ACBr Team
+ */
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -24,9 +30,9 @@ import br.com.acbr.lib.nfe.SSLType;
 public class ConfiguracoesWebServicesFragment extends Fragment {
     private ACBrLibNFe ACBrNFe;
 
-    private CheckBox ckbVisualizar;
-    private CheckBox ckbSalvarSOAP;
-    private CheckBox ckbAjustarAut;
+    private MaterialSwitch ckbVisualizar;
+    private MaterialSwitch ckbSalvarSOAP;
+    private MaterialSwitch ckbAjustarAut;
     private TextView txtTimeOut;
     private TextView txtAguardar;
     private TextView txtTentativas;
@@ -88,9 +94,13 @@ public class ConfiguracoesWebServicesFragment extends Fragment {
             }
         });
 
-        carregarConfiguracoesWebServices();
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        carregarConfiguracoesWebServices();
     }
 
     private void salvarConfiguracoesWebServices() {

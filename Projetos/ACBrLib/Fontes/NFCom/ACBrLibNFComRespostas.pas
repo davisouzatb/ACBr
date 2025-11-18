@@ -37,7 +37,7 @@ unit ACBrLibNFComRespostas;
 interface
 
 uses
-  Classes, SysUtils, Contnrs, pcnConversao,
+  Classes, SysUtils, Contnrs, pcnConversao, ACBrDfe.Conversao,
   ACBrNFComEventoClass, ACBrNFComConversao, ACBrXmlBase, ACBrBase,
   ACBrLibResposta, ACBrLibConfig,
   ACBrLibConsReciDFe, ACBrNFCom;
@@ -400,7 +400,7 @@ end;
 
 procedure TCancelamentoResposta.Processar(const ACBrNFCom: TACBrNFCom);
 begin
-  with ACBrNFCom.WebServices.EnvEvento.EventoRetorno.retEvento.Items[0] do
+  with ACBrNFCom.WebServices.EnvEvento.EventoRetorno do
   begin
     Arquivo    := RetInfEvento.NomeArquivo;
     Versao     := RetInfEvento.verAplic;
@@ -417,7 +417,7 @@ begin
     nSeqEvento := RetInfEvento.nSeqEvento;
     CNPJDest   := RetInfEvento.CNPJDest;
     emailDest  := RetInfEvento.emailDest;
-    XML        := RetInfEvento.XML;
+    Self.XML   := RetInfEvento.XML;
   end;
 end;
 

@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.acbr.nfe.acbrlibnfe.demo"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.acbr.nfe.acbrlibnfe.demo"
         minSdk = 25
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -17,6 +17,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Otimizações para debug
+            isMinifyEnabled = false
+            isDebuggable = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -29,6 +34,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    
     buildFeatures {
         viewBinding = true
     }
@@ -46,5 +52,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(files("./libs/ACBrLibNFe-release.aar"))
-    implementation("net.java.dev.jna:jna:5.14.0@aar")
+    implementation("net.java.dev.jna:jna:5.17.0@aar")
 }

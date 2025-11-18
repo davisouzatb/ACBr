@@ -154,6 +154,7 @@ type
     function ConsultarDFe(const ACabecalho, AMSG: string): string; virtual;
     function ConsultarParam(const ACabecalho, AMSG: string): string; virtual;
     function ConsultarSeqRps(const ACabecalho, AMSG: string): string; virtual;
+    function ObterDANFSE(const ACabecalho, AMSG: string): string; virtual;
 
     property URL: string read FPURL;
     property BaseURL: string read GetBaseUrl;
@@ -586,6 +587,12 @@ begin
       begin
         FPArqEnv := 'con-link';
         FPArqResp := 'link';
+      end;
+
+    tmObterDANFSE:
+      begin
+        FPArqEnv := 'con-nfse-chv';
+        FPArqResp := 'lista-nfse-chv';
       end;
   else
     begin
@@ -1258,6 +1265,13 @@ function TACBrNFSeXWebservice.RecepcionarSincrono(const ACabecalho, AMSG: string
 begin
   Result := '';
   raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Recepcionar Síncrono']));
+end;
+
+function TACBrNFSeXWebservice.ObterDANFSE(const ACabecalho,
+  AMSG: string): string;
+begin
+  Result := '';
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Obter DANFSE']));
 end;
 
 function TACBrNFSeXWebservice.RetornaHTMLNota(const Retorno: string): string;

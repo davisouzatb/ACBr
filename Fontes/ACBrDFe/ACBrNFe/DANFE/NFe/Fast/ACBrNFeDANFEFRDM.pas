@@ -43,7 +43,8 @@ uses
   ACBrNFe.EnvEvento,
   ACBrNFe.RetInut, ACBrNFe.Classes, pcnConversao,
   ACBrDFeReport, ACBrDFeDANFeReport, ACBrNFeDANFEClass,
-  frxClass, frxExportPDF, frxDBSet, frxBarcode;
+  frxClass, frxExportPDF, frxDBSet, frxBarcode,
+  ACBrUtil.FR;
 
 type
 
@@ -186,7 +187,7 @@ implementation
 uses
   StrUtils, Math, DateUtils,
   ACBrNFe, ACBrNFeDANFEFR, ACBrDFeUtil,
-  ACBrUtil.Strings, 
+  ACBrUtil.Strings,
   ACBrUtil.Math, ACBrUtil.FilesIO, ACBrUtil.Base, ACBrUtil.DateTime, ACBrUtil.XMLHTML,
   ACBrValidador, ACBrImage, ACBrDelphiZXingQRCode,
   pcnConversaoNFe;
@@ -2074,10 +2075,7 @@ begin
   else
     raise EACBrNFeDANFEFR.Create('Caminho do arquivo de impressão do DANFE não assinalado.');
 
-  frxReport.PrintOptions.Copies := DANFEClassOwner.NumCopias;
-  frxReport.PrintOptions.ShowDialog := DANFEClassOwner.MostraSetup;
-  frxReport.PrintOptions.PrintMode := FPrintMode; //Precisamos dessa propriedade porque impressoras não fiscais cortam o papel quando há muitos itens. O ajuste dela deve ser necessariamente após a carga do arquivo FR3 pois, antes da carga o componente é inicializado
-  frxReport.PrintOptions.PrintOnSheet := FPrintOnSheet; //Essa propriedade pode trabalhar em conjunto com a printmode
+
   frxReport.ShowProgress := DANFEClassOwner.MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
   frxReport.PreviewOptions.ShowCaptions := FExibeCaptionButton;
@@ -2098,8 +2096,17 @@ begin
     frxReport.FileName := DANFEClassOwner.NomeDocumento;
 
   // Define a impressora
-  if NaoEstaVazio(DANFEClassOwner.Impressora) then
+  if EstaVazio(DANFEClassOwner.Impressora) then
+  begin
+    frxReport.PrintOptions.Clear;
+    SetDefaultPrinter(FfrxReport);
+  end else
     frxReport.PrintOptions.Printer := DANFEClassOwner.Impressora;
+
+  frxReport.PrintOptions.Copies := DANFEClassOwner.NumCopias;
+  frxReport.PrintOptions.ShowDialog := DANFEClassOwner.MostraSetup;
+  frxReport.PrintOptions.PrintMode := FPrintMode; //Precisamos dessa propriedade porque impressoras não fiscais cortam o papel quando há muitos itens. O ajuste dela deve ser necessariamente após a carga do arquivo FR3 pois, antes da carga o componente é inicializado
+  frxReport.PrintOptions.PrintOnSheet := FPrintOnSheet; //Essa propriedade pode trabalhar em conjunto com a printmode
 
   // preparar relatorio
   if Assigned(ANFE) then
@@ -2107,6 +2114,7 @@ begin
     NFe := ANFE;
     CarregaDadosNFe;
 
+    AjustaMargensReports;
     Result := frxReport.PrepareReport;
   end
   else
@@ -2167,8 +2175,6 @@ begin
   else
     raise EACBrNFeDANFEFR.Create('Caminho do arquivo de impressão do EVENTO não assinalado.');
 
-  frxReport.PrintOptions.Copies := DANFEClassOwner.NumCopias;
-  frxReport.PrintOptions.ShowDialog := DANFEClassOwner.MostraSetup;
   frxReport.ShowProgress := DANFEClassOwner.MostraStatus;
   frxReport.PreviewOptions.ShowCaptions := ExibeCaptionButton;
   frxReport.PreviewOptions.ZoomMode     := ZoomModePadrao;
@@ -2178,8 +2184,13 @@ begin
     frxReport.FileName := DANFEClassOwner.NomeDocumento;
 
   // Define a impressora
-  if NaoEstaVazio(DANFEClassOwner.Impressora) then
+  if EstaVazio(DANFEClassOwner.Impressora) then
+    SetDefaultPrinter(FfrxReport)
+  else
     frxReport.PrintOptions.Printer := DANFEClassOwner.Impressora;
+
+  frxReport.PrintOptions.Copies := DANFEClassOwner.NumCopias;
+  frxReport.PrintOptions.ShowDialog := DANFEClassOwner.MostraSetup;
 
   // preparar relatorio
   if Assigned(DANFEClassOwner.ACBrNFe) then
@@ -2246,8 +2257,6 @@ begin
   else
     raise EACBrNFeDANFEFR.Create('Caminho do arquivo de impressão de INUTILIZAÇÃO não assinalado.');
 
-  frxReport.PrintOptions.Copies := DANFEClassOwner.NumCopias;
-  frxReport.PrintOptions.ShowDialog := DANFEClassOwner.MostraSetup;
   frxReport.ShowProgress := DANFEClassOwner.MostraStatus;
   frxReport.PreviewOptions.ShowCaptions := ExibeCaptionButton;
   frxReport.PreviewOptions.ZoomMode     := ZoomModePadrao;
@@ -2257,8 +2266,13 @@ begin
     frxReport.FileName := DANFEClassOwner.NomeDocumento;
 
   // Define a impressora
-  if NaoEstaVazio(DANFEClassOwner.Impressora) then
+  if EstaVazio(DANFEClassOwner.Impressora) then
+    SetDefaultPrinter(FfrxReport)
+  else
     frxReport.PrintOptions.Printer := DANFEClassOwner.Impressora;
+
+  frxReport.PrintOptions.Copies := DANFEClassOwner.NumCopias;
+  frxReport.PrintOptions.ShowDialog := DANFEClassOwner.MostraSetup;
 
   // preparar relatorio
   if Assigned(DANFEClassOwner.ACBrNFe) then
@@ -2393,6 +2407,7 @@ end;
 
 procedure TACBrNFeFRClass.ImprimirDANFE(ANFE: TNFe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   DANFEClassOwner.FIndexImpressaoIndividual := -1;
   if PrepareReport(ANFE) then
   begin
@@ -2410,6 +2425,7 @@ var
   fsShowDialog : Boolean;
   NomeArq: String;
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReport(ANFE) then
   begin
     if (AStream <> nil) then
@@ -2446,6 +2462,7 @@ end;
 
 procedure TACBrNFeFRClass.ImprimirDANFEResumido(ANFE: TNFe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReport(ANFE) then
   begin
     if DANFEClassOwner.MostraPreview then
@@ -2459,7 +2476,7 @@ procedure TACBrNFeFRClass.ImprimirEVENTO(ANFE: TNFe);
 var
   OK : boolean;
 begin
-
+  RemoveExportFastReportPDFDuplicate;
   OK := PrepareReportEvento;
   if OK then
   begin
@@ -2513,7 +2530,7 @@ end;
 
 procedure TACBrNFeFRClass.ImprimirINUTILIZACAO(ANFE: TNFe);
 begin
-
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReportInutilizacao then
   begin
     if DANFEClassOwner.MostraPreview then
@@ -2571,11 +2588,11 @@ var
   Page: TfrxReportPage;
   I: Integer;
 begin
-  for I := 0 to (frxReport.PreviewPages.Count - 1) do
+  for I := 0 to (frxReport.PagesCount - 1) do
   begin
-    if frxReport.PreviewPages.Page[I] is TfrxReportPage then
+    if frxReport.Pages[I] is TfrxReportPage then
     begin
-      Page := frxReport.PreviewPages.Page[I];
+      Page := TfrxReportPage(frxReport.Pages[I]);
       if (DANFEClassOwner.MargemSuperior > 0) then
         Page.TopMargin := DANFEClassOwner.MargemSuperior;
       if (DANFEClassOwner.MargemInferior > 0) then
@@ -2584,7 +2601,6 @@ begin
         Page.LeftMargin := DANFEClassOwner.MargemEsquerda;
       if (DANFEClassOwner.MargemDireita > 0) then
         Page.RightMargin := DANFEClassOwner.MargemDireita;
-      frxReport.PreviewPages.ModifyPage(I, Page);
     end;
   end;
 end;

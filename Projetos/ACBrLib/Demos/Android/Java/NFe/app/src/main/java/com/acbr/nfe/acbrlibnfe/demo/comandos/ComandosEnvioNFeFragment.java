@@ -1,5 +1,14 @@
 package com.acbr.nfe.acbrlibnfe.demo.comandos;
 
+/**
+ * Fragment para criação, validação, assinatura e transmissão de NFe.
+ * 
+ * Inclui formulário completo, geração de DANFE PDF e visualização integrada.
+ * Suporta impressão via Bluetooth.
+ * 
+ * @author ACBr Team
+ */
+
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -18,8 +27,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -84,10 +93,10 @@ public class ComandosEnvioNFeFragment extends Fragment {
     private NfeApplication application;
     private ACBrLibNFe ACBrNFe;
 
-    private EditText txtNFeINI;
-    private EditText txtNFeXML;
-    private EditText txtRespostaEnvio;
-    private EditText txtDestinatario;
+    private TextInputEditText txtNFeINI;
+    private TextInputEditText txtNFeXML;
+    private TextInputEditText txtRespostaEnvio;
+    private TextInputEditText txtDestinatario;
     private Button btnLimparLista;
     private Button btnEnviarNFe;
     private Button btnEnviarNFeClasseAltoNivel;
@@ -107,8 +116,6 @@ public class ComandosEnvioNFeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_comandos_envio_nfe, container, false);
 
         this.application = (NfeApplication)view.getContext().getApplicationContext();
-
-        ACBrNFe = ACBrLibHelper.getInstance("ACBrLib.ini");
 
         txtNFeINI = view.findViewById(R.id.txtNFeINI);
         txtNFeXML = view.findViewById(R.id.txtNFeXML);
@@ -182,9 +189,20 @@ public class ComandosEnvioNFeFragment extends Fragment {
         return view;
     }
 
-    public void onViewCreated(View view, Bundle savedInstanceState){
-        super.onViewCreated(view, savedInstanceState);
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        // Inicializa a biblioteca ACBr
+        ACBrNFe = ACBrLibHelper.getInstance("ACBrLib.ini");
+        
+        // Configuração dos spinners quando o fragment se torna visível
+        if (getView() != null) {
+            configurarSpinners();
+        }
+    }
 
+    private void configurarSpinners() {
         Spinner cmbModeloDocumento = getView().findViewById(R.id.cmbModeloDocumento);
         if (cmbModeloDocumento != null) {
             ModeloDF modeloDFSelecionado = (ModeloDF) cmbModeloDocumento.getSelectedItem();

@@ -468,6 +468,7 @@ begin
   fTEFScopeAPI.Empresa := fpACBrTEFAPI.DadosTerminal.CodEmpresa;
   fTEFScopeAPI.Filial := fpACBrTEFAPI.DadosTerminal.CodFilial;
   fTEFScopeAPI.PDV := fpACBrTEFAPI.DadosTerminal.CodTerminal;
+  fTEFScopeAPI.GravarLogScope := fpACBrTEFAPI.DadosTerminal.GravarLogTEF;
 
   s := fpACBrTEFAPI.DadosAutomacao.MensagemPinPad;
   if (s = '') then
@@ -479,7 +480,7 @@ begin
 
   fTEFScopeAPI.MsgPinPad := s;
   fTEFScopeAPI.PortaPinPad := fpACBrTEFAPI.DadosTerminal.PortaPinPad;
-  fTEFScopeAPI.GravarLogScope := (fpACBrTEFAPI.ArqLOG <> '');
+  fTEFScopeAPI.GravarLogScope := fTEFScopeAPI.GravarLogScope and (fpACBrTEFAPI.ArqLOG <> '');
 
   fTEFScopeAPI.Inicializar;
 

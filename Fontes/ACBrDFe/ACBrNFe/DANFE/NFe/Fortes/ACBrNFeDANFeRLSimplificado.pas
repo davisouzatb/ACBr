@@ -299,7 +299,7 @@ begin
   else
     lblNumero.Caption := ACBrStr('Número: ' + IntToStr(fpNFe.Ide.nNF));
 
-  lblNumero.Caption := lblNumero.Caption + ' - Série: ' + FormatFloat('000', fpNFe.Ide.serie);
+  lblNumero.Caption :=  ACBrStr(lblNumero.Caption +' - Série: ' + FormatFloat('000', fpNFe.Ide.serie));
 
   rllEmissao.Caption := ACBrStr('Emissão: ' + FormatDateTimeBr(fpNFe.Ide.dEmi));
 end;
@@ -632,8 +632,18 @@ procedure TfrlDANFeRLSimplificado.RLBand1BeforePrint(Sender: TObject; var
     PrintIt: Boolean);
 begin
   inherited;
+  if not fpDANFe.Etiqueta then
+  begin
+    rlmDadosAdicionais.AutoSize := true;
+    rlmDadosAdicionais.Align    := faClientBottom;
+  end
+  else
+  begin
+    rlmDadosAdicionais.AutoSize := false;
+    rlmDadosAdicionais.Align    := faLeft;
+  end;
   rlmDadosAdicionais.Lines.Clear;
-  rlmDadosAdicionais.Lines.Add('Informações Adicionais:');
+  rlmDadosAdicionais.Lines.Add(ACBrStr('Informações Adicionais:'));
   rlmDadosAdicionais.Lines.Add(fpNFe.infAdic.infCpl);
 end;
 

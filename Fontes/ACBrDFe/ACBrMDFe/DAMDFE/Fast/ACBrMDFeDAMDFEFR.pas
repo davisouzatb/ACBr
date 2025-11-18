@@ -172,11 +172,13 @@ implementation
 uses
   StrUtils,
   ACBrMDFe, pmdfeConversaoMDFe,
+  ACBrDFe.Conversao,
   ACBrUtil.Strings,
   ACBrUtil.DateTime,
   ACBrUtil.FilesIO,
   ACBrUtil.Base,
-  ACBrValidador, ACBrImage, ACBrDelphiZXingQRCode;
+  ACBrValidador, ACBrImage, ACBrDelphiZXingQRCode, 
+  ACBrUtil.FR;
 
 function CollateBr(Str: string): string;
 var
@@ -809,6 +811,7 @@ end;
 
 procedure TACBrMDFeDAMDFEFR.ImprimirDAMDFe(AMDFe: TMDFe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReport(AMDFe) then
   begin
     if MostraPreview then
@@ -891,6 +894,7 @@ end;
 
 procedure TACBrMDFeDAMDFEFR.ImprimirEVENTO(AMDFe: TMDFe);
 begin
+  RemoveExportFastReportPDFDuplicate;
   if PrepareReportEvento then
   begin
     if MostraPreview then
@@ -989,8 +993,6 @@ begin
   else
     raise EACBrMDFeDAMDFEFR.Create('Caminho do arquivo de impressão do DAMDFe não assinalado.');
 
-  frxReport.PrintOptions.Copies      := NumCopias;
-  frxReport.PrintOptions.ShowDialog  := MostraSetup;
   frxReport.ShowProgress             := MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
 
@@ -998,8 +1000,13 @@ begin
     frxReport.FileName := Trim(DAMDFEClassOwner.NomeDocumento);
 
   // Define a impressora
-  if NaoEstaVazio(frxReport.PrintOptions.Printer) then
+  if EstaVazio(Impressora) then
+    SetDefaultPrinter(frxReport)
+  else
     frxReport.PrintOptions.Printer := Impressora;
+
+  frxReport.PrintOptions.Copies      := NumCopias;
+  frxReport.PrintOptions.ShowDialog  := MostraSetup;
 
   if Assigned(AMDFe) then
   begin
@@ -1054,14 +1061,17 @@ begin
   else
     raise EACBrMDFeDAMDFEFR.Create('Caminho do arquivo de impressão do EVENTO não assinalado.');
 
-  frxReport.PrintOptions.Copies      := NumCopias;
-  frxReport.PrintOptions.ShowDialog  := MostraSetup;
   frxReport.ShowProgress             := MostraStatus;
   frxReport.PreviewOptions.AllowEdit := False;
 
   // Define a impressora
-  if NaoEstaVazio(frxReport.PrintOptions.Printer) then
+  if EstaVazio(Impressora) then
+    SetDefaultPrinter(frxReport)
+  else
     frxReport.PrintOptions.Printer := Impressora;
+
+  frxReport.PrintOptions.Copies      := NumCopias;
+  frxReport.PrintOptions.ShowDialog  := MostraSetup;
 
   // preparar relatorio
   if Assigned(ACBrMDFe) then

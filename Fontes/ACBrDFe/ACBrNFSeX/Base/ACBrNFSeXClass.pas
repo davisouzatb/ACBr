@@ -387,6 +387,9 @@ type
     FRetencoesFederais: Double;
     FValorTotalNotaFiscal: Double;
     FtotalAproxTrib: Double;
+    FValorMulta: Double;
+    FValorJuros: Double;
+    FValorIPI: Double;
 
     procedure SetDocDeducao(const Value: TDocDeducaoCollection);
   public
@@ -461,6 +464,10 @@ type
     property ValorTotalNotaFiscal: Double read FValorTotalNotaFiscal write FValorTotalNotaFiscal;
     //Provedor Infisc
     property totalAproxTrib: Double read FtotalAproxTrib write FtotalAproxTrib;
+    //Provedor ISSSaoPaulo
+    property ValorMulta: Double read FValorMulta write FValorMulta;
+    property ValorJuros: Double read FValorJuros write FValorJuros;
+    property ValorIPI: Double read FValorIPI write FValorIPI;
   end;
 
   TDadosDeducao = class(TObject)
@@ -849,6 +856,7 @@ type
     FEndereco: TEndereco;
     FInfAdicional: string;
     FxFormaPagamento: string;
+    FCodigoNCM: string;
 
     procedure SetItemServico(Value: TItemServicoCollection);
     procedure SetDeducao(const Value: TDeducaoCollection);
@@ -882,12 +890,12 @@ type
     property Tributacao: TTributacao read FTributacao write FTributacao;
     // Provedor Governa
     property UFPrestacao: string read FUFPrestacao write FUFPrestacao;
-    // Provedor SP
+    // Provedor ISSSaoPaulo
     property ValorCargaTributaria: Double read FValorCargaTributaria write FValorCargaTributaria;
     property PercentualCargaTributaria: Double read FPercentualCargaTributaria write FPercentualCargaTributaria;
     property FonteCargaTributaria: string read FFonteCargaTributaria write FFonteCargaTributaria;
     property ValorTotalRecebido: Double read FValorTotalRecebido write FValorTotalRecebido;
-
+    property CodigoNCM: string read FCodigoNCM write FCodigoNCM;
     // Provedor ISSBarueri
     property PrestadoEmViasPublicas: Boolean read FPrestadoEmViasPublicas write FPrestadoEmViasPublicas;
     property LocalPrestacao: TLocalPrestacao read FLocalPrestacao write FLocalPrestacao;
@@ -2017,6 +2025,8 @@ type
     FOptanteSN: TOptanteSN;
     FRegimeApuracaoSN: TRegimeApuracaoSN;
     Fsubst: TSubstituicao;
+    FcMotivoEmisTI: TcMotivoEmisTI;
+    FcLocEmi: string;
     // Reforma Tributaria
     FIBSCBS: TIBSCBSDPS;
 
@@ -2144,6 +2154,8 @@ type
     property OptanteSN: TOptanteSN read FOptanteSN write FOptanteSN;
     property RegimeApuracaoSN: TRegimeApuracaoSN read FRegimeApuracaoSN write FRegimeApuracaoSN;
     property subst: TSubstituicao read Fsubst write Fsubst;
+    property cMotivoEmisTI: TcMotivoEmisTI read FcMotivoEmisTI write FcMotivoEmisTI;
+    property cLocEmi: string read FcLocEmi write FcLocEmi;
     // Reforma Tributaria
     property IBSCBS: TIBSCBSDPS read FIBSCBS write FIBSCBS;
 

@@ -246,6 +246,8 @@ resourcestring
   Desc135 = 'Número da NFSe Substituta não informado.';
   Cod136 = 'X136';
   Desc136 =	'Data de Recibo não informada.';
+  Cod137 = 'X137';
+  Desc137 = 'CNPJ do Prestador não informado.';
 
   Cod201 = 'X201';
   Desc201 = 'WebService retornou um XML vazio.';
@@ -273,6 +275,8 @@ resourcestring
   Desc212 = 'Não foi retornado nenhum JSON.';
   Cod213 = 'X213';
   Desc213 = 'Não foi retornado nenhum Token.';
+  Cod214 = 'X214';
+  Desc214 = 'Não foi retornado nenhum DANFSE, chave/ambiente pode estar errado.';
 
   Cod800 = 'X800';
   Desc800 = 'Erro de Validação: ';

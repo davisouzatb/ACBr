@@ -94,6 +94,7 @@ type
 implementation
 
 uses
+  ACBrDFe.Conversao,
   ACBrUtil.XMLHTML,
   ACBrDFeException,
   WebISS.GravarXml, WebISS.LerXml;
@@ -343,8 +344,8 @@ begin
   FPMsgOrig := AMSG;
 
   Request := '<nfse:RecepcionarLoteRpsRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
+  Request := Request + '<nfseCabecMsg>' + IncluirCDATA(ACabecalho) + '</nfseCabecMsg>';
+  Request := Request + '<nfseDadosMsg>' + IncluirCDATA(AMSG) + '</nfseDadosMsg>';
   Request := Request + '</nfse:RecepcionarLoteRpsRequest>';
 
   Result := Executar('http://nfse.abrasf.org.br/RecepcionarLoteRps', Request,
@@ -360,8 +361,8 @@ begin
   FPMsgOrig := AMSG;
 
   Request := '<nfse:RecepcionarLoteRpsSincronoRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
+  Request := Request + '<nfseCabecMsg>' + IncluirCDATA(ACabecalho) + '</nfseCabecMsg>';
+  Request := Request + '<nfseDadosMsg>' + IncluirCDATA(AMSG) + '</nfseDadosMsg>';
   Request := Request + '</nfse:RecepcionarLoteRpsSincronoRequest>';
 
   Result := Executar('http://nfse.abrasf.org.br/RecepcionarLoteRpsSincrono', Request,
@@ -377,8 +378,8 @@ begin
   FPMsgOrig := AMSG;
 
   Request := '<nfse:GerarNfseRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
+  Request := Request + '<nfseCabecMsg>' + IncluirCDATA(ACabecalho) + '</nfseCabecMsg>';
+  Request := Request + '<nfseDadosMsg>' + IncluirCDATA(AMSG) + '</nfseDadosMsg>';
   Request := Request + '</nfse:GerarNfseRequest>';
 
   Result := Executar('http://nfse.abrasf.org.br/GerarNfse', Request,

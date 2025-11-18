@@ -1,0 +1,17 @@
+Index: ACBrNFSeXProviderBase.pas
+===================================================================
+--- ACBrNFSeXProviderBase.pas	(revision 42970)
++++ ACBrNFSeXProviderBase.pas	(working copy)
+@@ -1513,6 +1513,12 @@
+     if aXml = '' then
+       aXml := AWriter.Document.Xml;
+ 
++    // INICIO
++    // Implementado este replace, para corrigir quebra de linha no provedor Publico.
++    if ConfigGeral.Provedor = proPublica then
++      aXML := StringReplace(aXML, '&amp;#xD;', '&#xD;', [rfReplaceAll]);
++    // FIM
++
+     aAlerts := ACBrStr(AWriter.ListaDeAlertas.Text);
+   finally
+     AWriter.Destroy;

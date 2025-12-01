@@ -5,6 +5,8 @@ const dotenv = require('dotenv')
 // ACBrLibNFSeMT é exportado como default
 const ACBrLibNFSeMT = require("@projetoacbr/acbrlib-nfse-node/dist/src").default;
 
+const {NFSeModoEnvio} = require("@projetoacbr/acbrlib-nfse-node/dist/src");
+
 
 
 // define os caminhos para a lib e o arquivo de exemplo
@@ -34,7 +36,7 @@ const eChaveCrypt = "";
 const pathCert = path.resolve(__dirname, "data", "cert", "cert.pfx");
 const pathSchemas = path.join(__dirname, "data", "Schemas", "NFSe");
 const pathIniServicos = path.resolve("data", "config", "ACBrNFSeXServicos.ini");
-
+const dotenvPath = path.resolve(__dirname, '.env')
 let codigoMunicipio = "3550308"; //exemplo de codigo de municipio de Sao Paulo/SP
 
 let nfse = new ACBrLibNFSeMT(pathACBrLibNFSe, eArqConfig, eChaveCrypt);
@@ -42,7 +44,7 @@ let nfse = new ACBrLibNFSeMT(pathACBrLibNFSe, eArqConfig, eChaveCrypt);
 let inicio = 2;
 
 
-dotenv.config({ path: path.resolve(__dirname, '.env') })
+dotenv.config({ path: dotenvPath })
 try {
 
   let senha = process.env.PFX_PASSWORD;
@@ -64,7 +66,11 @@ try {
   inicio = nfse.configGravarValor("NFSe", "CodigoMunicipio", codigoMunicipio);
   console.log(`Set Configurações CodigoMunicipio ${inicio}`);
 
-  inicio = nfse.emitir("55", 0, false);
+  nfse.configGravar()
+
+  //
+  let modoEnvio = NFSeModoEnvio.TESTE;
+  inicio = nfse.emitir("55", modoEnvio, false);
   console.log(`NFSE_Emitir >>>>>>>> ${inicio}`);
 
 

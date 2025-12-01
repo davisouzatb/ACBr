@@ -950,7 +950,7 @@ begin
     Result.AppendChild(AddNode(tcStr, '#38', 'RazaoSocial', 1, 115, 0,
                                           NFSe.Tomador.RazaoSocial, DSC_XNOME));
 
-    if GerarEnderecoExterior and (NFSe.Tomador.Endereco.UF = 'EX') then
+    if GerarEnderecoExterior and (NFSe.Tomador.Endereco.CodigoPais <> 1058) then
       Result.AppendChild(GerarEnderecoExteriorTomador)
     else
       Result.AppendChild(GerarEnderecoTomador);
@@ -1301,6 +1301,10 @@ begin
   AINIRec.WriteInteger(FpSecao, 'CodigoPais', NFSe.Tomador.Endereco.CodigoPais);
   AINIRec.WriteString(FpSecao, 'Telefone', NFSe.Tomador.Contato.Telefone);
   AINIRec.WriteString(FpSecao, 'Email', NFSe.Tomador.Contato.Email);
+
+  AINIRec.WriteString(FpSecao, 'AtualizaTomador', FpAOwner.SimNaoToStr(NFSe.Tomador.AtualizaTomador));
+  AINIRec.WriteString(FpSecao, 'TomadorExterior', FpAOwner.SimNaoToStr(NFSe.Tomador.TomadorExterior));
+  AINIRec.WriteString(FpSecao, 'TomadorSubstitutoTributario', FpAOwner.SimNaoToStr(NFSe.Tomador.TomadorSubstitutoTributario));
 end;
 
 procedure TNFSeW_ABRASFv2.GerarINISecaoIntermediario(const AINIRec: TMemIniFile);

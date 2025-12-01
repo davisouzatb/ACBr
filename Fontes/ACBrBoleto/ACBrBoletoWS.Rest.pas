@@ -274,13 +274,12 @@ var
 begin
   LStream  := TStringStream.Create('');
   LHeaders := TStringList.Create;
-
+  httpsend.Clear;
   //Definido Valor para Timeout com a configuração da Classe
   httpsend.Timeout := Boleto.Configuracoes.WebService.TimeOut;
 
   try
     httpsend.OutputStream := LStream;
-    httpsend.Headers.Clear;
 
     if FPAccept <> '' then
       LHeaders.Add(C_ACCEPT + ': ' + FPAccept);
@@ -309,7 +308,7 @@ begin
   finally
     LHeaders.Free;
   end;
-  httpsend.Document.Clear;
+  
   try
     httpsend.Document.Position := 0;
     if FPDadosMsg <> '' then
@@ -342,11 +341,15 @@ begin
     end;
 
     FRetornoWS                       := String(UTF8ToNativeString(Trim(FRetornoWS)));
-    BoletoWS.RetornoBanco.CodRetorno := httpsend.Sock.LastError;
+    if (httpsend.ResultCode = 0) then
+      BoletoWS.RetornoBanco.CodRetorno := httpsend.Sock.LastError
+    else
+      BoletoWS.RetornoBanco.CodRetorno := httpsend.ResultCode;
     try
       BoletoWS.RetornoBanco.Msg            := Trim('HTTP_Code=' + IntToStr(httpsend.ResultCode) + ' ' + httpsend.ResultString + ' ' + FRetornoWS);
       BoletoWS.RetornoBanco.HTTPResultCode := httpsend.ResultCode;
     finally
+      httpsend.OutputStream := nil;
       LStream.Free;
     end;
   end;
@@ -420,7 +423,6 @@ begin
     Executar;
 
   finally
-
     Result := (BoletoWS.RetornoBanco.HTTPResultCode in [ 200 .. 207 ]);
 
     BoletoWS.DoLog('Retorno Envio: ' + Self.ClassName, logSimples);

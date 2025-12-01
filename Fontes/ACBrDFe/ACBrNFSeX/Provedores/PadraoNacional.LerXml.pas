@@ -146,6 +146,15 @@ type
     function LerIni: Boolean; override;
   end;
 
+  { TNFSeR_PadraoNacionalSoap }
+
+  TNFSeR_PadraoNacionalSoap = class(TNFSeR_PadraoNacional)
+  protected
+
+  public
+
+  end;
+
 implementation
 
 uses
@@ -188,7 +197,6 @@ procedure TNFSeR_PadraoNacional.LerXMLBeneficioMunicipal(
   const ANode: TACBrXmlNode);
 var
   AuxNode: TACBrXmlNode;
-  Ok: Boolean;
 begin
   AuxNode := ANode.Childrens.FindAnyNs('BM');
 

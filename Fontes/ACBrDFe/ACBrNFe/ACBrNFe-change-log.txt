@@ -44,6 +44,55 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+27/11/2025
+-- ACBrNFe.EnvEvento --
+[+] #ACBR-5451 - Implementado a leitura INI e JSON dos eventos "Imobilização de Item", "Solicitação de Apropriação de Crédito de Combustível" e "Solicitação de Apropriação de Crédito para bens e serviços que dependem de atividade do adquirente".
+  Por: Diego Folieni
+
+26/11/2025
+-- ACBrNFe.EnvEvento --
+[+] #ACBR-5451 - Implementado a leitura INI e JSON do evento "Aceite de débito na apuração por emissão de nota de crédito".
+  Por: Diego Folieni
+[+] #ACBR-5451 - Implementado a leitura INI e JSON dos eventos: "Destinação de item para consumo pessoal" e "Perecimento, perda, roubo ou furto durante o transporte contratado pelo adquirente".
+  Por: Diego Folieni
+
+25/11/2025
+-- ACBrNFe.EnvEvento --
+[+] #ACBR-5451 - Implementado a leitura INI e JSON dos eventos: "Informação de efetivo pagamento integral para liberar crédito presumido do adquirente" e "Solicitação de Apropriação de crédito presumido".
+  Por: Diego Folieni
+-- ACBrNFe.XmlWriter --
+[*] #ACBR-8446 - Comentado as linhas que geram os grupos IS e ISTot, uma vez que só devem ser gerados a partir de 2027.
+  Por: Elton Barbosa/Italo Giurizzato Junior
+
+24/11/2025
+-- ACBrNFe.Envento --
+[+] Adiciona leitura do elemento tpAutor para os eventos já implementados na rotina que lê o JSON dos eventos.
+  Por: Diego Folieni
+-- ACBrNFeWebServices/ACBrNFe.Conversao/ACBrNFe.EnvEvento/ACBrNFe.EventoClass/pcnConversaoNFe --
+[+] #ACBR-5451 - Implementado os eventos: Manifestação sobre Pedido de Transferência de Crédito de IBS em Operações de Sucessão e Manifestação sobre Pedido de Transferência de Crédito de CBS em Operações de Sucessão.
+  Por: Diego Folieni
+
+21/11/2025
+-- ACBrNFeWebServices/ACBrNFe.EnvEvento/ACBrNFe.EventoClass/ACBrNFe.Conversao/pcnConversaoNFe --
+[+] #ACBR-5451 - Implementado o evento: Atualização da Data de Previsão de Entrega
+  Por: Everson.turossi
+
+-- ACBrNFeWebServices/ACBrNFe.EnvEvento/ACBrNFe.EventoClass --
+[+] #ACBR-5451 - Implementado o evento: Fornecimento não realizado com pagamento antecipado
+  Por: everson.turossi / Diego Folieni
+
+19/11/2025
+-- ACBrNFeWebServices/ACBrNFe.EnvEvento/ACBrNFe.EventoClass --
+[+] #ACBR-5451 - Implementado o evento: Perecimento, perda, roubo ou furto durante o transporte contratado pelo fornecedor
+  Por: Bruno Siqueira / Diego Folieni
+-- ACBrNFe.XmlWriter --
+[*] #ACBR-8424 - Ajuste para gerar corretamente o grupo ICMS tendo em vista a regra B25-80.
+  Por: C4Dev
+
+18/11/2025
+-- ACBrNFeWebServices/ACBrNFe.EnvEvento/ACBrNFe.EventoClass --
+[+] #ACBR-5451 - Implementado o evento: Importação em ALC/ZFM não convertida em isenção.
+  Por: Diego Folieni
 
 12/11/2025
 -- ACBrNFeWebServices/ACBrNFe.Conversao/ACBrNFe.EnvEvento/ACBrNFe.EventoClass/pcnConversaoNFe --

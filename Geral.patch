@@ -1,0 +1,116 @@
+Index: Fontes/ACBrBoleto/ACBrBancoItau.pas
+===================================================================
+--- Fontes/ACBrBoleto/ACBrBancoItau.pas	(revision 42970)
++++ Fontes/ACBrBoleto/ACBrBancoItau.pas	(working copy)
+@@ -303,7 +303,7 @@
+     end;
+   end else
+   begin
+-    case ACBrTitulo.ACBrBoleto.Cedente.TipoInscricao of
++    case ACBrTitulo.Sacado.Pessoa of
+       pFisica   : Result := '1'; //N DO CPF DO BENEFICIÁRIO
+       pJuridica : Result := '2'; //N DO CNPJ DO BENEFICIÁRIO
+     else
+Index: Fontes/ACBrBoleto/FC/Fast/ACBrBoletoFCFR.pas
+===================================================================
+--- Fontes/ACBrBoleto/FC/Fast/ACBrBoletoFCFR.pas	(revision 42970)
++++ Fontes/ACBrBoleto/FC/Fast/ACBrBoletoFCFR.pas	(working copy)
+@@ -456,7 +456,7 @@
+           FfrxJPEGExport.ShowDialog    := False;
+           FfrxJPEGExport.ShowProgress  := True;
+           FfrxJPEGExport.Monochrome    := True;
+-          FfrxJPEGExport.SeparateFiles := True;
++          FfrxJPEGExport.SeparateFiles := CalcularNomeArquivoPDFIndividual;
+           FfrxJPEGExport.JPEGQuality   := 200;
+           FfrxJPEGExport.Resolution    := 160;
+           FfrxReport.Export(FfrxJPEGExport);
+Index: Fontes/ACBrComum/ACBr.inc
+===================================================================
+--- Fontes/ACBrComum/ACBr.inc	(revision 42970)
++++ Fontes/ACBrComum/ACBr.inc	(working copy)
+@@ -55,7 +55,7 @@
+ // Descomente a linha abaixo, se você não utiliza a obsoleta Capicom para Criptografia (RECOMENDADO)
+ {$DEFINE DFE_SEM_CAPICOM}
+ // Descomente a linha abaixo, se você não utiliza a obsoleta MSXML para Assinatura de XML (RECOMENDADO)
+-{$DEFINE DFE_SEM_MSXML}
++{.$DEFINE DFE_SEM_MSXML}
+ // Descomente a linha abaixo, se você não deseja adicionar a Dependência da INDY nos seus Projetos
+ {.$DEFINE DFE_SEM_INDY}
+ // Descomente a linha abaixo, se você deseja que sejam utilizadas as classes baseadas na ACBrXMLDocument
+Index: Fontes/ACBrDFe/ACBrNFe/ACBrECFVirtualNFCe/ACBrECFVirtualNFCe.pas
+===================================================================
+--- Fontes/ACBrDFe/ACBrNFe/ACBrECFVirtualNFCe/ACBrECFVirtualNFCe.pas	(revision 42970)
++++ Fontes/ACBrDFe/ACBrNFe/ACBrECFVirtualNFCe/ACBrECFVirtualNFCe.pas	(working copy)
+@@ -432,18 +432,18 @@
+       begin
+         fsvTotTrib := fsvTotTrib + Det.Items[i].Imposto.vTotTrib;
+         fsvBC := fsvBC + Det.Items[i].Imposto.ICMS.vBC;
+-        fsvICMS := fsvICMS + Det.Items[i].Imposto.ICMS.vICMS;
++        fsvICMS := fsvICMS + RoundABNT(Det.Items[i].Imposto.ICMS.vICMS,2);
+         fsvBCST := fsvBCST + Det.Items[i].Imposto.ICMS.vBCST;
+-        fsvST := fsvST + Det.Items[i].Imposto.ICMS.vICMSST;
++        fsvST := fsvST + RoundABNT(Det.Items[i].Imposto.ICMS.vICMSST,2);
+         fsvProd := fsvProd + Det.Items[i].Prod.vProd;
+-        fsvFrete := fsvFrete + Det.Items[i].Prod.vFrete;
+-        fsvSeg := fsvSeg + Det.Items[i].Prod.vSeg;
++        fsvFrete := fsvFrete + RoundABNT(Det.Items[i].Prod.vFrete,2);
++        fsvSeg := fsvSeg + RoundABNT(Det.Items[i].Prod.vSeg,2);
+         fsvDesc := fsvDesc + Det.Items[i].Prod.vDesc;
+-        fsvII := fsvII + Det.Items[i].Imposto.II.vII;
+-        fsvIPI := fsvIPI + Det.Items[i].Imposto.IPI.vIPI;
+-        fsvPIS := fsvPIS + Det.Items[i].Imposto.PIS.vPIS;
+-        fsvCOFINS := fsvCOFINS + Det.Items[i].Imposto.COFINS.vCOFINS;
+-        fsvOutro := fsvOutro + Det.Items[i].Prod.vOutro;
++        fsvII := fsvII + RoundABNT(Det.Items[i].Imposto.II.vII,2);
++        fsvIPI := fsvIPI + RoundABNT(Det.Items[i].Imposto.IPI.vIPI,2);
++        fsvPIS := fsvPIS + RoundABNT(Det.Items[i].Imposto.PIS.vPIS,2);
++        fsvCOFINS := fsvCOFINS + RoundABNT(Det.Items[i].Imposto.COFINS.vCOFINS,2);
++        fsvOutro := fsvOutro + RoundABNT(Det.Items[i].Prod.vOutro,2);
+       end;
+     end;
+   end;
+@@ -768,11 +768,23 @@
+           if NotasFiscais.Items[0].NFe.Det[i].Prod.cProd <> cItemCancelado then
+           begin
+             if fpCupom.DescAcresSubtotal > 0 then
+-              NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro :=
+-                NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro + ItDescAcre[i]
++            begin
++              NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro := NotasFiscais.Items[0].NFe.Det[i].Prod.vOutro + ItDescAcre[i];
++              if NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC > 0 then
++              begin
++                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC   := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC + ItDescAcre[i];
++                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vICMS := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC * (NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.pICMS/100);
++              end;
++            end
+             else
+-              NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc :=
+-                NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc + ItDescAcre[i];
++            begin
++              NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc := NotasFiscais.Items[0].NFe.Det[i].Prod.vDesc + ItDescAcre[i];
++              if NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC > 0 then
++              begin
++                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC   := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC - ItDescAcre[i];
++                NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vICMS := NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.vBC * (NotasFiscais.Items[0].NFe.Det[i].Imposto.ICMS.pICMS/100);
++              end;
++            end;
+           end;
+         end;
+       end;
+Index: Fontes/ACBrDFe/ACBrNFSeX/Base/Provedores/ACBrNFSeXProviderBase.pas
+===================================================================
+--- Fontes/ACBrDFe/ACBrNFSeX/Base/Provedores/ACBrNFSeXProviderBase.pas	(revision 42970)
++++ Fontes/ACBrDFe/ACBrNFSeX/Base/Provedores/ACBrNFSeXProviderBase.pas	(working copy)
+@@ -1513,6 +1513,12 @@
+     if aXml = '' then
+       aXml := AWriter.Document.Xml;
+ 
++    // INICIO
++    // Implementado este replace, para corrigir quebra de linha no provedor Publico.
++    if ConfigGeral.Provedor = proPublica then
++      aXML := StringReplace(aXML, '&amp;#xD;', '&#xD;', [rfReplaceAll]);
++    // FIM
++
+     aAlerts := ACBrStr(AWriter.ListaDeAlertas.Text);
+   finally
+     AWriter.Destroy;

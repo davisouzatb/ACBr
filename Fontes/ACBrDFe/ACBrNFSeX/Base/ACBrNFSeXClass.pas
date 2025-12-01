@@ -857,6 +857,8 @@ type
     FInfAdicional: string;
     FxFormaPagamento: string;
     FCodigoNCM: string;
+    FcClassTrib: string;
+    FINDOP: string;
 
     procedure SetItemServico(Value: TItemServicoCollection);
     procedure SetDeducao(const Value: TDeducaoCollection);
@@ -918,6 +920,9 @@ type
     // Provedor Megasoft
     property InfAdicional: string read FInfAdicional write FInfAdicional;
     property xFormaPagamento: string read FxFormaPagamento write FxFormaPagamento;
+    // Provedor ISSSalvador
+    property cClassTrib: string read FcClassTrib write FcClassTrib;
+    property INDOP: string read FINDOP write FINDOP;
   end;
 
   TDadosPessoa = class(TObject)
@@ -988,6 +993,7 @@ type
 
     FAtualizaTomador: TnfseSimNao;
     FTomadorExterior: TnfseSimNao;
+    FTomadorSubstitutoTributario: TnfseSimNao;
   public
     constructor Create;
     destructor Destroy; override;
@@ -999,6 +1005,7 @@ type
     property Contato: TContato read FContato write FContato;
     property AtualizaTomador: TnfseSimNao read FAtualizaTomador write FAtualizaTomador;
     property TomadorExterior: TnfseSimNao read FTomadorExterior write FTomadorExterior;
+    property TomadorSubstitutoTributario: TnfseSimNao read FTomadorSubstitutoTributario write FTomadorSubstitutoTributario;
   end;
 
   TDadosIntermediario = class(TObject)
@@ -1900,7 +1907,7 @@ type
     FfinNFSe: TfinNFSe;
     FindFinal: TindFinal;
     FcIndOp: string;
-    FtpOper: TtpOperGov;
+    FtpOper: TtpOperGovNFSe;
     FgRefNFSe: TgRefNFSeCollection;
     FtpEnteGov: TtpEnteGov;
     FindDest: TindDest;
@@ -1916,7 +1923,7 @@ type
     property finNFSe: TfinNFSe read FfinNFSe write FfinNFSe;
     property indFinal: TindFinal read FindFinal write FindFinal;
     property cIndOp: string read FcIndOp write FcIndOp;
-    property tpOper: TtpOperGov read FtpOper write FtpOper;
+    property tpOper: TtpOperGovNFSe read FtpOper write FtpOper;
     property gRefNFSe: TgRefNFSeCollection read FgRefNFSe write SetgRefNFSe;
     property tpEnteGov: TtpEnteGov read FtpEnteGov write FtpEnteGov;
     property indDest: TindDest read FindDest write FindDest;

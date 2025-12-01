@@ -52,10 +52,10 @@ type
   EACBrBoletoWSAsaasException = class(Exception);
   TBoletoW_Asaas = class(TBoletoWSREST)
   private
-    procedure DefinirAuthorization; override;
   protected
     function DefinirParametros: string;
 
+    procedure DefinirAuthorization; override;
     procedure DefinirURL; override;
     procedure DefinirContentType; override;
     procedure GerarHeader; override;
@@ -110,8 +110,9 @@ begin
     LNossoNumeroCorrespondente := ATitulo.NossoNumeroCorrespondente;
 
   case Boleto.Configuracoes.WebService.Ambiente of
-    tawsProducao : FPURL.URLProducao := C_URL_PROD;
-    tawsSandBox  : FPURL.URLSandBox  := C_URL_SANDBOX;
+    tawsProducao    : FPURL.URLProducao    := C_URL_PROD;
+    tawsHomologacao : FPURL.URLHomologacao := C_URL_SANDBOX;
+    tawsSandBox     : FPURL.URLSandBox     := C_URL_SANDBOX;
   end;
 
   case Boleto.Configuracoes.WebService.Operacao of
@@ -127,6 +128,13 @@ begin
           raise EACBrBoletoWSAsaasException.Create(C_ID_OBRIGATORIO);
       end;
     tpConsultaDetalhe:
+      begin
+        if (LNossoNumeroCorrespondente <> '') then
+          FPURL.SetPathURI( '/payments/' + LNossoNumeroCorrespondente)
+        else
+          raise EACBrBoletoWSAsaasException.Create(C_ID_OBRIGATORIO);
+      end;
+    tpPIXConsultar :
       begin
         if (LNossoNumeroCorrespondente <> '') then
           FPURL.SetPathURI( '/payments/' + LNossoNumeroCorrespondente + '/billingInfo')
@@ -173,15 +181,11 @@ begin
       begin
         FMetodoHTTP := htDELETE;
       end;
-    tpConsulta:
+    tpConsulta,
+    tpConsultaDetalhe,
+    tpPixConsultar:
       begin
         FMetodoHTTP := htGET;
-        RequisicaoConsulta;
-      end;
-    tpConsultaDetalhe:
-      begin
-        FMetodoHTTP := htGET;
-        RequisicaoConsultaDetalhe;
       end;
   else
     raise EACBrBoletoWSException.Create(ClassName + Format(S_OPERACAO_NAO_IMPLEMENTADO,[TipoOperacaoToStr(Boleto.Configuracoes.WebService.Operacao)]));
@@ -291,7 +295,7 @@ procedure TBoletoW_Asaas.RequisicaoIncluir;
       tawsSandbox  : LURL := C_URL_CUSTOMER_SANDBOX;
     end;
 
-    LStream  := TStringStream.Create('');
+    LStream := TStringStream.Create('');
     try
       httpsend.OutputStream := LStream;
       httpsend.Headers.Clear;
@@ -299,7 +303,7 @@ procedure TBoletoW_Asaas.RequisicaoIncluir;
       httpsend.Headers.Text := FPKeyUser;
       httpsend.Document.Clear;
       //necessario consultar se já existe, pois o portal permite duplicação de cadastros
-      httpsend.HTTPMethod('GET', LURL + Format('?cpfCnpj=', [ATitulo.Sacado.CNPJCPF]));
+      httpsend.HTTPMethod('GET', LURL + Format('?cpfCnpj=%s', [ATitulo.Sacado.CNPJCPF]));
       httpsend.Document.Position := 0;
       if (httpsend.ResultCode = 200) and (LStream.Size > 0) then
       begin
@@ -313,6 +317,7 @@ procedure TBoletoW_Asaas.RequisicaoIncluir;
         end;
       end;
     finally
+      httpsend.OutputStream := nil;
       LStream.Free;
     end;
 
@@ -326,9 +331,9 @@ procedure TBoletoW_Asaas.RequisicaoIncluir;
         httpsend.MimeType := FPContentType;
         httpsend.Headers.Text := FPKeyUser;
         httpsend.Document.Clear;
+        LJSON := TACBrJSONObject.Create;
         try
-          LJSON := TACBrJSONObject.Create
-                     .AddPair('name', ATitulo.Sacado.NomeSacado)
+          LJSON.AddPair('name', ATitulo.Sacado.NomeSacado)
                      .AddPair('cpfCnpj', OnlyNumber(ATitulo.Sacado.CNPJCPF))
                      .AddPair('email', ATitulo.Sacado.Email)
                      .AddPair('phone', ATitulo.Sacado.Fone)
@@ -350,10 +355,12 @@ procedure TBoletoW_Asaas.RequisicaoIncluir;
             LJSON := TACBrJSONObject.Parse(ReadStrFromStream(LStream, LStream.Size));
             LCustomerID := LJSON.AsString['id'];
           finally
-            LJSON.Free;
+            if Assigned(LJSON) then
+              LJSON.Free;
           end;
         end;
       finally
+        httpsend.OutputStream := nil;
         LStream.Free;
       end;
     end;
@@ -371,7 +378,7 @@ begin
 
       if not ((ATitulo.NossoNumero = '0') or
               (ATitulo.NossoNumero = Poem_Zeros('',Boleto.Banco.TamanhoMaximoNossoNum)) ) then
-        raise Exception.Create('Campo NossoNumero é inválido obrigatóriamente deve ser informado valor 0!');
+        raise Exception.Create('Campo NossoNumero é inválido obrigatoriamente deve ser informado valor 0!');
 
       if ATitulo.DataBaixa = 0 then
         ATitulo.DataBaixa := IncMonth(ATitulo.Vencimento, 1);
@@ -397,9 +404,9 @@ end;
 
 procedure TBoletoW_Asaas.RequisicaoAlterar;
 var
-  LJSON, LJSONDesconto, LJSONJuros, LJSONMulta : TACBrJSONObject;
+  LJSON: TACBrJSONObject;
 begin
-if Assigned(ATitulo) then
+  if Assigned(ATitulo) then
   begin
     LJSON := TACBrJSONObject.Create;
     try

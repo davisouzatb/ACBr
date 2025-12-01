@@ -146,6 +146,16 @@ type
     function GerarIni: string; override;
   end;
 
+  { TNFSeW_PadraoNacionalSoap }
+
+  TNFSeW_PadraoNacionalSoap = class(TNFSeW_PadraoNacional)
+  protected
+    procedure Configuracao; override;
+
+  public
+
+  end;
+
 implementation
 
 uses
@@ -1139,7 +1149,10 @@ begin
   Result := CreateElement('trib');
 
   Result.AppendChild(GerarXMLTributacaoMunicipal);
-  Result.AppendChild(GerarXMLTributacaoFederal);
+
+  if NFSe.OptanteSN <> osnOptanteMEI then
+    Result.AppendChild(GerarXMLTributacaoFederal);
+
   Result.AppendChild(GerarXMLTotalTributos);
 end;
 
@@ -1209,16 +1222,16 @@ end;
 
 function TNFSeW_PadraoNacional.GerarXMLTributacaoFederal: TACBrXmlNode;
 begin
-  Result := nil;
-
-  Result := CreateElement('tribFed');
-
-  Result.AppendChild(GerarXMLTributacaoOutrosPisCofins);
-
   if (NFSe.Servico.Valores.tribFed.vRetCP > 0) or
      (NFSe.Servico.Valores.tribFed.vRetIRRF > 0) or
-     (NFSe.Servico.Valores.tribFed.vRetCSLL > 0) then
+     (NFSe.Servico.Valores.tribFed.vRetCSLL > 0) or
+     (NFSe.Servico.Valores.tribFed.CST <> cstVazio) then
   begin
+    Result := CreateElement('tribFed');
+
+    if NFSe.Servico.Valores.tribFed.CST <> cstVazio then
+      Result.AppendChild(GerarXMLTributacaoOutrosPisCofins);
+
     Result.AppendChild(AddNode(tcDe2, '#1', 'vRetCP', 1, 15, 0,
                                       NFSe.Servico.Valores.tribFed.vRetCP, ''));
 
@@ -1231,9 +1244,9 @@ begin
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLTributacaoOutrosPisCofins: TACBrXmlNode;
+var
+  NOcorr: Integer;
 begin
-  Result := nil;
-
   Result := CreateElement('piscofins');
 
   Result.AppendChild(AddNode(tcStr, '#1', 'CST', 2, 2, 1,
@@ -1243,21 +1256,27 @@ begin
      (NFSe.Servico.Valores.tribFed.pAliqPis > 0) or
      (NFSe.Servico.Valores.tribFed.pAliqCofins > 0) or
      (NFSe.Servico.Valores.tribFed.vPis > 0) or
-     (NFSe.Servico.Valores.tribFed.vCofins > 0) then
+     (NFSe.Servico.Valores.tribFed.vCofins > 0) or
+     (NFSe.Servico.Valores.tribFed.CST in [cst04, cst06]) then
   begin
+    NOcorr := 0;
+
+    if NFSe.Servico.Valores.tribFed.CST in [cst04, cst06] then
+      NOcorr := 1;
+
     Result.AppendChild(AddNode(tcDe2, '#1', 'vBCPisCofins', 1, 15, 0,
                                 NFSe.Servico.Valores.tribFed.vBCPisCofins, ''));
 
-    Result.AppendChild(AddNode(tcDe2, '#1', 'pAliqPis', 1, 5, 0,
+    Result.AppendChild(AddNode(tcDe2, '#1', 'pAliqPis', 1, 5, NOcorr,
                                     NFSe.Servico.Valores.tribFed.pAliqPis, ''));
 
-    Result.AppendChild(AddNode(tcDe2, '#1', 'pAliqCofins', 1, 5, 0,
+    Result.AppendChild(AddNode(tcDe2, '#1', 'pAliqCofins', 1, 5, NOcorr,
                                  NFSe.Servico.Valores.tribFed.pAliqCofins, ''));
 
-    Result.AppendChild(AddNode(tcDe2, '#1', 'vPis', 1, 15, 0,
+    Result.AppendChild(AddNode(tcDe2, '#1', 'vPis', 1, 15, NOcorr,
                                         NFSe.Servico.Valores.tribFed.vPis, ''));
 
-    Result.AppendChild(AddNode(tcDe2, '#1', 'vCofins', 1, 15, 0,
+    Result.AppendChild(AddNode(tcDe2, '#1', 'vCofins', 1, 15, NOcorr,
                                      NFSe.Servico.Valores.tribFed.vCofins, ''));
 
     Result.AppendChild(AddNode(tcStr, '#1', 'tpRetPisCofins', 1, 1, 0,
@@ -1826,6 +1845,15 @@ begin
   AINIRec.WriteFloat(LSecao, 'vLiq', NFSe.infNFSe.valores.ValorLiquidoNfse);
 
   AINIRec.WriteString(LSecao, 'xOutInf', NFSe.OutrasInformacoes);
+end;
+
+{ TNFSeW_PadraoNacionalWSSoap }
+
+procedure TNFSeW_PadraoNacionalSoap.Configuracao;
+begin
+  inherited Configuracao;
+
+//  PrefixoPadrao := 'dps';
 end;
 
 end.

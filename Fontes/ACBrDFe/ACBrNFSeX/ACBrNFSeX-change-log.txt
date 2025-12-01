@@ -42,6 +42,142 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+01/12/2025
+-- ACBrNFSeXServicos --
+[*] ACBR-8512 - Alterado a versão e as URLs das cidades Mamborê/PR o provedor continua o mesmo.
+   Por: Arthur Haupt Pacheco
+
+28/11/2025
+-- Infisc.GravarXml --
+[+] ACBR-8493 - Acrescentado os campos opcionais que consta nos schemas, mas não estavam sendo gerados caso alimentados.
+   Por: Fabiano Oliveira de Castro
+-- IPM.GravarXml --
+[*] ACBR-8489 - Alteração visando gerar a tag codigoNBS para a versão 2.04
+   Por: Helius_ERP
+-- PadraoNacional.Provider --
+[*] Melhoria a rotina TratarXMLRetornado para usar classes próprias para criação do JSON.
+  Por: Diego Folieni
+-- ACBrNFSeXWebservicesResponse/PadraoNacional.Provider --
+[+] Incluído o campo XmlRetorno na lista Resumos para conter o XML da NFS-e do Padrão Nacional.
+  Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-8502 - Alterado a versão e as URLs das cidades Vitorino/PR e São Domingos/SC o provedor continua o mesmo.
+   Por: C4Dev
+-- PadraoNacional.Provider --
+[*] Melhorias no TrataRetornoEmitir visando atender API própria de outros provedores.
+  Por: Italo Giurizzato Junior
+
+27/11/2025
+-- ACBrNFSeXLerXML --
+[+] ACBR-8477 - Adiciona chamada de rotina que lê os novos campos da Reforma Tributária na leitura do arquivo INI.
+   Por: Diego Folieni
+-- ACBrNFSeXServicos --
+[*] Alterado de http para https as URLs da cidade Sao Sebastiao do Oeste/MG
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.GravarXml --
+[*] Alteração visando gerar as tags: vPis e vCofins que estão dentro do grupo piscofins mesmo com valores zero
+    quando o CST for 04 ou 06.
+  Por: Italo Giurizzato Junior
+-- PadraoNacional.Provider --
+[*] #ACBr-8492 Alteração visando a leitura correta do XML quando este tem vogais acentuadas e cedilha.
+  Por: marcelo.hgv
+[*] #ACBr-8491 Alteração visando obter o XML do evento pela propriedade XmlRetorno para salvar no banco de dados.
+  Por: Diego Reckziegel
+-- ACBrNFSeXServicos --
+[*] #ACBr-8475 A cidade Itapoa/SC mudou de versão e URL, o provedor continua o mesmo.
+   Por: C4Dev
+[*] #ACBr-8490 Criado a seção SimplISSPN que contem a URL base de Homologação da API própria do
+    provedor SimplISS a ser utilizada por todas as cidades atendidas pelo provedor.
+   Por: Denis (JJW)/Italo Giurizzato Junior
+
+26/11/2025
+-- Bauhaus.GravarJson/Bauhaus.LerJson --
+[*] #ACBr-8486 Ajustes na leitura do arquivo INI.
+  Por: Italo Giurizzato Junior
+-- ACBrNFSeXClass/ACBrNFSeXConversao/ACBrNFSeXGravarXml/ACBrNFSeXLerXml --
+[*] #ACBr-8469/8485 Definido um novo tipo para o tpOper para a NFS-e pois possui 
+    mais opções do que o tipo definido para os demais DF-e.
+  Por: Italo Giurizzato Junior
+-- PadraoNacional.Provider --
+[-] #ACBr-8483 Ajuste visando o correto tratamento do retorno para as respostas do PadraoNacional
+  Por: Diego Folieni
+-- Ginfes.GravarXml/Ginfes.LerXml --
+[*] #ACBr-8444 Alterações visando a Reforma Tributária
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXConversao/ACBrNFSeXGravarXml_ABRASFv2/Giss.GravarXml/Giss.LerXml/Infisc.GravarXml --
+[*] Ajustes no CST que se não informando estava sendo considerado o CST01.
+   Por: Italo Giurizzato Junior
+
+25/11/2025
+-- ACBrNFSeXClass/ACBrNFSeXGravarXml_ABRASFv2/ACBrNFSeXLerXml_ABRASFv2/DeISS.GravarXml --
+[*] #ACBr-8459 Implementado o campo TomadorSubstitutoTributario para determinar se o 
+    tomador é ou não é substituto tributário.
+   Por: Vinicius Jung - DSV Bremen/Italo Giurizzato Junior
+-- IPM.GravarXml -
+[*] #ACBr-8461 Alteração visando não gerar o grupo IBSCBS quando os campos não estiverem
+    alimentados.
+   Por: C4Dev
+-- Giss.GravarXml --
+[*] #ACBr-8466 Alteração visando não gerar a tag Alíquota.
+   Por: breno.silva
+-- ACBrNFSeXServicos --
+[*] #ACBr-8454 A cidade Santa Cecilia/SC mudou de versão e URL, o provedor continua o mesmo.
+   Por: lucasatz
+-- ACBrNFSeXConversao/PadraoNacional.GravarXml --
+[-] #ACBr-8465 Ajustes para não gerar Tributação Federal quando for MEI.
+   Por: Felipe baldin/Italo Giurizzato Junior
+-- ISSe.GravarXml --
+[-] #ACBr-8455 Ajustes para não ocorrer mais erro de validação ao gerar o XML com os novos
+    campos.
+   Por: Italo Giurizzato Junior
+-- IPM.GravarXml --
+[*] #ACBr-8454 Ajustes para gerar o XML com os novos campos da reforma tributária no
+    layout versão 2.04 da ABRASF.
+   Por: Italo Giurizzato Junior
+-- Infisc.GravarXml --
+[*] #ACBr-8443/8457 Ajustes para gerar o XML sem os novos campos da Reforma tributária em ambiente
+    de produção, somente em homologação.
+   Por: dna.automacao/TiagoTecchio
+
+24/11/2025
+-- ACBrNFSeXConfiguracoes/ACBrNFSeXProviderBase/ACBrNFSeXProviderManager --
+-- ISSSaoPaulo.Provider/PadraoNacional.GravarXml/PadraoNacional.LerXml/PadraoNacional.Provider -
+[*] Ajustes visando atender os provedores que tem API própria: Betha, EL, Infisc, Pronim, Tiplan.
+    E o provedor ISSSaoPaulo que vai manter o layout usado mas modificado para atender a reforma
+    tributária.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] Ajustes em algumas cidades visando a reforma tributária.
+   Por: Italo Giurizzato Junior
+
+21/11/2025
+-- IPM.GravarXml --
+[*] #ACBr-8387 Incluído linha para gerar o codigo_nbs no XML do RPS.
+   Por: Marcos Villatore
+-- ACBrNFSeXServicos --
+[*] #ACBr-8387 A cidade Telêmaco Borba/PR trocou as URLs, o provedor continua o mesmo.
+   Por: Marcos Villatore
+-- PadraoNacional.GravarXml/PadraoNacional.LerXml/PadraoNacional.Provider --
+[*] #ACBr-8427 Ajustes para gerar as tags das alíquotas do PIS e COFINS mesmo zeradas.
+    Ajustes para atender a API própria do provedor Pronim.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] #ACBr-8429 A cidade Navegantes/SC trocou de provedor, agora é IPM.
+   Por: edmilsonvg
+[+] #ACBr-8431 Incluída a cidade São Caitano/PE, o provedor é Tributus.
+   Por: Mauricio Andrade
+[*] #ACBr-8432 A cidade Arroio do Sal/RS trocou de provedor, agora é Pronim.
+   Por: Igor AcertSoft
+-- Diversos --
+[*] Diversos ajustes para atender os provedores Giss e ISSSalvador visando a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+19/11/2025
+-- ACBrNFSeXServicos --
+[*] #ACBr-8357 A cidade de Jales/SP trocou de provedor, agora é RLZ.
+   Por: mregiani
+[*] #ACBr-8363 A cidade de Renascenca/PR trocou de provedor, agora é EloTech.
+   Por: binotto
 
 18/11/2025
 -- ACBrNFSeXLerXml_ABRASFv2/Tecnos.LerXml --

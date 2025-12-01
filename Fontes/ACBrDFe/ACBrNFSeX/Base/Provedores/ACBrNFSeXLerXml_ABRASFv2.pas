@@ -1327,7 +1327,7 @@ begin
 
   if not Assigned(ANode) then Exit;
 
-  AuxNode := AuxNode.Childrens.FindAnyNs('Nfse');
+  AuxNode := ANode.Childrens.FindAnyNs('Nfse');
 
   if AuxNode = nil then
     AuxNode := ANode;
@@ -1562,6 +1562,7 @@ begin
 
     NFSe.Tomador.AtualizaTomador := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(LSecao, 'AtualizaTomador', '1'));
     NFSe.Tomador.TomadorExterior := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(LSecao, 'TomadorExterior', '2'));
+    NFSe.Tomador.TomadorSubstitutoTributario := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(LSecao, 'TomadorSubstitutoTributario', '2'));
   end;
 end;
 

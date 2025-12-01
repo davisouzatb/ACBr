@@ -844,7 +844,7 @@ begin
                                 NFCom.Det[aDet].Prod.qFaturada, DSC_QFATURADA));
 
   // pode ter 2 ou 8 casas decimais
-  Result.AppendChild(AddNode(tcDe2, '#168', 'vItem', 1, 15, 1,
+  Result.AppendChild(AddNode(tcDe8, '#168', 'vItem', 1, 15, 1,
                                         NFCom.Det[aDet].Prod.vItem, DSC_VITEM));
 
   Result.AppendChild(AddNode(tcDe2, '#168', 'vDesc', 1, 15, 0,
@@ -854,7 +854,7 @@ begin
                                       NFCom.Det[aDet].Prod.vOutro, DSC_VOUTRO));
 
   // pode ter 2 ou 8 casas decimais
-  Result.AppendChild(AddNode(tcDe2, '#169', 'vProd', 1, 15, 1,
+  Result.AppendChild(AddNode(tcDe8, '#169', 'vProd', 1, 15, 1,
                                         NFCom.Det[aDet].Prod.vProd, DSC_VPROD));
 
   Result.AppendChild(AddNode(tcDat, '#169', 'dExpiracao', 10, 10, 0,
@@ -1622,14 +1622,15 @@ begin
     Result.AppendChild(AddNode(tcStr, '#2', 'cClassTrib', 6, 6, 1,
                                             IBSCBS.cClassTrib, DSC_CCLASSTRIB));
 
-    Result.AppendChild(AddNode(tcStr, '#3', 'indDoacao', 1, 1, 0,
-              pcnConversao.TIndicadorExToStr(IBSCBS.indDoacao), DSC_INDDOACAO));
+    if IBSCBS.indDoacao = tieSim then
+      Result.AppendChild(AddNode(tcStr, '#3', 'indDoacao', 1, 1, 0,
+                                                           '1', DSC_INDDOACAO));
 
     if IBSCBS.CST = cst000 then
       Result.AppendChild(Gerar_IBSCBS_gIBSCBS(IBSCBS.gIBSCBS));
 
-  if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) then
-    Result.AppendChild(Gerar_gEstornoCred(IBSCBS.gEstornoCred));
+    if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) then
+      Result.AppendChild(Gerar_gEstornoCred(IBSCBS.gEstornoCred));
   end;
 end;
 

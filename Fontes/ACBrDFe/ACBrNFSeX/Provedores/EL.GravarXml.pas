@@ -43,7 +43,8 @@ uses
   ACBrNFSeXGravarXml,
   ACBrNFSeXGravarXml_ABRASFv2,
   ACBrNFSeXConversao,
-  ACBrNFSeXConsts;
+  ACBrNFSeXConsts,
+  PadraoNacional.GravarXml;
 
 type
   { TNFSeW_EL }
@@ -78,6 +79,13 @@ type
   TNFSeW_EL204 = class(TNFSeW_ABRASFv2)
   protected
     procedure Configuracao; override;
+
+  end;
+
+  { TNFSeW_ELAPIPropria }
+
+  TNFSeW_ELAPIPropria = class(TNFSeW_PadraoNacional)
+  protected
 
   end;
 
@@ -539,6 +547,14 @@ begin
   NrOcorrInformacoesComplemetares := 0;
   NrOcorrCepTomador := 1;
   NrOcorrCodigoPaisTomador := -1;
+
+  NrOcorrCodTribMun_1 := -1;
+  NrOcorrDiscriminacao_1 := -1;
+  NrOcorrCodigoMunic_1 := -1;
+
+  NrOcorrCodTribMun_2 := 0;
+  NrOcorrDiscriminacao_2 := 0;
+  NrOcorrCodigoMunic_2 := 0;
 
   TagTomador := 'TomadorServico';
 

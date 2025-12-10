@@ -1003,6 +1003,10 @@ begin
     LerINISecaoCondicaoPagamento(LINIRec);
     LerINISecaoOrgaoGerador(LINIRec);
     LerINISecaoParcelas(LINIRec);
+
+    // Ler os campos do arquivo INI referente a Reforma Tributária
+    LerINIIBSCBS(LINIRec, NFSe.IBSCBS);
+
     Result := True;
   finally
     LIniRec.Free;
@@ -1151,7 +1155,7 @@ begin
     NFSe.Tomador.Endereco.xMunicipio := AINIRec.ReadString(LSecao, 'xMunicipio', '');
     NFSe.Tomador.Endereco.UF := AINIRec.ReadString(LSecao, 'UF', '');
     NFSe.Tomador.Endereco.CEP := AINIRec.ReadString(LSecao, 'CEP', '');
-//    NFSe.Tomador.Endereco.CodigoPais := AINIRec.ReadInteger(LSecao, 'CodigoPais', 0);
+    NFSe.Tomador.Endereco.CodigoPais := AINIRec.ReadInteger(LSecao, 'CodigoPais', 0);
 
     NFSe.Tomador.Contato.Telefone := AINIRec.ReadString(LSecao, 'Telefone', '');
     NFSe.Tomador.Contato.Email := AINIRec.ReadString(LSecao, 'Email', '');

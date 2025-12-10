@@ -42,6 +42,98 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+
+
+09/12/2025
+-- Diversos --
+[*] Ajustes para gerar a tag CodigoNbs para os provedores que usam a versão 2 do layout da ABRASF.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXConversao --
+[*] Acrescentado as Naturezas de Operação: 602 e 603.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml/Citta.GravarXml/Citta.Provider --
+-- PadraoNacional.GravarXml/PadraoNacional.Provider --
+[*] Possível solução para atender a API Própria do provedor Citta.
+   Por: Italo Giurizzato Junior
+-- WebISS.LerXml --
+[*] Alteração visando a leitura correta do grupo IBSCBS.
+   Por: Tiago  Tecchio
+
+08/12/2025
+-- EL.GravarXml --
+[-] Correção para evitar erro de validação.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXLerXml --
+[-] Correção para evitar loop infinito.
+   Por: Italo Giurizzato Junior
+-- Pronim.Provider --
+[+] ACBR-8541 - Implementado a Consulta ao DPS por numero e serie do mesmo.
+    Consulta exclusiva para o provedor Pronim - API Própria.
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.GravarXml --
+[*] ACBR-8551 - Alterado a condição para gerar o grupo comExt, pois o valor do serviço pode ser zero.
+   Por: Leonardo Gomes
+-- ISSSaoPaulo.Provider --
+[*] ACBR-8550 - Se não tem Intermediário não é necessário incluir na assinatura adicional.
+   Por: Leonardo Gomes
+-- ACBrNFSeXClass/Tecnos.GravarXml --
+[*] ACBR-8458 - Alterações para atender o provedor Tecnos no que se refere a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+-- Diversos --
+[*] ACBR-8508/8520 - Alterações em diversas units para atender o provedor Publica no 
+    que se refere a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+05/12/2025
+-- ACBrNFSeXLerXml_ABRASFv2/WebISS.GravarXml/WebISS.LerXml --
+[*] ACBR-8538 - Ajustes para gerar a tag CodigoNbs e a leitura do grupo IBSCBS.
+   Por: Tiago Tecchio/Italo Giurizzato Junior
+-- ACBrNFSeXClass/ACBrNFSeXLerXml/SigISSWeb.GravarXml --
+[+] ACBR-8497 - Implementado os novos campos para atender a reforma tributária.
+   Por: Italo Giurizzato Junior
+
+04/12/2025
+-- ACBrNFSeXServicos --
+[*] A cidade Ribeirão Pires/SP mudou de provedor, agora é Giss
+   Por: Raquel Basani
+[*] ACBR-8378 - A cidade Jacareí/SP mudou de provedor, agora é PadraoNacional
+   Por: Raphael Sanini
+
+03/12/2025
+-- WebISS.GravarXml --
+[+] ACBR-8529 - Realizada alterações visando gerar o grupo IBSCBS.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-8527 - Alterado a versão da cidade São José do Cedro/SC, o provedor continua o mesmo.
+   Por: C4Dev
+-- ACBrNFSeXConfiguracoes/ACBrNFSeXClass/ACBrNFSeXGravarXml_ABRASFv2 --
+-- ACBrNFSeXLerXml_ABRASFv1/ACBrNFSeXLerXml_ABRASFv2 --
+[-] Correção para não gerar de forma indevida o grupo de Endereço no Exterior.
+   Por: Italo Giurizzato Junior
+-- ISSSaoPaulo.GravarXml/ISSSaoPaulo.Provider --
+[*] ACBR-8525 - Ajustes na geração do campo Assinatura, pois a versão 2 é diferente.
+   Por: Hunes/Italo Giurizzato Junior
+-- Diversos --
+[*] ACBR-8511/8496 - Varias alterações visando atender o provedor: ISSNet no que se refere a 
+    adoção ao layout da NFS-e Padrão Nacional
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.GravarXml --
+[-] Possível solução para a geração do grupo: totTrib.
+   Por: Italo Giurizzato Junior
+
+02/12/2025
+-- fintelISS.GravarXml --
+[*] ACBR-8509 - Ajustes por conta da alteração nos schemas disponibilizado pelo provedor.
+   Por: aslsoftwareltda/Italo Giurizzato Junior
+-- IPM.GravarXml --
+[*] ACBR-8510 - Ajustes por conta da alteração nos schemas disponibilizado pelo provedor.
+   Por: marciost
+-- Diversos --
+[*] Varias alterações visando atender os provedores: Betha, Città, E&L, Pronim, SimplISS,
+    Tiplan, SilTecnologia, RLZ, Infisc no que se refere a adoção ao layout da NFS-e
+    Padrão Nacional
+   Por: Italo Giurizzato Junior
+
 01/12/2025
 -- ACBrNFSeXServicos --
 [*] ACBR-8512 - Alterado a versão e as URLs das cidades Mamborê/PR o provedor continua o mesmo.

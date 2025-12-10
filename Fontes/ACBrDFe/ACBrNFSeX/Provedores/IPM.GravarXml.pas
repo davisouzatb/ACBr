@@ -228,7 +228,6 @@ begin
   FpNrOcorrCodigoAtividade := -1;
 
   // Reforma Tributária
-  NrOcorrtpOper := -1;
   NrOcorrindDest := -1;
   GerarDest := False;
   GerargReeRepRes := False;
@@ -813,12 +812,16 @@ begin
       begin
         GerarTagNifTomador := True;
         GerarEnderecoExterior := True;
+
         NrOcorrCodigoMunicInterm := 1;
+
+        NrOcorrCodTribMun_1 := -1;
         NrOcorrDiscriminacao_1 := -1;
         NrOcorrCodigoMunic_1 := -1;
-        NrOcorrCodigoNBS := 1;
-        NrOcorrDiscriminacao_2 := 1;
-        NrOcorrCodigoMunic_2 := 1;
+
+        NrOcorrCodTribMun_2 := 0;
+        NrOcorrDiscriminacao_2 := 0;
+        NrOcorrCodigoMunic_2 := 0;
       end;
   else
     begin

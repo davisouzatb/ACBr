@@ -386,7 +386,7 @@ begin
 
   item := FormatarItemServico(NFSe.Servico.ItemListaServico, FormatoItemListaServico);
 
-  Result.AppendChild(AddNode(tcStr, '#29', 'ItemListaServico', 1, 5, NrOcorrItemListaServico,
+  Result.AppendChild(AddNode(tcStr, '#29', 'ItemListaServico', 1, 6, NrOcorrItemListaServico,
                                                           item, DSC_CLISTSERV));
 
   Result.AppendChild(AddNode(tcStr, '#30', 'CodigoCnae', 1, 7, NrOcorrCodigoCnae,

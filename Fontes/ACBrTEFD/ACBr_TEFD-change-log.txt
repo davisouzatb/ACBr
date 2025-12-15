@@ -45,6 +45,78 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+12/12/2025
+-- ACBrTEFAPIComum --
+[+] Adição dos métodos: 'TACBrTEFAPIRespostas.Assign' e 'TACBrTEFAPIRespostas.Clear'
+
+-- ACBrTEFAPICliSiTef --
+[*] 'TACBrTEFAPIClassCliSiTef.Inicializar'
+    - Adicionada validações para ajustar para Ambiente de Produção se informar
+      Endereço Fiserv ou se informou 'ParamComunicacao' na conexão
+    - Ajuste para não mais informar o CNPJ do ACBr em 'ParmsClient', no Indice 4
+    - Correção para informar 'ParmsClient', em Chaves fora da chave usada por 'ParamAdic'
+    - Adicionado o tratamento a propriedade 'ACBrTEFAPI.DadosAutomacao.MensagemPinPad'
+[*] TACBrTEFAPIClassCliSiTef.FazerRequisicaoSiTef
+    - Adicionado tratamento a propriedade 'ACBrTEFAPI.DadosAutomacao.AutoAtendimento'
+    - Remoção de Logs que foram movidos para 'ACBrTEFCliSiTefComum'
+[+] Adicionado os Métodos Privados:
+    function AjustarMensagemTela(const AMsg: String): String;
+    procedure DoExibirMensagem(const AMsg: String; Terminal: TACBrTEFAPITela; MilissegundosExibicao: Integer);
+    function DoContinuarOperacao(OperacaoAPI: TACBrTEFAPIOperacaoAPI): Boolean;
+    function DoPerguntarSimNao(const Titulo: String): String;
+    function DoPerguntarMenu(const Titulo: String; Opcoes: TStringList): String; overload;
+    function DoPerguntarMenu(const Titulo: String; const Opcoes: String): String; overload;
+    function DoPerguntarCampo(DefinicaoCampo: TACBrTEFAPIDefinicaoCampo): String;
+    procedure DoExibirQRCode(const DadosQRCode: String);
+[*] TACBrTEFAPIClassCliSiTef.ContinuarRequisicaoSiTef
+    - Refatoração completa, separando código em vários métodos
+    - Variáveis renomeadas de acordo com os Parâmetros dos métodos da CliSiTef
+    - Modificação da alocação da memória de 'Buffer', com AllocMem
+    - Remoção de Logs que foram movidos para 'ACBrTEFCliSiTefComum'
+    - Uso dos métodos 'DoExibirMensagem', 'DoPerguntarSimNao', 'DoPerguntarMenu',
+      'DoContinuarOperacao', 'DoPerguntarCampo', 'DoExibirQRCode'
+    - Correção de Bug em comandos 30, 34, onde campo era perguntado de forma mascarada
+[*] TACBrTEFAPIClassCliSiTef.FinalizarTransacaoSiTef
+    - Remoção de Logs que foram movidos para 'ACBrTEFCliSiTefComum'
+[*] TACBrTEFAPIClassCliSiTef.EfetuarPagamento
+    - Melhorias no tratamento de 'Restricoes', para evitar telas de Menu, quando
+      já informar os parâmetros 'CartoesAceitos' e 'Financiamento'
+[-] Método 'TACBrTEFAPIClassCliSiTef.ExibirMensagemPinPad' corrigido para não
+    escrever Mensagem de forma permanente.
+	(por: DSA)
+	
+-- ACBrTEFCliSiTefComum --
+[*] Remoção de constantes desnecessárias
+[*] Ajustes nas contantes de Restrição, para evitar telas de Menu desnecessárias
+[+] Adicionado ao suporte aos método EscreveMensagemPinPad, LeSimNaoPinPad,
+    ObtemInformacoesPinPad da biblioteca CliSiTef
+[+] Adicionado os métodos:
+    Function EscreveMensagemPinPad(const Mensagem:AnsiString): Integer;
+    function LeSimNaoPinPad(const MensagemDisplay: AnsiString): Integer;
+    function ObtemInformacoesPinPad(out InfoPinPad: string): Integer;
+[*] TACBrTEFCliSiTefAPI.ContinuaFuncaoSiTefInterativo, melhorias no Log
+	(por: DSA)
+
+-- ACBrTEFAPIPayKit --
+[-] Correção no tratamento do JSon retornado em 'ConteudoToProperty', para
+    leitura de informações sobre a última transação
+
+-- ACBrTEFPayKitAPI --
+[-] Correção no retorno dos CallBacks, no mover String para PAnsiChar em Delphi 12+
+    https://www.projetoacbr.com.br/forum/topic/84257-tef-dtef-da-linx/?&_rid=61#findComment-572507
+    (por: DSA)
+
+-- ACBrTEFAPIElgin --
+[*] Ajuste para permitir o Cancelamento pela aplicação na leitura de QRCode do PIX
+    https://www.projetoacbr.com.br/forum/topic/88249-cancelamento-de-pix-no-tef-elgin/
+    (Por: plenustech)
+
+11/12/2025
+-- ACBrTEFAPIComum --
+[*] Alteração do momento de criação da lista de Respostas;
+[+] Inclusão de validações para verificar se o componente está ativo antes de 
+    executar os principais métodos.
+
 27/11/2025
 -- ACBrTEFAPIElginComum.pas --
 [*] Contribuição Leitura de Voucher TEF Elgin - ACBR-8494

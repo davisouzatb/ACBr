@@ -44,12 +44,23 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+10/12/2025
+-- ACBrCTeWebServices --
+[-] Ajuste visando sanar AV ao ler arquivo de retorno de DistribuiçãoDFe.
+  Por: Diego Folieni
+-- ACBrCTeDACTeRLRetrato --
+[-] ACBR-8440 / ACBR-8546 - Corrigida exibição da mensagem de DACTE em homologação ou cancelado.
+  Por: Renato Rubinho
+
+09/12/2025
+-- ACBrCTeWebServices --
+[*] Ajuste para retornar a data/hora de recebimento do envio do CT-e.
+  Por: Italo Giurizzato Junior
 
 10/11/2025
 -- ACBrCTe.IniWriter/ACBrCTe.XmlWriter --
 [-] Correção para emitir CTe Simplificado com os novos campos do IBS CBS.
   Por: Italo Giurizzato Junior
-
 
 03/11/2025
 -- ACBrCTe.XmlWriter --

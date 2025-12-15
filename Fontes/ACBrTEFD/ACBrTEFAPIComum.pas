@@ -59,6 +59,7 @@ resourcestring
                                        'não implementado para o TEF: %s';
   sACBrTEFAPIEventoInvalidoException = 'Evento %s não foi implementado na sua aplicação';
   sACBrTEFAPIComponenteInicializadoException = '%s não pode ser modificado após TEF Inicializado';
+  sACBrTEFAPIComponenteNaoInicializadoException = 'Componente não está inicializado';
   sACBrTEFAPIArquivoNaoExistenteException = 'Arquivo %s não Encontrado';
   sACBrTEFAPIDiretorioInvalido = 'Diretorio %s não existe';
   sACBrTEFAPISemTransacaoPendenteException = 'Não há transação Pendente';
@@ -282,6 +283,8 @@ type
       const DirTrabalho: String; GravarRespostas: Boolean;
       LimparRespostasPorTransacao: Boolean);
     destructor Destroy; override;
+    procedure Clear;
+    procedure Assign(Source: TACBrTEFAPIRespostas);
 
     function AdicionarRespostaTEF(ATEFResp: TACBrTEFResp): Integer;
     procedure SalvarRespostasTEF;
@@ -614,6 +617,20 @@ begin
   inherited;
 end;
 
+procedure TACBrTEFAPIRespostas.Clear;
+begin
+  fTEFRespList.Clear;
+end;
+
+procedure TACBrTEFAPIRespostas.Assign(Source: TACBrTEFAPIRespostas);
+var
+  i: Integer;
+begin
+  Clear;
+  for i := 0 to Source.Count-1 do
+    AddClone(Source.Items[i]);
+end;
+
 function TACBrTEFAPIRespostas.AcharTransacao(const Rede, NSU: String;
   const CodigoFinalizacao: String): Integer;
 var
@@ -686,7 +703,7 @@ var
 begin
   VerificarDiretorioTrabalho;
 
-  fTEFRespList.Clear;
+  Clear;
   SL := TStringList.Create;
   try
     FindFiles(ObterMascaraTodosArquivosDiretorioTrabalho, SL, True, fstFileName, fsdAscending );
@@ -1096,6 +1113,7 @@ end;
 procedure TACBrTEFAPIComum.Inicializar;
 begin
   GravarLog('Inicializar');
+  CriarListaTEFResp;
 
   if not Assigned( fQuandoFinalizarOperacao )  then
     DoException( Format( ACBrStr(sACBrTEFAPIEventoInvalidoException),
@@ -1115,7 +1133,6 @@ begin
   fpInicializando := True;
   try
     fpTEFAPIClass.Inicializar;
-    CriarListaTEFResp;
 
     // Verificando se ficou alguma Transação Pendente, no Diretório de Trabalho
     if (TratamentoTransacaoInicializacao = tefopiCancelarOuEstornar) then
@@ -1228,6 +1245,9 @@ function TACBrTEFAPIComum.EfetuarAdministrativa(const Operacao: string;
   const IdentificadorTransacao: string): Boolean;
 begin
   GravarLog('EfetuarAdministrativa( '+Operacao+', '+IdentificadorTransacao+' )');
+  
+  if (not Inicializado) then
+    DoException(ACBrStr(sACBrTEFAPIComponenteNaoInicializadoException));
 
   fRespostasTEF.IdentificadorTransacao := IdentificadorTransacao;
 
@@ -1245,6 +1265,9 @@ begin
   GravarLog('EfetuarAdministrativa( '+
             GetEnumName(TypeInfo(TACBrTEFOperacao), integer(Operacao) )+', '+
             IdentificadorTransacao+' )');
+     
+  if (not Inicializado) then
+    DoException(ACBrStr(sACBrTEFAPIComponenteNaoInicializadoException));
 
   fRespostasTEF.IdentificadorTransacao := IdentificadorTransacao;
 
@@ -1287,6 +1310,9 @@ begin
             IfThen(DadosAdicionais = '', '', ', '+DadosAdicionais)+
             ' )');
 
+  if (not Inicializado) then
+    DoException(ACBrStr(sACBrTEFAPIComponenteNaoInicializadoException));
+
   fRespostasTEF.IdentificadorTransacao := IdentificadorTransacao;
 
   fpTEFAPIClass.InicializarChamadaAPI(tefmtdPagamento);
@@ -1312,6 +1338,9 @@ begin
              CodigoFinalizacao+', '+
              Rede+' )' );
 
+  if (not Inicializado) then
+    DoException(ACBrStr(sACBrTEFAPIComponenteNaoInicializadoException));
+
   fpTEFAPIClass.InicializarChamadaAPI(tefmtdCancelamento);
   try
     Result := fpTEFAPIClass.CancelarTransacao( NSU, CodigoAutorizacaoTransacao,
@@ -1333,6 +1362,9 @@ begin
              NSU+', '+
              CodigoFinalizacao+', '+
              GetEnumName(TypeInfo(TACBrTEFStatusTransacao), integer(AStatus))+' )');
+
+  if (not Inicializado) then
+    DoException(ACBrStr(sACBrTEFAPIComponenteNaoInicializadoException));
 
   fpTEFAPIClass.FinalizarTransacao(Rede, NSU, CodigoFinalizacao, AStatus);
 
@@ -1494,7 +1526,7 @@ begin
                                                      fDiretorioTrabalho,
                                                      False, False);
   try
-    fpTEFAPIClass.CarregarRespostasPendentes( RespostasTEFAtuais );
+    RespostasTEFAtuais.Assign(fRespostasTEF);
 
     p := 0;  // No Passo 0, vamos processar primeiro os CNCs e ADMs, e as Não Confirmadas, depois Todas
     i := 0;

@@ -1,0 +1,13 @@
+Index: ACBrNFSeXGravarXml_ABRASFv1.pas
+===================================================================
+--- ACBrNFSeXGravarXml_ABRASFv1.pas	(revision 36553)
++++ ACBrNFSeXGravarXml_ABRASFv1.pas	(working copy)
+@@ -382,7 +382,7 @@
+ 
+   item := FormatarItemServico(NFSe.Servico.ItemListaServico, FormatoItemListaServico);
+ 
+-  Result.AppendChild(AddNode(tcStr, '#29', 'ItemListaServico', 1, 5, NrOcorrItemListaServico,
++  Result.AppendChild(AddNode(tcStr, '#29', 'ItemListaServico', 1, 6, NrOcorrItemListaServico,
+                                                           item, DSC_CLISTSERV));
+ 
+   Result.AppendChild(AddNode(tcStr, '#30', 'CodigoCnae', 1, 7, NrOcorrCodigoCnae,

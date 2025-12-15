@@ -44,6 +44,32 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+12/12/2025
+-- ACBrNFe.ValidarRegrasdeNegocio --
+[*] Comentado a validação da regra 571, pois não existe mais.
+  Por: Italo Giurizzato Junior
+
+09/12/2025
+-- ACBrNFe.XmlWriter --
+[-] Possível solução para gerar corretamente o grupo Entrega.
+  Por: Italo Giurizzato Junior
+-- ACBrNFeNotasFiscais/ACBrNFeWebServices/ACBrNFe.XmlReader --
+[*] Melhorias na leitura do XML da NF-e.
+  Por: Diego Folieni/Italo Giurizzato Junior
+
+05/12/2025
+-- ACBrNFe.EnvEvento --
+[-] #ACBR-8506 - Ajuste para que os eventos de Manifestação sobre Pedido de Transferência de Crédito tanto para o IBS quanto para o CBS não tenham seus acentos removidos.
+  Por: C4Dev
+
+03/12/2025
+-- ACBrNFe.EnvEvento, ACBrNFe.RetEnvEvento --
+[+] #ACBR-8514 - Implementado a leitura de XML dos eventos da Reforma Tributária
+  Por: Diego Folieni
+-- ACBrNFe.IniReader.pas --
+[+] Ajustado a leitura do da propriedade indDoacao da seção IBSCBS do metodo Ler_IBSCBS()
+  Por: Daniel de Morais InfoCodidiano
+
 27/11/2025
 -- ACBrNFe.EnvEvento --
 [+] #ACBR-5451 - Implementado a leitura INI e JSON dos eventos "Imobilização de Item", "Solicitação de Apropriação de Crédito de Combustível" e "Solicitação de Apropriação de Crédito para bens e serviços que dependem de atividade do adquirente".

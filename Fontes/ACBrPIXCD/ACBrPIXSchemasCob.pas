@@ -171,7 +171,7 @@ type
   public
     constructor Create(const ObjectName: String = ''); override;
     destructor Destroy; override;
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     procedure Assign(Source: TACBrPIXCobSolicitada);
     function LoadFromIni(aIniStr: String): Boolean; override;
@@ -191,7 +191,7 @@ type
     procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
   public
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     procedure Assign(Source: TACBrPIXCobRevisada);
     function LoadFromIni(aIniStr: String): Boolean; override;
@@ -208,7 +208,7 @@ type
     procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
   public
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     procedure Assign(Source: TACBrPIXCobBaseCopiaCola);
 
@@ -235,7 +235,7 @@ type
   public
     constructor Create(const ObjectName: String = ''); override;
     destructor Destroy; override;
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     procedure Assign(Source: TACBrPIXCobGerada);
 
@@ -260,7 +260,7 @@ type
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
   public
     constructor Create(const ObjectName: String = ''); override;
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     destructor Destroy; override;
     procedure Assign(Source: TACBrPIXCobCompleta);
@@ -422,8 +422,10 @@ end;
 
 procedure TACBrPIXRetirada.Clear;
 begin
-  fsaque.Clear;
-  ftroco.Clear;
+  if Assigned(fsaque) then
+    fsaque.Clear;
+  if Assigned(ftroco) then
+    ftroco.Clear;
 end;
 
 function TACBrPIXRetirada.IsEmpty: Boolean;
@@ -474,7 +476,8 @@ procedure TACBrPIXCobValor.Clear;
 begin
   foriginal := 0;
   fmodalidadeAlteracao := False;
-  fretirada.Clear;
+  if Assigned(fretirada) then
+    fretirada.Clear;
 end;
 
 function TACBrPIXCobValor.IsEmpty: Boolean;
@@ -531,7 +534,8 @@ procedure TACBrPIXCobBase.Clear;
 begin
   fchave := '';
   fsolicitacaoPagador := '';
-  finfoAdicionais.Clear;
+  if Assigned(finfoAdicionais) then
+    finfoAdicionais.Clear;
 end;
 
 function TACBrPIXCobBase.IsEmpty: Boolean;
@@ -616,10 +620,14 @@ end;
 procedure TACBrPIXCobSolicitada.Clear;
 begin
   inherited Clear;
-  fcalendario.Clear;
-  fdevedor.Clear;
-  floc.Clear;
-  fvalor.Clear;
+  if Assigned(fcalendario) then
+    fcalendario.Clear;
+  if Assigned(fdevedor) then
+    fdevedor.Clear;
+  if Assigned(floc) then
+    floc.Clear;
+  if Assigned(fvalor) then
+    fvalor.Clear;
 end;
 
 function TACBrPIXCobSolicitada.IsEmpty: Boolean;
@@ -835,10 +843,14 @@ end;
 procedure TACBrPIXCobGerada.Clear;
 begin
   inherited Clear;
-  fcalendario.Clear;
-  fdevedor.Clear;
-  floc.Clear;
-  fvalor.Clear;
+  if Assigned(fcalendario) then
+    fcalendario.Clear;
+  if Assigned(fdevedor) then
+    fdevedor.Clear;
+  if Assigned(floc) then
+    floc.Clear;
+  if Assigned(fvalor) then
+    fvalor.Clear;
   flocation := '';
   frevisao := 0;
   fstatus := stcNENHUM;
@@ -950,7 +962,8 @@ end;
 
 procedure TACBrPIXCobCompleta.Clear;
 begin
-  fpix.Clear;
+  if Assigned(fpix) then
+    fpix.Clear;
   inherited Clear;
 end;
 

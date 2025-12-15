@@ -145,7 +145,7 @@ type
     procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
   public
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     procedure Assign(Source: TACBrPIXCobVSolicitadaLote);
 
@@ -198,7 +198,7 @@ type
     procedure DoWriteToJSon(AJSon: TACBrJSONObject); override;
     procedure DoReadFromJSon(AJSon: TACBrJSONObject); override;
   public
-    procedure Clear; reintroduce;
+    procedure Clear; override;
     function IsEmpty: Boolean; override;
     procedure Assign(Source: TACBrPIXCobVRevisadaLote);
 
@@ -266,7 +266,8 @@ procedure TACBrPIXLoteCobV.Clear;
 begin
   fcriacao := 0;
   fcriacao_Bias := 0;
-  fproblema.Clear;
+  if Assigned(fproblema) then
+    fproblema.Clear;
   fstatus := stlNENHUM;
   ftxId := '';
 end;
@@ -398,7 +399,8 @@ end;
 
 procedure TACBrPIXLoteCobVConsultado.Clear;
 begin
-  fcobsv.Clear;
+  if Assigned(fcobsv) then
+    fcobsv.Clear;
   fcriacao := 0;
   fcriacao_Bias := 0;
   fdescricao := '';
@@ -596,7 +598,8 @@ end;
 
 procedure TACBrPIXLoteCobVBody.Clear;
 begin
-  fcobsv.Clear;
+  if Assigned(fcobsv) then
+    fcobsv.Clear;
   fdescricao := '';
 end;
 
@@ -729,7 +732,8 @@ end;
 
 procedure TACBrPIXLoteCobVBodyRevisado.Clear;
 begin
-  fcobsv.Clear;
+  if Assigned(fcobsv) then
+    fcobsv.Clear;
   fdescricao := '';
 end;
 

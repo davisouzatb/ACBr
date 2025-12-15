@@ -1170,6 +1170,7 @@ begin
 
           FcUF  := FCTeRetornoSincrono.cUF;
           chCTe := FCTeRetornoSincrono.ProtCTe.chDFe;
+          FdhRecbto := FCTeRetornoSincrono.protCTe.dhRecbto;
 
           if (FCTeRetornoSincrono.protCTe.cStat > 0) then
             FcStat := FCTeRetornoSincrono.protCTe.cStat
@@ -3604,6 +3605,7 @@ begin
   inherited Create(AOwner);
 
   FOwner := AOwner;
+  FretDistDFeInt := TretDistDFeInt.Create(AOwner, 'CTe');
 end;
 
 destructor TDistribuicaoDFe.Destroy;

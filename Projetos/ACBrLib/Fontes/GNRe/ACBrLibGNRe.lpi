@@ -23,7 +23,7 @@
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="1"/>
-      <BuildNr Value="277"/>
+      <BuildNr Value="280"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrGNRe - Biblioteca para emissão e impressão de Guia GNRe" InternalName="ACBrLibGNRe" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="ACBrGNRe " ProductVersion="0.0.0.1"/>
     </VersionInfo>
@@ -523,13 +523,13 @@
     </PublishOptions>
     <RunParams>
       <local>
-        <HostApplicationFilename Value="C:\Pascal\Comp\ACBr\trunk2\Projetos\ACBrLib\Testes\GNRe\bin\ACBrLibGNReTest.exe"/>
+        <HostApplicationFilename Value="$(ProjSrcPath)\..\..\Testes\GNRe\bin\ACBrLibGNReTest.exe"/>
       </local>
       <FormatVersion Value="2"/>
       <Modes Count="1">
         <Mode0 Name="default">
           <local>
-            <HostApplicationFilename Value="C:\Pascal\Comp\ACBr\trunk2\Projetos\ACBrLib\Testes\GNRe\bin\ACBrLibGNReTest.exe"/>
+            <HostApplicationFilename Value="$(ProjSrcPath)\..\..\Testes\GNRe\bin\ACBrLibGNReTest.exe"/>
           </local>
         </Mode0>
       </Modes>

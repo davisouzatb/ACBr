@@ -466,7 +466,8 @@ begin
 
       if NFSeXml <> '' then
       begin
-        NFSeXml := DecodeToString(DeCompress(DecodeBase64(NFSeXml)), True);
+//        NFSeXml := DecodeToString(DeCompress(DecodeBase64(NFSeXml)), True);
+        NFSeXml := DeCompress(DecodeBase64(NFSeXml));
         LerNFSe(NFSeXml);
       end;
     except
@@ -1424,6 +1425,7 @@ procedure TACBrNFSeProviderPadraoNacional.TratarRetornoObterDANFSE(
   Response: TNFSeObterDANFSEResponse);
 var
   AErro: TNFSeEventoCollectionItem;
+  Document: TACBrJSONObject;
 begin
   if Response.ArquivoRetorno = '' then
   begin
@@ -1441,10 +1443,26 @@ begin
     Exit
   end;
 
-  Response.Sucesso := (Response.Erros.Count = 0);
+  Document := TACBrJsonObject.Parse(Response.ArquivoRetorno);
 
-  if Response.Sucesso then
-    SalvarPDFNfse(Response.ChaveNFSe, Response.ArquivoRetorno);
+  try
+    try
+      ProcessarMensagemDeErros(Document, Response, 'Erros');
+      Response.Sucesso := (Response.Erros.Count = 0);
+
+      if Response.Sucesso then
+        SalvarPDFNfse(Response.ChaveNFSe, Response.ArquivoRetorno);
+    except
+      on E:Exception do
+      begin
+        AErro := Response.Erros.New;
+        AErro.Codigo := Cod999;
+        AErro.Descricao := ACBrStr(Desc999 + E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Document);
+  end;
 end;
 
 procedure TACBrNFSeProviderPadraoNacional.ValidarSchema(

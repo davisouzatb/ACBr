@@ -976,7 +976,7 @@ begin
   Result := nil;
   if trim(NFe.Retirada.xLgr) <> '' then
   begin
-    AjustarMunicipioUF(xUF, xMun, cMun, NFe.Emit.EnderEmit.cPais,
+    AjustarMunicipioUF(xUF, xMun, cMun, NFe.Retirada.cPais,
       NFe.Retirada.UF, NFe.Retirada.xMun, NFe.Retirada.cMun);
     Result := FDocument.CreateElement('retirada');
     Result.AppendChild(AddNodeCNPJCPF('F02', 'F02a', NFe.Retirada.CNPJCPF, True, False));
@@ -1024,8 +1024,9 @@ begin
   Result := nil;
   if trim(NFe.Entrega.xLgr) <> '' then
   begin
-    AjustarMunicipioUF(xUF, xMun, cMun, NFe.Emit.EnderEmit.cPais,
+    AjustarMunicipioUF(xUF, xMun, cMun, NFe.Entrega.cPais,
       NFe.Entrega.UF, NFe.Entrega.xMun, NFe.Entrega.cMun);
+
     Result := FDocument.CreateElement('entrega');
     Result.AppendChild(AddNodeCNPJCPF('G02', 'G02a', NFe.Entrega.CNPJCPF, True, False));
     Result.AppendChild(AddNode(tcStr, 'G02b', 'xNome', 02, 60, 0,
@@ -4678,10 +4679,12 @@ begin
 
     if (IBSCBSTot.gIBS.vIBS > 0) or
        (IBSCBSTot.gIBS.gIBSUFTot.vDif > 0) or (IBSCBSTot.gIBS.gIBSMunTot.vDif > 0) or
-       (IBSCBSTot.gIBS.gIBSUFTot.vDevTrib > 0) or (IBSCBSTot.gIBS.gIBSMunTot.vDevTrib > 0) then
+       (IBSCBSTot.gIBS.gIBSUFTot.vDevTrib > 0) or (IBSCBSTot.gIBS.gIBSMunTot.vDevTrib > 0) or
+       (IBSCBSTot.gIBS.vCredPres > 0) or (IBSCBSTot.gIBS.vCredPresCondSus > 0) then
       Result.AppendChild(Gerar_IBSCBSTot_gIBS(IBSCBSTot.gIBS));
 
-    if (IBSCBSTot.gCBS.vCBS > 0) or (IBSCBSTot.gCBS.vDif > 0) or (IBSCBSTot.gCBS.vDevTrib > 0) then
+    if (IBSCBSTot.gCBS.vCBS > 0) or (IBSCBSTot.gCBS.vDif > 0) or (IBSCBSTot.gCBS.vDevTrib > 0) or
+      (IBSCBSTot.gCBS.vCredPres > 0) or (IBSCBSTot.gCBS.vCredPresCondSus > 0) then
       Result.AppendChild(Gerar_IBSCBSTot_gCBS(IBSCBSTot.gCBS));
 
     if (IBSCBSTot.gMono.vIBSMono > 0) or (IBSCBSTot.gMono.vCBSMono > 0) or

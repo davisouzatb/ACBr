@@ -230,7 +230,7 @@ type
                            no119,
                            no121,
                            no200, no201,
-                           no300, no301,
+                           no300, no301, no305,
                            no400,
                            no501, no511, no512, no515, no521, no522,
                            no539, no541, no549, no551,
@@ -252,7 +252,8 @@ const
     '91',
     '101', '102', '103', '104', '105', '106', '107', '108',
     '109', '110', '111', '112', '113', '114', '115', '116',
-    '117', '118', '119', '121', '200', '201', '300', '301', '400',
+    '117', '118', '119', '121', '200', '201', '300', '301', '305',
+    '400',
     '501', '511', '512', '515', '521', '522', '539', '541',
     '549', '551', '601', '602', '603',
     '611', '612', '613', '615', '616',
@@ -405,11 +406,11 @@ const
 
 type
   TvincPrest = (vpSemVinculo, vpControlada, vpControladora, vpColigada,
-                vpMatriz, vpFilial, vpOutro);
+                vpMatriz, vpFilial, vpOutro, vpDesconhecido);
 
 const
   TvincPrestArrayStrings: array[TvincPrest] of string = ('0', '1', '2', '3',
-    '4', '5', '6');
+    '4', '5', '6', '9');
 
 type
   TmecAFComexP = (mapsDesconhecido, mapsNenhum, mapsACC, mapsACE,
@@ -12593,7 +12594,8 @@ begin
                             '91',
                             '101', '102', '103', '104', '105', '106', '107', '108',
                             '109', '110', '111', '112', '113', '114', '115', '116',
-                            '117', '118', '119', '121', '200', '201', '300', '301', '400',
+                            '117', '118', '119', '121', '200', '201', '300', '301', '305',
+                            '400',
                             '501', '511', '512', '515', '521', '522', '539', '541',
                             '549', '551', '601', '602', '603',
                             '611', '612', '613', '615', '616',
@@ -12609,7 +12611,8 @@ begin
                             no91,
                             no101, no102, no103, no104, no105, no106, no107, no108,
                             no109, no110, no111, no112, no113, no114, no115, no116,
-                            no117, no118, no119, no121, no200, no201, no300, no301, no400,
+                            no117, no118, no119, no121, no200, no201, no300, no301, no305,
+                            no400,
                             no501, no511, no512, no515, no521, no522, no539, no541,
                             no549, no551, no601, no602, no603,
                             no611, no612, no613, no615, no616,
@@ -12629,7 +12632,8 @@ begin
                             '91',
                             '101', '102', '103', '104', '105', '106', '107', '108',
                             '109', '110', '111', '112', '113', '114', '115', '116',
-                            '117', '118', '119', '121', '200', '201', '300', '301', '400',
+                            '117', '118', '119', '121', '200', '201', '300', '301', '305',
+                            '400',
                             '501', '511', '512', '515', '521', '522', '539', '541',
                             '549', '551', '601', '602', '603',
                             '611', '612', '613', '615', '616',
@@ -12645,7 +12649,8 @@ begin
                             no91,
                             no101, no102, no103, no104, no105, no106, no107, no108,
                             no109, no110, no111, no112, no113, no114, no115, no116,
-                            no117, no118, no119, no121, no200, no201, no300, no301, no400,
+                            no117, no118, no119, no121, no200, no201, no300, no301, no305,
+                            no400,
                             no501, no511, no512, no515, no521, no522, no539, no541,
                             no549, no551, no601, no602, no603,
                             no611, no612, no613, no615, no616,
@@ -12965,17 +12970,19 @@ end;
 function vincPrestToStr(const t: TvincPrest): string;
 begin
   result := EnumeradoToStr(t,
-                           ['0', '1', '2', '3', '4', '5', '6'],
+                           ['0', '1', '2', '3', '4', '5', '6', '9'],
                            [vpSemVinculo, vpControlada, vpControladora,
-                            vpColigada, vpMatriz, vpFilial, vpOutro]);
+                            vpColigada, vpMatriz, vpFilial, vpOutro,
+                            vpDesconhecido]);
 end;
 
 function StrTovincPrest(out ok: Boolean; const s: string): TvincPrest;
 begin
   result := StrToEnumerado(ok, s,
-                           ['0', '1', '2', '3', '4', '5', '6'],
+                           ['0', '1', '2', '3', '4', '5', '6', '9'],
                            [vpSemVinculo, vpControlada, vpControladora,
-                            vpColigada, vpMatriz, vpFilial, vpOutro]);
+                            vpColigada, vpMatriz, vpFilial, vpOutro,
+                            vpDesconhecido]);
 end;
 
 function mecAFComexPToStr(const t: TmecAFComexP): string;

@@ -7435,6 +7435,7 @@ begin
       ArquivoWebServicesGNRe    := edtArquivoWebServicesGNRe.Text;
       ArquivoWebServiceseSocial := edtArquivoWebServiceseSocial.Text;
       ArquivoWebServicesReinf   := edtArquivoWebServicesReinf.Text;
+      ArquivoWebServicesNFSe    := edtArquivoWebServicesNFSe.Text;
       ValidarDigest             := cbValidarDigest.Checked;
       TimeoutWebService         := edtTimeoutWebServices.Value;
       QuebraDeLinha             := edtQuebraDeLinha.Text;
@@ -12354,6 +12355,7 @@ begin
   else if Configuracoes is TConfiguracoesNFSe then
   begin
     // Italo
+    TConfiguracoesNFSe(Configuracoes).Arquivos.IniServicos := edtArquivoWebServicesNFSe.Text;
     TConfiguracoesNFSe(Configuracoes).Geral.FormaEmissao := StrToTpEmis(OK, IntToStr(cbFormaEmissaoNFe.ItemIndex + 1));
     TConfiguracoesNFSe(Configuracoes).Geral.ConsultaLoteAposEnvio := cbxConsultarLoteAposEnvio.Checked;
     TConfiguracoesNFSe(Configuracoes).Geral.ConsultaAposCancelar := cbxConsultarAposCancelar.Checked;

@@ -45,6 +45,41 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+18/12/2025
+-- ACBrTEFAPIPayKit --
+[+] Adicionda as propriedades abaixo, para permitir informar valores na chamada
+    dos métodos 'TransacaoCartaoCreditoCompleta' e 'TransacaoCartaoDebitoCompleta'
+    property ValorParcela: Double
+    property ValorTaxaServico: Double
+    property PermiteAlteracao: Boolean
+
+-- ACBrTEFAPIAditum, ACBrTEFAPIDestaxa, ACBrTEFAPIDirectPin, ACBrTEFAPIPayKit,
+ACBrTEFAPIStoneAutoTEF, ACBrTEFDBanese, ACBrTEFDClass, ACBrTEFDCliDTEF,
+ACBrTEFDCliSiTef, ACBrTEFDPayGoWeb, ACBrTEFDTicketCar, ACBrTEFDVeSPague --
+[*] Troca de valores hardcoded por constantes, deixando o código mais claro
+
+-- ACBrTEFAPIComum --
+[+] Adicionada a propriedade "DataHoraIdentificador" em "TACBrTEFAPIRespostas"
+
+-- ACBrTEFAPICliSiTef --
+[*] Troca de valores hardcoded por constantes, deixando o código mais claro
+[-] Correção em TACBrTEFAPIClassCliSiTef.Inicializar, no calculo de 'ParamComunicacao'
+    quando o Ambiente é modificado pela propria rotina
+[*] Melhorias no fluxo, para usar sempre o mesmo Docto e DataHora em todas as
+    transações da mesma venda
+[*] Melhorias no fluxo, para detectar se precisa Confirmar as transações
+[*] Melhorias na rotina de Cancelamento, para Chamar Cancelamento Crédito ou Débito
+    se já tiver essa informação
+[*] Melhorias no fluxo de Confirmação das transações de Forma Individual
+    "FinalizarTransacaoIndividual := True"
+
+-- ACBrTEFCliSiTefComum --
+[*] Troca de valores hardcoded por constantes, deixando o código mais claro
+[*] 'ConteudoToPropertyCliSiTef' alimenta propriedade 'Finalizacao', para ajudar
+    na rotina de Cancelamento de Transaçao
+[*] Correção na gravação do Log de 'FinalizaFuncaoSiTefInterativo'
+    (por: DSA)
+
 12/12/2025
 -- ACBrTEFAPIComum --
 [+] Adição dos métodos: 'TACBrTEFAPIRespostas.Assign' e 'TACBrTEFAPIRespostas.Clear'

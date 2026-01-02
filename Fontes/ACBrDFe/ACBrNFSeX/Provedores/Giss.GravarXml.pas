@@ -90,8 +90,15 @@ begin
   inherited Configuracao;
 
   NrOcorrCodigoPaisServico := 0;
+
   NrOcorrCodigoPaisTomador := -1;
   NrOcorrcCredPres := -1;
+  NrOcorrDiscriminacao_1 := -1;
+  NrOcorrCodigoMunic_1 := -1;
+
+  NrOcorrDiscriminacao_2 := 1;
+  NrOcorrCodigoMunic_2 := 1;
+  NrOcorrExigibilidadeISS := 1;
 
   GerarDest := False;
   GerarImovel := False;
@@ -196,7 +203,8 @@ begin
   Result := inherited GerarValores;
 
   // Reforma Tributária
-  if NFSe.Servico.Valores.tribFed.CST <> cstVazio then
+  if (NFSe.Servico.Valores.tribFed.CST <> cstVazio) or
+    (NFSe.IBSCBS.valores.trib.gIBSCBS.CST <> cstNenhum) then
     Result.AppendChild(GerarTrib(NFSe.IBSCBS.valores.trib));
 
   if (NFSe.IBSCBS.dest.xNome <> '') or (NFSe.IBSCBS.imovel.cCIB <> '') or

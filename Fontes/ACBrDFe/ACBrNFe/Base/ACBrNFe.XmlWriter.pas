@@ -978,8 +978,13 @@ begin
   begin
     AjustarMunicipioUF(xUF, xMun, cMun, NFe.Retirada.cPais,
       NFe.Retirada.UF, NFe.Retirada.xMun, NFe.Retirada.cMun);
+
     Result := FDocument.CreateElement('retirada');
-    Result.AppendChild(AddNodeCNPJCPF('F02', 'F02a', NFe.Retirada.CNPJCPF, True, False));
+
+    if NFe.Retirada.CNPJCPF <> '' then
+      Result.AppendChild(AddNodeCNPJCPF('F02', 'F02a',
+                                            NFe.Retirada.CNPJCPF, True, False));
+
     Result.AppendChild(AddNode(tcStr, 'F02b', 'xNome', 02, 60, 0,
       NFe.Retirada.xNome, DSC_XNOME));
     Result.AppendChild(AddNode(tcStr, 'F03', 'xLgr', 02, 60, 1,
@@ -1028,7 +1033,11 @@ begin
       NFe.Entrega.UF, NFe.Entrega.xMun, NFe.Entrega.cMun);
 
     Result := FDocument.CreateElement('entrega');
-    Result.AppendChild(AddNodeCNPJCPF('G02', 'G02a', NFe.Entrega.CNPJCPF, True, False));
+
+    if NFe.Entrega.CNPJCPF <> '' then
+      Result.AppendChild(AddNodeCNPJCPF('G02', 'G02a',
+                                             NFe.Entrega.CNPJCPF, True, False));
+
     Result.AppendChild(AddNode(tcStr, 'G02b', 'xNome', 02, 60, 0,
       NFe.Entrega.xNome, DSC_XNOME));
     Result.AppendChild(AddNode(tcStr, 'G03', 'xLgr', 02, 60, 1,
@@ -4248,7 +4257,8 @@ begin
 //  cst410 = Imunidade e não incidência usado em praticante todos DF-e mas não se calcula IBS/CBS
 //  cst820 = Tributação em declaração de regime especifico usado na NFSe
 
-    if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) then
+    if (IBSCBS.gEstornoCred.vIBSEstCred > 0) or (IBSCBS.gEstornoCred.vCBSEstCred > 0) or
+      ((NFe.Ide.modelo = 55) and (NFe.Ide.tpNFDebito = tdPerdaEmEstoque)) then
       Result.AppendChild(Gerar_IBSCBS_gEstornoCred(IBSCBS.gEstornoCred));
 
     if (IBSCBS.gCredPresOper.cCredPres <> cpNenhum) then

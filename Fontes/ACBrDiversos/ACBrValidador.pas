@@ -924,7 +924,7 @@ end;
 
 procedure TACBrValidador.ValidarEmail;
 const
-  InvalidChar = ' àâêôûãõáéíóúçüñıÀÂÊÔÛÃÕÁÉÍÓÚÇÜÑİ*;:\|#$%&*§!()][{}<>˜ˆ´ªº+¹²³';
+  InvalidChar = ' àâêôûãõáéíóúçüñıÀÂÊÔÛÃÕÁÉÍÓÚÇÜÑİ*,;:\|#$%&*§!()][{}<>˜ˆ´ªº+¹²³';
 var
   i: Integer;
 begin
@@ -1288,7 +1288,7 @@ begin
   begin
      Tamanho  := 9 ;
      vDigitos := VarArrayOf(
-        ['DVX',c0_9,c0_9,c0_9,c0_9,c0_9,c0_9,'8','2','','','','',''] ) ;
+        ['DVX',c0_9,c0_9,c0_9,c0_9,c0_9,c0_9,'0,8','2,5','','','','',''] ) ;
   end ;
 
   if fsComplemento = 'MG' then

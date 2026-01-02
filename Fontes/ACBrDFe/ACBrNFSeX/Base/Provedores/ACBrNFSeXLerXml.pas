@@ -132,11 +132,11 @@ type
 
     //====== Ler o Arquivo INI===========================================
     // Reforma Tributária DPS
-    procedure LerINIIBSCBS(AINIRec: TMemIniFile; IBSCBS: TIBSCBSDPS);
+    procedure LerINIIBSCBS(AINIRec: TMemIniFile; IBSCBS: TIBSCBSDPS); virtual;
     procedure LerINIgRefNFSe(AINIRec: TMemIniFile; gRefNFSe: TgRefNFSeCollection);
     procedure LerINIDestinatario(AINIRec: TMemIniFile; Dest: TDadosdaPessoa);
     procedure LerINIImovel(AINIRec: TMemIniFile; Imovel: TDadosimovel);
-    procedure LerINIIBSCBSValores(AINIRec: TMemIniFile; Valores: Tvalorestrib);
+    procedure LerINIIBSCBSValores(AINIRec: TMemIniFile; Valores: Tvalorestrib); virtual;
     procedure LerINIDocumentos(AINIRec: TMemIniFile; Documentos: TdocumentosCollection);
     procedure LerINITributacao(AINIRec: TMemIniFile; Tributacao: Ttrib);
     procedure LerINIgIBSCBS(AINIRec: TMemIniFile; gIBSCBS: TgIBSCBS);
@@ -749,6 +749,10 @@ begin
       if sData <> '' then
         dhRecebimento := StringToDateTimeDef(sData, 0);
 
+      sData := AINIRec.ReadString(sSecao, 'DataFatoGerador', '');
+      if sData <> '' then
+        DataFatoGerador := StringToDateTimeDef(sData, 0);
+
       NaturezaOperacao := StrToNaturezaOperacao(Ok, AINIRec.ReadString(sSecao, 'NaturezaOperacao', '0'));
 
       // Provedor Tecnos
@@ -1040,6 +1044,10 @@ begin
       // Provedor ISSSalvador
       Servico.cClassTrib := AINIRec.ReadString(sSecao, 'cClassTrib', '');
       Servico.INDOP := AINIRec.ReadString(sSecao, 'INDOP', '');
+
+      //Provedor ISSSaoPaulo
+      Servico.CodigoNCM := AINIRec.ReadString(sSecao, 'CodigoNCM', '');
+      Servico.CodigoNBS := AINIRec.ReadString(sSecao, 'CodigoNBS', '');
     end;
 
     i := 1;
@@ -1301,6 +1309,10 @@ begin
 
       // Provedor Equiplano
       Servico.Valores.dsImpostos := AINIRec.ReadString(sSecao, 'dsImpostos', '');
+
+      // Provedor IssSaoPaulo
+      Servico.Valores.ValorIPI := StringToFloatDef(AINIRec.ReadString(sSecao, 'ValorIPI', ''), 0);
+
     end;
 
     sSecao := 'ValoresNFSe';

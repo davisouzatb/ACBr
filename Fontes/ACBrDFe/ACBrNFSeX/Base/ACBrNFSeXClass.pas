@@ -864,6 +864,8 @@ type
     FINDOP: string;
     FCodigoServicoNacional: string;
     FCodigoMunicipioLocalPrestacao: Integer;
+    FxPed: String;
+    FnItemPed: String;
 
     procedure SetItemServico(Value: TItemServicoCollection);
     procedure SetDeducao(const Value: TDeducaoCollection);
@@ -932,6 +934,9 @@ type
     property CodigoServicoNacional: string read FCodigoServicoNacional write FCodigoServicoNacional;
     // Provedor Publica
     property CodigoMunicipioLocalPrestacao: Integer read FCodigoMunicipioLocalPrestacao write FCodigoMunicipioLocalPrestacao;
+    // Provedor Tecnos
+    property xPed: String read FxPed write FxPed;
+    property nItemPed: String read FnItemPed write FnItemPed;
   end;
 
   TDadosPessoa = class(TObject)
@@ -1059,6 +1064,10 @@ type
     FnMatri: string;
     FnNumeroEncapsulamento: string;
     FinscImobFisc: String;
+    FTipo: Integer;
+    FReformaCivil: TnfseSimNao;
+    FLocalConstrucao: string;
+    FCib: Integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -1073,6 +1082,12 @@ type
     property nNumeroEncapsulamento: string read FnNumeroEncapsulamento write FnNumeroEncapsulamento;
     // Provedor PadraoNacional
     property inscImobFisc: String read FinscImobFisc write FinscImobFisc;
+    // Provedor Publica
+    property Tipo: Integer read FTipo write FTipo;
+    //Provedor Tecnos
+    property ReformaCivil: TnfseSimNao read FReformaCivil write FReformaCivil;
+    property LocalConstrucao: string read FLocalConstrucao write FLocalConstrucao;
+    property Cib: Integer read FCib write FCib;
   end;
 
   TParcelasCollectionItem = class(TObject)
@@ -2064,6 +2079,7 @@ type
     FTransacao: TnfseSimNao;
     FInformacoesComplementares: string;
 
+    FDataFatoGerador: TDateTime;
     FPercentualCargaTributaria: Double;
     FValorCargaTributaria: Double;
     FPercentualCargaTributariaMunicipal: Double;
@@ -2191,6 +2207,7 @@ type
     property RegRec: TRegRec read FRegRec write FRegRec;
     property FrmRec: TFrmRec read FFrmRec write FFrmRec;
     // Provedor Techos
+    property DataFatoGerador: TDateTime read FDataFatoGerador write FDataFatoGerador;
     property PercentualCargaTributaria: Double read FPercentualCargaTributaria write FPercentualCargaTributaria;
     property ValorCargaTributaria: Double read FValorCargaTributaria write FValorCargaTributaria;
     property PercentualCargaTributariaMunicipal: Double read FPercentualCargaTributariaMunicipal write FPercentualCargaTributariaMunicipal;

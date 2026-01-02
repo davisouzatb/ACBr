@@ -38,7 +38,8 @@ interface
 
 uses
   SysUtils, Classes, StrUtils,
-  ACBrXmlDocument,
+  ACBrXmlDocument, IniFiles,
+  ACBrDFe.Conversao, ACBrNFSeXClass,
   ACBrNFSeXLerXml_ABRASFv2;
 
 type
@@ -46,6 +47,12 @@ type
 
   TNFSeR_Tecnos201 = class(TNFSeR_ABRASFv2)
   protected
+    procedure LerConstrucaoCivil(const ANode: TACBrXmlNode); override;
+    //======Arquivo INI===========================================
+    procedure LerINISecaoConstrucaoCivil(const AINIRec: TMemIniFile); override;
+    procedure LerINISecaoServico(const AINIRec: TMemIniFile); override;
+    procedure LerINIIBSCBS(AINIRec: TMemIniFile; IBSCBS: TIBSCBSDPS); override;
+    procedure LerINIIBSCBSValores(AINIRec: TMemIniFile; Valores: Tvalorestrib); override;
 
   public
     function LerXmlNfse(const ANode: TACBrXmlNode): Boolean; override;
@@ -63,6 +70,105 @@ uses
 //==============================================================================
 
 { TNFSeR_Tecnos201 }
+
+procedure TNFSeR_Tecnos201.LerConstrucaoCivil(const ANode: TACBrXmlNode);
+var
+  lAuxNode: TACBrXmlNode;
+  Ok: Boolean;
+begin
+  if not Assigned(ANode) then Exit;
+
+  lAuxNode := ANode.Childrens.FindAnyNs('ConstrucaoCivil');
+
+  if Assigned(lAuxNode) then
+  begin
+    NFSe.ConstrucaoCivil.LocalConstrucao := ObterConteudo(lAuxNode.Childrens.FindAnyNs('LocalConstrucao'), tcStr);
+    NFSe.ConstrucaoCivil.CodigoObra := ObterConteudo(lAuxNode.Childrens.FindAnyNs('CodigoObra'), tcStr);
+    NFSe.ConstrucaoCivil.Art := ObterConteudo(lAuxNode.Childrens.FindAnyNs('Art'), tcStr);
+    NFSe.ConstrucaoCivil.ReformaCivil := FpAOwner.StrToSimNao(Ok, ObterConteudo(lAuxNode.Childrens.FindAnyNs('ReformaCivil'), tcStr));
+    NFSe.ConstrucaoCivil.Cib := ObterConteudo(lAuxNode.Childrens.FindAnyNs('Cib'), tcInt);
+    NFSe.ConstrucaoCivil.Endereco.UF := ObterConteudo(lAuxNode.Childrens.FindAnyNs('EstadoObra'), tcStr);
+    NFSe.ConstrucaoCivil.Endereco.CodigoMunicipio := ObterConteudo(lAuxNode.Childrens.FindAnyNs('CidadeObra'), tcStr);
+    NFSe.ConstrucaoCivil.Endereco.Endereco := ObterConteudo(lAuxNode.Childrens.FindAnyNs('EnderecoObra'), tcStr);
+    NFSe.ConstrucaoCivil.Endereco.Numero := ObterConteudo(lAuxNode.Childrens.FindAnyNs('NumeroObra'), tcStr);
+    NFSe.ConstrucaoCivil.Endereco.Bairro := ObterConteudo(lAuxNode.Childrens.FindAnyNs('BairroObra'), tcStr);
+    NFSe.ConstrucaoCivil.Endereco.CEP := ObterConteudo(lAuxNode.Childrens.FindAnyNs('CepObra'), tcStr);
+    NFSe.ConstrucaoCivil.Endereco.Complemento := ObterConteudo(lAuxNode.Childrens.FindAnyNs('ComplementoObra'), tcStr);
+  end;
+end;
+
+procedure TNFSeR_Tecnos201.LerINIIBSCBS(AINIRec: TMemIniFile; IBSCBS: TIBSCBSDPS);
+begin
+  LerINIIBSCBSValores(AINIRec, IBSCBS.valores);
+end;
+
+procedure TNFSeR_Tecnos201.LerINIIBSCBSValores(AINIRec: TMemIniFile; Valores: Tvalorestrib);
+var
+  lSecao: String;
+begin
+  lSecao := 'IBSCBSValores';
+  if AINIRec.SectionExists(lSecao) then
+  begin
+    NFSe.IBSCBS.valores.IbsMunicipal := AINIRec.ReadFloat(lSecao, 'IbsMunicipal', 0);
+    NFSe.IBSCBS.valores.ValorIbsMunicipal := AINIRec.ReadFloat(lSecao, 'ValorIbsMunicipal', 0);
+    NFSe.IBSCBS.valores.IbsEstadual := AINIRec.ReadFloat(lSecao, 'IbsEstadual', 0);
+    NFSe.IBSCBS.valores.ValorIbsEstadual := AINIRec.ReadFloat(lSecao, 'ValorIbsEstadual', 0);
+    NFSe.IBSCBS.valores.Cbs := AINIRec.ReadFloat(lSecao, 'Cbs', 0);
+    NFSe.IBSCBS.valores.ValorCbs := AINIRec.ReadFloat(lSecao, 'ValorCbs', 0);
+  end;
+end;
+
+procedure TNFSeR_Tecnos201.LerINISecaoConstrucaoCivil(const AINIRec: TMemIniFile);
+var
+  lSecao: String;
+  Ok: Boolean;
+begin
+  lSecao := 'ConstrucaoCivil';
+
+  if AINIRec.SectionExists(LSecao) then
+  begin
+    NFSe.ConstrucaoCivil.LocalConstrucao := AINIRec.ReadString(lSecao, 'LocalConstrucao', EmptyStr);
+    NFSe.ConstrucaoCivil.CodigoObra := AINIRec.ReadString(LSecao, 'CodigoObra', EmptyStr);
+    NFSe.ConstrucaoCivil.Art := AINIRec.ReadString(LSecao, 'Art', EmptyStr);
+    NFSE.ConstrucaoCivil.ReformaCivil := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(lSecao, 'ReformaCivil', EmptyStr));
+    NFSE.ConstrucaoCivil.Cib := AINIRec.ReadInteger(lSecao, 'Cib', 0);
+    NFSe.ConstrucaoCivil.Endereco.UF := AINIRec.ReadString(lSecao, 'UF', EmptyStr);
+    NFSe.ConstrucaoCivil.Endereco.CodigoMunicipio := AINIRec.ReadString(lSecao, 'CodigoMunicipio', EmptyStr);
+    NFSe.ConstrucaoCivil.Endereco.Endereco := AINIRec.ReadString(lSecao, 'Logradouro', EmptyStr);
+    NFSE.ConstrucaoCivil.Endereco.Numero := AINIRec.ReadString(lSecao, 'Numero', '0');
+    NFSe.ConstrucaoCivil.Endereco.Bairro := AINIRec.ReadString(lSecao, 'Bairro', EmptyStr);
+    NFSe.ConstrucaoCivil.Endereco.CEP := AINIRec.ReadString(lSecao, 'CEP', EmptyStr);
+    NFSe.ConstrucaoCivil.Endereco.Complemento := AINIRec.ReadString(lSecao, 'Complemento', EmptyStr);
+  end;
+end;
+
+procedure TNFSeR_Tecnos201.LerINISecaoServico(const AINIRec: TMemIniFile);
+var
+  lSecao: String;
+  Ok: Boolean;
+begin
+  lSecao := 'Servico';
+  if AINIRec.SectionExists(lSecao) then
+  begin
+    NFSe.Servico.ResponsavelRetencao := FpAOwner.StrToResponsavelRetencao(Ok, AINIRec.ReadString(lSecao, 'ResponsavelRetencao', FpAOwner.ResponsavelRetencaoToStr(NFSe.Servico.ResponsavelRetencao)));
+    NFSe.Servico.ItemListaServico := AINIRec.ReadString(lSecao, 'ItemListaServico', NFSe.Servico.ItemListaServico);
+    NFSe.Servico.xItemListaServico := AINIRec.ReadString(lSecao, 'xItemListaServico', NFSe.Servico.xItemListaServico);
+    NFSe.Servico.CodigoCnae := AINIRec.ReadString(lSecao, 'CodigoCnae', NFSe.Servico.CodigoCnae);
+    NFSe.Servico.CodigoTributacaoMunicipio := AINIRec.ReadString(lSecao, 'CodigoTributacaoMunicipio', NFSe.Servico.CodigoTributacaoMunicipio);
+    NFSe.Servico.xCodigoTributacaoMunicipio := AINIRec.ReadString(lSecao, 'xCodigoTributacaoMunicipio', NFSe.Servico.xCodigoTributacaoMunicipio);
+    NFSe.Servico.Discriminacao := AINIRec.ReadString(lSecao, 'Discriminacao', NFSe.Servico.Discriminacao);
+    NFSe.Servico.CodigoMunicipio := AINIRec.ReadString(lSecao, 'CodigoMunicipio', NFSe.Servico.CodigoMunicipio);
+    NFSe.Servico.CodigoPais := AINIRec.ReadInteger(lSecao, 'CodigoPais', NFSe.Servico.CodigoPais);
+    NFSe.Servico.ExigibilidadeISS := FpAOwner.StrToExigibilidadeISS(Ok, AINIRec.ReadString(lSecao, 'ExigibilidadeISS', FpAOwner.ExigibilidadeISSToStr(NFSe.Servico.ExigibilidadeISS)));
+    NFSe.Servico.MunicipioIncidencia := AINIRec.ReadInteger(lSecao, 'MunicipioIncidencia', NFSe.Servico.MunicipioIncidencia);
+    NFSe.Servico.xMunicipioIncidencia := AINIRec.ReadString(lSecao, 'xMunicipioIncidencia', NFSe.Servico.xMunicipioIncidencia);
+    NFSe.Servico.NumeroProcesso := AINIRec.ReadString(lSecao, 'NumeroProcesso', NFSe.Servico.NumeroProcesso);
+    NFSe.Servico.xPed := AINIRec.ReadString(lSecao, 'xPed', NFSe.Servico.xPed);
+    NFSE.Servico.nItemPed := AINIRec.ReadString(lSecao, 'nItemPed', NFSE.Servico.nItemPed);
+    NFSe.Servico.CodigoNBS := AINIRec.ReadString(lSecao, 'CodigoNBS', NFSe.Servico.CodigoNBS);
+    NFSe.Servico.CodigoServicoNacional := AINIRec.ReadString(lSecao, 'CodigoServicoNacional', NFSe.Servico.CodigoServicoNacional);
+  end;
+end;
 
 function TNFSeR_Tecnos201.LerXmlNfse(const ANode: TACBrXmlNode): Boolean;
 var

@@ -44,6 +44,21 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+30/12/2025
+-- ACBrNFe.Conversao/pcnConversaoNFe --
+[*] #ACBR-8623 - Atualiza o enumerado do CSTIS e a respectiva função de conversão StrToCST.
+  Por: Daniel Ostoic / Diego Folieni
+
+23/12/2025
+-- ACBrNFe.EventoClass --
+[*] #ACBR-8532 - Complementa a rotina DescricaoTipoEvento utilizada para nomear o evento no impresso do Fast Reports.
+  Por: Diego Folieni
+
+16/12/2025
+-- ACBrNFe.XmlWriter --
+[*] No grupo Retirada e Entrega o CNPJ é opcional.
+  Por: Italo Giurizzato Junior
+
 12/12/2025
 -- ACBrNFe.ValidarRegrasdeNegocio --
 [*] Comentado a validação da regra 571, pois não existe mais.

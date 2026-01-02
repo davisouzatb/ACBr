@@ -55,7 +55,10 @@ type
 
   TACBrTEFAPIClassPayKit = class(TACBrTEFAPIClass)
   private
+    fPermiteAlteracao: Boolean;
     fTempoMsgPinPad: Integer;
+    fValorParcela: Double;
+    fValorTaxaServico: Double;
     function GetTEFPayKitAPI: TACBrTEFPayKitAPI;
 
     procedure QuandoGravarLogAPI(const ALogLine: String; var Tratado: Boolean);
@@ -128,6 +131,10 @@ type
 
     property TEFPayKitAPI: TACBrTEFPayKitAPI read GetTEFPayKitAPI;
     property TempoMsgPinPad: Integer read fTempoMsgPinPad write fTempoMsgPinPad default 5000;
+
+    property ValorParcela: Double read fValorParcela write fValorParcela;
+    property ValorTaxaServico: Double read fValorTaxaServico write fValorTaxaServico;
+    property PermiteAlteracao: Boolean read fPermiteAlteracao write fPermiteAlteracao;
   end;
 
 implementation
@@ -148,15 +155,15 @@ var
   jso, jsLog: TACBrJSONObject;
   dh: TDateTime;
 begin
-  fpCNFEnviado := (UpperCase(Conteudo.LeInformacao(899,1).AsString) = 'S');
-  fpHeader := Conteudo.LeInformacao(899,100).AsString;
+  fpCNFEnviado := (UpperCase(Conteudo.LeInformacao(899, CTEF_RESP_CONFIRMADO).AsString) = 'S');
+  fpHeader := Conteudo.LeInformacao(899, CTEF_RESP_HEADER).AsString;
 
-  cupom := StringToBinaryString(Conteudo.LeInformacao(899,300).AsString);
+  cupom := StringToBinaryString(Conteudo.LeInformacao(899, CTEF_RESP_TEXTO_CUPOM).AsString);
   ImagemComprovante1aVia.Text := cupom;
   ImagemComprovante2aVia.Text := cupom;
   Confirmar := (cupom <> '');
 
-  json := Trim(Conteudo.LeInformacao(899,200).AsString);
+  json := Trim(Conteudo.LeInformacao(899, CTEF_RESP_JSON).AsString);
   jso := TACBrJSONObject.Parse(json);
   try
     jsLog := jso.AsJSONObject['LogTransacao'];
@@ -232,6 +239,9 @@ begin
 
   fpTEFRespClass := TACBrTEFRespPayKit;
   fTempoMsgPinPad := 5000;
+  fValorParcela := 0;
+  fValorTaxaServico := 0;
+  fPermiteAlteracao := False;
 
   with GetTEFPayKitAPI do
   begin
@@ -345,8 +355,8 @@ begin
   with fpACBrTEFAPI.UltimaRespostaTEF do
   begin
     Clear;
-    Conteudo.GravaInformacao(899,200, json);
-    Conteudo.GravaInformacao(899,300, BinaryStringToString(Cupom) );
+    Conteudo.GravaInformacao(899, CTEF_RESP_JSON, json);
+    Conteudo.GravaInformacao(899, CTEF_RESP_TEXTO_CUPOM, BinaryStringToString(Cupom) );
     DocumentoVinculado := fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao;
     AtualizarHeader;
     ConteudoToProperty;
@@ -634,7 +644,9 @@ begin
         //  StrToIntDef(fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao, 0));
         NumeroControle := TransacaoCartaoCreditoCompleta( ValorPagto,
           StrToIntDef(fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao, 0),
-          TipoOp, Parcelas, 0, 0, False, DadosAdicionais);
+          TipoOp, Parcelas,
+          fValorParcela, fValorTaxaServico, fPermiteAlteracao,
+          DadosAdicionais);
       end
       else if (teftcDebito in CartoesAceitos) then
       begin
@@ -650,7 +662,9 @@ begin
         //  StrToIntDef(fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao, 0));
         NumeroControle := TransacaoCartaoDebitoCompleta( ValorPagto,
           StrToIntDef(fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao, 0),
-          TipoOp, Parcelas, 1, DataPreDatado, 0, 0, False, DadosAdicionais);
+          TipoOp, Parcelas, 1, DataPreDatado,
+          fValorParcela, fValorTaxaServico, fPermiteAlteracao,
+          DadosAdicionais);
       end
       else if (teftcVoucher in CartoesAceitos) then
       begin
@@ -685,6 +699,10 @@ begin
       fpACBrTEFAPI.DoException(Format(ACBrStr(sACBrTEFAPICapturaNaoSuportada),
         [GetEnumName(TypeInfo(TACBrTEFModalidadePagamento), integer(Modalidade) ), ClassName] ));
   end;
+
+  fValorParcela := 0;
+  fValorTaxaServico := 0;
+  fPermiteAlteracao := False;
 
   Result := (NumeroControle <> '');
 end;

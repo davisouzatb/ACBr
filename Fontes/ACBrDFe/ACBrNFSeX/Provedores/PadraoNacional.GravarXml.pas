@@ -163,6 +163,7 @@ uses
   ACBrUtil.Strings,
   ACBrNFSeXConsts,
   ACBrDFe.Conversao,
+  ACBrNFSeX,
   ACBrNFSeXConversao,
   ACBrValidador;
 
@@ -317,11 +318,17 @@ end;
 
 function TNFSeW_PadraoNacional.GerarXMLDPS: TACBrXmlNode;
 var
-  chave: string;
+  chave, CodigoMun, CNPJ: string;
   xmlNode: TACBrXmlNode;
 begin
-  chave := GerarChaveDPS(NFSe.Prestador.Endereco.CodigoMunicipio,
-                         NFSe.Prestador.IdentificacaoPrestador.CpfCnpj,
+  CodigoMun := IntToStr(CodMunEmit);
+  CNPJ := CNPJEmitente;
+
+  if CNPJ = '' then
+    CNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
+
+  chave := GerarChaveDPS(CodigoMun,
+                         CNPJ,
                          NFSe.IdentificacaoRps.Serie,
                          NFSe.IdentificacaoRps.Numero);
 
@@ -337,16 +344,22 @@ end;
 
 function TNFSeW_PadraoNacional.GerarXMLInfNFSe: TACBrXmlNode;
 var
-  chave, xLocEmi, xUF, xLocPrestacao, xLocIncid: string;
+  chave, xLocEmi, xUF, xLocPrestacao, xLocIncid, CodigoMun, CNPJ: string;
   xmlNode: TACBrXmlNode;
 begin
-  chave := GerarChaveNFSe(NFSe.Prestador.Endereco.CodigoMunicipio,
-                         ambGerToStr(NFSe.infNFSe.ambGer),
-                         NFSe.Prestador.IdentificacaoPrestador.CpfCnpj,
-                         NFSe.infNFSe.nNFSe,
-                         NFSe.Prestador.Endereco.UF,
-                         NFSe.infNFSe.dhProc,
-                         StrToInt64Def(NFSe.infNFSe.nDFSe, 1));
+  CodigoMun := IntToStr(CodMunEmit);
+  CNPJ := CNPJEmitente;
+
+  if CNPJ = '' then
+    CNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
+
+  chave := GerarChaveNFSe(CodigoMun,
+                          ambGerToStr(NFSe.infNFSe.ambGer),
+                          CNPJ,
+                          NFSe.infNFSe.nNFSe,
+                          NFSe.Prestador.Endereco.UF,
+                          NFSe.infNFSe.dhProc,
+                          StrToInt64Def(NFSe.infNFSe.nDFSe, 1));
 
   chave := 'NFS' + chave;
 
@@ -1580,7 +1593,7 @@ end;
 function TNFSeW_PadraoNacional.GerarXml: Boolean;
 var
   NFSeNode, xmlNode: TACBrXmlNode;
-  chave: string;
+  chave, CodigoMun, CNPJ: string;
 begin
   Configuracao;
 
@@ -1590,8 +1603,14 @@ begin
 
   FpVersao := VersaoNFSeToStr(VersaoNFSe);
 
-  chave := GerarChaveDPS(NFSe.Prestador.Endereco.CodigoMunicipio,
-                         NFSe.Prestador.IdentificacaoPrestador.CpfCnpj,
+  CodigoMun := IntToStr(CodMunEmit);
+  CNPJ := CNPJEmitente;
+
+  if CNPJ = '' then
+    CNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
+
+  chave := GerarChaveDPS(CodigoMun,
+                         CNPJ,
                          NFSe.IdentificacaoRps.Serie,
                          NFSe.IdentificacaoRps.Numero);
 

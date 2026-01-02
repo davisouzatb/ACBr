@@ -44,6 +44,21 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+29/12/2025
+--- ACBrMonitor1 ---
+[*] Correção na configuração do IniServicos do ACBrNFSeX.
+    Por: Italo Giurizzato Junior
+--- DoACBrNFSeUnit, ACBrMonitorConsts, ACBrMonitor1 ---
+[+] Adicionado novo metodo NFSe.SetPathArquivoWebServices
+    Por: Daniel de Morais Infocotidiano
+
+23/12/2025
+--- ACBrMonitor1 ---
+[-] Adicionado No salvar ini a propriedade edtArquivoWebServicesNFSe.Text
+	ACBR-8642 - https://discordapp.com/channels/798697718800318484/1394678716344434708/1453009746733826048
+    Por: Daniel de Morais Infocotidiano
+
+
 12/11/2025
 --- ExtratoAPI ---
 [+] ACBR-8222 - Implementação do ExtratoAPI

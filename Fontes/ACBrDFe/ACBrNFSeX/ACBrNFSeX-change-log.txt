@@ -42,6 +42,177 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+02/01/2026
+-- ACBrNFSeXDANFSeRLRetrato --
+[*] ACBR-8687: Alteração visando não imprimir duas vezes as informações complementares do Padrão Nacional.
+  Por: João Vitor Bogo
+-- GeisWeb.GravarXml/GeisWeb.Provider --
+[*] ACBR-8688: Alterações visando o novo webservice do provedor.
+  Por: Italo Giurizzato Junior
+-- Publica.GravarXml/Publica.LerXml --
+[*] ACBR-8689: Ajustes na geração do XML com os novos campos da Reforma Tributária
+  Por: Roger Rodrigues
+-- GovDigital.GravarXml --
+[+] ACBR-8671: Alterações visando atender a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+-- ACBrNFSeXConversao/SpeedGov.GravarXml/SpeedGov.Provider --
+[+] ACBR-8675: Alterações visando atender a Reforma Tributária.
+  Por: Dorivan Sousa
+-- Pronim.Provider --
+[+] ACBR-8695: Implementado o envio de eventos.
+  Por: Italo Giurizzato Junior
+-- Giss.GravarXml --
+[*] ACBR-8597: Alterado a condição para gerar o grupo <trib>
+  Por: Alessandro dos Santos/Marcelo DeSoft7
+
+31/12/2025
+-- ACBrNFSeXLerXml.pas --
+[*] Adicionado campos utilizado provedor ISSSaoPaulo lerINI
+  Por: Italo Giurizzato Junior/ Daniel de Morais InfoCotidiano
+
+30/12/2025
+-- PadraoNacional.Provider --
+[-] ACBR-8678: Remove o elemento nPedRegEvento do evento e do Id.
+  Por: Diego Folieni / Italo Giurizzato Junior
+-- SilTecnologia.Provider --
+[*] Ajustes no Tratar XML Retornado.
+  Por: Italo Giurizzato Junior
+-- Publica.GravarXml --
+[*] ACBR-8676: Ajustes na geração do grupo Serviço.
+  Por: Suporte Bravus Sistemas
+-- Citta.Provider --
+[+] ACBR-8677: Implementação do método de Cancelamento da NFS-e.
+  Por: Dalvan
+
+29/12/2025
+-- Coplan.Provider --
+[*] ACBR-8631: Implementação de alguns métodos que estavam faltando.
+  Por: Márcio Baroni
+-- ACBrNFSeXGravarXml/ACBrNFSeXLerXml/Tecnos.GravarXml/Tecnos.LerXml
+[*] ACBR-8599: Altera as rotinas de leitura e escrita do INI para receber as informações do IBSCBS e deixar mais fidedignas.
+  Por: Diego Folieni
+-- ACBrNFSeXGravarXml/EloTech.GravarXml --
+[*] ACBR-8630: Alteração visando atender a alteração feita pelo provedor para a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml/GeisWeb.GravarXml/GeisWeb.LerXml/GeisWeb.Provider --
+[*] ACBR-8633: Alteração visando atender a alteração feita pelo provedor para a Reforma Tributária.
+  Por: Italo Giurizzato Junior
+-- Tecnos.LerXML --
+[-] Corrige a leitura do campo Cib do grupo ConstrucaoCivil
+  Por: MGWare Dev
+
+26/12/2025
+-- ACBrNFSeXClass/Tecnos.GravarXML/Tecnos.LerXML --
+[*] ACBR-8593: Ajuste visando compatibilização com alteração feita pelo provedor para adequar a Reforma Tributária
+  Por: Diego Folieni
+-- ACBrNFSeXClass/ACBrNFSeXConsts/ACBrNFSeXLerXml_ABRASFv2/Tecnos.GravarXml/Tecnos.LerXml --
+[-] ACBR-8593: Adiciona a geração e a leitura dos campos faltantes para o grupo ConstrucaoCivil
+  Por: Diego Folieni
+
+23/12/2025
+-- ACBrNFSeXProviderManager/Coplan.GravarXml/Coplan.LerXml/Coplan.Provider --
+[*] ACBR-8631: Implementação da API Própria do Provedor Coplan que vai usar um WS Soap.
+   Por: Márcio Baroni
+23/12/2025
+-- Tiplan.GravarXml --
+[*] ACBR-8619: O provedor também fez alterações no layout em uso, ajustes no componente
+    visando essa alteração no layout.
+   Por: Luis AGSI
+
+22/12/2025
+-- ACBrNFSeXServicosRTC.ini --
+[*] ACBR-8636: A cidade Santo Antônio de Pádua/RJ mudou para o provedor PadraoNacional.
+   Por: Fernando Souza DNA
+[*] ACBR-8637: A cidade Atibaia/SP mudou para o provedor PadraoNacional.
+   Por: Luis AGSI
+-- ACBrNFSeXServicos --
+[*] ACBR-8627: A cidade Santo Antônio/RS mudou para o provedor IPM.
+   Por: HPR sistemas
+-- ABase.Provider --
+[+] ACBR-8605: Implementado as Consultas por Lote e por chave do DPS.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicosRTC.ini --
+[*] Atualização, novas cidades que aderiram ao Padrão Nacional.
+   Por: Italo Giurizzato Junior
+
+21/12/2025
+-- ACBrNFSeXConfiguracoes -- 
+[*] Alteração visando ler os campos Versao e Params da seção do provedor.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml_ABRASFv2 --
+[*] Removido a função OnlyNumber do campo CodigoNbs.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] Removido do arquivo as novas URLs para 2026.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicosRTC.ini --
+[+] Criado o novo arquivo somente com as novas URLs para 2026.
+   Por: Italo Giurizzato Junior
+
+19/12/2025
+-- PadraoNacional.Provider --
+[-] ACBR-8607 Ajuste visando sanar falha no retorno do ObterDANFSe quando o mesmo for um PDF.
+   Por: marcosvillatore /Diego Folieni 
+-- Publica.Provider --
+[*] ACBr-8616 Alterado o método Configuração para assinar o Rps.
+   Por: leonardo.gomes
+-- ACBrNFSeXConversao/ACBrNFSeXProviderBase --
+[*] ACBr-8614 Incluído a Natureza da Operação 305.
+   Por: Gustavo Totta
+-- ACBrNFSeXClass/ACBrNFSeXLerXml/ACBrNFSeXLerXml_ABRASFv2/Tecnos.GravarXml --
+[*] ACBr-8611 Alteração visando gerar e ler a tag DataFatoGerador.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXProviderManager/ABase.GravarXml/ABase.LerXml/ABase.Provider --
+[+] ACBr-8605 Implementado a API própria no provedor ABase, por enquanto somente o envio do DPS.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBr-8605 Criada a seção ABasePN para conter as URLs de homologação e produção a ser utilizadas
+    pelo provedor ABase em sua API própria (falta implementar a API própria no componente).
+   Por: Eduardo Zils
+[*] ACBr-8603 A cidade Lagoa da Prata/MG mudou de versão e URLs, o provedor continua o mesmo.
+   Por: João Antônio
+[*] ACBr-8602 A cidade Rio das Antas/SC mudou de versão e URLs, o provedor continua o mesmo.
+   Por: Wesley Lamb
+[*] ACBr-8601 A cidade Criciúma/SC mudou para o PadraoNacional.
+   Por: BluData
+[*] ACBr-8598 Incluída  URL de homologação da cidade de Mercedes/PR.
+   Por: Arthur Haupt Pacheco
+[*] ACBr-8594 Correção na URLs da cidade de Cáceres/MT, o provedor continua o mesmo.
+   Por: Fernando Henrique
+
+18/12/2025
+-- ACBrNFSeXServicos --
+[*] Correção nas novas URLs o provedor RLZ
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.GravarXml --
+[*] ACBR-8559 - Possível solução para gerar o ID corretamente após a carga do XML de um DPS.
+   Por: Italo Giurizzato Junior
+
+17/12/2025
+-- ACBrNFSeXServicos --
+[*] Correção da HomLinkURL de produção restrita do padrão nacional
+   Por: Renato Rubinho
+
+16/12/2025
+-- ACBrNFSeXServicos --
+[*] ACBr-8587 Incluído o Params NaoAssinar para a cidade Avare/SP.
+   Por: Anderson Grolli
+[*] A cidade Armação dos Búzios/RJ trocou de provedor, agora é EL versão 2.04.
+   Por: Light System Software
+
+15/12/2025
+-- Diversos --
+[*] Ajustes para o provedor Publica no que se refere a Construção Civil.
+   Por: Ivan
+-- Giss.GravarXml --
+[*] Ajustes para não ocorrer erro de validação com o novo campo CodigoNBS.
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.GravarXml --
+[*] ACBR-8559 - Possível solução para gerar o ID corretamente após a carga do XML de um DPS.
+   Por: Italo Giurizzato Junior
+-- Citta.Provider --
+[+] ACBR-8575 - Implementado a Consulta da NFSe pela chave do RPS.
+   Por: Italo Giurizzato Junior
 
 12/12/2025
 -- Infisc.Provider/PadraoNacional.Provider --

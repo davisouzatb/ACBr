@@ -83,12 +83,12 @@
                                                         <xsd:element name="Aliquota" type="xsd:decimal" />
                                                         <xsd:element name="DescontoIncondicionado" type="xsd:decimal" />
                                                         <xsd:element name="DescontoCondicionado" type="xsd:decimal" />
-							<xsd:element name="IbsMunicipal" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
-							<xsd:element name="ValorIbsMunicipal" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
-							<xsd:element name="IbsEstadual" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
-							<xsd:element name="ValorIbsEstadual" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
-							<xsd:element name="Cbs" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
-							<xsd:element name="ValorCbs" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+														<xsd:element name="IbsMunicipal" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+														<xsd:element name="ValorIbsMunicipal" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+														<xsd:element name="IbsEstadual" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+														<xsd:element name="ValorIbsEstadual" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+														<xsd:element name="Cbs" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+														<xsd:element name="ValorCbs" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
                                                       </xsd:sequence>
                                                     </xsd:complexType>
                                                   </xsd:element>
@@ -103,8 +103,10 @@
                                                   <xsd:element name="ExigibilidadeISS" type="xsd:unsignedByte" />
                                                   <xsd:element name="MunicipioIncidencia" type="xsd:unsignedLong" />
                                                   <xsd:element name="NumeroProcesso" />
-						  <xsd:element name="CodigoNBS" type="xsd:unsignedLong" minOccurs="0" maxOccurs="1"/>
-						  <xsd:element name="CodigoServicoNacional" type="xsd:unsignedLong" minOccurs="0" maxOccurs="1"/>
+                                                  <xsd:element name="xPed" minOccurs="0" />
+                                                  <xsd:element name="nItemPed" minOccurs="0" />												  
+												  <xsd:element name="CodigoNBS" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+												  <xsd:element name="CodigoServicoNacional" type="xsd:unsignedLong" minOccurs="0" maxOccurs="1"/>
                                                 </xsd:sequence>
                                               </xsd:complexType>
                                             </xsd:element>
@@ -143,6 +145,7 @@
                                                     </xsd:complexType>
                                                   </xsd:element>
                                                   <xsd:element name="InscricaoMunicipal" type="xsd:string" minOccurs="0" maxOccurs="1" />
+                                                  <xsd:element name="InscricaoEstadual" type="xsd:string" minOccurs="0" maxOccurs="1" />
                                                 </xsd:sequence>
                                               </xsd:complexType>
                                             </xsd:element>
@@ -172,6 +175,7 @@
                                           </xsd:sequence>
                                         </xsd:complexType>
                                       </xsd:element>
+                                      <xsd:element name="DataFatoGerador" type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
                                       <xsd:element name="Intermediario" minOccurs="0" maxOccurs="1">
                                         <xsd:complexType>
                                           <xsd:sequence>
@@ -199,8 +203,42 @@
                                       <xsd:element name="ConstrucaoCivil" minOccurs="0" maxOccurs="1">
                                         <xsd:complexType>
                                           <xsd:sequence>
-                                            <xsd:element name="CodigoObra" />
-                                            <xsd:element name="Art" />
+                                            <xsd:element name="LocalConstrucao" type="xsd:string" />
+                                            <xsd:element name="CodigoObra" type="xsd:string" />
+                                            <xsd:element name="Art" type="xsd:string" />
+                                            <xsd:element name="ReformaCivil" type="xsd:unsignedByte" />
+                                            <xsd:element name="Cib" type="xsd:unsignedInt" />
+                                            <xsd:element name="EstadoObra" type="xsd:string" />
+                                            <xsd:element name="CidadeObra" type="xsd:string"/>
+                                            <xsd:element name="EnderecoObra" type="xsd:string" />
+                                            <xsd:element name="NumeroObra" type="xsd:unsignedShort" />
+                                            <xsd:element name="BairroObra" />
+                                            <xsd:element name="CepObra" type="xsd:unsignedLong" />
+                                            <xsd:element name="ComplementoObra" />
+                                          </xsd:sequence>
+                                        </xsd:complexType>
+                                      </xsd:element>
+                                      <xsd:element name="Evento" minOccurs="0">
+                                        <xsd:complexType>
+                                          <xsd:sequence>
+                                            <xsd:element name="Nome" type="xsd:string"/>
+                                            <xsd:element name="DataInicio" type="xsd:dateTime" />
+                                            <xsd:element name="DataFim" type="xsd:dateTime" />
+                                            <xsd:element name="CodigoIdentificador" type="xsd:unsignedInt" />
+                                            <xsd:element name="Endereco">
+                                              <xsd:complexType>
+                                                <xsd:sequence>
+                                                  <xsd:element name="Endereco" type="xsd:string"/>
+                                                  <xsd:element name="Numero" type="xsd:string"/>
+                                                  <xsd:element name="Complemento" type="xsd:string"/>
+                                                  <xsd:element name="Bairro" type="xsd:string"/>
+                                                  <xsd:element name="CodigoMunicipio" type="xsd:unsignedInt"/>
+                                                  <xsd:element name="Uf" type="xsd:string"/>
+                                                  <xsd:element name="CodigoPais" type="xsd:unsignedInt"/>
+                                                  <xsd:element name="Cep" type="xsd:unsignedLong"/>
+                                                </xsd:sequence>
+                                              </xsd:complexType>
+                                            </xsd:element>
                                           </xsd:sequence>
                                         </xsd:complexType>
                                       </xsd:element>
@@ -222,6 +260,10 @@
                                       <xsd:element name="SerieTalonario" type="xsd:unsignedByte" />
                                       <xsd:element name="FormaPagamento" type="xsd:unsignedByte" />
                                       <xsd:element name="NumeroParcelas" type="xsd:unsignedByte" />
+                                      <xsd:element name="NomeDependentesIRRF" type="xsd:string" minOccurs="0" />
+                                      <xsd:element name="ServicoByNomeIRRF" type="xsd:string" minOccurs="0"/>
+                                      <xsd:element name="DeclaraTrocaEnquadramento" type="xsd:unsignedByte" minOccurs="0" />
+                                      <xsd:element name="EnquadContribuinte" type="xsd:string" minOccurs="0" />
                                     </xsd:sequence>
                                     <xsd:attribute name="Id" type="xsd:string" use="required" />
                                   </xsd:complexType>

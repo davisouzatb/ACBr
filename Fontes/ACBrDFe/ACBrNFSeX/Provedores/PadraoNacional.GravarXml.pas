@@ -500,7 +500,7 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'verAplic', 1, 20, 1,
                                                             NFSe.verAplic, ''));
 
-  Result.AppendChild(AddNode(tcInt, '#1', 'serie', 5, 5, 1,
+  Result.AppendChild(AddNode(tcInt, '#1', 'serie', TamMinimo, 5, 1,
                               StrToIntDef(NFSe.IdentificacaoRps.Serie, 0), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'nDPS', 1, 15, 1,
@@ -1918,6 +1918,7 @@ begin
 
   AINIRec.WriteString(LSecao, 'CodigoObra', NFSe.ConstrucaoCivil.CodigoObra);
   AINIRec.WriteString(LSecao, 'inscImobFisc', NFSe.ConstrucaoCivil.inscImobFisc);
+  AINIRec.WriteInteger(LSecao, 'Cib', NFSe.ConstrucaoCivil.Cib);
 
   AINIRec.WriteString(LSecao, 'CEP', NFSe.ConstrucaoCivil.Endereco.CEP);
   AINIRec.WriteString(LSecao, 'xMunicipio', NFSe.ConstrucaoCivil.Endereco.xMunicipio);

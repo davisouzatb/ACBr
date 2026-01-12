@@ -42,6 +42,35 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+12/01/2026
+-- ACBrNFSeXServicos --
+[*] ACBR-8764 - Correção nas URLs de Vila Velha/ES.
+   Por: Diego Folieni
+-- SilTecnologia.Provider --
+[*] ACBR-8764 - Alteração visando correta leitura do retorno para API Própria.
+   Por: Diego Folieni
+--Equiplano.GravarXml --
+[*] ACBR-8674 - Alterações visando a Reforma Tributária.
+   Por: Mychel Dambros
+-- PadraoNacional.GravarXml, PadraoNacional.LerXml --
+[*] Adicionado no ler e gravar INI a propriedade "Cib" dentro de construçãocivil para ler ini da lib e monitor
+   Por: Daniel de Morais Infocotidiano
+-- ACBrNFSeXLerXml_ABRASFv2/Giss.LerXml --
+[*] ACBR-8641 - Adicionada chamada da LerINIIBSCBSNFSe() na unit base do padrão ABRASF2, após a LerINIIBSCBS()
+   Por: Cezar Sakugawa
+-- Digifred.GravarXml --
+[*] Temos que enviar o XML da NFS-e e não o do DPS e dentro do grupo infNFSe não deve constar
+    a tag tpAmb.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml/PadraoNacional.GravarXml/PadraoNacional.Provider/SimplISS.GravarXml --
+[*] O provedor SimplISS requer que a tag serie seja gerada com 5 dígitos.
+   Por: Italo Giurizzato Junior
+-- VersaTecnologia.GravarXml/VersaTecnologia.Provider --
+[*] ACBR-8746 - Ajustes para a versão 2.04
+   Por: Antonio Gomes
+-- WebISS.GravarXml/WebISS.LerXml --
+[*] Alterações visando a Reforma Tributária.
+   Por: Wallace Oliveira
 
 09/01/2026
 -- PadraoNacional.GravarXml --

@@ -50,6 +50,7 @@ type
   TACBrNFSeXWebserviceISSSaoPaulo = class(TACBrNFSeXWebserviceSoap11)
   public
     function Recepcionar(const ACabecalho, AMSG: string): string; override;
+    function RecepcionarSincrono(const ACabecalho, AMSG: string): string; override;
     function GerarNFSe(const ACabecalho, AMSG: string): string; override;
     function TesteEnvio(const ACabecalho, AMSG: string): string; override;
     function ConsultarSituacao(const ACabecalho, AMSG: string): string; override;
@@ -126,7 +127,7 @@ uses
 procedure TACBrNFSeProviderISSSaoPaulo.AssinaturaAdicional(Nota: TNotaFiscal);
 var
   sSituacao, sISSRetido, sCPFCNPJTomador, sIndTomador, sTomador,
-  sCPFCNPJInter, sIndInter, sISSRetidoInter, sInter, sAssinatura, sNIF: string;
+  sCPFCNPJInter, sIndInter, sISSRetidoInter, sInter, sAssinatura, sNIF, sValorServicos: string;
   iTamanhoIM: Integer;
 begin
   with Nota do
@@ -178,6 +179,11 @@ begin
         sInter := '';
 
       iTamanhoIM := 12;
+
+      if NFSe.Servico.Valores.ValorInicialCobrado > 0 then
+        sValorServicos := Poem_Zeros(OnlyNumber(FormatFloat('#0.00', NFSe.Servico.Valores.ValorInicialCobrado)), 15)
+      else
+        sValorServicos := Poem_Zeros(OnlyNumber(FormatFloat('#0.00', NFSe.Servico.Valores.ValorFinalCobrado)), 15);
     end
     else
     begin
@@ -187,6 +193,8 @@ begin
         sInter := '';
 
       iTamanhoIM := 8;
+
+      sValorServicos := Poem_Zeros(OnlyNumber(FormatFloat('#0.00', NFSe.Servico.Valores.ValorServicos)), 15);
     end;
 
     sAssinatura := Poem_Zeros(NFSe.Prestador.IdentificacaoPrestador.InscricaoMunicipal, iTamanhoIM) +
@@ -196,7 +204,7 @@ begin
                    TipoTributacaoRPSToStr(NFSe.TipoTributacaoRPS) +
                    sSituacao +
                    sISSRetido +
-                   Poem_Zeros(OnlyNumber(FormatFloat('#0.00', NFSe.Servico.Valores.ValorServicos)), 15) +
+                   sValorServicos +
                    Poem_Zeros(OnlyNumber(FormatFloat('#0.00', NFSe.Servico.Valores.ValorDeducoes)), 15) +
                    Poem_Zeros(OnlyNumber(NFSe.Servico.ItemListaServico), 5) +
                    sTomador +
@@ -213,7 +221,11 @@ begin
   FPVersaoDFe := '1';
 
   if TACBrNFSeX(FAOwner).Configuracoes.Geral.Versao = ve200 then
+  begin
     FPVersaoDFe := '2';
+
+    ConfigGeral.Particularidades.AtendeReformaTributaria := True;
+  end;
 
   with ConfigGeral do
   begin
@@ -231,6 +243,7 @@ begin
     ServicosDisponibilizados.ConsultarServicoPrestado := True;
     ServicosDisponibilizados.ConsultarServicoTomado := True;
     ServicosDisponibilizados.CancelarNfse := True;
+    ServicosDisponibilizados.EnviarLoteSincrono := True;
   end;
 
   with ConfigAssinar do
@@ -284,6 +297,9 @@ begin
     CancelarNFSe.InfElemento := '';
     CancelarNFSe.DocElemento := 'PedidoCancelamentoNFe';
 
+    LoteRpsSincrono.InfElemento := 'RPS';
+    LoteRpsSincrono.DocElemento := 'PedidoEnvioLoteRPS';
+
     DadosCabecalho := FPVersaoDFe;
   end;
 
@@ -301,6 +317,7 @@ begin
     ConsultarNFSeServicoPrestado := 'PedidoConsultaNFePeriodo_v0' + FPVersaoDFe + '.xsd';
     ConsultarNFSeServicoTomado := 'PedidoConsultaNFePeriodo_v0' + FPVersaoDFe + '.xsd';
     CancelarNFSe := 'PedidoCancelamentoNFe_v0' + FPVersaoDFe + '.xsd';
+    RecepcionarSincrono := 'PedidoEnvioLoteRPS_v0' + FPVersaoDFe + '.xsd';
   end;
 end;
 
@@ -454,13 +471,14 @@ var
   wAno, wMes, wDia: Word;
   Transacao: Boolean;
 begin
+  {
   if Response.ModoEnvio = meLoteSincrono then
   begin
     AErro := Response.Erros.New;
     AErro.Codigo := Cod001;
     AErro.Descricao := ACBrStr(Desc001);
   end;
-
+  }
   if TACBrNFSeX(FAOwner).NotasFiscais.Count <= 0 then
   begin
     AErro := Response.Erros.New;
@@ -1860,6 +1878,23 @@ begin
 
   Result := Executar('http://www.prefeitura.sp.gov.br/nfe/ws/cancelamentoNFe', Request,
                      ['RetornoXML', 'RetornoCancelamentoNFe'],
+                     ['xmlns:nfe="http://www.prefeitura.sp.gov.br/nfe"']);
+end;
+
+function TACBrNFSeXWebserviceISSSaoPaulo.RecepcionarSincrono(
+  const ACabecalho, AMSG: string): string;
+var
+  Request: string;
+begin
+  FPMsgOrig := AMSG;
+
+  Request := '<nfe:EnvioLoteRPSRequest>';
+  Request := Request + '<nfe:VersaoSchema>' + ACabecalho + '</nfe:VersaoSchema>';
+  Request := Request + '<nfe:MensagemXML>' + XmlToStr(AMSG) + '</nfe:MensagemXML>';
+  Request := Request + '</nfe:EnvioLoteRPSRequest>';
+
+  Result := Executar('http://www.prefeitura.sp.gov.br/nfe/ws/envioLoteRPS', Request,
+                     ['RetornoXML', 'RetornoEnvioLoteRPS'],
                      ['xmlns:nfe="http://www.prefeitura.sp.gov.br/nfe"']);
 end;
 

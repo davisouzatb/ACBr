@@ -313,7 +313,13 @@ begin
       proDesenvolve:
         Result := TACBrNFSeProviderDesenvolve203.Create(ACBrNFSe);
 
-      proDigifred: Result := TACBrNFSeProviderDigifred200.Create(ACBrNFSe);
+      proDigifred:
+        begin
+          if APIPropria then
+            Result := TACBrNFSeProviderDigifredAPIPropria.Create(ACBrNFSe)
+          else
+            Result := TACBrNFSeProviderDigifred200.Create(ACBrNFSe);
+        end;
 
       proDSF:
         begin
@@ -531,7 +537,12 @@ begin
       proMitra: Result := TACBrNFSeProviderMitra200.Create(ACBrNFSe);
 
       proModernizacaoPublica:
-        Result := TACBrNFSeProviderModernizacaoPublica202.Create(ACBrNFSe);
+        begin
+          if APIPropria then
+            Result := TACBrNFSeProviderModernizacaoPublicaAPIPropria.Create(ACBrNFSe)
+          else
+            Result := TACBrNFSeProviderModernizacaoPublica202.Create(ACBrNFSe);
+        end;
 
       proNEAInformatica:
         Result := TACBrNFSeProviderNEAInformatica200.Create(ACBrNFSe);
@@ -729,6 +740,7 @@ begin
             ve200: Result := TACBrNFSeProviderVersaTecnologia200.Create(ACBrNFSe);
             ve201: Result := TACBrNFSeProviderVersaTecnologia201.Create(ACBrNFSe);
             ve202: Result := TACBrNFSeProviderVersaTecnologia202.Create(ACBrNFSe);
+            ve204: Result := TACBrNFSeProviderVersaTecnologia204.Create(ACBrNFSe);
           else
             Result := nil;
           end;

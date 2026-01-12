@@ -118,7 +118,7 @@ type
     procedure LerINIIdentificacaoNFSe(AINIRec: TMemIniFile);
     procedure LerINIIdentificacaoRps(AINIRec: TMemIniFile);
     procedure LerININFSeSubstituicao(AINIRec: TMemIniFile);
-    procedure LerINIDadosEmitente(AINIRec: TMemIniFile);
+    procedure LerINIDadosEmitente(AINIRec: TMemIniFile); virtual;
     procedure LerINIValoresNFSe(AINIRec: TMemIniFile);
 
     procedure LerINIDadosPrestador(AINIRec: TMemIniFile);
@@ -835,7 +835,7 @@ begin
   if AuxNode <> nil then
   begin
     NFSe.infID.ID := OnlyNumber(ObterConteudoTag(AuxNode.Attributes.Items['Id']));
-    NFSe.DataEmissao := ObterConteudo(AuxNode.Childrens.FindAnyNs('dhEmi'), tcDatHor);
+    NFSe.DataEmissaoRPS := ObterConteudo(AuxNode.Childrens.FindAnyNs('dhEmi'), tcDatHor);
     NFSe.verAplic := ObterConteudo(AuxNode.Childrens.FindAnyNs('verAplic'), tcStr);
     NFSe.IdentificacaoRps.Serie := ObterConteudo(AuxNode.Childrens.FindAnyNs('serie'), tcStr);
     NFSe.IdentificacaoRps.Numero := ObterConteudo(AuxNode.Childrens.FindAnyNs('nDPS'), tcStr);
@@ -901,6 +901,7 @@ begin
 
     NFSe.Servico.MunicipioIncidencia := NFSe.infNFSe.cLocIncid;
     NFSe.Servico.xMunicipioIncidencia := NFSe.infNFSe.xLocIncid;
+    NFSe.DataEmissao := NFSe.infNFSe.dhProc;
 
     LerXMLEmitente(AuxNode);
     LerXMLValoresNFSe(AuxNode);
@@ -1645,6 +1646,7 @@ begin
 
     NFSe.verAplic := AINIRec.ReadString(sSecao, 'verAplic', 'ACBrNFSeX-1.00');
     NFSe.tpEmit := StrTotpEmit(Ok, AINIRec.ReadString(sSecao, 'tpEmit', '1'));
+    NFSe.cLocEmi := AINIRec.ReadString(sSecao, 'cLocEmi', '');
     NFSe.cMotivoEmisTI := StrTocMotivoEmisTI(AINIRec.ReadString(sSecao, 'cMotivoEmisTI', ''));
   end;
 end;

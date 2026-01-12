@@ -3,7 +3,7 @@
 {  Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
 { mentos de Automação Comercial utilizados no Brasil                           }
 {                                                                              }
-{ Direitos Autorais Reservados (c) 2022 Daniel Simoes de Almeida               }
+{ Direitos Autorais Reservados (c) 2026 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
@@ -68,6 +68,10 @@ const
   CTEF_RESP_RESPOSTA_FISCAL = 501;
   CTEF_RESP_SERIAL_POS      = 502;
   CTEF_RESP_ESTABELECIMENTO = 503;
+
+  // https://pt.wikipedia.org/wiki/ISO_4217
+  CMODEDA_BRL = 986;
+  CMODEDA_USD = 840;
 
 type
 

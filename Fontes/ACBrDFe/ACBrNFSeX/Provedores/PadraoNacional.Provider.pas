@@ -107,7 +107,7 @@ type
 
     procedure ProcessarMensagemDeErros(LJson: TACBrJSONObject;
                                      Response: TNFSeWebserviceResponse;
-                                     const AListTag: string = 'Erros');
+                                     const AListTag: string = 'Erros'); virtual;
 
     procedure ValidarSchema(Response: TNFSeWebserviceResponse; aMetodo: TMetodo); override;
   public
@@ -142,6 +142,7 @@ begin
 
   with ConfigGeral do
   begin
+    Layout := loPadraoNacional;
     QuebradeLinha := '\n';
     ModoEnvio := meUnitario;
     ConsultaLote := False;

@@ -105,6 +105,19 @@ type
     function GetSchemaPath: string; override;
   end;
 
+  TACBrNFSeProviderVersaTecnologia204 = class (TACBrNFSeProviderVersaTecnologia200)
+  protected
+    procedure Configuracao; override;
+
+    function CriarGeradorXml(const ANFSe: TNFSe): TNFSeWClass; override;
+    function CriarLeitorXml(const ANFSe: TNFSe): TNFSeRClass; override;
+
+    procedure GerarMsgDadosCancelaNFSe(Response: TNFSeCancelaNFSeResponse;
+      Params: TNFSeParamsResponse); override;
+  public
+    function GetSchemaPath: string; override;
+  end;
+
 implementation
 
 uses
@@ -319,10 +332,11 @@ begin
   else
     xURL := TACBrNFSeX(FPDFeOwner).Provider.ConfigGeral.Params.ValorParametro('URLHomologacao');
 
-  if TACBrNFSeX(FPDFeOwner).Configuracoes.Geral.Versao = ve201 then
-    xURL := xURL + '/webservice'
-  else
-    xURL := xURL + '/webservices/2.02';
+  case TACBrNFSeX(FPDFeOwner).Configuracoes.Geral.Versao of
+    ve201: xURL := xURL + '/webservice';
+    ve202: xURL := xURL + '/webservices/2.02';
+    ve204: xURL := xURL + '/webservices/2.04';
+  end;
 
   Result := xURL;
 end;
@@ -334,7 +348,10 @@ end;
 
 function TACBrNFSeXWebserviceVersaTecnologia200.GetSoapAction: string;
 begin
-  Result := 'http://' + URL + '/servicos#';
+  if TACBrNFSeX(FPDFeOwner).Configuracoes.Geral.Versao = ve204 then
+    Result := 'http://' + URL + '/nfse.wsdl/'
+  else
+    Result := 'http://' + URL + '/servicos#';
 end;
 
 function TACBrNFSeXWebserviceVersaTecnologia200.Recepcionar(const ACabecalho,
@@ -645,6 +662,95 @@ begin
   Result := inherited GetSchemaPath;
 
   Result := PathWithDelim(Result + ConfigGeral.CodIBGE);
+end;
+
+{ TACBrNFSeProviderVersaTecnologia204 }
+
+procedure TACBrNFSeProviderVersaTecnologia204.Configuracao;
+var
+  FpURL: string;
+begin
+  inherited Configuracao;
+
+  if FAOwner.Configuracoes.WebServices.AmbienteCodigo = 1 then
+    FpURL := ConfigWebServices.Producao.NameSpace
+  else
+    FpURL := ConfigWebServices.Homologacao.NameSpace;
+
+  with ConfigWebServices do
+  begin
+    VersaoDados := '2.04';
+    VersaoAtrib := '204';
+  end;
+
+  ConfigAssinar.CancelarNFSe := False;
+
+  ConfigMsgDados.DadosCabecalho := GetCabecalho(FpURL);
+  ConfigMsgDados.GerarPrestadorLoteRps := True;
+
+  SetXmlNameSpace(ConfigWebServices.Producao.XMLNameSpace);
+
+  SetNomeXSD('nfse_v204.xsd');
+end;
+
+function TACBrNFSeProviderVersaTecnologia204.CriarGeradorXml(
+  const ANFSe: TNFSe): TNFSeWClass;
+begin
+  Result := TNFSeW_VersaTecnologia204.Create(Self);
+  Result.NFSe := ANFSe;
+end;
+
+function TACBrNFSeProviderVersaTecnologia204.CriarLeitorXml(
+  const ANFSe: TNFSe): TNFSeRClass;
+begin
+  Result := TNFSeR_VersaTecnologia204.Create(Self);
+  Result.NFSe := ANFSe;
+end;
+
+function TACBrNFSeProviderVersaTecnologia204.GetSchemaPath: string;
+begin
+  Result := inherited GetSchemaPath;
+
+  Result := PathWithDelim(Result + ConfigGeral.CodIBGE);
+end;
+
+procedure TACBrNFSeProviderVersaTecnologia204.GerarMsgDadosCancelaNFSe(
+  Response: TNFSeCancelaNFSeResponse; Params: TNFSeParamsResponse);
+var
+  Emitente: TEmitenteConfNFSe;
+  InfoCanc: TInfCancelamento;
+begin
+  Emitente := TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente;
+  InfoCanc := Response.InfCancelamento;
+
+  with Params do
+  begin
+    Response.ArquivoEnvio :=
+      '<' + Prefixo + 'CancelarNfseEnvio' + NameSpace + '>' +
+        '<' + Prefixo2 + 'Pedido>' +
+          '<' + Prefixo2 + 'InfPedidoCancelamento' + {IdAttr +} '>' +
+            '<' + Prefixo2 + 'IdentificacaoNfse>' +
+              '<' + Prefixo2 + 'Numero>' +
+                 InfoCanc.NumeroNFSe +
+              '</' + Prefixo2 + 'Numero>' +
+              Serie +
+              '<' + Prefixo2 + 'CpfCnpj>' +
+                GetCpfCnpj(Emitente.CNPJ, Prefixo2) +
+              '</' + Prefixo2 + 'CpfCnpj>' +
+              GetInscMunic(Emitente.InscMun, Prefixo2) +
+              '<' + Prefixo2 + 'CodigoMunicipio>' +
+                 IntToStr(TACBrNFSeX(FAOwner).Configuracoes.Geral.CodigoMunicipio) +
+              '</' + Prefixo2 + 'CodigoMunicipio>' +
+              CodigoVerificacao +
+            '</' + Prefixo2 + 'IdentificacaoNfse>' +
+            '<' + Prefixo2 + 'CodigoCancelamento>' +
+               InfoCanc.CodCancelamento +
+            '</' + Prefixo2 + 'CodigoCancelamento>' +
+            Motivo +
+          '</' + Prefixo2 + 'InfPedidoCancelamento>' +
+        '</' + Prefixo2 + 'Pedido>' +
+      '</' + Prefixo + 'CancelarNfseEnvio>';
+  end;
 end;
 
 end.

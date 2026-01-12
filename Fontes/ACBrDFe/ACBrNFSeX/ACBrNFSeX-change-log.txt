@@ -42,6 +42,117 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+
+09/01/2026
+-- PadraoNacional.GravarXml --
+[*] Adiciona alguns campos faltantes na geração do grupo Valores da NFSe.
+   Por: Diego Folieni
+-- ISSSaoPaulo.Provider/ACBrNFSeXGravarXml/ACBrNFSeXLerXml --
+[*] Ajustes visando correta geração da Assinatura Adicional
+   Por: Diego Folieni
+-- ACBrNFSeXLerXml/Betha.GravarXml/Betha.LerXml --
+[*] A API própria do provedor Betha ainda esta usando a versão 1.2 da NT 003,
+    ajustes realizados para não ocorrer erro de validação por parte do provedor.
+   Por: Italo Giurizzato Junior
+-- VersaTecnologia.GravarXml/VersaTecnologia.Provider --
+[*] ACBR-8746 - Ajustes para a versão 2.04
+   Por: Antonio Gomes
+
+08/01/2026
+-- ACBrNFSeXProviderManager/ModernizacaoPublica.GravarXml/ModernizacaoPublica.LerXml --
+-- ModernizacaoPublica.Provider/PadraoNacional.Provider --
+[*] ACBR-8742 - O provedor ModernizacaoPublica implemento uma API Própria para recepcionar o
+    XML segundo o layout do Padrão Nacional.
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.LerXml/SilTecnologia.LerXml --
+[*] ACBR-8739 - Ajuste visando o correto preenchimento do grupo emit a partir da leitura do INI.
+   Por: Diego Folieni 
+-- ACBrNFSeXServicos --
+[+] ACBR-8638: Incluída a cidade Russas/CE, o provedor é SpeedGov.
+   Por: PrimeSoftware/Italo Giurizzato Junior
+-- ACBrNFSeXConversao/ACBrNFSeXGravarXml/Ginfes.GravarXml/Giss.GravarXml/PadraoNacional.GravarXml --
+-- Etherium.GravarXml/Etherium.Provider/SigCorp.GravarXml/SigCorp.Provider --
+[*] ACBR-8639/8617: Alterações visando a Reforma Tributária para os provedores Etherium e SigCorp.
+   Por: Raphael Sanini/Italo Giurizzato Junior
+-- MetropolisWeb.GravarXml --
+[*] ACBR-8714: Alterações visando a Reforma Tributária.
+   Por: Dino Rodrigo S. Moreira/Italo Giurizzato Junior
+-- PadraoNacional.GravarXML/PadraoNacional.LerXML -
+[-] Ajustes visando compatibilização com o schema da versão 1.01.
+   Por: Diego Folieni
+-- ACBrNFSeXClass/Conam.GravarXml/Conam.Provider --
+[*] ACBR-8685/8683: Alterações visando a versão 4.00 que contem os novos campos para a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+-- ACBrNFSeXServicos --
+[*] Alteração da cidade de Parnaíba/PI para o Padrão Nacional.
+  Por: BigWings 
+
+07/01/2026
+-- SilTecnologia.Provider --
+[*] Ajustes para realizar a assinatura do DPS quando informado que o modo de envio é automático.
+   Por: Diego Folieni
+-- ACBrNFSeXServicos --
+[*] Atualizado o arquivo ACBrNFSeXServicos com o conteúdo do ACBrNFSeXServicosRTC.
+    Podemos agora remover da aplicação a configuração da propriedade IniServicos que apontava para
+    o arquivo ACBrNFSeXServicosRTC, pois ele foi removido SVN.
+   Por: Italo Giurizzato Junior
+-- ISSSaoPaulo.Provider --
+[+] ACBR-8702: Implementado o envio síncrono.
+   Por: Leonardo Gomes
+-- Pronim.Provider --
+[-] Correção no envio do evento.
+   Por: Italo Giurizzato Junior
+-- ISSSaoPaulo.Provider --
+[-] ACBR-8733: Ajuste na geração da AssinaturaAdicional da versão 2.00 para coincidir com manual.
+   Por: Diego Folieni
+-- Agili.GravarXml --
+[*] ACBR-8731: Alterações visando a reforma tributária.
+   Por: plenustech
+-- Diversos --
+[*] Ajustes para informar corretamente quando o provedor usa o layout do Padrão Nacional
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXProviderManager/VersaTecnologia.GravarXml/VersaTecnologia.LerXml/VersaTecnologia.Provider --
+[+] ACBR-8731: Implementado a versão 2.04 
+   Por: Italo Giurizzato Junior
+
+06/01/2026
+-- ACBrNFSeXDANFSeFR --
+[*] ACBR-8699: Ajustes para imprimir o Código do Item Lista Serviço com 8 caracteres.
+   Por: HUGO753
+-- ACBrNFSeXGravarXml/ISSNatal.GravarXml --
+[*] ACBR-8681: Ajustes no provedor ISSNatal para atender a Reforma Tributária
+   Por: Italo Giurizzato Junior
+-- Tinus.Provider --
+[*] ACBR-8684: Ajustes no provedor Tinus para atender a Reforma Tributária
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXLerXml_ABRASFv2.pas --
+[*] ACBR-8673: Adicionado ler propriedade SituacaoTributariaPISCOFINS
+   https://www.projetoacbr.com.br/forum/topic/88675-erro-valida%C3%A7%C3%A3o-nfservi%C3%A7o-referente-situacaotributariapiscofins
+   Por: Daniel de Morais InfoCotidiano
+-- PadraoNacional.GravarXml/SilTecnologia.GravarXml --
+[*] ACBR-8717: Alterações visando gerar corretamente o XML da NFS-e do provedor SilTecnologia.
+   Por: Innovae Brasil Engenharia
+-- PadraoNacional.GravarXml --
+[*] ACBR-8701: A tag pRedBCBM é opcional, portanto só deve ser gerada se o valor for maior que zero.
+   Por: Leonardo Gomes
+[*] ACBR-8697: Alterações na geração do grupo piscofins.
+   Por: maxuel82
+
+05/01/2026
+-- ACBrNFSeXServicosRTC.ini --
+[*] Atualização em diversas cidades.
+   Por: Italo Giurizzato Junior
+[+] Implementado o envio dos Eventos de Cancelamento e Substituição.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml/ACBrNFSeXProviderManager/PadraoNacional.GravarXml --
+-- Digifred.GravarXml/Digifred.LerXml/Digifred.Provider --
+[*] Alterações nas units do provedor Digifred visando a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicosRTC.ini --
+[*] A cidade Sonora/MS mudou para o provedor PadraoNacional.
+   Por: Comsystem
+
 02/01/2026
 -- ACBrNFSeXDANFSeRLRetrato --
 [*] ACBR-8687: Alteração visando não imprimir duas vezes as informações complementares do Padrão Nacional.

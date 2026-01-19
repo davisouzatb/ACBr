@@ -307,8 +307,6 @@ begin
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLValoresNFSe: TACBrXmlNode;
-var
-  vISSQN, vTotalRet: Double;
 begin
   Result := CreateElement('valores');
 
@@ -373,6 +371,7 @@ end;
 function TNFSeW_PadraoNacional.GerarXMLInfNFSe: TACBrXmlNode;
 var
   chave, xLocEmi, xUF, xLocPrestacao, xLocIncid, CodigoMun, CNPJ: string;
+  cLocIncid: Integer;
   xmlNode: TACBrXmlNode;
 begin
   CodigoMun := IntToStr(CodMunEmit);
@@ -421,16 +420,25 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'nNFSe', 1, 1, 1,
                                                        NFSe.infNFSe.nNFSe, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'cLocIncid', 7, 7, 1,
-                                  NFSe.Prestador.Endereco.CodigoMunicipio, ''));
+  if NFSe.infNFSe.IBSCBS.cLocalidadeIncid > 0 then
+  begin
+    cLocIncid := NFSe.infNFSe.IBSCBS.cLocalidadeIncid;
+    xLocIncid := NFSe.infNFSe.IBSCBS.xLocalidadeIncid;
+  end
+  else
+    cLocIncid := StrToIntDef(NFSe.Prestador.Endereco.CodigoMunicipio, 0);
 
-  xLocIncid := ObterNomeMunicipioUF(StrToIntDef(NFSe.Prestador.Endereco.CodigoMunicipio, 0), xUF);
+  if xLocIncid = '' then
+    xLocIncid := ObterNomeMunicipioUF(cLocIncid, xUF);
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'cLocIncid', 7, 7, 1,
+                                  cLocIncid, ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'xLocIncid', 1, 60, 1,
                                                             xLocIncid, ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'xTribNac', 1, 7, 1,
-                                            NFSe.Servico.ItemListaServico, ''));
+                                                    NFSe.infNFSe.xTribNac, ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'verAplic', 1, 20, 1,
                                                             NFSe.verAplic, ''));

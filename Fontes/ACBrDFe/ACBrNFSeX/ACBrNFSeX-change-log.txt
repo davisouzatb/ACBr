@@ -42,6 +42,56 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+
+19/01/2026
+-- SigISS.GravarXml/SigISS.LerXml --
+[*] ACBR-8682 - Ajustes visando a reforma tributária.
+   Por: Neto
+
+16/01/2026
+-- Tinus.GravarXml/Tinus.LerXml/Tinus.Provider --
+[*] ACBR-8809 - O provedor esta retornado o XML segundo o Padrão Nacional em vez ABRASF.
+    Ajustes para a leitura correta do retorno no Padrão Nacional.
+   Por: Rene Melo
+-- ISSNatal.Provider --
+[*] ACBR-8648 - Ajuste para gerar a versão de dados como sendo 2.
+   Por: Italo Giurizzato Junior
+-- ABase.Provider/Betha.Provider/ISSNet.Provider/ModernizacaoPublica.Provider --
+[*] Ajustes para usar a função: PrepararArquivoEnvio.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] Ajuste nas cidades: Barra Mansa/RJ, Barueri/SP, Bauru/SP, Caxias do Sul/RS, Picada Café/RS
+   Por: Matheus Klein / Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-8802 - Ajuste de seções das cidades atendidas pelo ISSNet, EL e SimplISS visando a correta emissão.
+   Por: Matheus Klein / Revisão: Diego Folieni
+-- Pronim.Provider --
+[*] Ajustes para usar a função: PrepararArquivoEnvio.
+   Por: Italo Giurizzato Junior
+-- ISSBarueri.GravarXml/ISSBarueri.Provider --
+[*] ACBR-8554 - Alteração visando a Reforma Tributária
+   Por: Italo Giurizzato Junior
+
+14/01/2026
+-- ACBrNFSeXServicos --
+[*] ACBR-8548 - Alterado município Itaí-SP para utilizar provedor Fiorilli;
+[-] ACBR-8608 - Removida URL de homologação do município Valinhos.
+    por: Matheus Ferreira
+-- SilTecnologia.Provider --
+[-] ACBR-8780 - Ajuste visando sanar erro na geração do elemento IdPedRegEvt
+   Por: Diego Folieni
+-- ACBrNFSeXServicos --
+[*] Acrescentado a URL de homologação do provedor ISSNet.
+   Por: Diego Folieni
+-- ISSNet.Provider --
+[*] Ajustes para montagem correta do Envelope Soap para envio do XML do DPS e
+    tratamento do retorno.
+   Por: Diego Folieni/Italo Giurizzato Junior
+-- PadraoNacional.GravarXml --
+[*] Alterado o campo de Servico.ItemListaServico para infNFSe.xTribNac para gerar a
+    tag xTribNac.
+   Por: Italo Giurizzato Junior
+
 12/01/2026
 -- ACBrNFSeXServicos --
 [*] ACBR-8764 - Correção nas URLs de Vila Velha/ES.

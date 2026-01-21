@@ -651,6 +651,7 @@ begin
   DescSituacao := '';
   NumeroLote := '';
   Sucesso := False;
+  DataCanc := 0;
   SucessoCanc := False;
   NumeroNota := '';
   SerieNota := '';
@@ -850,6 +851,7 @@ begin
   NumeroLote := '';
   Situacao := '';
   Protocolo := '';
+  tpEvento := teNenhum;
 end;
 
 constructor TNFSeConsultaSituacaoResponse.Create;

@@ -70,7 +70,7 @@ type
 
     function GerarXMLSubstituicao: TACBrXmlNode;
 
-    function GerarXMLPrestador: TACBrXmlNode;
+    function GerarXMLPrestador: TACBrXmlNode; virtual;
     function GerarXMLEnderecoPrestador: TACBrXmlNode;
     function GerarXMLEnderecoNacionalPrestador: TACBrXmlNode;
     function GerarXMLEnderecoExteriorPrestador: TACBrXmlNode;
@@ -86,19 +86,20 @@ type
     function GerarXMLEnderecoNacionalIntermediario: TACBrXmlNode;
     function GerarXMLEnderecoExteriorIntermediario: TACBrXmlNode;
 
-    function GerarXMLServico: TACBrXmlNode;
+    function GerarXMLServico: TACBrXmlNode; virtual;
     function GerarXMLLocalPrestacao: TACBrXmlNode;
     function GerarXMLCodigoServico: TACBrXmlNode;
     function GerarXMLComercioExterior: TACBrXmlNode;
     function GerarXMLLocacaoSubLocacao: TACBrXmlNode;
-    function GerarXMLObra: TACBrXmlNode;
+    function GerarXMLObra: TACBrXmlNode; virtual;
     function GerarXMLEnderecoObra: TACBrXmlNode;
-    function GerarXMLEnderecoExteriorObra: TACBrXmlNode;
+    function GerarXMLEnderecoExteriorObra: TACBrXmlNode; virtual;
     function GerarXMLAtividadeEvento: TACBrXmlNode;
     function GerarXMLEnderecoEvento: TACBrXmlNode;
     function GerarXMLEnderecoExteriorEvento: TACBrXmlNode;
     function GerarXMLExploracaoRodoviaria: TACBrXmlNode;
     function GerarXMLInformacoesComplementares: TACBrXmlNode;
+    function GerarXMLgItemPed: TACBrXMLNode;
 
     function GerarXMLValores: TACBrXmlNode;
 
@@ -110,13 +111,13 @@ type
     function GerarXMLNFSeMunicipio(Item: Integer): TACBrXmlNode;
     function GerarXMLNFNFS(Item: Integer): TACBrXmlNode;
 
-    function GerarXMLFornecedor(Item: Integer): TACBrXmlNode;
+    function GerarXMLFornecedor(Item: Integer): TACBrXmlNode; virtual;
     function GerarXMLEnderecoFornecedor(Item: Integer): TACBrXmlNode;
     function GerarXMLEnderecoNacionalFornecedor(Item: Integer): TACBrXmlNode;
     function GerarXMLEnderecoExteriorFornecedor(Item: Integer): TACBrXmlNode;
 
     function GerarXMLTributacao: TACBrXmlNode;
-    function GerarXMLTributacaoMunicipal: TACBrXmlNode;
+    function GerarXMLTributacaoMunicipal: TACBrXmlNode; virtual;
     function GerarXMLBeneficioMunicipal: TACBrXmlNode;
     function GerarXMLExigibilidadeSuspensa: TACBrXmlNode;
     function GerarXMLTributacaoFederal: TACBrXmlNode;
@@ -139,6 +140,7 @@ type
     procedure GerarINIEvento(AINIRec: TMemIniFile);
     procedure GerarINIRodoviaria(AINIRec: TMemIniFile);
     procedure GerarINIInformacoesComplementares(AINIRec: TMemIniFile);
+    procedure GerarINIInformacoesComplementaresgItemPed(AINIRec: TMemIniFile);
     procedure GerarINIValores(AINIRec: TMemIniFile);
     procedure GerarINIDocumentosDeducoes(AINIRec: TMemIniFile);
     procedure GerarINIDocumentosDeducoesFornecedor(AINIRec: TMemIniFile;
@@ -890,7 +892,7 @@ begin
   if DevoGerarXMLObra then
     Result.AppendChild(GerarXMLObra);
   Result.AppendChild(GerarXMLAtividadeEvento);
-  Result.AppendChild(GerarXMLExploracaoRodoviaria);
+
   Result.AppendChild(GerarXMLInformacoesComplementares);
 end;
 
@@ -1144,7 +1146,9 @@ begin
 
   if (NFSe.Servico.infoCompl.idDocTec <> '') or
      (NFSe.Servico.infoCompl.docRef <> '') or
-     (NFSe.Servico.infoCompl.xInfComp <> '') then
+     (NFSe.Servico.infoCompl.xInfComp <> '') or
+     (NFSe.Servico.infoCompl.xPed <> '') or
+     (NFSe.Servico.infoCompl.gItemPed.Count > 0) then
   begin
     Result := CreateElement('infoCompl');
 
@@ -1154,8 +1158,14 @@ begin
     Result.AppendChild(AddNode(tcStr, '#1', 'docRef', 1, 255, 0,
                                             NFSe.Servico.infoCompl.docRef, ''));
 
+    Result.AppendChild(AddNode(tcStr, '#1', 'xPed', 1, 60, 0,
+                                            NFSe.Servico.infoCompl.xPed, ''));
+
+    Result.AppendChild(GerarXMLgItemPed);
+
     Result.AppendChild(AddNode(tcStr, '#1', 'xInfComp', 1, 2000, 0,
                                           NFSe.Servico.infoCompl.xInfComp, ''));
+
   end;
 end;
 
@@ -1368,6 +1378,24 @@ begin
 
       Result.AppendChild(AddNode(tcStr, '#1', 'email', 1, 80, 0,
                                                             Contato.Email, ''));
+    end;
+  end;
+end;
+
+function TNFSeW_PadraoNacional.GerarXMLgItemPed: TACBrXMLNode;
+var
+  i: Integer;
+begin
+  Result := nil;
+
+  if NFSe.Servico.infoCompl.gItemPed.Count > 0 then
+  begin
+    Result := CreateElement('gItemPed');
+
+    for i := 0 to NFSe.Servico.infoCompl.gItemPed.Count - 1 do
+    begin
+      Result.AppendChild(AddNode(tcStr, '#1', 'xItemPed', 1, 60, 1,
+                                NFSe.Servico.infoCompl.gItemPed[i].xItemPed));
     end;
   end;
 end;
@@ -1699,6 +1727,7 @@ begin
   GerarINIEvento(AINIRec);
   GerarINIRodoviaria(AINIRec);
   GerarINIInformacoesComplementares(AINIRec);
+  GerarINIInformacoesComplementaresgItemPed(AINIRec);
   GerarINIValores(AINIRec);
   GerarINIDocumentosDeducoes(AINIRec);
   GerarINIValoresTribMun(AINIRec);
@@ -1731,6 +1760,7 @@ begin
   GerarINIEvento(AINIRec);
   GerarINIRodoviaria(AINIRec);
   GerarINIInformacoesComplementares(AINIRec);
+  GerarINIInformacoesComplementaresgItemPed(AINIRec);
   GerarINIValores(AINIRec);
   GerarINIDocumentosDeducoes(AINIRec);
   GerarINIValoresTribMun(AINIRec);
@@ -1975,7 +2005,19 @@ begin
 
   AINIRec.WriteString(LSecao, 'idDocTec', NFSe.Servico.infoCompl.idDocTec);
   AINIRec.WriteString(LSecao, 'docRef', NFSe.Servico.infoCompl.docRef);
+  AINIRec.WriteString(LSecao, 'xPed', NFSe.Servico.infoCompl.xPed);
   AINIRec.WriteString(LSecao, 'xInfComp', NFSe.Servico.infoCompl.xInfComp);
+end;
+
+procedure TNFSeW_PadraoNacional.GerarINIInformacoesComplementaresgItemPed(AINIRec: TMemIniFile);
+var
+  i: Integer;
+begin
+  for i := 0 to NFSe.Servico.infoCompl.gItemPed.Count-1 do
+  begin
+    LSecao := 'gItemPed' + IntToStrZero(i+1, 2);
+    AINIRec.WriteString(LSecao, 'xItemPed', NFSe.Servico.infoCompl.gItemPed[i].xItemPed);
+  end;
 end;
 
 procedure TNFSeW_PadraoNacional.GerarINIValores(AINIRec: TMemIniFile);

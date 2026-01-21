@@ -299,6 +299,9 @@ type
     FvRetCP: Double;
     FvRetIRRF: Double;
     FvRetCSLL: Double;
+    FvBCPCP: Double;
+    FvBCCSLL: Double;
+    FvBCPIRRF: Double;
   public
     property CST: TCST read FCST write FCST;
     property vBCPisCofins: Double read FvBCPisCofins write FvBCPisCofins;
@@ -310,6 +313,10 @@ type
     property vRetCP: Double read FvRetCP write FvRetCP;
     property vRetIRRF: Double read FvRetIRRF write FvRetIRRF;
     property vRetCSLL: Double read FvRetCSLL write FvRetCSLL;
+    // Provedor Conam
+    property vBCPCP: Double read FvBCPCP write FvBCPCP;
+    property vBCPIRRF: Double read FvBCPIRRF write FvBCPIRRF;
+    property vBCCSLL: Double read FvBCCSLL write FvBCCSLL;
   end;
 
   TtotTrib = class(TObject)
@@ -393,6 +400,9 @@ type
     FUnidadeServico: string;
     FValorFinalCobrado: Double;
     FValorInicialCobrado: Double;
+    //GovDigital
+    FCSTPis: TCSTPis;
+    FtpRetPisCofins: TtpRetPisCofins;
 
     procedure SetDocDeducao(const Value: TDocDeducaoCollection);
   public
@@ -475,6 +485,9 @@ type
     property ValorFinalCobrado: Double read FValorFinalCobrado write FValorFinalCobrado;
     // Provedor Publica
     property UnidadeServico: string read FUnidadeServico write FUnidadeServico;
+    // GovDigital
+    property CSTPis: TCSTPis read FCSTPis write FCSTPis;
+    property tpRetPisCofins: TtpRetPisCofins read FtpRetPisCofins write FtpRetPisCofins;
   end;
 
   TDadosDeducao = class(TObject)
@@ -779,14 +792,38 @@ type
     property codContrato: string read FcodContrato write FcodContrato;
   end;
 
+  TgItemPedCollectionItem = class(TObject)
+  private
+    FxItemPed: string;
+  public
+    property xItemPed: string read FxItemPed write FxItemPed;
+  end;
+
+  TgItemPedCollection = class(TACBrObjectList)
+  private
+    function GetItem(Index: Integer): TgItemPedCollectionItem;
+    procedure SetItem(Index: Integer; Value: TgItemPedCollectionItem);
+  public
+    function Add: TgItemPedCollectionItem; overload; deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Obsoleta: Use a função New'{$EndIf};
+    function New: TgItemPedCollectionItem;
+    property Items[Index: Integer]: TgItemPedCollectionItem read GetItem write SetItem; default;
+  end;
+
   TinfoCompl = class(TObject)
   private
     FidDocTec: string;
     FdocRef: string;
     FxInfComp: string;
+    FxPed: string;
+    FgItemPed: TgItemPedCollection;
   public
+    constructor Create;
+    destructor Destroy; override;
+
     property idDocTec: string read FidDocTec write FidDocTec;
     property docRef: string read FdocRef write FdocRef;
+    property xPed: String read FxPed write FxPed;
+    property gItemPed: TgItemPedCollection read FgItemPed;
     property xInfComp: string read FxInfComp write FxInfComp;
   end;
 
@@ -1629,9 +1666,11 @@ type
   private
     FcMun: Integer;
     FCEP: string;
+    FUF: string;
   public
     property cMun: Integer read FcMun write FcMun;
     property CEP: string read FCEP write FCEP;
+    property UF: string read FUF write FUF;
   end;
 
   { TendExt }
@@ -2987,6 +3026,8 @@ begin
   FtribMun := TtribMun.Create;
   FtribFed := TtribFed.Create;
   FtotTrib := TtotTrib.Create;
+  FCSTPis := cstPisVazio;
+  FtpRetPisCofins := trpcNaoRetido;
 end;
 
 destructor TValores.Destroy;
@@ -3498,6 +3539,43 @@ begin
   FgCBSCredPres.Free;
 
   inherited Destroy;
+end;
+
+{ TgItemPedCollection }
+
+function TgItemPedCollection.Add: TgItemPedCollectionItem;
+begin
+  Result := Self.New;
+end;
+
+function TgItemPedCollection.GetItem(Index: Integer): TgItemPedCollectionItem;
+begin
+  Result := TgItemPedCollectionItem(inherited Items[Index]);
+end;
+
+function TgItemPedCollection.New: TgItemPedCollectionItem;
+begin
+  Result := TgItemPedCollectionItem.Create;
+  Self.Add(Result);
+end;
+
+procedure TgItemPedCollection.SetItem(Index: Integer;
+  Value: TgItemPedCollectionItem);
+begin
+  inherited Items[Index] := Value;
+end;
+
+{ TinfoCompl }
+
+constructor TinfoCompl.Create;
+begin
+  FgItemPed := TgItemPedCollection.Create;
+end;
+
+destructor TinfoCompl.Destroy;
+begin
+  FgItemPed.Free;
+  inherited;
 end;
 
 end.

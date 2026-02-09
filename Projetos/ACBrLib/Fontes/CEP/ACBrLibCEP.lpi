@@ -13,13 +13,14 @@
       <SessionStorage Value="InProjectDir"/>
       <Title Value="ACBrLibCEP"/>
       <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="319"/>
+      <BuildNr Value="321"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrCEP - Biblioteca para consulta Endereços e CEPs" InternalName="ACBrLibCEP" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="CEP" ProductVersion="0.0.1.30"/>
     </VersionInfo>

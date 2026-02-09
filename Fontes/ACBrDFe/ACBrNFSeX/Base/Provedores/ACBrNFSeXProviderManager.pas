@@ -387,7 +387,14 @@ begin
           end;
         end;
 
-      proFiorilli:   Result := TACBrNFSeProviderFiorilli200.Create(ACBrNFSe);
+      proFiorilli:
+        begin
+          if APIPropria then
+            Result := TACBrNFSeProviderFiorilliAPIPropria.Create(ACBrNFSe)
+          else
+            Result := TACBrNFSeProviderFiorilli200.Create(ACBrNFSe);
+        end;
+
       proFisco:      Result := TACBrNFSeProviderFisco203.Create(ACBrNFSe);
       proFISSLex:    Result := TACBrNFSeProviderFISSLex.Create(ACBrNFSe);
       proFuturize:   Result := TACBrNFSeProviderFuturize202.Create(ACBrNFSe);
@@ -480,7 +487,14 @@ begin
       proISSCuritiba:
         Result := TACBrNFSeProviderISSCuritiba.Create(ACBrNFSe);
 
-      proISSDigital: Result := TACBrNFSeProviderISSDigital200.Create(ACBrNFSe);
+      proISSDigital:
+        begin
+          if APIPropria then
+            Result := TACBrNFSeProviderISSDigitalAPIPropria.Create(ACBrNFSe)
+          else
+            Result := TACBrNFSeProviderISSDigital200.Create(ACBrNFSe);
+        end;
+
       proISSDSF:     Result := TACBrNFSeProviderISSDSF.Create(ACBrNFSe);
       proISSe:       Result := TACBrNFSeProviderISSe201.Create(ACBrNFSe);
 

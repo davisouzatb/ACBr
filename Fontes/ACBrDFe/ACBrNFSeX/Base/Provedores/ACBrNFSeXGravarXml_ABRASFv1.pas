@@ -850,6 +850,7 @@ begin
   FpSecao:= 'Servico';
   AINIRec.WriteString(FpSecao, 'ItemListaServico', NFSe.Servico.ItemListaServico);
   AINIRec.WriteString(FpSecao, 'xItemListaServico', NFSe.Servico.xItemListaServico);
+  AINIRec.WriteString(FpSecao, 'cTribNac', NFSe.Servico.CodigoServicoNacional);
   AINIRec.WriteString(FpSecao, 'CodigoCnae', NFSe.Servico.CodigoCnae);
   AINIRec.WriteString(FpSecao, 'CodigoTributacaoMunicipio', NFSe.Servico.CodigoTributacaoMunicipio);
   AINIRec.WriteString(FpSecao, 'Discriminacao', ChangeLineBreak(NFSe.Servico.Discriminacao, FpAOwner.ConfigGeral.QuebradeLinha));
@@ -858,6 +859,7 @@ begin
   AINIRec.WriteString(FpSecao, 'xMunicipioIncidencia',NFSe.Servico.xMunicipioIncidencia);
   AINIRec.WriteString(FpSecao, 'MunicipioPrestacaoServico', NFSe.Servico.MunicipioPrestacaoServico);
   AINIRec.WriteFloat(FpSecao,'ValorTotalRecebido', NFSe.Servico.ValorTotalRecebido);
+  AINIRec.WriteString(FpSecao, 'CodigoNBS', NFSe.Servico.CodigoNBS);
 end;
 
 procedure TNFSeW_ABRASFv1.GerarINISecaoDeducoes(const AINIRec: TMemIniFile);

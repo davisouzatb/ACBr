@@ -248,10 +248,11 @@ var
   AErro: TNFSeEventoCollectionItem;
   Emitente: TEmitenteConfNFSe;
   Nota: TNotaFiscal;
-  IdAttr, ListaRps, xRps, xOptante, xReg90, Aliquota: string;
+  IdAttr, ListaRps, xRps, xOptante, xReg90, Aliquota,
+  RegApTribSN, TribTpSusp, TribProcSusp: string;
   I, QtdTributos, QtdReg40, QtdReg50: Integer;
   vTotServicos, vTotISS, vTotISSRetido, vTotDeducoes, vTotTributos,
-  AliquotaSN: Double;
+  vAliquota: Double;
   OptanteSimples: TnfseSimNao;
   ExigibilidadeISS: TnfseExigibilidadeISS;
   DataOptanteSimples, DataInicial, DataFinal: TDateTime;
@@ -319,10 +320,15 @@ begin
       OptanteSimples := Nota.NFSe.OptanteSimplesNacional;
       ExigibilidadeISS := Nota.NFSe.Servico.ExigibilidadeISS;
       DataOptanteSimples := Nota.NFSe.DataOptanteSimplesNacional;
+
+      RegApTribSN := RegimeApuracaoSNToStr(Nota.NFSe.RegimeApuracaoSN);
+      TribTpSusp := tpSuspToStr(Nota.NFSe.Servico.Valores.tribMun.tpSusp);
+      TribProcSusp := Nota.NFSe.Servico.Valores.tribMun.nProcesso;
+
       DataInicial := Nota.NFSe.DataEmissao;
       DataFinal := DataInicial;
-      AliquotaSN := Nota.NFSe.Servico.Valores.AliquotaSN;
-      Aliquota := FormatFloat('#.00', AliquotaSN);
+      vAliquota := Nota.NFSe.Servico.Valores.Aliquota;
+      Aliquota := FormatFloat('#.00', vAliquota);
       Aliquota := StringReplace(Aliquota, '.', ',', [rfReplaceAll]);
     end;
 
@@ -396,7 +402,16 @@ begin
                 '</DtAdeSN>' +
                 '<AlqIssSN_IP>' +
                    Aliquota +
-                '</AlqIssSN_IP>';
+                '</AlqIssSN_IP>' +
+                '<RegApTribSN>' +
+                   RegApTribSN +
+                '</RegApTribSN>' +
+                '<TribTpSusp>' +
+                   TribTpSusp +
+                '</TribTpSusp>' +
+                '<TribProcSusp>' +
+                   TribProcSusp +
+                '</TribProcSusp>';
   end
   else
   begin

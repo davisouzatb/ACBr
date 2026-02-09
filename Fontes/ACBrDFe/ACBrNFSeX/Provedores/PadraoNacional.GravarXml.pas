@@ -66,7 +66,7 @@ type
 
     function GerarXMLDPS: TACBrXmlNode;
 
-    function GerarXMLInfDps: TACBrXmlNode;
+    function GerarXMLInfDps: TACBrXmlNode; virtual;
 
     function GerarXMLSubstituicao: TACBrXmlNode;
 
@@ -245,67 +245,133 @@ begin
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLEnderecoEmitente: TACBrXmlNode;
+var
+  Endereco, Numero, Complemento, Bairro, CodigoMunicipio, UF, CEP: string;
 begin
+  case NFSe.tpEmit of
+    tePrestador:
+      begin
+        Endereco := NFSe.Prestador.Endereco.Endereco;
+        Numero := NFSe.Prestador.Endereco.Numero;
+        Complemento := NFSe.Prestador.Endereco.Complemento;
+        Bairro := NFSe.Prestador.Endereco.Bairro;
+        CodigoMunicipio := NFSe.Prestador.Endereco.CodigoMunicipio;
+        UF := NFSe.Prestador.Endereco.UF;
+        CEP := NFSe.Prestador.Endereco.CEP;
+      end;
+
+    teTomador:
+      begin
+        Endereco := NFSe.Tomador.Endereco.Endereco;
+        Numero := NFSe.Tomador.Endereco.Numero;
+        Complemento := NFSe.Tomador.Endereco.Complemento;
+        Bairro := NFSe.Tomador.Endereco.Bairro;
+        CodigoMunicipio := NFSe.Tomador.Endereco.CodigoMunicipio;
+        UF := NFSe.Tomador.Endereco.UF;
+        CEP := NFSe.Tomador.Endereco.CEP;
+      end;
+
+    teIntermediario:
+      begin
+        Endereco := NFSe.Intermediario.Endereco.Endereco;
+        Numero := NFSe.Intermediario.Endereco.Numero;
+        Complemento := NFSe.Intermediario.Endereco.Complemento;
+        Bairro := NFSe.Intermediario.Endereco.Bairro;
+        CodigoMunicipio := NFSe.Intermediario.Endereco.CodigoMunicipio;
+        UF := NFSe.Intermediario.Endereco.UF;
+        CEP := NFSe.Intermediario.Endereco.CEP;
+      end;
+  end;
+
   Result := CreateElement('enderNac');
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xLgr', 1, 255, 1,
-                                          NFSe.Emitente.Endereco.Endereco, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xLgr', 1, 255, 1, Endereco, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'nro', 1, 60, 1,
-                                            NFSe.Emitente.Endereco.Numero, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'nro', 1, 60, 1, Numero, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xCpl', 1, 156, 0,
-                                       NFSe.Emitente.Endereco.Complemento, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xCpl', 1, 156, 0, Complemento, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xBairro', 1, 60, 1,
-                                            NFSe.Emitente.Endereco.Bairro, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xBairro', 1, 60, 1, Bairro, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'cMun', 7, 7, 1,
-                                   NFSe.Emitente.Endereco.CodigoMunicipio, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'cMun', 7, 7, 1, CodigoMunicipio, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'UF', 2, 2, 1,
-                                                NFSe.Emitente.Endereco.UF, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'UF', 2, 2, 1, UF, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'CEP', 8, 8, 1,
-                                               NFSe.Emitente.Endereco.CEP, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'CEP', 8, 8, 1, CEP, ''));
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLEmitente: TACBrXmlNode;
+var
+  CPFCNPJ, NIF, CAEPF, IM, Nome, Fantasia, Telefone, Email: string;
+  cNaoNIF: TNaoNIF;
 begin
   Result := CreateElement('emit');
 
-  if NFSe.Emitente.IdentificacaoPrestador.CpfCnpj <> '' then
-    Result.AppendChild(AddNodeCNPJCPF('#1', '#1',
-                                  NFSe.Emitente.IdentificacaoPrestador.CpfCnpj))
-  else
-  begin
-    if NFSe.Emitente.IdentificacaoPrestador.Nif <> '' then
-      Result.AppendChild(AddNode(tcStr, '#1', 'NIF', 1, 40, 1,
-                                  NFSe.Emitente.IdentificacaoPrestador.Nif, ''))
-    else
-      Result.AppendChild(AddNode(tcStr, '#1', 'cNaoNIF', 1, 1, 1,
-                NaoNIFToStr(NFSe.Emitente.IdentificacaoPrestador.cNaoNIF), ''));
+  case NFSe.tpEmit of
+    tePrestador:
+      begin
+        CPFCNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
+        NIF := NFSe.Prestador.IdentificacaoPrestador.Nif;
+        cNaoNIF := NFSe.Prestador.IdentificacaoPrestador.cNaoNIF;
+        CAEPF := NFSe.Prestador.IdentificacaoPrestador.CAEPF;
+        IM := NFSe.Prestador.IdentificacaoPrestador.InscricaoMunicipal;
+        Nome := NFSe.Prestador.RazaoSocial;
+        Fantasia := NFSe.Prestador.NomeFantasia;
+        Telefone := NFSe.Prestador.Contato.Telefone;
+        Email := NFSe.Prestador.Contato.Email;
+      end;
+
+    teTomador:
+      begin
+        CPFCNPJ := NFSe.Tomador.IdentificacaoTomador.CpfCnpj;
+        NIF := NFSe.Tomador.IdentificacaoTomador.Nif;
+        cNaoNIF := NFSe.Tomador.IdentificacaoTomador.cNaoNIF;
+        CAEPF := NFSe.Tomador.IdentificacaoTomador.CAEPF;
+        IM := NFSe.Tomador.IdentificacaoTomador.InscricaoMunicipal;
+        Nome := NFSe.Tomador.RazaoSocial;
+        Fantasia := NFSe.Tomador.NomeFantasia;
+        Telefone := NFSe.Tomador.Contato.Telefone;
+        Email := NFSe.Tomador.Contato.Email;
+      end;
+
+    teIntermediario:
+      begin
+        CPFCNPJ := NFSe.Intermediario.Identificacao.CpfCnpj;
+        NIF := NFSe.Intermediario.Identificacao.Nif;
+        cNaoNIF := NFSe.Intermediario.Identificacao.cNaoNIF;
+        CAEPF := NFSe.Intermediario.Identificacao.CAEPF;
+        IM := NFSe.Intermediario.Identificacao.InscricaoMunicipal;
+        Nome := NFSe.Intermediario.RazaoSocial;
+        Fantasia := '';
+        Telefone := NFSe.Intermediario.Contato.Telefone;
+        Email := NFSe.Intermediario.Contato.Email;
+      end;
   end;
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'CAEPF', 1, 14, 0,
-                               NFSe.Emitente.IdentificacaoPrestador.CAEPF, ''));
+  if CPFCNPJ <> '' then
+    Result.AppendChild(AddNodeCNPJCPF('#1', '#1', CPFCNPJ))
+  else
+  begin
+    if NIF <> '' then
+      Result.AppendChild(AddNode(tcStr, '#1', 'NIF', 1, 40, 1, NIF, ''))
+    else
+      Result.AppendChild(AddNode(tcStr, '#1', 'cNaoNIF', 1, 1, 1,
+                                                     NaoNIFToStr(cNaoNIF), ''));
+  end;
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'IM', 1, 15, 0,
-                  NFSe.Emitente.IdentificacaoPrestador.InscricaoMunicipal, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'CAEPF', 1, 14, 0, CAEPF, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xNome', 1, 300, 0,
-                                                NFSe.Emitente.RazaoSocial, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'IM', 1, 15, 0, IM, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xFant', 1, 300, 0,
-                                               NFSe.Emitente.NomeFantasia, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xNome', 1, 300, 0, Nome, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xFant', 1, 150, 0, Fantasia, ''));
 
   Result.AppendChild(GerarXMLEnderecoEmitente);
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'fone', 6, 20, 0,
-                                           NFSe.Emitente.Contato.Telefone, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'fone', 6, 20, 0, Telefone, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'email', 1, 80, 0,
-                                              NFSe.Emitente.Contato.Email, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'email', 1, 80, 0, Email, ''));
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLValoresNFSe: TACBrXmlNode;
@@ -313,32 +379,43 @@ begin
   Result := CreateElement('valores');
 
   Result.AppendChild(AddNode(tcDe2, '#1', 'vCalcDR', 1, 15, 0,
-                                         NFSe.infNFSe.Valores.vCalcDR, ''));
+                                       NFSe.Servico.Valores.ValorDeducoes, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'tpBM', 1, 15, 0,
-                                         NFSe.infNFSe.Valores.tpBM, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'tpBM', 1, 1, 0,
+                             tpBMToStr(NFSe.Servico.Valores.tribMun.tpBM), ''));
 
-  Result.AppendChild(AddNode(tcDe2, '#1', 'vCalcBM', 1, 15, 0,
-                                         NFSe.infNFSe.Valores.vCalcBM, ''));
+  case NFSe.Servico.Valores.tribMun.tpBM of
+    tbIsencao:
+      Result.AppendChild(AddNode(tcDe2, '#1', 'vCalcBM', 1, 15, 0, 0, ''));
+
+    tbReducaoBCvalor:
+      Result.AppendChild(AddNode(tcDe2, '#1', 'vCalcBM', 1, 15, 0,
+                                    NFSe.Servico.Valores.tribMun.vRedBCBM, ''));
+
+    tbReducaoBCperc,
+    tbAliquota:
+      Result.AppendChild(AddNode(tcDe2, '#1', 'vCalcBM', 1, 15, 0,
+                                    NFSe.Servico.Valores.tribMun.pRedBCBM, ''));
+  end;
 
   Result.AppendChild(AddNode(tcDe2, '#1', 'vBC', 1, 15, 0,
-                                         NFSe.infNFSe.Valores.BaseCalculo, ''));
+                                         NFSe.Servico.Valores.BaseCalculo, ''));
 
-  Result.AppendChild(AddNode(tcDe2, '#1', 'pAliqAplic', 1, 15, 0,
-                                            NFSe.infNFSe.Valores.Aliquota, ''));
+  Result.AppendChild(AddNode(tcDe2, '#1', 'pAliqAplic', 1, 3, 0,
+                                            NFSe.Servico.Valores.Aliquota, ''));
 
   Result.AppendChild(AddNode(tcDe2, '#1', 'vISSQN', 1, 15, 0,
-                                            NFSe.infNFSe.Valores.ValorIss, ''));
+                                            NFSe.Servico.Valores.ValorIss, ''));
 
   Result.AppendChild(AddNode(tcDe2, '#1', 'vTotalRet', 1, 15, 0,
-                                           NFSe.infNFSe.Valores.vTotalRet, ''));
+                                      NFSe.Servico.Valores.ValorIssRetido, ''));
 
   Result.AppendChild(AddNode(tcDe2, '#1', 'vLiq', 1, 15, 1,
-                                    NFSe.infNFSe.Valores.ValorLiquidoNfse, ''));
+                                    NFSe.Servico.Valores.ValorLiquidoNfse, ''));
 
   if VersaoNFSe = ve100 then
-    Result.AppendChild(AddNode(tcStr, '#1', 'xOutInf', 1, 15, 0,
-                                           NFSe.OutrasInformacoes, ''));
+    Result.AppendChild(AddNode(tcStr, '#1', 'xOutInf', 1, 2000, 0,
+                                                   NFSe.OutrasInformacoes, ''));
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLDPS: TACBrXmlNode;
@@ -372,7 +449,8 @@ end;
 
 function TNFSeW_PadraoNacional.GerarXMLInfNFSe: TACBrXmlNode;
 var
-  chave, xLocEmi, xUF, xLocPrestacao, xLocIncid, CodigoMun, CNPJ: string;
+  chave, xLocEmi, xUF, xLocPrestacao, xLocIncid, CodigoMun, CNPJ, ldhProc,
+  lnDFSe: string;
   cLocIncid: Integer;
   xmlNode: TACBrXmlNode;
 begin
@@ -382,13 +460,18 @@ begin
   if CNPJ = '' then
     CNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
 
+  if NFSe.infNFSe.nDFSe <> '' then
+    lnDFSe := NFSe.infNFSe.nDFSe
+  else
+    lnDFSe := NFSe.IdentificacaoRps.Numero;
+
   chave := GerarChaveNFSe(CodigoMun,
-                          ambGerToStr(NFSe.infNFSe.ambGer),
+                          '1', //ambGerToStr(NFSe.infNFSe.ambGer),
                           CNPJ,
-                          NFSe.infNFSe.nNFSe,
+                          NFSe.IdentificacaoRps.Numero,
                           NFSe.Prestador.Endereco.UF,
-                          NFSe.infNFSe.dhProc,
-                          StrToInt64Def(NFSe.infNFSe.nDFSe, 1));
+                          NFSe.DataEmissaoRps,
+                          StrToInt64Def(lnDFSe, 1));
 
   chave := 'NFS' + chave;
 
@@ -405,6 +488,7 @@ begin
     case NFSe.tpEmit of
       teTomador:
         xLocEmi := ObterNomeMunicipioUF(StrToIntDef(NFSe.Tomador.Endereco.CodigoMunicipio, 0), xUF);
+
       teIntermediario:
         xLocEmi := ObterNomeMunicipioUF(StrToIntDef(NFSe.Intermediario.Endereco.CodigoMunicipio, 0), xUF);
     else
@@ -412,15 +496,15 @@ begin
     end;
   end;
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xLocEmi', 1, 60, 1, xLocEmi, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xLocEmi', 1, 150, 1, xLocEmi, ''));
 
   xLocPrestacao := ObterNomeMunicipioUF(StrToIntDef(NFSe.Servico.CodigoMunicipio, 0), xUF);
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xLocPrestacao', 1, 60, 1,
+  Result.AppendChild(AddNode(tcStr, '#1', 'xLocPrestacao', 1, 150, 1,
                                                             xLocPrestacao, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'nNFSe', 1, 1, 1,
-                                                       NFSe.infNFSe.nNFSe, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'nNFSe', 1, 13, 1,
+                                             NFSe.IdentificacaoRps.Numero, ''));
 
   if NFSe.infNFSe.IBSCBS.cLocalidadeIncid > 0 then
   begin
@@ -433,35 +517,41 @@ begin
   if xLocIncid = '' then
     xLocIncid := ObterNomeMunicipioUF(cLocIncid, xUF);
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'cLocIncid', 7, 7, 1,
-                                  cLocIncid, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'cLocIncid', 7, 7, 0, cLocIncid, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xLocIncid', 1, 60, 1,
-                                                            xLocIncid, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xLocIncid', 1, 150, 0, xLocIncid, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xTribNac', 1, 7, 1,
-                                                    NFSe.infNFSe.xTribNac, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'xTribNac', 1, 600, 1,
+                 ItemListaServicoDescricao(NFSe.Servico.ItemListaServico), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'verAplic', 1, 20, 1,
                                                             NFSe.verAplic, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'ambGer', 1, 1, 1,
-                                         ambGerToStr(NFSe.infNFSe.ambGer), ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'ambGer', 1, 1, 1, '1', ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'tpEmis', 1, 1, 1,
-                                         tpEmisToStr(NFSe.infNFSe.tpEmis), ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'tpEmis', 1, 1, 1, '2'
+                                       {tpEmisToStr(NFSe.infNFSe.tpEmis)}, ''));
 
+  {
+        Situações possíveis:
+        100 - NFS-e Gerada;
+        102 - NFS-e de Decisão Judicial;
+        103 - NFS-e Avulsa;
+        107 - NFS-e MEI;
+  }
   Result.AppendChild(AddNode(tcInt, '#1', 'cStat', 1, 3, 1, '100', ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'tpAmb', 1, 1, NrOcorrtpAmb,
                                               TipoAmbienteToStr(Ambiente), ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'dhProc', 25, 25, 1,
-                  DateTimeTodh(NFSe.infNFSe.dhProc) +
-                  GetUTC(NFSe.Prestador.Endereco.UF, NFSe.infNFSe.dhProc), ''));
+  if NFSe.infNFSe.dhProc > 0 then
+    ldhProc := DateTimeTodh(NFSe.infNFSe.dhProc) + GetUTC(NFSe.Prestador.Endereco.UF, NFSe.infNFSe.dhProc)
+  else
+    ldhProc := DateTimeTodh(NFSe.DataEmissaoRps) + GetUTC(NFSe.Prestador.Endereco.UF, NFSe.DataEmissaoRps);
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'nDFSe', 1, 9, 1,
-                                                       NFSe.infNFSe.nDFSe, ''));
+  Result.AppendChild(AddNode(tcStr, '#1', 'dhProc', 25, 25, 1, ldhProc, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'nDFSe', 1, 9, 1, lnDFSe, ''));
 
   xmlNode := GerarXMLEmitente;
   Result.AppendChild(xmlNode);
@@ -469,7 +559,12 @@ begin
   xmlNode := GerarXMLValoresNFSe;
   Result.AppendChild(xmlNode);
 
-  if GerarIBSCBSNFSe then
+  {Uso da Administração Tributária Municipal}
+  if VersaoNFSe = ve101 then
+    Result.AppendChild(AddNode(tcStr, '#1', 'xOutInf', 1, 15, 0,
+                                                   NFSe.OutrasInformacoes, ''));
+
+  if GerarIBSCBSNFSe and (NFSe.OptanteSN = osnNaoOptante) then
   begin
     xmlNode := GerarXMLIBSCBSNFSe;
     Result.AppendChild(xmlNode);
@@ -494,6 +589,8 @@ begin
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLInfDps: TACBrXmlNode;
+var
+  dhEmissao: TdateTime;
 begin
   Result := CreateElement('infDPS');
 
@@ -503,9 +600,12 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'tpAmb', 1, 1, 1,
                                               TipoAmbienteToStr(Ambiente), ''));
 
+  dhEmissao := NFSe.DataEmissaoRps;
+  if dhEmissao = 0 then
+    dhEmissao := NFSe.DataEmissao;
+
   Result.AppendChild(AddNode(tcStr, '#1', 'dhEmi', 25, 25, 1,
-               DateTimeTodh(NFSe.DataEmissao) +
-               GetUTC(NFSe.Prestador.Endereco.UF, NFSe.DataEmissao), DSC_DEMI));
+    DateTimeTodh(dhEmissao) + GetUTC(NFSe.Prestador.Endereco.UF, dhEmissao), DSC_DEMI));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'verAplic', 1, 20, 1,
                                                             NFSe.verAplic, ''));
@@ -1165,7 +1265,24 @@ begin
 
     Result.AppendChild(AddNode(tcStr, '#1', 'xInfComp', 1, 2000, 0,
                                           NFSe.Servico.infoCompl.xInfComp, ''));
+  end;
+end;
 
+function TNFSeW_PadraoNacional.GerarXMLgItemPed: TACBrXMLNode;
+var
+  i: Integer;
+begin
+  Result := nil;
+
+  if NFSe.Servico.infoCompl.gItemPed.Count > 0 then
+  begin
+    Result := CreateElement('gItemPed');
+
+    for i := 0 to NFSe.Servico.infoCompl.gItemPed.Count - 1 do
+    begin
+      Result.AppendChild(AddNode(tcStr, '#1', 'xItemPed', 1, 60, 1,
+                                NFSe.Servico.infoCompl.gItemPed[i].xItemPed));
+    end;
   end;
 end;
 
@@ -1382,24 +1499,6 @@ begin
   end;
 end;
 
-function TNFSeW_PadraoNacional.GerarXMLgItemPed: TACBrXMLNode;
-var
-  i: Integer;
-begin
-  Result := nil;
-
-  if NFSe.Servico.infoCompl.gItemPed.Count > 0 then
-  begin
-    Result := CreateElement('gItemPed');
-
-    for i := 0 to NFSe.Servico.infoCompl.gItemPed.Count - 1 do
-    begin
-      Result.AppendChild(AddNode(tcStr, '#1', 'xItemPed', 1, 60, 1,
-                                NFSe.Servico.infoCompl.gItemPed[i].xItemPed));
-    end;
-  end;
-end;
-
 function TNFSeW_PadraoNacional.GerarXMLEnderecoFornecedor(
   Item: Integer): TACBrXmlNode;
 begin
@@ -1563,7 +1662,7 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'CST', 2, 2, 1,
                                CSTToStr(NFSe.Servico.Valores.tribFed.CST), ''));
 
-  if not (NFSe.Servico.Valores.tribFed.CST in [cst08, cst09]) then
+  if not (NFSe.Servico.Valores.tribFed.CST in [cst00, cst08, cst09]) then
   begin
     //futuramente acredito que o cst07 tambem entre nessa condição
     Result.AppendChild(AddNode(tcDe2, '#1', 'vBCPisCofins', 1, 15, 1,
@@ -1649,6 +1748,7 @@ var
   chave, CodigoMun, CNPJ: string;
 begin
   Configuracao;
+  LerParamsTabIni(True);
 
   ListaDeAlertas.Clear;
 
@@ -1811,7 +1911,7 @@ begin
 
   AINIRec.WriteString(LSecao, 'Numero', NFSe.IdentificacaoRps.Numero);
   AINIRec.WriteString(LSecao, 'Serie', NFSe.IdentificacaoRps.Serie);
-  AINIRec.WriteString(LSecao, 'DataEmissao', DateTimeTodh(NFSe.DataEmissao));
+  AINIRec.WriteString(LSecao, 'DataEmissaoRPS', DateTimeTodh(NFSe.DataEmissaoRps));
   AINIRec.WriteString(LSecao, 'Competencia', DateTimeTodh(NFSe.Competencia));
   AINIRec.WriteString(LSecao, 'verAplic', NFSe.verAplic);
   AINIRec.WriteString(LSecao, 'tpEmit', tpEmitToStr(NFSe.tpEmit));
@@ -1832,7 +1932,7 @@ procedure TNFSeW_PadraoNacional.GerarINIDadosPrestador(AINIRec: TMemIniFile);
 begin
   LSecao := 'Prestador';
 
-  AINIRec.WriteString(LSecao, 'CNPJ', NFSe.Prestador.IdentificacaoPrestador.CpfCnpj);
+  AINIRec.WriteString(LSecao, 'CNPJCPF', NFSe.Prestador.IdentificacaoPrestador.CpfCnpj);
   AINIRec.WriteString(LSecao, 'InscricaoMunicipal', NFSe.Prestador.IdentificacaoPrestador.InscricaoMunicipal);
   AINIRec.WriteString(LSecao, 'NIF', NFSe.Prestador.IdentificacaoPrestador.NIF);
   AINIRec.WriteString(LSecao, 'cNaoNIF', NaoNIFToStr(NFSe.Prestador.IdentificacaoPrestador.cNaoNIF));
@@ -1855,7 +1955,7 @@ begin
 
   AINIRec.WriteString(LSecao, 'opSimpNac', OptanteSNToStr(NFSe.OptanteSN));
   AINIRec.WriteString(LSecao, 'RegimeApuracaoSN', RegimeApuracaoSNToStr(NFSe.RegimeApuracaoSN));
-  AINIRec.WriteString(LSecao, 'Regime', FpAOwner.RegimeEspecialTributacaoToStr(NFSe.RegimeEspecialTributacao));
+  AINIRec.WriteString(LSecao, 'RegimeEspTrib', FpAOwner.RegimeEspecialTributacaoToStr(NFSe.RegimeEspecialTributacao));
 end;
 
 procedure TNFSeW_PadraoNacional.GerarINIDadosTomador(AINIRec: TMemIniFile);
@@ -2073,6 +2173,7 @@ begin
   AINIRec.WriteString(LSecao, 'NIF', fornec.Identificacao.NIF);
   AINIRec.WriteString(LSecao, 'cNaoNIF', NaoNIFToStr(fornec.Identificacao.cNaoNIF));
   AINIRec.WriteString(LSecao, 'CAEPF', fornec.Identificacao.CAEPF);
+  AINIRec.WriteString(LSecao, 'RazaoSocial', fornec.RazaoSocial);
 
   AINIRec.WriteString(LSecao, 'CEP', fornec.Endereco.CEP);
   AINIRec.WriteString(LSecao, 'xMunicipio', fornec.Endereco.xMunicipio);
@@ -2093,6 +2194,7 @@ begin
   AINIRec.WriteString(LSecao, 'tribISSQN', tribISSQNToStr(NFSe.Servico.Valores.tribMun.tribISSQN));
   AINIRec.WriteInteger(LSecao, 'cPaisResult', NFSe.Servico.Valores.tribMun.cPaisResult);
 //  AINIRec.WriteString(LSecao, 'tpBM', tpBMToStr(NFSe.Servico.Valores.tribMun.tpBM));
+  AINIRec.WriteString(LSecao, 'nBM', NFSe.Servico.Valores.tribMun.nBM);
   AINIRec.WriteFloat(LSecao, 'vRedBCBM', NFSe.Servico.Valores.tribMun.vRedBCBM);
   AINIRec.WriteFloat(LSecao, 'pRedBCBM', NFSe.Servico.Valores.tribMun.pRedBCBM);
   AINIRec.WriteString(LSecao, 'tpSusp', tpSuspToStr(NFSe.Servico.Valores.tribMun.tpSusp));
@@ -2138,7 +2240,7 @@ procedure TNFSeW_PadraoNacional.GerarINIDadosEmitente(
 begin
   LSecao := 'Emitente';
 
-  AINIRec.WriteString(LSecao, 'CNPJ', NFSe.infNFSe.emit.Identificacao.CpfCnpj);
+  AINIRec.WriteString(LSecao, 'CNPJCPF', NFSe.infNFSe.emit.Identificacao.CpfCnpj);
   AINIRec.WriteString(LSecao, 'InscricaoMunicipal', NFSe.infNFSe.emit.Identificacao.InscricaoMunicipal);
 
   AINIRec.WriteString(LSecao, 'RazaoSocial', NFSe.infNFSe.emit.RazaoSocial);

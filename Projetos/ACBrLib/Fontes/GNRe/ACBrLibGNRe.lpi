@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
     <Version Value="12"/>
@@ -13,9 +13,7 @@
       <SessionStorage Value="InProjectDir"/>
       <Title Value="ACBrLibGNRe"/>
       <ResourceType Value="res"/>
-      <XPManifest>
-        <DpiAware Value="True/PM"/>
-      </XPManifest>
+      <UseXPManifest Value="True"/>
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
@@ -23,7 +21,7 @@
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="1"/>
-      <BuildNr Value="286"/>
+      <BuildNr Value="289"/>
       <Language Value="0416"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrGNRe - Biblioteca para emissão e impressão de Guia GNRe" InternalName="ACBrLibGNRe" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="ACBrGNRe " ProductVersion="0.0.0.1"/>
     </VersionInfo>

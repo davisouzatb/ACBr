@@ -49,7 +49,7 @@ uses
   RLPrinters, 
   RLPDFFilter, 
   RLConsts,
-  pgnreGNRERetorno, 
+  pgnreGNRERetorno,
   ACBrGNRE2;
 
 type
@@ -145,7 +145,7 @@ begin
       FMargemEsquerda := AMargemEsquerda;
       FMargemDireita := AMargemDireita;
       FImpressora := AImpressora;
-
+      
       if FImpressora > '' then
         RLPrinter.PrinterName := FImpressora;
 

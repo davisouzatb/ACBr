@@ -61,14 +61,14 @@ type
     procedure LerIdentificacaoRps(const ANode: TACBrXmlNode);
     procedure LerServico(const ANode: TACBrXmlNode); virtual;
     procedure LerItensServico(const ANode: TACBrXmlNode);
-    procedure LerValores(const ANode: TACBrXmlNode);
+    procedure LerValores(const ANode: TACBrXmlNode); virtual;
 
     procedure LerPrestadorServico(const ANode: TACBrXmlNode);
     procedure LerEnderecoPrestadorServico(const ANode: TACBrXmlNode; const aTag: string);
     procedure LerIdentificacaoPrestador(const ANode: TACBrXmlNode);
     procedure LerContatoPrestador(const ANode: TACBrXmlNode);
 
-    procedure LerTomadorServico(const ANode: TACBrXmlNode);
+    procedure LerTomadorServico(const ANode: TACBrXmlNode); virtual;
     procedure LerIdentificacaoTomador(const ANode: TACBrXmlNode);
     procedure LerEnderecoTomador(const ANode: TACBrXmlNode);
     procedure LerContatoTomador(const ANode: TACBrXmlNode);
@@ -1006,6 +1006,7 @@ begin
 
     // Ler os campos do arquivo INI referente a Reforma Tributária
     LerINIIBSCBS(LINIRec, NFSe.IBSCBS);
+    LerINIIBSCBSNFSe(LINIRec, NFSe.infNFSe.IBSCBS);
 
     Result := True;
   finally
@@ -1101,7 +1102,7 @@ end;
 
 procedure TNFSeR_ABRASFv1.LerINISecaoPrestador(const AINIRec: TMemIniFile);
 var
-  LSecao: String;
+  LSecao, lAuxStr: String;
   Ok: Boolean;
 begin
   LSecao := 'Prestador';
@@ -1111,6 +1112,13 @@ begin
     NFSe.RegimeEspecialTributacao := FpAOwner.StrToRegimeEspecialTributacao(Ok, AINIRec.ReadString(LSecao, 'Regime', ''));
     NFSe.OptanteSimplesNacional := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(LSecao, 'OptanteSN', ''));
     NFSe.IncentivadorCultural := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(LSecao, 'IncentivadorCultural', ''));
+    lAuxStr := AINIRec.ReadString(LSecao, 'RegimeApuracaoSN', '');
+    if lAuxStr <> '' then
+      NFSe.RegimeApuracaoSN := StrToRegimeApuracaoSN(Ok, lAuxStr);
+
+    lAuxStr := AINIRec.ReadString(LSecao, 'opSimpNac', '');
+    if lAuxStr <> '' then
+      NFSe.OptanteSN := StrToOptanteSN(Ok, lAuxStr);
 
     NFSe.Prestador.IdentificacaoPrestador.CpfCnpj := AINIRec.ReadString(LSecao, 'CNPJ', '');
     NFSe.Prestador.IdentificacaoPrestador.InscricaoMunicipal := AINIRec.ReadString(LSecao, 'InscricaoMunicipal', '');
@@ -1205,10 +1213,12 @@ begin
   begin
     NFSe.Servico.ItemListaServico := AINIRec.ReadString(LSecao, 'ItemListaServico', '');
     NFSe.Servico.xItemListaServico := AINIRec.ReadString(LSecao, 'xItemListaServico', '');
+    NFSe.Servico.CodigoServicoNacional := AINIRec.ReadString(LSecao, 'cTribNac', '');
     NFSe.Servico.CodigoCnae := AINIRec.ReadString(LSecao, 'CodigoCnae', '');
     NFSe.Servico.CodigoTributacaoMunicipio := AINIRec.ReadString(LSecao, 'CodigoTributacaoMunicipio', '');
     NFSe.Servico.Discriminacao := ChangeLineBreak(AINIRec.ReadString(LSecao, 'Discriminacao', ''), FpAOwner.ConfigGeral.QuebradeLinha);
     NFSe.Servico.CodigoMunicipio := AINIRec.ReadString(LSecao, 'CodigoMunicipio', '');
+    NFSe.Servico.CodigoNBS := AINIRec.ReadString(LSecao, 'CodigoNBS', '');
     {
     NFSe.Servico.MunicipioIncidencia := AINIRec.ReadInteger(LSecao, 'MunicipioIncidencia', 0);
     NFSe.Servico.xMunicipioIncidencia := AINIRec.ReadString(LSecao, 'xMunicipioIncidencia', '');

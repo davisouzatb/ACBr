@@ -40,6 +40,7 @@ uses
   SysUtils, Classes, StrUtils,
   ACBrNFSeXGravarXml_ABRASFv1,
   ACBrNFSeXGravarXml_ABRASFv2,
+  ACBrDFe.Conversao,
   ACBrNFSeXConversao,
   ACBrXmlDocument,
   PadraoNacional.GravarXml;
@@ -73,7 +74,6 @@ uses
   ACBrUtil.Base,
   ACBrUtil.DateTime,
   ACBrUtil.Strings,
-  ACBrDFe.Conversao,
   ACBrXmlBase,
   ACBrNFSeXConsts;
 
@@ -102,30 +102,16 @@ begin
 end;
 
 function TNFSeW_Tiplan203.GerarTomador: TACBrXmlNode;
-var
-  tomadorIdentificado, tipoPessoa, item, cnpjCpfDestinatario,
-  xCidade, xUF: string;
 begin
   Result := inherited GerarTomador;
-
-  {tomadorIdentificado := '0';
-  cnpjCpfDestinatario := NFSe.Tomador.IdentificacaoTomador.CpfCnpj;
-
-  if NFSe.Tomador.IdentificacaoTomador.Nif <> '' then
-  begin
-    tomadorIdentificado := '1';
-    cnpjCpfDestinatario := NFSe.Tomador.IdentificacaoTomador.Nif;
-  end;
-
-  Result.AppendChild(AddNode(tcStr, '#38', 'MotivoNifNaoInformado', 1, 1, 1,
-                             tomadorIdentificado, ''));}
 end;
 
 function TNFSeW_Tiplan203.GerarValores: TACBrXmlNode;
 begin
   Result := inherited GerarValores;
 
-  if Result <> nil then
+  if (Result <> nil) and not
+     (NFSe.Servico.Valores.tribFed.CST in [cstVazio, cst00, cst08, cst09]) then
   begin
     Result.AppendChild(AddNode(tcStr, '#', 'SituacaoTributariaPISCOFINS', 2, 2, 1,
                                CSTToStr(NFSe.Servico.Valores.tribFed.CST), ''));

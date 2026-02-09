@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.acbr.pixcd.acbrlibpixcd.demo.R;
 import com.acbr.pixcd.acbrlibpixcd.demo.utils.ACBrLibHelper;
@@ -62,23 +63,38 @@ public class ComandosQRCodeEstaticoFragment extends Fragment {
         return view;
     }
 
-    public void GerarQRCodeEstatico(){
+
+    private double getValor() throws NumberFormatException {
+        String valorStr = txtValorQRCodeEstatico.getText().toString();
+        if (valorStr.isEmpty()) {
+            throw new NumberFormatException("Valor não pode ser vazio.");
+        } else {
+            return Double.parseDouble(valorStr);
+        }
+    }
+
+    public void GerarQRCodeEstatico() {
         txtRespostaQRCodeEstatico.setText("");
         String result = "";
-        double valor = Double.parseDouble(txtValorQRCodeEstatico.getText().toString());
+        double valor = 0.0;
         String informacoesAdicionais = txtInfoAdicionaisQRCodeEstatico.getText().toString();
         String txIdQRCodeEstatico = txtTxIdQRCodeEstatico.getText().toString();
         try {
+            valor = getValor();
             result = ACBrPIXCD.GerarQRCodeEstatico(valor, informacoesAdicionais, txIdQRCodeEstatico);
+        } catch (NumberFormatException ex) {
+            result = "";
+
+            Toast.makeText(getContext(), "Erro: " + ex.getMessage(), Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
-            Log.e("Erro ao Gerar QRCode Estatico", ex.getMessage());
-            result = ex.getMessage();
+            Toast.makeText(getContext(), "Erro : " + ex.getMessage(), Toast.LENGTH_LONG).show();
+
         } finally {
             txtRespostaQRCodeEstatico.setText(result);
         }
     }
 
-    public void LimparRespostaQRCodeEstatico(){
+    public void LimparRespostaQRCodeEstatico() {
         txtRespostaQRCodeEstatico.setText("");
     }
 }

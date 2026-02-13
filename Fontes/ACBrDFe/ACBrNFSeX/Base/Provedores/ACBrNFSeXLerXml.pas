@@ -88,28 +88,28 @@ type
 
     // Reforma Tributária
     procedure LerXMLIBSCBSDPS(const ANode: TACBrXmlNode; IBSCBS: TIBSCBSDPS); virtual;
-    procedure LerXMLgRefNFSe(const ANode: TACBrXmlNode);
+    procedure LerXMLgRefNFSe(const ANode: TACBrXmlNode); virtual;
 
-    procedure LerXMLDestinatario(const ANode: TACBrXmlNode; Dest: TDadosdaPessoa);
-    procedure LerXMLEnderecoDestinatario(const ANode: TACBrXmlNode; ender: Tender);
+    procedure LerXMLDestinatario(const ANode: TACBrXmlNode; Dest: TDadosdaPessoa); virtual;
+    procedure LerXMLEnderecoDestinatario(const ANode: TACBrXmlNode; ender: Tender); virtual;
     procedure LerXMLEnderecoNacionalDestinatario(const ANode: TACBrXmlNode; endNac: TendNac);
     procedure LerXMLEnderecoExteriorDestinatario(const ANode: TACBrXmlNode; endExt: TendExt);
 
-    procedure LerXMLImovel(const ANode: TACBrXmlNode; Imovel: TDadosimovel);
-    procedure LerXMLEnderecoNacionalImovel(const ANode: TACBrXmlNode; ender: TenderImovel);
+    procedure LerXMLImovel(const ANode: TACBrXmlNode; Imovel: TDadosimovel); virtual;
+    procedure LerXMLEnderecoNacionalImovel(const ANode: TACBrXmlNode; ender: TenderImovel); virtual;
     procedure LerXMLEnderecoExteriorImovel(const ANode: TACBrXmlNode; endExt: TendExt);
 
-    procedure LerXMLIBSCBSValores(const ANode: TACBrXmlNode; valores: Tvalorestrib);
-    procedure LerXMLgReeRepRes(const ANode: TACBrXmlNode; gReeRepRes: TgReeRepRes);
-    procedure LerXMLdFeNacional(const ANode: TACBrXmlNode; dFeNacional: TdFeNacional);
-    procedure LerXMLdocFiscalOutro(const ANode: TACBrXmlNode; docFiscalOutro: TdocFiscalOutro);
-    procedure LerXMLdocOutro(const ANode: TACBrXmlNode; docOutro: TdocOutro);
-    procedure LerXMLfornec(const ANode: TACBrXmlNode; fornec: Tfornec);
+    procedure LerXMLIBSCBSValores(const ANode: TACBrXmlNode; valores: Tvalorestrib); virtual;
+    procedure LerXMLgReeRepRes(const ANode: TACBrXmlNode; gReeRepRes: TgReeRepRes); virtual;
+    procedure LerXMLdFeNacional(const ANode: TACBrXmlNode; dFeNacional: TdFeNacional); virtual;
+    procedure LerXMLdocFiscalOutro(const ANode: TACBrXmlNode; docFiscalOutro: TdocFiscalOutro); virtual;
+    procedure LerXMLdocOutro(const ANode: TACBrXmlNode; docOutro: TdocOutro); virtual;
+    procedure LerXMLfornec(const ANode: TACBrXmlNode; fornec: Tfornec); virtual;
 
-    procedure LerXMLTributos(const ANode: TACBrXmlNode; trib: Ttrib);
-    procedure LerXMLgIBSCBS(const ANode: TACBrXmlNode; gIBSCBS: TgIBSCBS);
-    procedure LerXMLgTribRegular(const ANode: TACBrXmlNode; gTribRegular: TgTribRegular);
-    procedure LerXMLgDif(const ANode: TACBrXmlNode; gDif: TgDif);
+    procedure LerXMLTributos(const ANode: TACBrXmlNode; trib: Ttrib); virtual;
+    procedure LerXMLgIBSCBS(const ANode: TACBrXmlNode; gIBSCBS: TgIBSCBS); virtual;
+    procedure LerXMLgTribRegular(const ANode: TACBrXmlNode; gTribRegular: TgTribRegular); virtual;
+    procedure LerXMLgDif(const ANode: TACBrXmlNode; gDif: TgDif); virtual;
 
     procedure LerXMLIBSCBSNFSe(const ANode: TACBrXmlNode; IBSCBS: TIBSCBSNfse);
     procedure LerXMLValoresIBSCBSNFSe(const ANode: TACBrXmlNode; valores: TvaloresIBSCBS);
@@ -266,10 +266,10 @@ begin
     xCodigo := PadLeft(IntToStr(Item), 6, '0');
     lResultNacional := Copy(xCodigo, 1, 2) + '.' + Copy(xCodigo, 3, 2) + '.' + Copy(xCodigo, 5, 2);
 
-    if ItemListaServicoDescricao(lResultProprio) <> '' then
-      Result := lResultProprio
+    if ItemListaServicoDescricao(lResultNacional) <> '' then
+      Result := lResultNacional
     else
-      Result := lResultNacional;
+      Result := lResultProprio;
   end;
 end;
 
@@ -1363,6 +1363,7 @@ begin
     end;
 
     LerINIIBSCBS(AINIRec, IBSCBS);
+    LerINIIBSCBSNFSe(AINIRec, infNFSe.IBSCBS);
   end;
 end;
 

@@ -920,16 +920,31 @@ begin
         BaseCalculo := ValorServicos - ValorDeducoes - DescontoIncondicionado;
 
         case tribFed.tpRetPisCofins of
-          trpcNaoRetido:
+          trpiscofinscsllNaoRetido:
+            RetencoesFederais := ValorInss + ValorIr;
+
+          trpiscofinscsllRetido:
+            RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCofins + ValorCsll;
+
+          trpiscofinsRetidocsllNaoRetido:
+            RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCofins;
+
+          trPisRetidoCofinsCsllNaoRetido:
+            RetencoesFederais := ValorInss + ValorIr + ValorPis;
+
+          trCofinsRetidoPisCsllNaoRetido:
+            RetencoesFederais := ValorInss + ValorIr + ValorCofins;
+
+          trCofinsCsllRetidoPisNaoRetido:
+            RetencoesFederais := ValorInss + ValorIr + ValorCofins + ValorCsll;
+
+          trCsllRetidoPisCofinsNaoRetido:
             RetencoesFederais := ValorInss + ValorIr + ValorCsll;
 
-          trpcPISRetido:
-            RetencoesFederais := ValorPis + ValorInss + ValorIr + ValorCsll;
-
-          trpcCOFINSRetido:
-            RetencoesFederais := ValorCofins + ValorInss + ValorIr + ValorCsll;
+          trPisCsllRetidoCofinsNaoRetido:
+            RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCsll;
         else
-          RetencoesFederais := ValorPis + ValorCofins + ValorInss + ValorIr + ValorCsll;
+          RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCofins + ValorCsll;
         end;
 
         ValorLiquidoNfse := ValorServicos - RetencoesFederais - OutrasRetencoes -
@@ -940,6 +955,9 @@ begin
         ValorTotalNotaFiscal := ValorServicos - DescontoCondicionado -
                                 DescontoIncondicionado;
     end;
+
+    NFSe.Servico.Valores.RetencoesFederais := NFSe.Servico.Valores.RetencoesFederais -
+                                              NFSe.Servico.Valores.ValorIssRetido;
 
     // Reforma Tributária
     LerXMLIBSCBSNFSe(AuxNode.Childrens.FindAnyNs('IBSCBS'), NFSe.infNFSe.IBSCBS);
@@ -1439,7 +1457,8 @@ begin
     NFSe.Servico.Valores.BaseCalculo := NFSe.infNFSe.valores.BaseCalculo;
     NFSe.Servico.Valores.Aliquota := NFSe.infNFSe.valores.Aliquota;
     NFSe.Servico.Valores.ValorIss := NFSe.infNFSe.valores.ValorIss;
-    NFSe.Servico.Valores.ValorIssRetido := NFSe.infNFSe.valores.vTotalRet;
+    NFSe.Servico.Valores.ValorIssRetido := NFSe.infNFSe.valores.ValorIss;
+    NFSe.Servico.Valores.RetencoesFederais := NFSe.infNFSe.valores.vTotalRet;
     NFSe.Servico.Valores.ValorLiquidoNfse := NFSe.infNFSe.valores.ValorLiquidoNfse;
   end;
 
@@ -1619,21 +1638,38 @@ begin
       BaseCalculo := ValorServicos - ValorDeducoes - DescontoIncondicionado;
 
       case tribFed.tpRetPisCofins of
-        trpcNaoRetido:
+        trpiscofinscsllNaoRetido:
+          RetencoesFederais := ValorInss + ValorIr;
+
+        trpiscofinscsllRetido:
+          RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCofins + ValorCsll;
+
+        trpiscofinsRetidocsllNaoRetido:
+          RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCofins;
+
+        trPisRetidoCofinsCsllNaoRetido:
+          RetencoesFederais := ValorInss + ValorIr + ValorPis;
+
+        trCofinsRetidoPisCsllNaoRetido:
+          RetencoesFederais := ValorInss + ValorIr + ValorCofins;
+
+        trCofinsCsllRetidoPisNaoRetido:
+          RetencoesFederais := ValorInss + ValorIr + ValorCofins + ValorCsll;
+
+        trCsllRetidoPisCofinsNaoRetido:
           RetencoesFederais := ValorInss + ValorIr + ValorCsll;
 
-        trpcPISRetido:
-          RetencoesFederais := ValorPis + ValorInss + ValorIr + ValorCsll;
-
-        trpcCOFINSRetido:
-          RetencoesFederais := ValorCofins + ValorInss + ValorIr + ValorCsll;
+        trPisCsllRetidoCofinsNaoRetido:
+          RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCsll;
       else
-        RetencoesFederais := ValorPis + ValorCofins + ValorInss + ValorIr + ValorCsll;
+        RetencoesFederais := ValorInss + ValorIr + ValorPis + ValorCofins + ValorCsll;
       end;
 
       ValorLiquidoNfse := ValorServicos - RetencoesFederais - OutrasRetencoes -
                  ValorIssRetido - DescontoIncondicionado - DescontoCondicionado;
     end;
+
+    RetencoesFederais := RetencoesFederais - ValorIssRetido;
 
     if ValorTotalNotaFiscal = 0 then
       ValorTotalNotaFiscal := ValorServicos - DescontoCondicionado -
@@ -1787,7 +1823,8 @@ begin
     NFSe.Servico.Valores.BaseCalculo := NFSe.infNFSe.valores.BaseCalculo;
     NFSe.Servico.Valores.Aliquota := NFSe.infNFSe.valores.Aliquota;
     NFSe.Servico.Valores.ValorIss := NFSe.infNFSe.valores.ValorIss;
-    NFSe.Servico.Valores.ValorIssRetido := NFSe.infNFSe.valores.vTotalRet;
+    NFSe.Servico.Valores.ValorIssRetido := NFSe.infNFSe.valores.ValorIss;
+    NFSe.Servico.Valores.RetencoesFederais := NFSe.infNFSe.valores.vTotalRet;
     NFSe.Servico.Valores.ValorLiquidoNfse := NFSe.infNFSe.valores.ValorLiquidoNfse;
   end;
 end;

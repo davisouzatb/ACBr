@@ -42,8 +42,77 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+13/02/2026
+-- DBSeller.GravarXml --
+[-] ACBR-8979 - Correção da geração da tag CodigoNBS.
+   Por: Diego Folieni
+
+12/02/2026
+-- ISSFortaleza.LerXml --
+[+] Inclusão da leitura dos campos IBSCBS no XML.
+    por: Elias
+
+-- ACBrNFSeXLerXml --
+[*] Definindo métodos necessários como 'virtual'.
+
+-- ACBrNFSeXLerXml_ABRASFv1 --
+[*] Inclusão de métodos utilizados em GravarXML.
+
+12/02/2026
+-- ACBrNFSeXServicos --
+[-] A cidade de Ganhaes/MG usa a versão 2.04 do provedor EL.
+   Por: Diego Folieni
+-- ISSNet.GravarXml/ISSNet.Provider --
+[+] ACBR-8496 - Implementado o Provider para os serviços: Emitir e ConsultarLote.
+    Obs: O WebService responde que o serviço não esta disponível, esta em construção.
+   Por: Italo Giurizzato Junior
+-- Conam.LerXml --
+[*] Inclusão de campos novos na leitura do arquivo INI.
+    Seção [Servico] agora tem mais esses campos: CodigoCnae, CodigoAnexoSN, CodigoCTN, CodigoNBS e InfAdicional.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml/ACBrNFSeXLerXml/ISSSaoPaulo.GravarXml/ISSSaoPaulo.LerXml --
+[*] ACBR-8944 - Ajustes diversos para aparelhar a escrita/leitura do XML com a escrita/leitura do INI para o ISSSaoPaulo.
+   Por: Diego Folieni 
+-- Digifred.Provider --
+[*] ACBR-8915 - Ajustes no TratarXmlRetornado por conta de conter duas Declarações no XML diferentes.
+   Por: Italo Giurizzato Junior
+-- PadraoNacional.LerXml --
+[*] Ajustes para considerar ISSQN retido na leitura do XML.
+   Por: Helius_ERP
+-- Citta.Provider --
+[-] Corrigida geração do lote de envio do provedor Citta - https://www.projetoacbr.com.br/forum/topic/90338-nfsex-david-canabarrors/
+   Por: Renato Rubinho
+
+11/02/2026
+-- Digifred.Provider --
+[*] ACBR-8915 - Ajustes na leitura do retorno do envio de uma nota.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXConversao/PadraoNacional.LerXml --
+[*] ACBR-8963 - Ajustes nos valores do tipo: TtpRetPisCofins visando atender a NT 007.
+   Por: Bruno
+-- Fiorilli.Provider, ACBrNFSeXServicos --
+[*] ACBR-8782 - Ajustes visando compatibilização com a nova API do provedor que recepciona no leiaute do Padrão Nacional.
+   Por: Diego Folieni
+
+10/02/2026
+-- ISSFortaleza.GravarXml --
+-- ACBrNFSeXGravarXml_ABRASFv1/ACBrNFSeXGravarXml_ABRASFv2 --
+[*] ACBR-8680 - Ajustes para gerar os campos de AtvEventos.
+   Por: Milton Campanhã
+-- ISSFortaleza.GravarXml --
+[*] ACBR-8923 - Ajustes para gerar corretamente a tag CodigoNbs.
+   Por: Italo Giurizzato Junior
+-- WebISS.GravarXml --
+[*] ACBR-8947 - Ajustes para gerar corretamente a tag CodigoNbs.
+   Por: Italo Giurizzato Junior
+-- ISSDigital.GravarXml/ISSDigital.Provider --
+[-] Correção na geração do atributo ID no XML do DPS.
+   Por: Italo Giurizzato Junior
 
 09/02/2026
+-- SigCorp.GravarXml/SigCorp.LerXml --
+[*] ACBR-8402 - Incluído as tags de retenção do PIS e COFINS.
+   Por: Italo Giurizzato Junior
 -- ISSSaoPaulo.Provider --
 [*] ACBR-8402 - Incluído a tag Inscrição na consulta a NFS-e serviço prestado e tomado.
    Por: Italo Giurizzato Junior

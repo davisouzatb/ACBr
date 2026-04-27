@@ -15,10 +15,11 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AssemblyVersion>1.0.12.0</AssemblyVersion>
-    <FileVersion>1.0.12.0</FileVersion>
-    <Version>1.0.12.0</Version>
+    <AssemblyVersion>1.0.19.0</AssemblyVersion>
+    <FileVersion>1.0.19.0</FileVersion>
+    <Version>1.0.19.0</Version>
     <Platforms>AnyCPU</Platforms>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
@@ -67,7 +68,9 @@
 		<Compile Include="..\Shared\AilosConfig.cs" Link="AilosConfig.cs" />
 		<Compile Include="..\Shared\C6BankConfig.cs" Link="C6BankConfig.cs" />
 		<Compile Include="..\Shared\AppLessConfig.cs" Link="AppLessConfig.cs" />
+		<Compile Include="..\Shared\QQPagConfig.cs" Link="QQPagConfig.cs" />
 		<Compile Include="..\Shared\ACBrPIXCDConfig.cs" Link="ACBrPIXCDConfig.cs" />
+    <Compile Include="..\Shared\IACBrLibPIXCD.cs" Link="IACBrLibPIXCD.cs" />
 	</ItemGroup>
 	
   <ItemGroup>

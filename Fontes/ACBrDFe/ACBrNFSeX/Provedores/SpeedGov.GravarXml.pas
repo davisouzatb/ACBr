@@ -54,7 +54,7 @@ type
     function DeveGerarIBSCBS: Boolean;
   protected
     procedure Configuracao; override;
-    function GerarXml: Boolean; override;
+
     function GerarInfRps: TACBrXmlNode; override;
     function GerarTomador: TACBrXmlNode; override;
     function GerarValores: TACBrXmlNode; override;
@@ -69,7 +69,8 @@ type
     procedure GerarINISecaoValores(const AINIRec: TMemIniFile); override;
     procedure GerarINIIBSCBSValores(AINIRec: TMemIniFile; Valores: Tvalorestrib); override;
   public
-    function GerarIni: string; override;
+    function GerarXml: Boolean; override;
+//    function GerarIni: string; override;
   end;
 
 implementation
@@ -324,7 +325,7 @@ begin
     Result.AppendChild(AddNode(tcDat, '#30', 'DataCompetencia', 1, 10, 0,
                                    NFSe.Competencia, ''));
 end;
-
+(*
 function TNFSeW_SpeedGov.GerarIni: string;
 var
   LINIRec: TMemIniFile;
@@ -362,7 +363,7 @@ begin
     end;
   end;
 end;
-
+*)
 procedure TNFSeW_SpeedGov.GerarINIIBSCBSValores(AINIRec: TMemIniFile;
   Valores: Tvalorestrib);
 var

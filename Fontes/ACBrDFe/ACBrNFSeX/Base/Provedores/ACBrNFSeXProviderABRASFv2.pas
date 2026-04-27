@@ -39,7 +39,7 @@ interface
 uses
   SysUtils, Classes,
   ACBrDFe.Conversao,
-  ACBrXmlBase, ACBrXmlDocument,
+  ACBrXmlBase, ACBrXmlDocument, ACBrNFSeXConversao,
   ACBrNFSeXProviderBase, ACBrNFSeXWebservicesResponse;
 
 type
@@ -161,6 +161,9 @@ type
                                      Response: TNFSeWebserviceResponse;
                                      const AListTag: string = 'ListaMensagemRetorno';
                                      const AMessageTag: string = 'MensagemRetorno'); virtual;
+  public
+    procedure AlteraVersao(const AVersao: TVersaoNFSe); override;
+    function SuportaVersao(const AVersao: TVersaoNFSe): Boolean; override;
 
   end;
 
@@ -170,7 +173,7 @@ uses
   ACBrUtil.Base, ACBrUtil.Strings, ACBrUtil.XMLHTML, ACBrUtil.DateTime,
   ACBrDFeException,
   ACBrNFSeX, ACBrNFSeXConfiguracoes, ACBrNFSeXNotasFiscais, ACBrNFSeXConsts,
-  ACBrNFSeXConversao, ACBrNFSeXWebserviceBase;
+  ACBrNFSeXWebserviceBase;
 
 { TACBrNFSeProviderABRASFv2 }
 
@@ -251,33 +254,37 @@ begin
     CodVerif := ObterConteudoTag(Node.Childrens.FindAnyNs('CodigoVerificacao'), tcStr);
     DataAut := ObterConteudoTag(Node.Childrens.FindAnyNs('DataEmissao'), FpFormatoDataEmissao);
 
-    Node2 := Node.Childrens.FindAnyNs('DeclaracaoPrestacaoServico');
+    //Procura direto na raiz primeiro
+    Node2 := Node.Childrens.FindAnyNs('IdentificacaoRps');
+    if Assigned(Node2) then
+      Node := Node2
+    else
+    begin
+      //Se não encontrou na raiz faz a busca na estrutura esperada
+      Node2 := Node.Childrens.FindAnyNs('DeclaracaoPrestacaoServico');
 
-    // Tem provedor que mudou a tag de <DeclaracaoPrestacaoServico>
-    // para <Rps>
-    if Node2 = nil then
-      Node2 := Node.Childrens.FindAnyNs('Rps');
+      // Tem provedor que mudou a tag de <DeclaracaoPrestacaoServico>
+      // para <Rps>
+      if Node2 = nil then
+        Node2 := Node.Childrens.FindAnyNs('Rps');
 
-    if not Assigned(Node2) then Exit;
+      if not Assigned(Node2) then Exit;
 
-    Node := Node2.Childrens.FindAnyNs('InfDeclaracaoPrestacaoServico');
-    if not Assigned(Node) then Exit;
+      Node := Node2.Childrens.FindAnyNs('InfDeclaracaoPrestacaoServico');
+      if not Assigned(Node) then Exit;
 
-    Node := Node.Childrens.FindAnyNs('Rps');
+      Node := Node.Childrens.FindAnyNs('Rps');
+      Node := Node.Childrens.FindAnyNs('IdentificacaoRps');
+    end;
 
     NumRps := '';
     SerieRps := '';
 
     if Node <> nil then
     begin
-      Node := Node.Childrens.FindAnyNs('IdentificacaoRps');
-
-      if Node <> nil then
-      begin
-        NumRps := ObterConteudoTag(Node.Childrens.FindAnyNs('Numero'), tcStr);
-        NumeroRps := StrToIntDef(NumRps, 0);
-        SerieRps := ObterConteudoTag(Node.Childrens.FindAnyNs('Serie'), tcStr);
-      end;
+      NumRps := ObterConteudoTag(Node.Childrens.FindAnyNs('Numero'), tcStr);
+      NumeroRps := StrToIntDef(NumRps, 0);
+      SerieRps := ObterConteudoTag(Node.Childrens.FindAnyNs('Serie'), tcStr);
     end;
 
     AResumo := Response.Resumos.New;
@@ -1251,6 +1258,11 @@ begin
       AErro.Descricao := ACBrStr(Desc001);
     end;
   end;
+end;
+
+procedure TACBrNFSeProviderABRASFv2.AlteraVersao(const AVersao: TVersaoNFSe);
+begin
+  //Não vai fazer nada aqui, sobrescrever na herança
 end;
 
 procedure TACBrNFSeProviderABRASFv2.AssinarConsultaNFSe(Response: TNFSeConsultaNFSeResponse);
@@ -3030,6 +3042,11 @@ begin
       end;
     end;
   end;
+end;
+
+function TACBrNFSeProviderABRASFv2.SuportaVersao(const AVersao: TVersaoNFSe): Boolean;
+begin
+  Result := True;
 end;
 
 end.

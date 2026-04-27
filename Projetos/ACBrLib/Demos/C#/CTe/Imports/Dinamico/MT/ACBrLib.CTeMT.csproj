@@ -1,21 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8;net452;netstandard2.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Product>ACBrLib.CTe</Product>
-    <Company>Projeto ACBr</Company>
-    <Authors>Projeto ACBr</Authors>
-    <Copyright>Copyright © Projeto ACBr 2018 - 2021</Copyright>
-    <PackageProjectUrl>http://projetoacbr.com.br/</PackageProjectUrl>
-    <RepositoryType>svn</RepositoryType>
-    <RepositoryUrl>http://svn.code.sf.net/p/acbr/code/trunk2/</RepositoryUrl>
-    <NeutralLanguage>pt-BR</NeutralLanguage>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.0.7.0</Version>
+	<TargetFrameworks>net8;net452;netstandard2.0</TargetFrameworks>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Product>ACBrLib.CTe</Product>
+	<Company>Projeto ACBr</Company>
+	<Authors>Projeto ACBr</Authors>
+	<Copyright>Copyright © Projeto ACBr 2018 - 2021</Copyright>
+	<PackageProjectUrl>http://projetoacbr.com.br/</PackageProjectUrl>
+	<RepositoryType>svn</RepositoryType>
+	<RepositoryUrl>http://svn.code.sf.net/p/acbr/code/trunk2/</RepositoryUrl>
+	<NeutralLanguage>pt-BR</NeutralLanguage>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<Version>1.0.10.0</Version>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
@@ -142,6 +143,7 @@
 	  <Compile Include="..\Shared\Respostas\ConsultaCTeResposta.cs" Link="Respostas\ConsultaCTeResposta.cs" />
 	  <Compile Include="..\Shared\Respostas\CancelamentoCTeResposta.cs" Link="Respostas\CancelamentoCTeResposta.cs" />
 	  <Compile Include="..\Shared\Respostas\InutilizacaoCTeResposta.cs" Link="Respostas\InutilizacaoCTeResposta.cs" />
+	  <Compile Include="..\Shared\IACBrLibCTe.cs" Link="IACBrLibCTe.cs" />
 
   </ItemGroup>
 

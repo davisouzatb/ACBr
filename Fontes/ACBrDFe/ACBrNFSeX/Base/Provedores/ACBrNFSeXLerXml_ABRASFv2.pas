@@ -80,7 +80,7 @@ type
     procedure LerListaServicos(const ANode: TACBrXmlNode); virtual;
     procedure LerServicos(const ANode: TACBrXmlNode); virtual;
     procedure LerServico(const ANode: TACBrXmlNode); virtual;
-    procedure LerValores(const ANode: TACBrXmlNode);
+    procedure LerValores(const ANode: TACBrXmlNode); virtual;
 
     procedure LerPrestador(const ANode: TACBrXmlNode);
     procedure LerIdentificacaoPrestador(const ANode: TACBrXmlNode);
@@ -1033,8 +1033,6 @@ begin
       Discriminacao := StringReplace(Discriminacao, FpQuebradeLinha,
                                                     sLineBreak, [rfReplaceAll]);
 
-      VerificarSeConteudoEhLista(Discriminacao);
-
       CodigoMunicipio := ObterConteudo(AuxNode.Childrens.FindAnyNs('CodigoMunicipio'), tcStr);
 
       if CodigoMunicipio = '' then
@@ -1322,6 +1320,8 @@ begin
     Result := LerXmlNfse(XmlNode)
   else
     Result := LerXmlRps(XmlNode);
+
+  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
 
   FreeAndNil(FDocument);
 end;
@@ -1627,6 +1627,7 @@ begin
     NFSe.Servico.CodigoCnae := AINIRec.ReadString(LSecao, 'CodigoCnae', '');
     NFSe.Servico.CodigoTributacaoMunicipio := AINIRec.ReadString(LSecao, 'CodigoTributacaoMunicipio', '');
     NFSe.Servico.CodigoServicoNacional := AINIRec.ReadString(LSecao, 'CodigoServicoNacional', '');
+    NFSe.Servico.CodigoTributacaoNacional := AINIRec.ReadString(LSecao, 'CodigoTributacaoNacional', '');
     NFSe.Servico.Discriminacao := ChangeLineBreak(AINIRec.ReadString(LSecao, 'Discriminacao', ''), FpAOwner.ConfigGeral.QuebradeLinha);
     NFSe.Servico.CodigoMunicipio := AINIRec.ReadString(LSecao, 'CodigoMunicipio', '');
     NFSe.Servico.CodigoNBS := AINIRec.ReadString(LSecao, 'CodigoNBS', '');
@@ -1641,7 +1642,7 @@ begin
     NFSe.Servico.CodigoMunicipioLocalPrestacao := StrToIntDef(NFSe.Servico.CodigoMunicipio, 0);
     NFSe.Servico.ValorTotalRecebido := StringToFloatDef(AINIRec.ReadString(LSecao, 'ValorTotalRecebido', ''), 0);
 
-    NFSe.Servico.CClassTrib := AINIRec.ReadString(LSecao, 'CClassTribReg', '');
+    NFSe.Servico.CClassTrib := AINIRec.ReadString(LSecao, 'CClassTribReg', AINIRec.ReadString(LSecao, 'cClassTrib', ''));
     NFSe.Servico.INDOP := AINIRec.ReadString(LSecao, 'CIndOp', '');
   end;
 end;

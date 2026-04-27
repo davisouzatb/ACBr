@@ -44,6 +44,58 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+27/04/2026
+-- ACBrNFe.XmlWriter --
+[-] ACBR-9306 - Ajuste para que o campo cBenefRBC siga a cardinalidade do MOC.
+   Por: Valter Patrick
+
+20/04/2026
+-- ACBrNFe.XmlWriter --
+[*] Ajuste na geração do grupo de ICMS desonerado quando CST = 20.
+    https://www.projetoacbr.com.br/forum/topic/91889-revis%C3%A3o-45813-causando-rejei%C3%A7%C3%A3o-934-n%C3%A3o-informado-valor-do-icms-desonerado-ou-o-motivo-de-desonera%C3%A7%C3%A3o/
+  Por: BigWings
+
+16/04/2026
+-- ACBrNFe.XmlWriter --
+[*] ACBR-9067 - Alterações visando atender a NT 2022/002 versão 1.30a
+   Por: Italo Giurizzato Junior
+
+14/04/2026
+-- pcnConversaoNFe --
+[*] ACBR-9097: Incluído as novas formas de pagamento: PIX Automático e TEF - Book Transfer.
+   Por: Italo Giurizzato Junior
+
+31/03/2026
+-- ACBrNFe.EnvEvento --
+[*] ACBR-9207: Alterações visando não gerar alertar para Numero de Protocolo com 17 dígitos.
+    O XSD que define o TProt já esta pronto para aceitar protocolo com 15 ou 17 dígitos.
+   Por: Italo Giurizzato Junior
+
+23/03/2026
+-- ACBrNFCeDANFeFPDF --
+[-] ACBR-8578: Corrigida impressão do logo jpg da NFCe em FPDF - https://www.projetoacbr.com.br/forum/topic/91219-acbr-8578-acbrlibmdfeconsolemt-ajustes-na-impress%C3%A3o-do-damdfe
+   Por: Renato Rubinho
+
+19/03/2026
+-- Diversos --
+[*] ACBr-8018 - https://www.projetoacbr.com.br/forum/topic/85510-ajustes-no-evento-cancelamento-por-substitui%C3%A7%C3%A3o/
+   Por: Luiz Alberto da Silva Lope
+
+03/03/2026
+-- ACBrNFeDANFeRLPaisagem --
+[-] ACBR-8936 - DANFe Paisagem - Não exibir Motivo sobre o código de barras quando a NFe for autorizada fora do prazo, cStat=150 - https://www.projetoacbr.com.br/forum/topic/89794-acbr-8860-erro-danfe-em-modo-paisagem/
+   Por: Renato Rubinho
+
+25/02/2026
+-- ACBrNFeNotasFiscais --
+[*] Alteração visando remover se necessário os bytes do UTF8 BOM ao carregar um XML.
+   Por: Italo Giurizzato Junior
+
+21/02/2026
+-- ACBrNFe.RetEnvEvento --
+[-] ACBR-8931: Ajuste visando a leitura da tag chNFeRef do XML de Cancelamento por Substituição.
+   Por: SG Sistemas
+
 11/02/2026
 -- ACBrNFe.XmlWriter/ACBrNFe.JSONWriter --
 [-] ACBR-8886: Ajuste visando geração da tag CNPJ vazia para os grupos entrega e retirada a fim de evitar erro de schema

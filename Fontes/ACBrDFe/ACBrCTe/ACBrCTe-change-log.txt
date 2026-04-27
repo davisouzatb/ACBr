@@ -44,6 +44,51 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+22/04/2026
+-- ACBrCTe.XmlReader --
+[-] A tag tpNav não é obrigatório no XML e estava causando problema de conversão.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/91908-erro-ao-carregar-xml-cte/ 
+
+15/04/2026
+-- Diversos --
+[*] ACBr-9136: Ajustes para o envio dos eventos de Vinculação de Pagamento e 
+    Cancelamento de Vinculação de Pagamento.
+   Por: Italo Giurizzato Junior
+
+13/04/2026
+-- Diversos --
+[*] ACBr-9136: Implementação dos novos campos constantes nas NT de 2025 e 2026 bem como 
+    os novos eventos de Vinculação de Pagamento e Cancelamento de Vinculação de Pagamento.
+   Por: Italo Giurizzato Junior
+
+07/04/2026
+-- ACBrCTeDACTeRLRetrato --
+[*] Alteração visando imprimir a chave da DC-e no DACTE quando o documento vinculado
+    é uma DC-e em vez de NF-e.
+   Por: Italo Giurizzato Junior
+
+16/03/2026
+-- ACBrCTe.XmlWriter --
+[*] ACBr-9087: Alteração visando gerar a tag vTotDFe quando for CT-e Simplificado.
+   Por: Italo Giurizzato Junior
+
+25/02/2026
+-- ACBrCTe.XmlWriter --
+[*] ACBr-9026: Ajuste para gerar a tag vTotDFe mesmo quando o seu valor for zero.
+  Por: THx
+-- ACBrCTeConhecimentos --
+[*] Alteração visando remover se necessário os bytes do UTF8 BOM ao carregar um XML.
+   Por: Italo Giurizzato Junior
+
+20/02/2026
+-- ACBrCTe.EnvEvento --
+[-] ACBr-8755: Possível solução para o erro que esta ocorrendo com a leitura do XML do evento.
+  Por: Italo Giurizzato Junior
+-- Frm_ACBrCTe --
+[+] ACBR-8588: Implementado motor FPDF no programa de exemplo em Delphi
+  Por: Renato Rubinho
+
 09/02/2026
 -- ACBrCTe.IniReader --
 [*] Correção para leitura da Componentes do Valor da Prestação no modelo 67 - https://www.projetoacbr.com.br/forum/topic/90148-cte-n%C3%A3o-mostra-componentes-do-valor-da-presta%C3%A7%C3%A3o/

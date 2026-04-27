@@ -9,19 +9,23 @@ using ACBrLib.Core.PosPrinter;
 namespace ACBrLib.PosPrinter
 {
     /// <inheritdoc />
-    public sealed partial class ACBrPosPrinter : ACBrLibHandle
+    public sealed partial class ACBrPosPrinter : ACBrLibHandle, IACBrLibPosPrinter
     {
         #region Constructors
 
         public ACBrPosPrinter(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrPosPrinter64.dll" : "libacbrposprinter64.so",
                                                                                       IsWindows ? "ACBrPosPrinter32.dll" : "libacbrposprinter32.so")
         {
+            Inicializar(eArqConfig, eChaveCrypt);
+            Config = new PosPrinterConfig(this);
+        }
+
+        public override void Inicializar(string eArqConfig, string eChaveCrypt)
+        {
             var inicializar = GetMethod<POS_Inicializar>();
             var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
             CheckResult(ret);
 
-            Config = new PosPrinterConfig(this);
         }
 
         #endregion Constructors
@@ -161,7 +165,7 @@ namespace ACBrLib.PosPrinter
             CheckResult(ret);
         }
 
-        public void Inicializar()
+        public void InicializarPos()
         {
             var method = GetMethod<POS_InicializarPos>();
             var ret = ExecuteMethod(() => method());
@@ -431,10 +435,10 @@ namespace ACBrLib.PosPrinter
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<POS_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<POS_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 
@@ -455,7 +459,7 @@ namespace ACBrLib.PosPrinter
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
         }
-        
+
         #endregion Private Methods
 
         #endregion Metodos

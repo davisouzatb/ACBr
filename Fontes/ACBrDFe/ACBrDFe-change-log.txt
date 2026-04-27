@@ -39,6 +39,54 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+17/04/2026
+-- ACBrLibXml2 --
+[+] Adicionado o Bind, para o método 'xmlNewText'
+
+-- ACBrXmlDocument --
+[*] Otimização dos métodos, inserindo a diretiva "const" nos parêmtros String
+[*] Remoção de comentários, desnecessários
+{-] Remoção de Warnings, onde o método "Create" não era público
+[*] TACBrXmlDocument.Xml passa a ser AnsiString, para evitar perda de caracteres
+[+] Adicionado o método:  TACBrXmlNode.SetText(const AContent: string);
+    Que permite trocar o Texto de um Nó, sem afetar os demais Filhos dele
+    (por: DSA)
+
+-- ACBrDFeOpenSSL --
+[*] Métodos movidos para ACBrOpenSSLUtils
+    function CertToDERBase64(cert: pX509): AnsiString;
+    function GetCertExt(cert: pX509; const FlagExt: AnsiString): AnsiString;
+    function GetIssuerName(cert: pX509): String;
+    function GetNotAfter(cert: pX509): TDateTime;
+    function GetNotBefore(cert: pX509): TDateTime;
+    function GetSerialNumber(cert: pX509): String;
+    function GetThumbPrint( cert: pX509 ): String;
+    function GetSubjectName(cert: pX509): String;
+    function GetTaxIDFromExtensions(cert: pX509): String;
+    function X509NameToString(AX509Name: PX509_NAME): AnsiString;
+    (por: DSA)
+
+16/04/2026
+-- ACBrDFe.Conversao --
+[+] ACBR-9067 - Inclusão do enumerado cstPart20 para o ICMSPart visando atender a NT 2022/002 versão 1.30a
+   Por: Italo Giurizzato Junior
+
+15/04/2026
+-- ACBrDFeConsts --
+[*] Incluído algumas constantes de mensagens de erro de validação usadas pelos componentes:
+    BP-e, CT-e, NF3-e e NFCom.
+   Por: Italo Giurizzato Junior
+
+10/04/2026
+-- ACBrDFe.Conversao --
+[+] ACBR-9136 - Inclusão dos eventos: Vinculação de Pagamento e Cancelamento de Vinculação de Pagamento.
+   Por: Italo Giurizzato Junior
+
+25/02/2026
+-- ACBrXmlBase --
+[*] ACBR-8925: Alterada a função: RemoverPrefixosDesnecessarios para remover também o prefixo s01.
+   Por: Italo Giurizzato Junior
+
 11/02/2026
 -- ACBrDFeUtil/ACBrDFeSSL/ACBrDFeXsLibXml2/ACBrDFeXsXmlSec --
 [*] ACBR-8782: Adiciona possibilidade de usar canonicalização exclusiva ao assinar arquivos XML.

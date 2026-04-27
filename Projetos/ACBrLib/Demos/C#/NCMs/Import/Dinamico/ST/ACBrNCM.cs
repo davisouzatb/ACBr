@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,60 +10,63 @@ using ACBrLib.NCM;
 namespace ACBrLib.NCM
 {
     /// <inheritdoc />
-    public sealed partial class ACBrNCM : ACBrLibHandle
+    public sealed partial class ACBrNCM : ACBrLibHandle, IACBrLibNCM
     {
         #region Constructors
 
         public ACBrNCM(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrNCMs64.dll" : "libacbrncms64.so",
                                                                                       IsWindows ? "ACBrNCMs32.dll" : "libacbrncms32.so")
         {
-            var inicializar = GetMethod<NCM_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
-            CheckResult(ret);
-
+            Inicializar(eArqConfig, eChaveCrypt);
             Config = new ACBrNCMConfig(this);
+        }
+
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializarLib = GetMethod<NCM_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            CheckResult(ret);
         }
 
         #endregion Constructors
 
         #region Properties
 
-        public string Nome
-        {
-            get
-            {
-                var bufferLen = BUFFER_LEN;
-                var buffer = new StringBuilder(bufferLen);
-
-                var method = GetMethod<NCM_Nome>();
-                var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-                CheckResult(ret);
-
-                return ProcessResult(buffer, bufferLen);
-            }
-        }
-
-        public string Versao
-        {
-            get
-            {
-                var bufferLen = BUFFER_LEN;
-                var buffer = new StringBuilder(bufferLen);
-
-                var method = GetMethod<NCM_Versao>();
-                var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-                CheckResult(ret);
-
-                return ProcessResult(buffer, bufferLen);
-            }
-        }
-
         public ACBrNCMConfig Config { get; }
 
         #endregion Properties
+
+        #region IACBrLibBase (Nome e Versao como métodos)
+
+        /// <inheritdoc />
+        public string Nome()
+        {
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
+
+            var method = GetMethod<NCM_Nome>();
+            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+
+            CheckResult(ret);
+
+            return ProcessResult(buffer, bufferLen);
+        }
+
+        /// <inheritdoc />
+        public string Versao()
+        {
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
+
+            var method = GetMethod<NCM_Versao>();
+            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+
+            CheckResult(ret);
+
+            return ProcessResult(buffer, bufferLen);
+        }
+
+        #endregion IACBrLibBase
 
         #region Metodos
 
@@ -216,10 +219,10 @@ namespace ACBrLib.NCM
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<NCM_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<NCM_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 

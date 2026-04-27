@@ -44,6 +44,23 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+15/04/2026
+-- ACBrEPCBloco_M_Class --
+[+] #ACBR-9216 - Novos itens no enumerado TACBrCodAj dos registro M510 e M620 do EFDContribuições
+-- Frm_SPEDPisCofins --
+[+] #ACBR-9216 - Adicionados registros M510 e M620 no programa de exemplo do EFDContribuições
+    por: Renato Rubinho
+
+14/04/2026
+-- ACBrEPCBloco_M_Class --
+[*] #ACBR-9216 - Correção nas casas decimais da BC e Aliq nos registros M115, M225 e M625 do EFDContribuições
+    por: Gustavo_Schwarz / Renato Rubinho
+-- ACBrEPCBlocos -- 
+[+] #ACBR-9216 - Novos itens no enumerado TACBrCodAj do EFDContribuições
+-- Frm_SPEDPisCofins --
+[+] #ACBR-9216 - Adicionados registros M110, M220 E M225 no programa de exemplo do EFDContribuições
+    por: Renato Rubinho
+
 30/12/2025
 -- ACBrEFDBlocos --
 [+] #ACBR-8194 - Novo leiaute 020 (vlVersao119) do EFD-ICMS/IPI com início em 01/2026

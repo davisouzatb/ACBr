@@ -32,13 +32,18 @@ unit Frm_ACBrCTe;
 
 interface
 
+//descomentar o motor de relatório que desejar utilizar! removendo o ponto
+{$DEFINE GERADOR_FORTES_REPORT}
+{.$DEFINE GERADOR_FPDF}
+
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, Spin, Buttons, ComCtrls, OleCtrls, SHDocVw,
   ShellAPI, XMLIntf, XMLDoc, zlib,
-  ACBrBase, ACBrMail, ACBrDFe, ACBrDFeReport, ACBrCTe,
-  ACBrCTeDACTEClass, ACBrCTeDACTeRLClass;
-
+  ACBrBase, ACBrMail, ACBrDFe, ACBrCTe,
+{$IFDEF GERADOR_FORTES_REPORT}ACBrCTeDACTeRLClass,{$ENDIF}
+{$IFDEF GERADOR_FPDF}ACBrCTeDACTeFPDF,{$ENDIF}
+  ACBrDFeReport, ACBrCTeDACTEClass;
 type
   TfrmACBrCTe = class(TForm)
     pnlMenus: TPanel;
@@ -209,11 +214,6 @@ type
     btnAdicionarProtocolo: TButton;
     btnCarregarXMLEnviar: TButton;
     btnValidarAssinatura: TButton;
-    btnCancelarXML: TButton;
-    btnCancelarChave: TButton;
-    btnCartadeCorrecao: TButton;
-    btnImprimirEvento: TButton;
-    btnEnviarEventoEmail: TButton;
     tsDistribuicao: TTabSheet;
     btnDistrDFePorUltNSU: TButton;
     pgRespostas: TPageControl;
@@ -233,22 +233,33 @@ type
     OpenDialog1: TOpenDialog;
     btnStatusServ: TButton;
     ACBrCTe1: TACBrCTe;
-    ACBrCTeDACTeRL1: TACBrCTeDACTeRL;
     btnCriarEnviarSincrono: TButton;
-    btnCompEntr: TButton;
-    btnCancEntr: TButton;
-    btnEnvEPEC: TButton;
-    btnPrestacaoDesacordo: TButton;
-    btnGerarPDFEvento: TButton;
     btnGerarPDFInut: TButton;
     btnDistrDFePorNSU: TButton;
     btnDistrDFePorChave: TButton;
-    btnInsucessoEntrega: TButton;
-    btnCancInsuc: TButton;
     tsOutros: TTabSheet;
     btnGerarArqINI: TButton;
     btnLerArqINI: TButton;
     rgReformaTributaria: TRadioGroup;
+    rgMotorDACTE: TRadioGroup;
+    ACBrCTeDACTeRL1: TACBrCTeDACTeRL;
+    pgcEventos: TPageControl;
+    tsComuns: TTabSheet;
+    tsRTC: TTabSheet;
+    btnCancelarXML: TButton;
+    btnCancelarChave: TButton;
+    btnCartadeCorrecao: TButton;
+    btnCompEntr: TButton;
+    btnCancEntr: TButton;
+    btnEnvEPEC: TButton;
+    btnPrestacaoDesacordo: TButton;
+    btnInsucessoEntrega: TButton;
+    btnCancInsuc: TButton;
+    btnImprimirEvento: TButton;
+    btnGerarPDFEvento: TButton;
+    btnEnviarEventoEmail: TButton;
+    btnVincPagto: TButton;
+    btnCancelarPagVinc: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure btnSalvarConfigClick(Sender: TObject);
@@ -316,7 +327,17 @@ type
     procedure btnCancInsucClick(Sender: TObject);
     procedure btnGerarArqINIClick(Sender: TObject);
     procedure btnLerArqINIClick(Sender: TObject);
+    procedure btnVincPagtoClick(Sender: TObject);
+    procedure btnCancelarPagVincClick(Sender: TObject);
   private
+  {$IFDEF GERADOR_FORTES_REPORT}
+    FACBrCTeDACTeRL   : TACBrCTeDACTeRL;
+  {$ENDIF}
+
+  {$IFDEF GERADOR_FPDF}
+    FACBrCTeDACTeFPDF: TACBrCTeDACTeFPDF;
+  {$ENDIF}
+
     { Private declarations }
     procedure GravarConfiguracao;
     procedure LerConfiguracao;
@@ -535,6 +556,15 @@ begin
     begin
       ide.gCompraGov.tpEnteGov := tcgUniao;
       ide.gCompraGov.pRedutor := 5;
+      {
+        togNenhum, togFornecimento, togRecebimentoPag,
+        togFornecimentoPagRealizado, togRecebimentoPagFornecPosterior
+      }
+      Ide.gCompraGov.tpOperGov := togFornecimentoPagRealizado;
+      with Ide.gCompraGov.refDFe.New do
+      begin
+        refDFeAnt := '12345678901234567890123456789012345678901234';
+      end;
     end;
 
     {Dados do Percurso}
@@ -795,6 +825,16 @@ begin
     infRespTec.xContato := '';
     infRespTec.email    := '';
     infRespTec.fone     := '';
+
+    // Informações sobre Pagamentos Vinculados
+    with pgtoVinc.pgto.New do
+    begin
+      nPag := 1;
+      idTransacao := '1234';
+      tpMeioPgto := '10';
+      CNPJReceb := edtEmitCNPJ.Text;
+      CNPJBasePSP := Copy(edtEmitCNPJ.Text, 1, 8);
+    end;
   end;
 end;
 
@@ -852,6 +892,15 @@ begin
     begin
       ide.gCompraGov.tpEnteGov := tcgUniao;
       ide.gCompraGov.pRedutor := 5;
+      {
+        togNenhum, togFornecimento, togRecebimentoPag,
+        togFornecimentoPagRealizado, togRecebimentoPagFornecPosterior
+      }
+      Ide.gCompraGov.tpOperGov := togFornecimentoPagRealizado;
+      with Ide.gCompraGov.refDFe.New do
+      begin
+        refDFeAnt := '12345678901234567890123456789012345678901234';
+      end;
     end;
 
     {Informações Complementares do CTe}
@@ -1235,6 +1284,16 @@ begin
     infRespTec.xContato := '';
     infRespTec.email    := '';
     infRespTec.fone     := '';
+
+    // Informações sobre Pagamentos Vinculados
+    with pgtoVinc.pgto.New do
+    begin
+      nPag := 1;
+      idTransacao := '1234';
+      tpMeioPgto := '10';
+      CNPJReceb := edtEmitCNPJ.Text;
+      CNPJBasePSP := Copy(edtEmitCNPJ.Text, 1, 8);
+    end;
   end;
 end;
 
@@ -1294,6 +1353,15 @@ begin
     begin
       ide.gCompraGov.tpEnteGov := tcgUniao;
       ide.gCompraGov.pRedutor := 5;
+      {
+        togNenhum, togFornecimento, togRecebimentoPag,
+        togFornecimentoPagRealizado, togRecebimentoPagFornecPosterior
+      }
+      Ide.gCompraGov.tpOperGov := togFornecimentoPagRealizado;
+      with Ide.gCompraGov.refDFe.New do
+      begin
+        refDFeAnt := '12345678901234567890123456789012345678901234';
+      end;
     end;
 
     {Dados do Percurso}
@@ -1831,6 +1899,16 @@ begin
     infRespTec.xContato := '';
     infRespTec.email    := '';
     infRespTec.fone     := '';
+
+    // Informações sobre Pagamentos Vinculados
+    with pgtoVinc.pgto.New do
+    begin
+      nPag := 1;
+      idTransacao := '1234';
+      tpMeioPgto := '10';
+      CNPJReceb := edtEmitCNPJ.Text;
+      CNPJBasePSP := Copy(edtEmitCNPJ.Text, 1, 8);
+    end;
   end;
 end;
 
@@ -2100,6 +2178,47 @@ begin
   ACBrCTe1.WebServices.EnvEvento.EventoRetorno.retEvento[0].RetInfEvento.dhRegEvento
   ACBrCTe1.WebServices.EnvEvento.EventoRetorno.retEvento[0].RetInfEvento.nProt
   *)
+end;
+
+procedure TfrmACBrCTe.btnCancelarPagVincClick(Sender: TObject);
+var
+  Titulo, Chave, idLote, CNPJ, Protocolo, nProtVincPgto: string;
+begin
+  Titulo := 'WebServices Eventos: Cancelar Pagamento Vinculado';
+
+  if not(InputQuery(Titulo, 'Chave da BP-e', Chave)) then
+     exit;
+  Chave := Trim(OnlyNumber(Chave));
+  idLote := '1';
+  if not(InputQuery(Titulo, 'Identificador de controle do Lote de envio do Evento', idLote)) then
+     exit;
+  CNPJ := copy(Chave,7,14);
+  if not(InputQuery(Titulo, 'CNPJ ou o CPF do autor do Evento', CNPJ)) then
+     exit;
+  Protocolo:='';
+  if not(InputQuery(Titulo, 'Protocolo de Autorização', Protocolo)) then
+     exit;
+  nProtVincPgto := '';
+  if not(InputQuery(Titulo, 'Protocolo de Autorização do Vinculação de Pagamento', nProtVincPgto)) then
+     exit;
+
+  ACBrCTe1.EventoCTe.Evento.Clear;
+
+  with ACBrCTe1.EventoCTe.Evento.New do
+  begin
+    infevento.chCTe := Chave;
+    infevento.CNPJ   := CNPJ;
+    infEvento.dhEvento := now;
+    infEvento.tpEvento := teCancVinculoPgto;
+    infEvento.detEvento.nProt := Protocolo;
+    infEvento.detEvento.nProtVincPgto := nProtVincPgto;
+  end;
+
+  ACBrCTe1.EnviarEvento(StrToInt(idLote));
+
+  MemoResp.Lines.Text := ACBrCTe1.WebServices.EnvEvento.RetWS;
+  memoRespWS.Lines.Text := ACBrCTe1.WebServices.EnvEvento.RetornoWS;
+  LoadXML(ACBrCTe1.WebServices.EnvEvento.RetornoWS, WBResposta);
 end;
 
 procedure TfrmACBrCTe.btnCancelarXMLClick(Sender: TObject);
@@ -3506,6 +3625,72 @@ begin
   end;
 end;
 
+procedure TfrmACBrCTe.btnVincPagtoClick(Sender: TObject);
+var
+  Titulo, Chave, idLote, CNPJ, Protocolo, nPag, idTransacao, tpMeioPgto,
+  CNPJReceb, CNPJBasePSP: string;
+begin
+  Titulo := 'WebServices Eventos: Pagamento Vinculado';
+  Chave := '';
+  if not(InputQuery(Titulo, 'Chave da BP-e', Chave)) then
+     exit;
+  Chave := Trim(OnlyNumber(Chave));
+
+  idLote := '1';
+  if not(InputQuery(Titulo, 'Identificador de controle do Lote de envio do Evento', idLote)) then
+     exit;
+
+  CNPJ := copy(Chave,7,14);
+  if not(InputQuery(Titulo, 'CNPJ ou o CPF do autor do Evento', CNPJ)) then
+     exit;
+
+  Protocolo := '';
+  if not(InputQuery('WebServices Eventos: Não Embarque', 'Protocolo de Autorização', Protocolo)) then
+     exit;
+
+  nPag:='1';
+  if not(InputQuery(Titulo, 'Numero do Pagamento', nPag)) then
+     exit;
+
+  idTransacao := '';
+  if not(InputQuery(Titulo, 'Identificação da Transação', idTransacao)) then
+     exit;
+
+  tpMeioPgto := '';
+  if not(InputQuery(Titulo, 'Código do Meio de Pagamento', tpMeioPgto)) then
+     exit;
+
+  CNPJReceb := '';
+  if not(InputQuery(Titulo, 'CNPJ do Recebedor', CNPJReceb)) then
+     exit;
+
+  CNPJBasePSP := '';
+  if not(InputQuery(Titulo, 'CNPJ Base do PSP', CNPJBasePSP)) then
+     exit;
+
+  ACBrCTe1.EventoCTe.Evento.Clear;
+
+  with ACBrCTe1.EventoCTe.Evento.New do
+  begin
+    infevento.chCTe := Chave;
+    infevento.CNPJ   := CNPJ;
+    infEvento.dhEvento := now;
+    infEvento.tpEvento := teVinculoPgto;
+    infEvento.detEvento.nProt := Protocolo;
+    infEvento.detEvento.pgto.nPag := StrToIntDef(nPag, 1);
+    infEvento.detEvento.pgto.idTransacao := idTransacao;
+    infEvento.detEvento.pgto.tpMeioPgto := tpMeioPgto;
+    infEvento.detEvento.pgto.CNPJReceb := CNPJReceb;
+    infEvento.detEvento.pgto.CNPJBasePSP := CNPJBasePSP;
+  end;
+
+  ACBrCTe1.EnviarEvento(StrToInt(idLote));
+
+  MemoResp.Lines.Text := ACBrCTe1.WebServices.EnvEvento.RetWS;
+  memoRespWS.Lines.Text := ACBrCTe1.WebServices.EnvEvento.RetornoWS;
+  LoadXML(ACBrCTe1.WebServices.EnvEvento.RetornoWS, WBResposta);
+end;
+
 procedure TfrmACBrCTe.btnGerarArqINIClick(Sender: TObject);
 var
   vAux: string;
@@ -3636,6 +3821,20 @@ begin
      cbVersaoDF.Items.Add( GetEnumName(TypeInfo(TVersaoCTe), integer(K) ) );
   cbVersaoDF.ItemIndex := 0;
 
+  rgMotorDACTE.Items.Clear;
+{$IFDEF GERADOR_FORTES_REPORT}
+  FACBrCTeDACTeRL := TACBrCTeDACTeRL.Create(Self);
+  rgMotorDACTE.Items.Add('Fortes');
+{$ENDIF}
+
+{$IFDEF GERADOR_FPDF}
+  FACBrCTeDACTeFPDF := TACBrCTeDACTeFPDF.Create(Self);
+  rgMotorDACTE.Items.Add('FPDF');
+{$ENDIF}
+
+  if rgMotorDACTE.Items.Count = 0 then
+    rgMotorDACTE.Items.Add('Nenhum');
+
   LerConfiguracao;
   pgRespostas.ActivePageIndex := 2;
 end;
@@ -3727,6 +3926,7 @@ begin
 
     Ini.WriteInteger('DACTE', 'Tipo',      rgTipoDaCTe.ItemIndex);
     Ini.WriteString( 'DACTE', 'LogoMarca', edtLogoMarca.Text);
+    Ini.WriteInteger('DACTE', 'Motor',     rgMotorDACTE.ItemIndex);
 
     ConfigurarComponente;
     ConfigurarEmail;
@@ -3852,6 +4052,7 @@ begin
 
     rgTipoDaCTe.ItemIndex := Ini.ReadInteger('DACTE', 'Tipo',      0);
     edtLogoMarca.Text     := Ini.ReadString( 'DACTE', 'LogoMarca', '');
+    rgMotorDACTE.ItemIndex := Ini.ReadInteger('DACTE', 'Motor', 0);
 
     ConfigurarComponente;
     ConfigurarEmail;
@@ -3936,6 +4137,17 @@ begin
     PathMensal       := GetPathCTe(0);
     PathSalvar       := PathMensal;
   end;
+
+  ACBrCTe1.DACTe := nil;
+  {$IFDEF GERADOR_FORTES_REPORT}
+    if rgMotorDACTE.Items[rgMotorDACTE.ItemIndex] = 'Fortes' then
+      ACBrCTe1.DACTe := FACBrCTeDACTeRL;
+  {$ENDIF}
+
+  {$IFDEF GERADOR_FPDF}
+    if rgMotorDACTE.Items[rgMotorDACTE.ItemIndex] = 'FPDF' then
+      ACBrCTe1.DACTe := FACBrCTeDACTeFPDF;
+  {$ENDIF}
 
   if ACBrCTe1.DACTe <> nil then
   begin

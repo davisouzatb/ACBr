@@ -192,6 +192,7 @@ type
     procedure ConsultarEvento(const aChave: string; atpEvento: TtpEvento); overload;
     procedure ConsultarEvento(const aChave: string; atpEvento: TtpEvento;
       aNumSeq: Integer); overload;
+    procedure ConsultarDFe(const aCNPJ: String; aNSU: Integer); overload;
     procedure ConsultarDFe(aNSU: Integer); overload;
     procedure ConsultarDFe(const aChave: string); overload;
 
@@ -229,13 +230,8 @@ uses
   ACBrDFeSSL,
   ACBrNFSeXProviderManager;
 
-{$IFDEF FPC}
- {$R ACBrNFSeXServicos.rc}
- {$R TabServicos.rc}
-{$ELSE}
- {$R ACBrNFSeXServicos.res}
- {$R TabServicos.res}
-{$ENDIF}
+{$R ACBrNFSeXServicos.res}
+{$R TabServicos.res}
 
 { TACBrNFSeX }
 
@@ -413,7 +409,7 @@ begin
   xCNPJ := ANFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
 
   if (Configuracoes.Geral.Provedor = proPadraoNacional) or
-     Configuracoes.Geral.APIPropria then
+     Configuracoes.Geral.APIPropria or (ANFSe.infNFSe.nNFSe <> '') then
   begin
     Result := NomeXmlPadraoNacional;
 
@@ -485,7 +481,8 @@ begin
     Exit;
 
   if Configuracoes.Geral.ConsultaLoteAposEnvio and
-     (FWebService.Emite.ModoEnvio = meLoteAssincrono) then
+     ((FWebService.Emite.ModoEnvio = meLoteAssincrono) or
+      Configuracoes.Geral.APIPropria) then
   begin
     if (FWebService.Emite.Protocolo <> '') or (FWebService.Emite.NumeroLote <> '') then
     begin
@@ -615,6 +612,21 @@ begin
   FWebService.ConsultarEvento.nSeqEvento := aNumSeq;
 
   FProvider.ConsultarEvento;
+end;
+
+procedure TACBrNFSeX.ConsultarDFe(const aCNPJ: String; aNSU: Integer);
+begin
+  if not Assigned(FProvider) then
+    raise EACBrNFSeException.Create(ERR_SEM_PROVEDOR);
+
+  if (Length(aCNPJ) > 0) and (Length(aCNPJ) <> 14) then
+    raise EACBrNFSeException.Create('Cnpj inválido');
+
+  FWebService.ConsultarDFe.Clear;
+  FWebService.ConsultarDFe.NSU  := aNSU;
+  FWebService.ConsultarDFe.Cnpj := aCNPJ;
+
+  FProvider.ConsultarDFe;
 end;
 
 procedure TACBrNFSeX.ConsultarDFe(aNSU: Integer);

@@ -3,7 +3,7 @@
 {  Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
 { mentos de Automação Comercial utilizados no Brasil                           }
 {                                                                              }
-{ Direitos Autorais Reservados (c) 2024 Daniel Simoes de Almeida               }
+{ Direitos Autorais Reservados (c) 2026 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
@@ -122,8 +122,12 @@ type
     function DoPerguntarCampo(DefinicaoCampo: TACBrTEFAPIDefinicaoCampo): String;
     procedure DoExibirQRCode(const DadosQRCode: String);
 
+    function NomeArquivoBackupTemporario: String;
+    procedure GravarArquivoBackupTemporario;
   protected
     procedure InterpretarRespostaAPI; override;
+    procedure ProcessarRespostaOperacaoTEF; override;
+
     procedure CarregarRespostasPendentes(const AListaRespostasTEF: TACBrTEFAPIRespostas); override;
 
   public
@@ -281,12 +285,25 @@ begin
     if (NumeroTerminal = '') then
       fpACBrTEFAPI.DoException(ACBrStr(sErroCliSiTef_SemTerminal));
   end
-  else  // homologação
+  else  // homologação ou NãoDefinido
   begin
-    fpACBrTEFAPI.GravarLog( 'Ajustando Loja e Terminal para ambiente de homologacao') ;
-    EnderecoIP := IfEmptyThen(EnderecoIP, CURL_LOCALHOST);
-    CodLoja := IfEmptyThen(CodLoja, '00000000' );
-    NumeroTerminal := IfEmptyThen(NumeroTerminal, 'SE000001');
+    if (EnderecoIP = '') then
+    begin
+      fpACBrTEFAPI.GravarLog( 'Ajustando IP para: '+CURL_LOCALHOST);
+      EnderecoIP := CURL_LOCALHOST;
+    end;
+
+    if (CodLoja = '') then
+    begin
+      fpACBrTEFAPI.GravarLog( 'Ajustando CodLoja para: 00000000');
+      CodLoja := '00000000';
+    end;
+
+    if (NumeroTerminal = '') then
+    begin
+      fpACBrTEFAPI.GravarLog( 'Ajustando NumeroTerminal para: SE000001');
+      NumeroTerminal := 'SE000001';
+    end;
   end;
 
   // Poderiamos ajustar o Diretorio de trabalho na Clisitef.ini,
@@ -448,7 +465,7 @@ begin
   else
   begin
     DataHora := Now;
-    DoctoStr := FormatDateTime('YYYYMMDDHHNNSS', DataHora );
+    DoctoStr := FormatDateTime('YYMMDDHHNNSSZZZ', DataHora );
   end;
 
   DataStr := FormatDateTime('YYYYMMDD', DataHora );
@@ -461,13 +478,21 @@ begin
     if not ParamTemChave(ParamAdicFuncao, CPARAM_ExibeMsgOperadorPinpad) then
       ParamAdicFuncao.Values[CPARAM_ExibeMsgOperadorPinpad] := '1';
 
-  // Exibe QRCode na tela ?
-  // https://dev.softwareexpress.com.br/docs/clisitef-interface-aplicacao/parametro-adicional-tratamento-de-qrcode
-  if (TACBrTEFAPI(fpACBrTEFAPI).ExibicaoQRCode = qrapiExibirAplicacao) then
-    if not ParamTemChave(ParamAdicFuncao, CPARAM_DevolveStringQRCode) then
-      ParamAdicFuncao.Values[CPARAM_DevolveStringQRCode] := '1';
-
   ParamAdicStr := StringReplace(Trim(ParamAdicFuncao.Text), sLineBreak, ';', [rfReplaceAll]);
+
+  // Se a automação vai exibir o QRCode, solicitar que a CliSiTef devolva a String do QRCode
+  // no fluxo iterativo (comandos 50/51/52).
+  // https://dev.softwareexpress.com.br/docs/clisitef-interface-aplicacao/parametro-adicional-tratamento-de-qrcode
+  if (pos(CPARAM_DevolveStringQRCode, ParamAdicStr) = 0) then
+  begin
+    if (TACBrTEFAPI(fpACBrTEFAPI).ExibicaoQRCode = qrapiExibirAplicacao) then
+    begin
+      if NaoEstaVazio(ParamAdicStr) then
+        ParamAdicStr := ParamAdicStr + ';';
+      ParamAdicStr := ParamAdicStr + '{' + CPARAM_DevolveStringQRCode + '=1;}';
+    end;
+  end;
+
   fDocumentosFinalizados := '' ;
 
   fpACBrTEFAPI.UltimaRespostaTEF.Clear;
@@ -492,10 +517,10 @@ procedure TACBrTEFAPIClassCliSiTef.ContinuarRequisicaoSiTef;
 const
   CBufferSize = 20480;
 var
-  ContinuaNavegacao, EsperaMensagem: Integer;
-  ProximoComando,TamanhoMinimo, TamanhoMaximo : SmallInt;
+  ContinuaNavegacao, EsperaMensagem, ProximoComando: Integer;
+  TamanhoMinimo, TamanhoMaximo : SmallInt;
   TipoCampo: LongInt;
-  pBuffer:PAnsiChar;
+  pBuffer: PAnsiChar;
   RespBuffer: AnsiString;
   Mensagem, TituloMenu: String;
   EhCarteiraDigital: Boolean ;
@@ -518,7 +543,7 @@ begin
   RespBuffer := '';
   TituloMenu := '' ;
 
-  pBuffer :=  AllocMem(CBufferSize);
+  pBuffer := AllocMem(CBufferSize);
   RespCliSiTef := TACBrTEFRespCliSiTef(fpACBrTEFAPI.UltimaRespostaTEF);
   try
     repeat
@@ -566,6 +591,13 @@ begin
                 EhCarteiraDigital := True;
               110:  // Cancelamento, precisa confirmar
                 RespCliSiTef.Conteudo.GravaInformacao(899, CTEF_RESP_CONFIRMAR, 'True');
+
+              1,   // Dados de confirmação da transação.
+              133, // Contém o NSU do SiTef
+              952: // Número de autorização NFCE
+              begin
+                GravarArquivoBackupTemporario;
+              end;
             end;
           end;
 
@@ -605,13 +637,13 @@ begin
           16:  // Deve remover o cabeçalho apresentado pelo comando 15
             DoExibirMensagem('', telaCliente, -1);
 
-          20:  // Deve apresentar o texto em pBuffer, e obter uma resposta do tipo SIM/NÃO.
+          20:  // Deve apresentar o texto, e obter uma resposta do tipo SIM/NÃO.
             RespBuffer := DoPerguntarSimNao(Mensagem);
 
           21:  // Deve apresentar um menu de opções e permitir que o usuário selecione uma delas
             RespBuffer := DoPerguntarMenu(TituloMenu, Mensagem);
 
-          22:  // Deve apresentar a mensagem em pBuffer, e aguardar uma tecla do operador.
+          22:  // Deve apresentar a mensagem, e aguardar uma tecla do operador.
           begin
             if (Mensagem = '') then
               Mensagem := CACBrTEFCliSiTef_PressioneEnter;
@@ -631,7 +663,7 @@ begin
 
           30,  // Deve ser lido um campo cujo tamanho está entre TamMinimo e TamMaximo
           31,  // Deve ser lido o número de um cheque. A coleta pode ser feita via leitura de CMC-7, digitação do CMC-7 ou pela digitação da primeira linha do cheque
-          34,  // Deve ser lido um campo monetário ou seja, aceita o delimitador de centavos e devolvido no parâmetro pBuffer
+          34,  // Deve ser lido um campo monetário ou seja, aceita o delimitador de centavos e devolvido no parâmetro Buffer
           35,  // Deve ser lido um código em barras ou o mesmo deve ser coletado manualmente.
           41:  // Análogo ao Comando 30, porém o campo deve ser coletado de forma mascarada
           begin
@@ -701,8 +733,8 @@ begin
         fpACBrTEFAPI.GravarLog( '*** Finalizando ContinuaFuncaoSiTefInterativo: STS = '+IntToStr(fUltimoRetornoAPI) ) ;
 
       //StrPCopy(pBuffer, RespBuffer);
-      RespBuffer := RespBuffer + #00;
-      Move( RespBuffer[1], pBuffer^, Length(RespBuffer)+1);
+      RespBuffer := RespBuffer + #0;
+      Move( RespBuffer[1], pBuffer^, Length(RespBuffer));
 
     until (fUltimoRetornoAPI <> CRET_ITERATIVO_CONTINUA);
 
@@ -839,7 +871,7 @@ end;
 function TACBrTEFAPIClassCliSiTef.ParamTemChave(AParam: TACBrTEFParametros;
   const Chave: String): Boolean;
 begin
-  Result := (AParam.IndexOf(Chave) >= 0);
+  Result := (AParam.IndexOfName(Chave) >= 0);
 end;
 
 procedure TACBrTEFAPIClassCliSiTef.QuandoGravarLogAPI(const ALogLine: String; var Tratado: Boolean);
@@ -981,10 +1013,34 @@ end;
 
 procedure TACBrTEFAPIClassCliSiTef.DoExibirQRCode(const DadosQRCode: String);
 begin
+  fpACBrTEFAPI.GravarLog( 'TACBrTEFAPIClassCliSiTef.DoExibirQRCode( '+DadosQRCode+' )');
   with TACBrTEFAPI(fpACBrTEFAPI) do
   begin
     if Assigned(QuandoExibirQRCode) then
       QuandoExibirQRCode(DadosQRCode);
+  end;
+end;
+
+function TACBrTEFAPIClassCliSiTef.NomeArquivoBackupTemporario: String;
+begin
+  Result := fpACBrTEFAPI.DiretorioTrabalho + CPREFIXO_ARQUIVO_TEF + '999' + CEXTENSAO_ARQUIVO_TEF
+end;
+
+procedure TACBrTEFAPIClassCliSiTef.GravarArquivoBackupTemporario;
+var
+  Salvar: Boolean;
+begin
+  InterpretarRespostaAPI;  // Mapeia valores da resposta
+  Salvar := (fpMetodoOperacao in [tefmtdPagamento, tefmtdCancelamento]) or
+            (max(fpACBrTEFAPI.UltimaRespostaTEF.ImagemComprovante1aVia.Count,
+                 fpACBrTEFAPI.UltimaRespostaTEF.ImagemComprovante2aVia.Count) > 0);
+
+  if Salvar then  // Apenas salva Transações que precisem de Confirmação (Terceira Perna)
+  begin
+    fpACBrTEFAPI.UltimaRespostaTEF.ArqBackup := NomeArquivoBackupTemporario;
+    fpACBrTEFAPI.UltimaRespostaTEF.CNFEnviado := False;
+    fpACBrTEFAPI.UltimaRespostaTEF.Conteudo.GravaInformacao(899, CTEF_RESP_FUNCAO, '999');
+    AtualizarHeader;  // Atualiza Header e Grava o Backup temporário
   end;
 end;
 
@@ -997,29 +1053,67 @@ begin
   fpACBrTEFAPI.UltimaRespostaTEF.Sucesso := (fUltimoRetornoAPI = CRET_SUCESSO);
 
   fpACBrTEFAPI.UltimaRespostaTEF.ConteudoToProperty;
-  if (fUltimoRetornoAPI <> CRET_SUCESSO) then
+  if (fUltimoRetornoAPI <> CRET_SUCESSO) and (fUltimoRetornoAPI <> CRET_ITERATIVO_CONTINUA) then
     fpACBrTEFAPI.UltimaRespostaTEF.TextoEspecialOperador := ACBrStr(fTEFCliSiTefAPI.TraduzirErroTransacao(fUltimoRetornoAPI));
+end;
+
+procedure TACBrTEFAPIClassCliSiTef.ProcessarRespostaOperacaoTEF;
+var
+  ArqBkp: String;
+begin
+  // Apaga arquivo de Backup, criado dentro do Loop de 'ContinuarRequisicaoSiTef';
+  if (fpACBrTEFAPI.UltimaRespostaTEF.ArqBackup <> '') then
+  begin
+    ArqBkp := NomeArquivoBackupTemporario;
+    if (fpACBrTEFAPI.UltimaRespostaTEF.ArqBackup = ArqBkp) and FileExists(ArqBkp) then
+    begin
+      DeleteFile(ArqBkp);
+      fpACBrTEFAPI.UltimaRespostaTEF.ArqBackup := '';
+    end;
+  end;
+
+  inherited ProcessarRespostaOperacaoTEF;
 end;
 
 procedure TACBrTEFAPIClassCliSiTef.CarregarRespostasPendentes(
   const AListaRespostasTEF: TACBrTEFAPIRespostas);
 var
-  i, j: Integer;
+  i, j, k: Integer;
   CupomFiscal, NumIdent, DataFiscal, HoraFiscal: String;
   ValorTransacao: Double;
   RespTEFPendente: TACBrTEFResp;
   InfValor: TACBrInformacao;
+
+  function TransacaoJaExisteNaLista(const NumCupom: String; const DataHora: String): Boolean;
+  var
+    ii: Integer;
+    r: TACBrTEFResp;
+  begin
+    Result := False;
+    ii := 0;
+    while (not Result) and (ii < k) do
+    begin
+      with AListaRespostasTEF[ii] do
+      begin
+        Result := (Conteudo.LeInformacao(899, CTEF_RESP_DOCTO_VINCULADO).AsString = CupomFiscal) and
+                  (Conteudo.LeInformacao(899, CTEF_RESP_DATA_HORA).AsString = DataHora);
+      end;
+      Inc(ii);
+    end;
+  end;
+
 begin
   AListaRespostasTEF.CarregarRespostasDoDiretorioTrabalho;
   i := 0;
   while i < AListaRespostasTEF.Count do
   begin
-    RespTEFPendente := AListaRespostasTEF[i];
-    if not RespTEFPendente.CNFEnviado then   // Transações não confirmadas, serão carregadas abaixo, pelo comando 130
-      AListaRespostasTEF.ApagarRespostaTEF(i)
+    if (AListaRespostasTEF[i].Conteudo.LeInformacao(899, CTEF_RESP_CONFIRMADO).AsString = 'S') and
+       (AListaRespostasTEF[i].Conteudo.LeInformacao(899, CTEF_RESP_FUNCAO).AsString = '999') then
+      AListaRespostasTEF.ApagarRespostaTEF(i)  // Confirmadas e Backup Temporário podem ser removidas
     else
       Inc(i);
   end;
+  k := AListaRespostasTEF.Count;
 
   // Solicita do TEF respostas pendentes
   ExecutarTransacaoSiTef(CSITEF_OP_ConsultarTrasPendente, 0);
@@ -1039,29 +1133,32 @@ begin
       HoraFiscal := Trim(LeInformacao(164, i).AsString);
       ValorTransacao := LeInformacao(1319, i).AsFloat;
 
-      RespTEFPendente :=  TACBrTEFRespCliSiTef.Create;
-      InfValor := TACBrInformacao.Create;
-      try
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_HEADER,'CRT');
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_DOCTO_VINCULADO, CupomFiscal);
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_ID_PAGAMENTO, NumIdent);
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_DATA_HORA, DataFiscal + HoraFiscal);
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_CONFIRMAR, 'True');
-        RespTEFPendente.Conteudo.GravaInformacao(105, 000, DataFiscal + HoraFiscal);
-        InfValor.AsFloat := ValorTransacao;
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_VALOR_TRANSACAO, InfValor);
-        RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_FUNCAO, IntToStr(CSITEF_OP_ConsultarTrasPendente));
+      if not TransacaoJaExisteNaLista(CupomFiscal, DataFiscal + HoraFiscal) then
+      begin
+        RespTEFPendente :=  TACBrTEFRespCliSiTef.Create;
+        InfValor := TACBrInformacao.Create;
+        try
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_HEADER,'CRT');
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_DOCTO_VINCULADO, CupomFiscal);
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_ID_PAGAMENTO, NumIdent);
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_DATA_HORA, DataFiscal + HoraFiscal);
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_CONFIRMAR, 'True');
+          RespTEFPendente.Conteudo.GravaInformacao(105, 000, DataFiscal + HoraFiscal);
+          InfValor.AsFloat := ValorTransacao;
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_VALOR_TRANSACAO, InfValor);
+          RespTEFPendente.Conteudo.GravaInformacao(899, CTEF_RESP_FUNCAO, IntToStr(CSITEF_OP_ConsultarTrasPendente));
 
-        RespTEFPendente.Finalizacao := CupomFiscal;
-        RespTEFPendente.DocumentoVinculado := CupomFiscal;
+          RespTEFPendente.Finalizacao := CupomFiscal;
+          RespTEFPendente.DocumentoVinculado := CupomFiscal;
 
-        j := AListaRespostasTEF.AdicionarRespostaTEF(RespTEFPendente); // Cria Clone interno
-        AListaRespostasTEF.Items[j].NSU := '';
-        AListaRespostasTEF.Items[j].CNFEnviado := False;
-        AListaRespostasTEF.Items[j].Confirmar := True;
-      finally
-        InfValor.Free;
-        RespTEFPendente.Free;
+          j := AListaRespostasTEF.AdicionarRespostaTEF(RespTEFPendente); // Cria Clone interno
+          AListaRespostasTEF.Items[j].NSU := '';
+          AListaRespostasTEF.Items[j].CNFEnviado := False;
+          AListaRespostasTEF.Items[j].Confirmar := True;
+        finally
+          InfValor.Free;
+          RespTEFPendente.Free;
+        end;
       end;
 
       inc(i);

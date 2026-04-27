@@ -54,6 +54,7 @@ type
     FValReg30: Double;
     FQtdReg40: Integer;
     FQtdReg50: Integer;
+    FEnder   : TEnder;
   protected
     procedure Configuracao; override;
 
@@ -235,8 +236,9 @@ begin
 
   if (CpfCnpj <> 'CONSUMIDOR') and (CpfCnpj <> 'EXTERIOR') then
     NFSeNode.AppendChild(AddNode(tcStr, '#1', 'CepTom', 1, 8, 1,
-                                    OnlyNumber(NFSe.Tomador.Endereco.CEP), ''));
-  {Conforme manual nao enviar a CepTom qdo Tomador for Consumidor ou Exterior}
+                                     OnlyNumber(NFSe.Tomador.Endereco.CEP), ''))
+  else
+    NFSeNode.AppendChild(AddNode(tcStr, '#1', 'CepTom', 1, 8, 1, '',''));
 
   if (CpfCnpj = 'CONSUMIDOR') then
     NFSeNode.AppendChild(AddNode(tcStr, '#1', 'Telefone', 1, 10, 1, '', ''))
@@ -641,6 +643,8 @@ begin
     // TipoEnd = 3
     Result.AppendChild(GerarXmlItemImovel(NFSe.IBSCBS.imovel));
   end;
+
+  Result.AppendChild(GerarXMLItemEnderecoDestinatario(Fender));
 end;
 
 function TNFSeW_Conam.GerarXmlItemDestinatario(
@@ -684,14 +688,14 @@ begin
     Result.AppendChild(AddNode(tcStr, '#1', 'DestNIF', 1, 40, 1, Dest.Nif, ''))
   else
   if CNPJCPF <> '' then
-    Result := AddNode(tcStr, '#1', 'DestCpfCnpj', 0, 14, 1, CNPJCPF)
+    Result.AppendChild(AddNode(tcStr, '#1', 'DestCpfCnpj', 0, 14, 1, CNPJCPF , ''))
   else
     Result.AppendChild(AddNode(tcStr, '#1', 'DestNaoNIF', 1, 1, 1,
                                                 NaoNIFToStr(Dest.cNaoNIF), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'DestNome', 1, 300, 1, Dest.xNome, ''));
 
-  Result.AppendChild(GerarXMLItemEnderecoDestinatario(Dest.ender));
+  FEnder := Dest.ender;
 end;
 
 function TNFSeW_Conam.GerarXMLItemEnderecoDestinatario(
@@ -765,13 +769,13 @@ begin
                                              finNFSeToStr(IBSCBS.finNFSe), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'IndConsFin', 1, 1, 1,
-                 IfThen(indFinalToStr(IBSCBS.indFinal) = '1','SIM','NAO'), ''));
+                              IfThen(IBSCBS.indFinal = ifSim,'SIM','NAO'), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'IndDest', 1, 1, 1,
-                   IfThen(indDestToStr(IBSCBS.indDest) = '1','SIM','NAO'), ''));
+    IfThen(IBSCBS.indDest = idTomadorAdquirenteDestinatarioIguais,'SIM','NAO'), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'IndOpeOne', 1, 1, 1,
-              IfThen(TIndicadorToStr(IBSCBS.IndOpeOne) = '1','SIM','NAO'), ''));
+                             IfThen(IBSCBS.IndOpeOne = tiSim,'SIM','NAO'), ''));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'IndCodOpe', 6, 6, 1,
                                                             IBSCBS.cIndOp, ''));

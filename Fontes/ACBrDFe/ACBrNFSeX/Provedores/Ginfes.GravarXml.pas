@@ -158,7 +158,9 @@ function TNFSeW_Ginfes.GerarTrib(trib: Ttrib): TACBrXmlNode;
 begin
   Result := CreateElement('trib');
 
-//  Result.AppendChild(GerarXMLTributacaoFederal);
+  if NFSe.Servico.Valores.tribFed.CST <> cstVazio then
+    Result.AppendChild(GerarXMLTributacaoFederal);
+
   Result.AppendChild(GerarXMLTotalTributos);
 end;
 
@@ -166,8 +168,7 @@ function TNFSeW_Ginfes.GerarServico: TACBrXmlNode;
 begin
   Result := inherited GerarServico;
 
-  if Now >= EncodeDate(2026, 1, 1) then
-    Result.AppendChild(AddNode(tcStr, '#32', 'CodigoNbs', 1, 9, 0,
+  Result.AppendChild(AddNode(tcStr, '#32', 'CodigoNbs', 1, 9, 0,
                                  OnlyNumber(NFSe.Servico.CodigoNBS), DSC_CMUN));
 
   Result.AppendChild(GerarcomExt);
@@ -244,7 +245,8 @@ begin
   // Reforma Tributária
   if (NFSe.Servico.Valores.totTrib.pTotTribFed > 0) or
      (NFSe.Servico.Valores.totTrib.pTotTribEst > 0) or
-     (NFSe.Servico.Valores.totTrib.pTotTribMun > 0) then
+     (NFSe.Servico.Valores.totTrib.pTotTribMun > 0) or
+     (NFSe.Servico.Valores.totTrib.pTotTribSN > 0) then
     Result.AppendChild(GerarTrib(NFSe.IBSCBS.valores.trib));
 
   if (NFSe.IBSCBS.dest.xNome <> '') or (NFSe.IBSCBS.imovel.cCIB <> '') or
@@ -275,21 +277,6 @@ begin
 
   if NFSe.Servico.Valores.tribFed.CST <> cstVazio then
     Result.AppendChild(GerarXMLTributacaoOutrosPisCofins);
-  {
-  if (NFSe.Servico.Valores.tribFed.vRetCP > 0) or
-     (NFSe.Servico.Valores.tribFed.vRetIRRF > 0) or
-     (NFSe.Servico.Valores.tribFed.vRetCSLL > 0) then
-  begin
-    Result.AppendChild(AddNode(tcDe2, '#1', 'vRetCP', 1, 15, 0,
-                                      NFSe.Servico.Valores.tribFed.vRetCP, ''));
-
-    Result.AppendChild(AddNode(tcDe2, '#1', 'vRetIRRF', 1, 15, 0,
-                                    NFSe.Servico.Valores.tribFed.vRetIRRF, ''));
-
-    Result.AppendChild(AddNode(tcDe2, '#1', 'vRetCSLL', 1, 15, 0,
-                                    NFSe.Servico.Valores.tribFed.vRetCSLL, ''));
-  end;
-  }
 end;
 
 function TNFSeW_Ginfes.GerarXMLTributacaoOutrosPisCofins: TACBrXmlNode;

@@ -111,6 +111,7 @@ type
     function GerarParcelas: TACBrXmlNodeArray; virtual;
     function GerarDestinatario: TACBrXmlNode; virtual;
     function GerarImovel: TACBrXmlNode; virtual;
+    function GerarComercioExterior: TACBrXmlNode; virtual;
 
     function GerarServicoCodigoMunicipio: TACBrXmlNode; virtual;
     function GerarCodigoMunicipioUF: TACBrXmlNodeArray; virtual;
@@ -153,7 +154,7 @@ type
 
   public
     function GerarXml: Boolean; override;
-    function GerarIni: string; override;
+//    function GerarIni: string; override;
 
     property NrOcorrComplTomador: Integer read FNrOcorrComplTomador write FNrOcorrComplTomador;
     property NrOcorrOutrasRet: Integer    read FNrOcorrOutrasRet    write FNrOcorrOutrasRet;
@@ -350,6 +351,8 @@ begin
 
   if GerarAtividadeEventoAposConstrucaoCivil then
     Result.AppendChild(GeraAtividadeEvento);
+
+  Result.AppendChild(GerarComercioExterior);
 end;
 
 function TNFSeW_ABRASFv1.GerarIdentificacaoRPS: TACBrXmlNode;
@@ -1030,7 +1033,7 @@ procedure TNFSeW_ABRASFv1.GerarINISecaoParcelas(const AINIRec: TMemIniFile);
 begin
   //Não faz nada neste leiaute...
 end;
-
+{
 function TNFSeW_ABRASFv1.GerarIni: string;
 var
   LINIRec: TMemIniFile;
@@ -1082,7 +1085,7 @@ begin
     end;
   end;
 end;
-
+}
 function TNFSeW_ABRASFv1.GeraAtividadeEvento: TACBrXmlNode;
 begin
   Result := nil;
@@ -1095,6 +1098,12 @@ end;
 
 function TNFSeW_ABRASFv1.GerarEnderecoExteriorEvento: TACBrXmlNode;
 begin
+  Result := nil;
+end;
+
+function TNFSeW_ABRASFv1.GerarComercioExterior: TACBrXmlNode;
+begin
+  // Aqui não fazer nada
   Result := nil;
 end;
 

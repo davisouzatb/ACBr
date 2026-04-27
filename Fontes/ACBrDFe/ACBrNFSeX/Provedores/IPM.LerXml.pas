@@ -255,6 +255,8 @@ begin
       if Trim(CodigoVerificacao) = '' then
         CodigoVerificacao := ObterConteudo(AuxNode.Childrens.FindAnyNs('cod_verificador_autenticidade'), tcStr);
 
+      ChaveAcesso := ObterConteudo(AuxNode.Childrens.FindAnyNs('chave_acesso_nfse_nacional'), tcStr);
+
       Link := ObterConteudo(AuxNode.Childrens.FindAnyNs('link_nfse'), tcStr);
       Link := StringReplace(Link, '&amp;', '&', [rfReplaceAll]);
 
@@ -504,6 +506,8 @@ begin
     Result := LerXmlNfse(XmlNode)
   else
     Result := LerXmlRps(XmlNode);
+
+  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
 
   FreeAndNil(FDocument);
 end;

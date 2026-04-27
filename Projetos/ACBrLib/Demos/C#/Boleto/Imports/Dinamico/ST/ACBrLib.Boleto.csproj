@@ -15,11 +15,12 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AssemblyVersion>1.0.27.0</AssemblyVersion>
-    <FileVersion>1.0.27.0</FileVersion>
-    <Version>1.0.27.0</Version>
+    <AssemblyVersion>1.0.32.0</AssemblyVersion>
+    <FileVersion>1.0.32.0</FileVersion>
+    <Version>1.0.32.0</Version>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ProJetoACBr.snk</AssemblyOriginatorKeyFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
@@ -107,6 +108,7 @@
       Link="Consulta\ACBrIndicadorSituacaoBoleto.cs" />
     <Compile Include="..\Shared\Consulta\ConsultaTitulosPorPeriodo.cs"
       Link="Consulta\ConsultaTitulosPorPeriodo.cs" />
+    <Compile Include="..\Shared\IACBrLibBoleto.cs" Link="IACBrLibBoleto.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,21 +8,29 @@ using ACBrLib.Core.DFe;
 
 namespace ACBrLib.CTe
 {
-    public sealed partial class ACBrCTe : ACBrLibHandle
+    public sealed partial class ACBrCTe : ACBrLibHandle, IACBrLibCTe
     {
         #region Constructors
 
+
+        /// <inheritdoc/>
         public ACBrCTe(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrCTe64.dll" : "libacbrcte64.so",
                                                                                IsWindows ? "ACBrCTe32.dll" : "libacbrcte32.so")
         {
-            var inicializar = GetMethod<CTE_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
-            CheckResult(ret);
-
+            Inicializar(eArqConfig, eChaveCrypt);
             Config = new CTeConfig(this);
         }
 
+
+        /// <inheritdoc/>
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializarLib = GetMethod<CTE_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            CheckResult(ret);
+        }
+
+        /// <inheritdoc/>
         public CTeConfig Config { get; }
 
         #endregion Constructors
@@ -67,72 +75,82 @@ namespace ACBrLib.CTe
 
         #region Ini
 
+        /// <inheritdoc/>
         public override void ConfigGravar(string eArqConfig = "")
         {
             var gravarIni = GetMethod<CTE_ConfigGravar>();
             var ret = ExecuteMethod<int>(() => gravarIni(ToUTF8(eArqConfig)));
-
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override void ConfigLer(string eArqConfig = "")
         {
             var lerIni = GetMethod<CTE_ConfigLer>();
             var ret = ExecuteMethod<int>(() => lerIni(ToUTF8(eArqConfig)));
-
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override T ConfigLerValor<T>(ACBrSessao eSessao, string eChave)
         {
             var method = GetMethod<CTE_ConfigLerValor>();
-
             var bufferLen = BUFFER_LEN;
             var pValue = new StringBuilder(bufferLen);
             var ret = ExecuteMethod<int>(() => method(ToUTF8(eSessao.ToString()), ToUTF8(eChave), pValue, ref bufferLen));
             CheckResult(ret);
-
             var value = ProcessResult(pValue, bufferLen);
             return ConvertValue<T>(value);
         }
 
+        /// <inheritdoc/>
         public override void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value)
         {
             if (value == null) return;
-
             var method = GetMethod<CTE_ConfigGravarValor>();
             var propValue = ConvertValue(value);
-
             var ret = ExecuteMethod<int>(() => method(ToUTF8(eSessao.ToString()), ToUTF8(eChave), ToUTF8(propValue)));
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override void ImportarConfig(string eArqConfig = "")
         {
             var importarConfig = GetMethod<CTE_ConfigImportar>();
             var ret = ExecuteMethod<int>(() => importarConfig(ToUTF8(eArqConfig)));
-
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override string ExportarConfig()
         {
             var bufferLen = BUFFER_LEN;
             var buffer = new StringBuilder(bufferLen);
-
             var method = GetMethod<CTE_ConfigExportar>();
             var ret = ExecuteMethod<int>(() => method(buffer, ref bufferLen));
-
             CheckResult(ret);
+            return ProcessResult(buffer, bufferLen);
+        }
 
+        /// <inheritdoc/>
+        public override string OpenSSLInfo()
+        {
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
+            var method = GetMethod<CTE_OpenSSLInfo>();
+            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+            CheckResult(ret);
             return ProcessResult(buffer, bufferLen);
         }
 
         #endregion Ini
 
+        /// <inheritdoc/>
         public void CarregarCTe(CTe cte) => CarregarINI(cte.ToString());
 
+        /// <inheritdoc/>
         public CTe ObterCTe(int aIndex) => CTe.Load(ObterIni(aIndex));
+        /// <inheritdoc/>
         public void CarregarXML(string eArquivoOuXml)
         {
             var method = GetMethod<CTE_CarregarXML>();
@@ -141,6 +159,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void CarregarINI(string eArquivoOuIni)
         {
             var method = GetMethod<CTE_CarregarINI>();
@@ -149,6 +168,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public string ObterXml(int aIndex)
         {
             var bufferLen = BUFFER_LEN;
@@ -162,6 +182,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public void GravarXml(int aIndex, string eNomeArquivo = "", string ePathArquivo = "")
         {
             var method = GetMethod<CTE_GravarXml>();
@@ -170,6 +191,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public string ObterIni(int aIndex)
         {
             var bufferLen = BUFFER_LEN;
@@ -183,6 +205,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public void GravarIni(int aIndex, string eNomeArquivo = "", string ePathArquivo = "")
         {
             var method = GetMethod<CTE_GravarIni>();
@@ -191,6 +214,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void CarregarEventoXML(string eArquivoOuXml)
         {
             var method = GetMethod<CTE_CarregarEventoXML>();
@@ -199,6 +223,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void CarregarEventoINI(string eArquivoOuIni)
         {
             var method = GetMethod<CTE_CarregarEventoINI>();
@@ -207,6 +232,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void LimparLista()
         {
             var method = GetMethod<CTE_LimparLista>();
@@ -215,6 +241,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void LimparListaEventos()
         {
             var method = GetMethod<CTE_LimparListaEventos>();
@@ -223,6 +250,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void Assinar()
         {
             var method = GetMethod<CTE_Assinar>();
@@ -231,6 +259,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void Validar()
         {
             var method = GetMethod<CTE_Validar>();
@@ -239,6 +268,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public string ValidarRegrasdeNegocios()
         {
             var bufferLen = BUFFER_LEN;
@@ -252,6 +282,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string VerificarAssinatura()
         {
             var bufferLen = BUFFER_LEN;
@@ -265,6 +296,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string GerarChave(int aCodigoUf, int aCodigoNumerico, int aModelo, int aSerie, int aNumero,
             int aTpEmi, DateTime aEmissao, string acpfcnpj)
         {
@@ -281,6 +313,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public InfoCertificado[] ObterCertificados()
         {
             var bufferLen = BUFFER_LEN;
@@ -295,19 +328,7 @@ namespace ACBrLib.CTe
             return certificados.Length == 0 ? new InfoCertificado[0] : certificados.Select(x => new InfoCertificado(x)).ToArray();
         }
 
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<CTE_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
-
+        /// <inheritdoc/>
         public string GetPath(TipoPathCTe tipo)
         {
             var bufferLen = BUFFER_LEN;
@@ -319,6 +340,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string GetPathEvento(string evento)
         {
             var bufferLen = BUFFER_LEN;
@@ -330,6 +352,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string StatusServico()
         {
             var bufferLen = BUFFER_LEN;
@@ -343,6 +366,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public ConsultaCTeResposta Consultar(string eChaveOuCTe, bool AExtrairEventos = false)
         {
             var bufferLen = BUFFER_LEN;
@@ -356,6 +380,7 @@ namespace ACBrLib.CTe
             return ConsultaCTeResposta.LerResposta(ProcessResult(buffer, bufferLen));
         }
 
+        /// <inheritdoc/>
         public string ConsultaCadastro(string cUF, string nDocumento, bool nIE)
         {
             var bufferLen = BUFFER_LEN;
@@ -369,6 +394,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public InutilizacaoCTeResposta Inutilizar(string acnpj, string aJustificativa, int ano, int modelo,
             int serie, int numeroInicial, int numeroFinal)
         {
@@ -383,6 +409,7 @@ namespace ACBrLib.CTe
             return InutilizacaoCTeResposta.LerResposta(ProcessResult(buffer, bufferLen));
         }
 
+        /// <inheritdoc/>
         public EnvioRetornoResposta Enviar(int aLote, bool imprimir = false, bool sincrono = false)
         {
             var bufferLen = BUFFER_LEN;
@@ -396,6 +423,7 @@ namespace ACBrLib.CTe
             return EnvioRetornoResposta.LerResposta(ProcessResult(buffer, bufferLen), "CTe");
         }
 
+        /// <inheritdoc/>
         public string ConsultarRecibo(string aRecibo)
         {
             var bufferLen = BUFFER_LEN;
@@ -409,6 +437,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public CancelamentoCTeResposta Cancelar(string eChave, string eJustificativa, string eCNPJ, int aLote)
         {
             var bufferLen = BUFFER_LEN;
@@ -422,6 +451,7 @@ namespace ACBrLib.CTe
             return CancelamentoCTeResposta.LerResposta(ProcessResult(buffer, bufferLen));
         }
 
+        /// <inheritdoc/>
         public string EnviarEvento(int aLote)
         {
             var bufferLen = BUFFER_LEN;
@@ -435,6 +465,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string DistribuicaoDFePorUltNSU(int acUFAutor, string eCnpjcpf, string eultNsu)
         {
             var bufferLen = BUFFER_LEN;
@@ -448,6 +479,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string DistribuicaoDFe(int acUFAutor, string eCnpjcpf, string eultNsu, string ArquivoOuXml)
         {
             var bufferLen = BUFFER_LEN;
@@ -461,6 +493,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string DistribuicaoDFePorNSU(int acUFAutor, string eCnpjcpf, string eNsu)
         {
             var bufferLen = BUFFER_LEN;
@@ -474,6 +507,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string DistribuicaoDFePorChave(int acUFAutor, string eCnpjcpf, string echCTe)
         {
             var bufferLen = BUFFER_LEN;
@@ -487,6 +521,7 @@ namespace ACBrLib.CTe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public void EnviarEmail(string ePara, string eArquivoCTe, bool aEnviaPDF, string eAssunto, string eMensagem, string[] eCc = null, string[] eAnexos = null)
         {
             var method = GetMethod<CTE_EnviarEmail>();
@@ -496,6 +531,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void EnviarEmailEvento(string ePara, string eArquivoEvento, string eArquivoCTe, bool aEnviaPDF, string eAssunto, string eMensagem, string[] eCc = null, string[] eAnexos = null)
         {
             var method = GetMethod<CTE_EnviarEmailEvento>();
@@ -505,6 +541,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void Imprimir(string cImpressora = "", int nNumCopias = 1, string cProtocolo = "", bool? bMostrarPreview = null)
         {
             var mostrarPreview = bMostrarPreview.HasValue ? $"{Convert.ToInt32(bMostrarPreview.Value)}" : string.Empty;
@@ -515,6 +552,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void ImprimirPDF()
         {
             var method = GetMethod<CTE_ImprimirPDF>();
@@ -523,6 +561,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public async void ImprimirPDF(Stream aStream)
         {
             if (aStream == null) throw new ArgumentNullException(nameof(aStream));
@@ -539,6 +578,7 @@ namespace ACBrLib.CTe
             Base64ToStream(pdf, aStream);
         }
 
+        /// <inheritdoc/>
         public void ImprimirEvento(string eArquivoXmlCTe, string eArquivoXmlEvento)
         {
             var method = GetMethod<CTE_ImprimirEvento>();
@@ -547,6 +587,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void ImprimirEventoPDF(string eArquivoXmlCTe, string eArquivoXmlEvento)
         {
             var method = GetMethod<CTE_ImprimirEventoPDF>();
@@ -555,6 +596,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void ImprimirInutilizacao(string eArquivoXml)
         {
             var method = GetMethod<CTE_ImprimirInutilizacao>();
@@ -563,6 +605,7 @@ namespace ACBrLib.CTe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void ImprimirInutilizacaoPDF(string eArquivoXml)
         {
             var method = GetMethod<CTE_ImprimirInutilizacaoPDF>();
@@ -573,10 +616,10 @@ namespace ACBrLib.CTe
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<CTE_Finalizar>();
-            var ret = ExecuteMethod<int>(() => finalizar());
+            var finalizarLib = GetMethod<CTE_Finalizar>();
+            var ret = ExecuteMethod<int>(() => finalizarLib());
             CheckResult(ret);
         }
 

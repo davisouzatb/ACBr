@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,23 +9,25 @@ using ACBrLib.Core;
 namespace ACBrLib.PIXCD
 {
     /// <inheritdoc />
-    public sealed partial class ACBrPIXCD : ACBrLibHandle
+    public sealed partial class ACBrPIXCD : ACBrLibHandle, IACBrLibPIXCDMatera
     {
         #region Constructors
 
         public ACBrPIXCD(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrPIXCD64.dll" : "libacbrpixcd64.so",
                                                                                       IsWindows ? "ACBrPIXCD32.dll" : "libacbrpixcd32.so")
         {
-            var inicializar = GetMethod<PIXCD_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
-            CheckResult(ret);
-
+            Inicializar(eArqConfig, eChaveCrypt);
             Config = new ACBrPIXCDConfig(this);
         }
 
         #endregion Constructors
 
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializar = GetMethod<PIXCD_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            CheckResult(ret);
+        }
         #region Properties
 
         public string Nome
@@ -332,10 +334,10 @@ namespace ACBrLib.PIXCD
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<PIXCD_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<PIXCD_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 

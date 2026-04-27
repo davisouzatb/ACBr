@@ -3,7 +3,7 @@
 {  Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
 { mentos de Automação Comercial utilizados no Brasil                           }
 {                                                                              }
-{ Direitos Autorais Reservados (c) 2024 Daniel Simoes de Almeida               }
+{ Direitos Autorais Reservados (c) 2026 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
@@ -53,6 +53,7 @@ uses
 resourcestring
   sACBrTEFAPIIdentificadorVendaVazioException = 'IdentificadorVenda não pode ser vazio';
   sACBrTEFAPIValorPagamentoInvalidoException = 'Valor do Pagamento inválido';
+  sACBrTEFAPIParamNaoInformado = 'Parâmetro %s não informado';
 
   sACBrTEFAPIClassDonoNaoDefinido = 'O componente TACBrTEFAPIComumClass, deve ser filho de TACBrTEFAPIComum';
   sACBrTEFAPIMetodoInvalidoException = 'Método: %s '+ sLineBreak +
@@ -70,7 +71,10 @@ resourcestring
                                  'Rede: %s' + sLineBreak +
                                  'NSU: %s';
   sACBrTEFAPIPNGNaoSuportado = 'PNG não suportado nesse compilador';
-
+  sACBrTEFAPILibJaInicializada = 'Biblioteca %s já foi inicializada';
+  sACBrTEFAPILibNaoInicializada = 'Biblioteca %s ainda NÃO foi carregada';
+  sACBrTEFAPIErroAoCarregarMetodoDeLib = 'Erro ao carregar método: %s da biblioteca: %s';
+  sACBrTEFAPIMetodoNaoRequeridoNaoEncontrado = 'Método não obrigatório: %s não encontrado na biblioteca: %s';
 
 const
   CPREFIXO_ARQUIVO_TEF = 'ACBr_';
@@ -85,14 +89,18 @@ type
 
   TACBrTEFRespHack = class(TACBrTEFResp);
 
+  TACBrTEFAPIIdioma = (idPortugues, idIngles, idEspanhol);
+
   { TACBrTEFAPIDadosAutomacao }
 
   TACBrTEFAPIDadosAutomacao = class( TPersistent )
   private
     fAutoAtendimento: Boolean;
+    fIdioma: TACBrTEFAPIIdioma;
     fMensagemPinPad: String;
     fNomeSoftwareHouse: String;
     fNomeAplicacao: String;
+    fParamAplicacao: String;
     fVersaoAplicacao: String;
     fSuportaSaque: Boolean;
     fSuportaDesconto: Boolean;
@@ -113,8 +121,9 @@ type
   published
     property NomeSoftwareHouse: String read fNomeSoftwareHouse write SetNomeSoftwareHouse;
     property CNPJSoftwareHouse: String read fCNPJSoftwareHouse write fCNPJSoftwareHouse;
-    property NomeAplicacao: String read fNomeAplicacao write SetNomeAplicacao ;
-    property VersaoAplicacao: String read fVersaoAplicacao write SetVersaoAplicacao ;
+    property NomeAplicacao: String read fNomeAplicacao write SetNomeAplicacao;
+    property VersaoAplicacao: String read fVersaoAplicacao write SetVersaoAplicacao;
+    property ParamAplicacao: String read fParamAplicacao write fParamAplicacao;
     property MensagemPinPad: String read fMensagemPinPad write fMensagemPinPad;
 
     Property SuportaSaque: Boolean read fSuportaSaque write fSuportaSaque default False;
@@ -126,6 +135,7 @@ type
     property UtilizaSaldoTotalVoucher: Boolean read fUtilizaSaldoTotalVoucher
       write fUtilizaSaldoTotalVoucher default False;
     property MoedaISO4217: Integer read fMoedaISO4217 write fMoedaISO4217 default CMODEDA_BRL;
+    property Idioma: TACBrTEFAPIIdioma read fIdioma write fIdioma default idPortugues;
     property AutoAtendimento: Boolean read fAutoAtendimento write fAutoAtendimento;  // Ainda NÃO utilizado
   end;
 
@@ -347,6 +357,8 @@ type
     fpInicializando: Boolean;
 
     procedure CriarTEFResp;
+    procedure DoQuandoFinalizarTransacao(ATEFResp: TACBrTEFResp; AStatus: TACBrTEFStatusTransacao);
+    procedure DoQuandoFinalizarOperacao(ATEFResp: TACBrTEFResp);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -389,7 +401,7 @@ type
 
     procedure ProcessarTransacaoPendente(const MsgErro: String); virtual;
     procedure ResolverTransacaoPendente(
-      Status: TACBrTEFStatusTransacao = tefstsSucessoManual); virtual;
+      AStatus: TACBrTEFStatusTransacao = tefstsSucessoManual); virtual;
 
     //  function VerificarTEF: Boolean;
     procedure AbortarTransacaoEmAndamento;
@@ -472,6 +484,7 @@ begin
   fNomeSoftwareHouse := '';
   fNomeAplicacao := '';
   fVersaoAplicacao := '';
+  fParamAplicacao := '';
   fMensagemPinPad := '';
   fImprimeViaClienteReduzida := False;
   fSuportaDesconto := False;
@@ -480,6 +493,7 @@ begin
   fUtilizaSaldoTotalVoucher := False;
   fMoedaISO4217 := 986;
   fAutoAtendimento := False;
+  fIdioma := idPortugues;
 end;
 
 procedure TACBrTEFAPIDadosAutomacao.Assign(Source: TPersistent);
@@ -491,14 +505,18 @@ begin
     DadosSource := TACBrTEFAPIDadosAutomacao(Source);
 
     fNomeSoftwareHouse := DadosSource.NomeSoftwareHouse;
+    fCNPJSoftwareHouse := DadosSource.CNPJSoftwareHouse;
     fNomeAplicacao := DadosSource.NomeAplicacao;
     fVersaoAplicacao := DadosSource.VersaoAplicacao;
+    fParamAplicacao := DadosSource.ParamAplicacao;
     fMensagemPinPad := DadosSource.MensagemPinPad;
-    fImprimeViaClienteReduzida := DadosSource.ImprimeViaClienteReduzida;
-    fSuportaDesconto := DadosSource.SuportaDesconto;
     fSuportaSaque := DadosSource.SuportaSaque;
+    fSuportaDesconto := DadosSource.SuportaDesconto;
+    fImprimeViaClienteReduzida := DadosSource.ImprimeViaClienteReduzida;
     fSuportaViasDiferenciadas := DadosSource.SuportaViasDiferenciadas;
     fUtilizaSaldoTotalVoucher := DadosSource.UtilizaSaldoTotalVoucher;
+    fMoedaISO4217 := DadosSource.MoedaISO4217;
+    fIdioma := DadosSource.Idioma;
     fAutoAtendimento := DadosSource.AutoAtendimento;
   end;
 end;
@@ -766,7 +784,7 @@ end;
 procedure TACBrTEFAPIRespostas.GravarRespostaTEF(ATEFResp: TACBrTEFResp);
 begin
   if (ATEFResp.ArqBackup <> '') then
-    ATEFResp.Conteudo.GravarArquivo(ATEFResp.ArqBackup);
+    ATEFResp.Conteudo.GravarArquivo(ATEFResp.ArqBackup, True);
 end;
 
 procedure TACBrTEFAPIRespostas.SalvarRespostasTEF;
@@ -805,7 +823,7 @@ begin
   if Sobrescrever or (not FileExists(ArqResposta)) then
   begin
     ATEFResp.ArqBackup := ArqResposta;
-    ATEFResp.Conteudo.GravarArquivo(ArqResposta);
+    ATEFResp.Conteudo.GravarArquivo(ArqResposta, True);
   end;
 end;
 
@@ -988,11 +1006,7 @@ begin
       end;
     end;
 
-    if Assigned(QuandoFinalizarOperacao) then
-    begin
-      GravarLog('  QuandoFinalizarOperacao');
-      QuandoFinalizarOperacao(UltimaRespostaTEF);
-    end;
+    DoQuandoFinalizarOperacao(UltimaRespostaTEF);
   end;
 end;
 
@@ -1042,7 +1056,7 @@ begin
     TACBrTEFRespHack(UltimaRespostaTEF).fpHeader := AHeader;
     UltimaRespostaTEF.Conteudo.GravaInformacao(899, CTEF_RESP_HEADER, AHeader);
     if (UltimaRespostaTEF.ArqBackup <> '') then
-      UltimaRespostaTEF.Conteudo.GravarArquivo(UltimaRespostaTEF.ArqBackup);
+      UltimaRespostaTEF.Conteudo.GravarArquivo(UltimaRespostaTEF.ArqBackup, True);
   end;
 end;
 
@@ -1106,8 +1120,31 @@ begin
   fUltimaRespostaTEF := fpTEFAPIClass.TEFRespClass.Create;
 end;
 
+procedure TACBrTEFAPIComum.DoQuandoFinalizarTransacao(ATEFResp: TACBrTEFResp;
+  AStatus: TACBrTEFStatusTransacao);
+begin
+  if Assigned(fQuandoFinalizarTransacao) then
+  begin
+    GravarLog('      QuandoFinalizarTransacao');
+    fQuandoFinalizarTransacao(ATEFResp, AStatus);
+  end;
+end;
+
+procedure TACBrTEFAPIComum.DoQuandoFinalizarOperacao(ATEFResp: TACBrTEFResp);
+begin
+  if Assigned(QuandoFinalizarOperacao) then
+  begin
+    GravarLog('  QuandoFinalizarOperacao');
+    QuandoFinalizarOperacao(UltimaRespostaTEF);
+  end;
+end;
+
 destructor TACBrTEFAPIComum.Destroy;
 begin
+  // Desliga gravação de Logs, para evitar A.V.
+  fArqLOG := '';
+  fQuandoGravarLog := Nil;
+
   fpTEFAPIClass.Free;
   fDadosAutomacao.Free;
   fDadosEstabelecimento.Free;
@@ -1392,12 +1429,7 @@ begin
   begin
     ATEFResp := fRespostasTEF[i];
     fRespostasTEF.AtualizarTransacaoComTerceiraPerna(ATEFResp);
-
-    if Assigned(fQuandoFinalizarTransacao) then
-    begin
-      GravarLog('      QuandoFinalizarTransacao');
-      fQuandoFinalizarTransacao(ATEFResp, AStatus);
-    end;
+    DoQuandoFinalizarTransacao(ATEFResp, AStatus);
   end;
 end;
 
@@ -1447,13 +1479,14 @@ begin
 end;
 
 procedure TACBrTEFAPIComum.ResolverTransacaoPendente(
-  Status: TACBrTEFStatusTransacao);
+  AStatus: TACBrTEFStatusTransacao);
 begin
   GravarLog( 'ResolverOperacaoPendente( '+
-             GetEnumName(TypeInfo(TACBrTEFStatusTransacao), integer(Status))+' )');
+             GetEnumName(TypeInfo(TACBrTEFStatusTransacao), integer(AStatus))+' )');
 
-  fpTEFAPIClass.ResolverTransacaoPendente(Status);
+  fpTEFAPIClass.ResolverTransacaoPendente(AStatus);
   fRespostasTEF.AtualizarTransacaoComTerceiraPerna(UltimaRespostaTEF);
+  DoQuandoFinalizarTransacao(UltimaRespostaTEF, AStatus);
 end;
 
 procedure TACBrTEFAPIComum.AbortarTransacaoEmAndamento;
@@ -1485,7 +1518,7 @@ var
   i: Integer;
   MsgErro: String;
 begin
-  GravarLog('VerificarTransacoesPendentes');
+  GravarLog('VerificarTransacoesPendentes: '+IntToStr(RespostasTEF.Count));
   for i := 0 to RespostasTEF.Count-1 do
   begin
     UltimaRespostaTEF.Assign(RespostasTEF[i]);

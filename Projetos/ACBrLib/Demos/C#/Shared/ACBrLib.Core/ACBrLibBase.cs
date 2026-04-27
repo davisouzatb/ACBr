@@ -7,11 +7,10 @@ namespace ACBrLib.Core
 
     /// <summary>
     /// Classe base para as novas biblioteca ACBrLib C# Mono.
-    /// É indica para uso em ambiente Linux, principalmente desenvolvimento de APIs REST, mas também pode ser usada em ambiente Windows.
     /// Diferente de ACBrLibHandle essa classe define apenas os métodos e propriedades comuns a todas as bibliotecas ACBrLib em alto nível, ou seja, sem lidar diretamente com ponteiros e buffers.
     /// Essa classe define os métodos e propriedades comuns a todas as bibliotecas ACBrLib em alto nível.
     /// </summary>
-    public abstract class ACBrLibBase: IACBrLibBase
+    public abstract class ACBrLibBase : IACBrLibBase
     {
 
         #region fields
@@ -20,6 +19,12 @@ namespace ACBrLib.Core
         #endregion
 
         #region constructor
+
+        /// <summary>
+        /// Construtor da classe base para as novas biblioteca ACBrLib C#
+        /// </summary>
+        /// <param name="eArqConfig"></param>
+        /// <param name="eChaveCrypt"></param>
         public ACBrLibBase(string eArqConfig = "", string eChaveCrypt = "")
         {
             arquivoConfig = eArqConfig;
@@ -30,25 +35,75 @@ namespace ACBrLib.Core
 
         public const int BUFFER_LEN = 1024;
 
-        #region métodos  abstratos comuns 
-        public abstract int Inicializar();
-        public abstract int Finalizar();
+        #region métodos  abstratos comuns
+
+        /// <inheritdoc/>
+        public abstract void Inicializar(string eArqConfig = "", string eChaveCrypt = "");
+
+        /// <inheritdoc/>
+        public abstract void Finalizar();
+
+        /// <inheritdoc/>
         public abstract void ConfigLer(string eArqConfig);
+
+        /// <inheritdoc/>
         public abstract void ConfigGravar(string eArqConfig);
+
+        /// <summary>
+        /// Método usado para ler um valor específico da configuração da biblioteca.
+        /// </summary>
+        /// <param name="eSessao">Sessão da configuração.</param>
+        /// <param name="eChave">Chave da configuração.</param>
+        /// <returns>Valor da configuração.</returns>
         public abstract string ConfigLerValor(string eSessao, string eChave);
+
+        /// <summary>
+        /// Método usado para gravar um valor específico na configuração da biblioteca.
+        /// </summary>
+        /// <param name="eSessao">Sessão da configuração.</param>
+        /// <param name="eChave">Chave da configuração.</param>
+        /// <param name="eValor">Valor da configuração.</param>
         public abstract void ConfigGravarValor(string eSessao, string eChave, string eValor);
-        public abstract T ConfigLerValor<T>(ACBrSessao eSessao, string eChave);
 
-        public abstract void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value);
-
+        /// <inheritdoc/>
         public abstract void ImportarConfig(string eArqConfig);
 
+        /// <inheritdoc/>
         public abstract string ExportarConfig();
 
+        /// <inheritdoc/>
         public abstract string Versao();
+
+        /// <inheritdoc/>
         public abstract string Nome();
+
+
+        /// <summary>
+        /// Método usado retornar o ultimo retorno processado pela biblioteca
+        /// </summary>
+        /// <param name="iniBufferLen">Tamanho inicial do buffer.</param>
+        /// <returns>Último retorno processado pela biblioteca.</returns>
         protected abstract string GetUltimoRetorno(int iniBufferLen = 0);
+
+        /// <inheritdoc/>
         public abstract string OpenSSLInfo();
+
+        #endregion
+
+        #region metodos comuns implementados
+        /// <inheritdoc/>
+        public virtual T ConfigLerValor<T>(ACBrSessao eSessao, string eChave)
+        {
+            var value = ConfigLerValor(eSessao.ToString(), eChave);
+            return ConvertValue<T>(value);
+        }
+
+        /// <inheritdoc/>
+        public virtual void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value)
+        {
+            var propValue = ConvertValue(value);
+            ConfigGravarValor(eSessao.ToString(), eChave, propValue);
+        }
 
         #endregion
 
@@ -135,7 +190,7 @@ namespace ACBrLib.Core
             }
         }
 
-        protected String CheckBuffer(StringBuilder buffer, int bufferLen)
+        protected string CheckBuffer(StringBuilder buffer, int bufferLen)
         {
             if (bufferLen > BUFFER_LEN)
             {
@@ -148,7 +203,8 @@ namespace ACBrLib.Core
 
 
 
-        ///     Cria e dispara uma <see cref="ApplicationException" /> com a mensagem informada.
+        /// <summary>
+        ///  Cria e dispara uma <see cref="ApplicationException" /> com a mensagem informada.
         /// </summary>
         /// <param name="errorMessage">Mensagem de erro.</param>
         /// <returns>

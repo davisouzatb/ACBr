@@ -42,6 +42,40 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+15/04/2026
+-- ACBrDCe.XmlWriter --
+[*] Revertido a alteração, pois conforme consta no Schema o cPais do emitente, tem que ser
+    o código IBGE do Brasil.
+   Por: Italo Giurizzato Junior
+
+08/04/2026
+-- ACBrDCe.IniReader, ACBrDCe.IniWriter --
+[*] Leitura e escrita dos campos cPais e xPais no ini
+-- Frm_ACBrDCe.dfm, Frm_ACBrDCe, Frm_ACBrDCe.lfm --
+[*] Correção da compilação dos programas de exemplo em Delphi e Lazarus
+  - Adicionada aba Outros e botões para leitura e geração de ini 
+   Por: Renato Rubinho
+
+07/04/2026
+-- ACBrDCe.XmlWriter --
+[-] Alteração visando levar em consideração o cPais do emitente, pois estava fixo o
+    valor CODIGO_BRASIL.
+   Por: Italo Giurizzato Junior
+-- ACBrDCe.XmlReader/ACBrDCe.XmlWriter --
+[-] Alteração visando gerar os grupos de observação no local correto do layout do XML.
+   Por: Italo Giurizzato Junior
+
+25/03/2026
+-- ACBrDCeDeclaracoes --
+[*] Alteração visando Checar o CNPJ do Certificado com o CNPJ de quem realmente esta emitindo o 
+    DC-e.
+   Por: Italo Giurizzato Junior
+
+25/02/2026
+-- ACBrDCeDeclaracoes --
+[*] Alteração visando remover se necessário os bytes do UTF8 BOM ao carregar um XML.
+   Por: Italo Giurizzato Junior
+
 25/09/2025
 -- ACBrDCe.RetEnvEvento --
 [-] Correção por conta de erro de compilação/instalação.

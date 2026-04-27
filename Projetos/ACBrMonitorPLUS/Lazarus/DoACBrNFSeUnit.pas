@@ -342,6 +342,19 @@ public
   procedure Executar; override;
 end;
 
+{ TMetodoSetAmbiente}
+
+TMetodoSetAmbiente = class(TACBrMetodo)
+public
+  procedure Executar; override;
+end;
+
+{ TMetodoSetVersaoDF }
+
+TMetodoSetVersaoDF = class(TACBrMetodo)
+public
+  procedure Executar; override;
+end;
 
 implementation
 
@@ -415,6 +428,50 @@ begin
   end;
 end;
 
+{ TMetodoSetAmbiente }
+
+// Params: 0 - NumAmbiente : Integer 1- Producao / 2- Homologacao
+
+procedure TMetodoSetAmbiente.Executar;
+var
+  NumAmbiente: Integer;
+begin
+  NumAmbiente := StrToIntDef(fpCmd.Params(0), 2);
+
+  if (NumAmbiente < 1) or (NumAmbiente > 2) then
+    raise Exception.Create('Ambiente Inválido: ' + IntToStr(NumAmbiente));
+
+  with TACBrObjetoNFSe(fpObjetoDono) do
+  begin
+    with MonitorConfig.DFE.WebService do
+      Ambiente := NumAmbiente -1;
+
+    MonitorConfig.SalvarArquivo;
+  end;
+end;
+
+{ TMetodoSetVersaoDF }
+
+procedure TMetodoSetVersaoDF.Executar;
+var
+  lVersaoDF: TVersaoNFSe;
+  Ok: Boolean;
+  lParam: String;
+begin
+  {Atenção, esse método é diferente dos SetVersaoDF implementados em outros objetos.
+   aqui a configuração não pode ser aplicada fisicamente (salva no ini) ela só é trabalhada em memória.
+   se precisar implementar método semelhante para outro DFe, utilize eSocial ou Reinf como base.
+  }
+  lParam := fpCmd.Params(0);
+  if lParam = '' then
+    lParam := '1.00';
+
+  lVersaoDF := StrToVersaoNFSe(Ok, lParam);
+  if not(OK) then
+    raise Exception.Create('Versão inválida: ' + lParam);
+
+  TACBrObjetoNFSe(fpObjetoDono).ACBrNFSeX.Configuracoes.Geral.Versao := lVersaoDF;
+end;
 
 { TMetodoSetEmitente }
 
@@ -582,6 +639,16 @@ begin
   begin
     ACBrNFSeX.NotasFiscais.Clear;
 
+    if Assigned(ACBrNFSeX.DANFSE) then
+    begin
+      ACBrNFSeX.DANFSE.Tomador.InscricaoEstadual := '';
+      ACBrNFSeX.DANFSE.Tomador.InscricaoMunicipal := '';
+      ACBrNFSeX.DANFSE.Tomador.Fone := '';
+      ACBrNFSeX.DANFSE.Tomador.Endereco := '';
+      ACBrNFSeX.DANFSE.Tomador.Complemento := '';
+      ACBrNFSeX.DANFSE.Tomador.Email := '';
+    end;
+
     CargaDFe := TACBrCarregarNFSe.Create(ACBrNFSeX, APathXML);
     try
       ACBrNFSeX.NotasFiscais.ImprimirPDF;
@@ -619,10 +686,20 @@ begin
   begin
     ACBrNFSeX.NotasFiscais.Clear;
 
+    if Assigned(ACBrNFSeX.DANFSE) then
+    begin
+      ACBrNFSeX.DANFSE.Tomador.InscricaoEstadual := '';
+      ACBrNFSeX.DANFSE.Tomador.InscricaoMunicipal := '';
+      ACBrNFSeX.DANFSE.Tomador.Fone := '';
+      ACBrNFSeX.DANFSE.Tomador.Endereco := '';
+      ACBrNFSeX.DANFSE.Tomador.Complemento := '';
+      ACBrNFSeX.DANFSE.Tomador.Email := '';
+    end;
+
     CargaDFe := TACBrCarregarNFSe.Create(ACBrNFSeX, APathXML);
     try
 
-      if NaoEstaVazio(AImpressora) then
+      if trim(AImpressora) <> EmptyStr then
         ACBrNFSeX.DANFSE.Impressora := AImpressora;
 
       if (ACopias > 0) then
@@ -665,6 +742,16 @@ begin
   with TACBrObjetoNFSe(fpObjetoDono) do
   begin
     ACBrNFSeX.NotasFiscais.Clear;
+
+    if Assigned(ACBrNFSeX.DANFSE) then
+    begin
+      ACBrNFSeX.DANFSE.Tomador.InscricaoEstadual := '';
+      ACBrNFSeX.DANFSE.Tomador.InscricaoMunicipal := '';
+      ACBrNFSeX.DANFSE.Tomador.Fone := '';
+      ACBrNFSeX.DANFSE.Tomador.Endereco := '';
+      ACBrNFSeX.DANFSE.Tomador.Complemento := '';
+      ACBrNFSeX.DANFSE.Tomador.Email := '';
+    end;
 
     slMensagemEmail := TStringList.Create;
     slCC := TStringList.Create;
@@ -1897,6 +1984,8 @@ begin
   ListaDeMetodos.Add(CMetodoSetAutenticacaoNFSe);
   ListaDeMetodos.Add(CMetodoConsultarLinkNFSe);
   ListaDeMetodos.Add(CMetodoSetPathArquivoWebServices);
+  ListaDeMetodos.Add(CMetodoSetambiente);
+  ListaDeMetodos.Add(CMetodoSetversaodf);
 
   // DoACBrUnit
   ListaDeMetodos.Add(CMetodoSavetofile);
@@ -1974,6 +2063,8 @@ begin
     41  : AMetodoClass := TMetodoSetAutenticacaoNFSe;
     42  : AMetodoClass := TMetodoConsultarLinkNFSe;
     43  : AMetodoClass := TMetodoSetPathArquivoWebServices;
+    44  : AMetodoClass := TMetodoSetAmbiente;
+    45  : AMetodoClass := TMetodoSetVersaoDF;
 
     else
     begin

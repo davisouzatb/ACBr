@@ -726,8 +726,8 @@ begin
   MS := TMemoryStream.Create;
   try
     MS.LoadFromFile(CaminhoArquivo);
-
     XmlUTF8 := ReadStrFromStream(MS, MS.Size);
+    XMLUTF8 := RemoverUTF8Bom(XMLUTF8);
   finally
     MS.Free;
   end;
@@ -765,7 +765,7 @@ var
   MS: TMemoryStream;
   P, N, TamTag, j: Integer;
   aXml, aXmlLote: string;
-  TagF: Array[1..16] of string;
+  TagF: Array[1..17] of string;
   SL: TStringStream;
   IsFile: Boolean;
 
@@ -786,7 +786,8 @@ var
     TagF[13] := '<NOTA>';             // Provedor AssessorPublico
     TagF[14] := '<NOTA_FISCAL>';      // Provedor ISSDSF
     TagF[15] := '<tcCompNfse>';       // Provedor ISSCuritiba
-    TagF[16] := '<notafiscal>';       //Provedor SigISSWeb
+    TagF[16] := '<notafiscal>';       // Provedor SigISSWeb
+    TagF[17] := '<NFSE>';             // Provedor Ginfes - Obtido do Site
 
     j := 0;
 
@@ -815,6 +816,7 @@ var
     TagF[14] := '</NOTA_FISCAL>';      // Provedor ISSDSF
     TagF[15] := '</tcCompNfse>';       // Provedor ISSCuritiba
     TagF[16] := '</notafiscal>';       // Provedor SigISSWeb
+    TagF[17] := '</NFSE>';             // Provedor Ginfes - Obtido do Site
 
     j := 0;
 
@@ -830,6 +832,7 @@ var
     Result := FaststringReplace(XMLStr, ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"', '', [rfReplaceAll]);
     Result := FaststringReplace(Result, ' xmlns:xsd="http://www.w3.org/2001/XMLSchema"', '', [rfReplaceAll]);
     Result := RemoverPrefixosDesnecessarios(Result);
+    Result := RemoverIdentacao(Result);
   end;
 begin
   MS := TMemoryStream.Create;
@@ -846,6 +849,7 @@ begin
     end;
 
     XMLUTF8 := ReadStrFromStream(MS, MS.Size);
+    XMLUTF8 := RemoverUTF8Bom(XMLUTF8);
   finally
     MS.Free;
   end;
@@ -860,7 +864,7 @@ begin
   aXmlLote := copy(aXmlLote, P, length(aXmlLote));
   N := PosNFSe;
 
-  while N > 0 do
+  while N > 1 do
   begin
     aXml := copy(aXmlLote, 1, N + TamTAG);
     aXmlLote := Trim(copy(aXmlLote, N + TamTAG + 1, length(aXmlLote)));
@@ -901,10 +905,14 @@ end;
 
 function TNotasFiscais.LoadFromString(const AXMLString: string;
   AGerarNFSe: Boolean = True): Boolean;
+var
+  XMLStr: AnsiString;
 begin
+  XMLStr := RemoverUTF8Bom(AXMLString);
+
   with Self.New do
   begin
-    LerXML(AXMLString);
+    LerXML(XMLStr);
 
     if AGerarNFSe then
       GerarXML;

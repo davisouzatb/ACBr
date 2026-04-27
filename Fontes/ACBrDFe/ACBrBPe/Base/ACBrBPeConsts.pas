@@ -132,8 +132,6 @@ resourcestring
   DSC_TBAND = 'Bandeira da Operadora de Cartão';
   DSC_CAUT = 'Número da Autorização';
 
-  DSC_PLACA = 'Placa do Veículo';
-
 implementation
 
 end.

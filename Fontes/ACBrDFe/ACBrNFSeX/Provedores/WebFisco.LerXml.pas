@@ -56,6 +56,10 @@ type
     function LerXmlNfse(const ANode: TACBrXmlNode): Boolean;
   end;
 
+  TNFSeR_WebFisco101 = class(TNFSeR_WebFisco)
+
+  end;
+
 implementation
 
 uses
@@ -103,6 +107,8 @@ begin
     Result := LerXmlNfse(XmlNode)
   else
     Result := LerXmlRps(XmlNode);
+
+  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
 
   FreeAndNil(FDocument);
 end;
@@ -192,6 +198,9 @@ begin
 //          IssRetido := stNormal;
 
     Servico.Valores.ValorServicos := ObterConteudo(ANode.Childrens.FindAnyNs('nfevalor'), tcDe2);
+    if Servico.Valores.ValorServicos = 0 then
+      Servico.Valores.ValorServicos := ObterConteudo(ANode.Childrens.FindAnyNs('nfevaltributavel'), tcDe2);
+
     Servico.Valores.ValorLiquidoNfse := Servico.Valores.ValorServicos;
     Servico.Valores.ValorIss := ObterConteudo(ANode.Childrens.FindAnyNs('nfevaliss'), tcDe2);
     Servico.Valores.ValorIssRetido := ObterConteudo(ANode.Childrens.FindAnyNs('nfevalissretido'), tcDe2);
@@ -217,31 +226,13 @@ begin
     Servico.Valores.ValorTotalNotaFiscal := Servico.Valores.ValorServicos -
       Servico.Valores.DescontoCondicionado - Servico.Valores.DescontoIncondicionado;
 
-    i := 0;
-
-    repeat
-      Inc(i);
-      aValor := ObterConteudo(ANode.Childrens.FindAnyNs('nfeitemserv' + IntToStr(i)), tcStr);
-
-      if aValor <> '' then
-      begin
-        Servico.ItemServico.New;
-
-        Servico.ItemServico[i-1].ItemListaServico := aValor;
-        Servico.ItemServico[i-1].Aliquota := ObterConteudo(ANode.Childrens.FindAnyNs('nfealiqserv' + IntToStr(i)), tcDe2);
-        Servico.ItemServico[i-1].ValorUnitario := ObterConteudo(ANode.Childrens.FindAnyNs('nfevalserv' + IntToStr(i)), tcDe2);
-
-        if i = 1 then
-        begin
-          Servico.ItemServico[i-1].Descricao := ObterConteudo(ANode.Childrens.FindAnyNs('nfedescricaoservicos'), tcStr);
-          Servico.ItemServico[i-1].Descricao := StringReplace(Servico.ItemServico[i-1].Descricao, FpQuebradeLinha,
-                                                    sLineBreak, [rfReplaceAll]);
-        end;
-
-        Servico.ItemServico[i-1].Quantidade := 1;
-        Servico.ItemServico[i-1].ValorTotal := Servico.ItemServico[i-1].ValorUnitario;
-      end;
-    until aValor = '';
+    aValor := ObterConteudo(ANode.Childrens.FindAnyNs('nfedescricaoservicos'), tcStr);
+    if aValor <> '' then
+    begin
+      Servico.ItemServico.New;
+      Servico.ItemServico[0].Descricao := StringReplace(aValor, FpQuebradeLinha,
+                                                sLineBreak, [rfReplaceAll]);
+    end;
   end;
 end;
 

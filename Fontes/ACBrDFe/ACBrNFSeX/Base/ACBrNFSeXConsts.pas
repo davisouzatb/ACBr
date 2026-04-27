@@ -97,6 +97,7 @@ resourcestring
   DSC_REGISSQN = 'Regime Especial de Tributação do ISSQN';
   DSC_CNAE = 'Classificação Nacional de Atividades Econômicas';
   DSC_CSERVTRIBMUN = 'Codigo de tributação pelo ISSQN do municipio';
+  DSC_CSERVTRIBNAC = 'Codigo de tributação Nacional';
 
   DSC_XSERV = 'Descrição do serviço';
   DSC_QTDE = 'Quantidade';
@@ -190,7 +191,7 @@ resourcestring
   Cod101 = 'X101';
   Desc101 = 'Número do Protocolo não informado.';
   Cod102 = 'X102';
-  Desc102 = 'Número do RPS não informado.';
+  Desc102 = 'Número do RPS/DPS não informado.';
   Cod103 = 'X103';
   Desc103 = 'Série do Rps não informada.';
   Cod104 = 'X104';
@@ -290,6 +291,8 @@ resourcestring
   Desc213 = 'Não foi retornado nenhum Token.';
   Cod214 = 'X214';
   Desc214 = 'Não foi retornado nenhum DANFSE, chave/ambiente pode estar errado.';
+  Cod215 = 'X215';
+  Desc215 = 'Identificacao do Prestador ou Senha inválida.';
 
   Cod800 = 'X800';
   Desc800 = 'Erro de Validação: ';

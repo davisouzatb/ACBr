@@ -44,7 +44,8 @@ uses
   ACBrXmlDocument,
   ACBrDFe.Conversao,
   ACBrNFSeXConversao,
-  ACBrNFSeXLerXml;
+  ACBrNFSeXLerXml,
+  ACBrNFSeXClass;
 
 type
   { TNFSeR_ISSSaoPaulo }
@@ -60,6 +61,7 @@ type
     procedure LerEnderecoTomador(const ANode: TACBrXmlNode);
     procedure LerCPFCNPJIntermediario(const ANode: TACBrXmlNode);
     procedure LerRetornoComplementarIBSCBS(const ANode: TACBrXmlNode);
+    procedure LerXMLDestinatario(const ANode: TACBrXmlNode; Dest: TDadosdaPessoa); override;
   public
     function LerXml: Boolean; override;
     function LerXmlRps(const ANode: TACBrXmlNode): Boolean;
@@ -147,11 +149,16 @@ end;
 procedure TNFSeR_ISSSaoPaulo.LerCPFCNPJTomador(const ANode: TACBrXmlNode);
 var
   LNode: TACBrXmlNode;
+  Ok: Boolean;
 begin
   LNode := ANode.Childrens.FindAnyNs('CPFCNPJTomador');
 
   if LNode <> nil then
+  begin
     NFSe.Tomador.IdentificacaoTomador.CpfCnpj := ObterCNPJCPF(LNode);
+    NFSe.Tomador.IdentificacaoTomador.Nif  := ObterConteudo(LNode.Childrens.FindAnyNs('NIF'), tcStr);
+    NFSe.Tomador.IdentificacaoTomador.cNaoNIF  := StrToNaoNIF(Ok, ObterConteudo(LNode.Childrens.FindAnyNs('NaoNIF'), tcStr));
+  end;
 end;
 
 procedure TNFSeR_ISSSaoPaulo.LerEnderecoPrestador(const ANode: TACBrXmlNode);
@@ -271,9 +278,31 @@ begin
       Result := LerXmlNfse(LNode)
     else
       Result := LerXmlRps(LNode);
+
+    VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
+
   finally
     FreeAndNil(FDocument);
   end;
+end;
+
+procedure TNFSeR_ISSSaoPaulo.LerXMLDestinatario(const ANode: TACBrXmlNode;
+  Dest: TDadosdaPessoa);
+var
+  oK: Boolean;
+begin
+  if not Assigned(ANode) then Exit;
+
+  Dest.CNPJCPF := ObterCNPJCPF(ANode);
+  Dest.NIF := ObterConteudo(ANode.Childrens.FindAnyNs('NIF'), tcStr);
+  Dest.cNaoNIF := StrToNaoNIF(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('NaoNIF'), tcStr));
+
+  Dest.xNome := ObterConteudo(ANode.Childrens.FindAnyNs('xNome'), tcStr);
+
+  LerXMLEnderecoDestinatario(ANode.Childrens.FindAnyNs('end'), Dest.ender);
+
+  Dest.fone := ObterConteudo(ANode.Childrens.FindAnyNs('fone'), tcStr);
+  Dest.email := ObterConteudo(ANode.Childrens.FindAnyNs('email'), tcStr);
 end;
 
 function TNFSeR_ISSSaoPaulo.LerXmlNfse(const ANode: TACBrXmlNode): Boolean;
@@ -318,8 +347,6 @@ begin
   NFSe.Servico.Discriminacao := ObterConteudo(ANode.Childrens.FindAnyNs('Discriminacao'), tcStr);
   NFSe.Servico.Discriminacao := StringReplace(NFSe.Servico.Discriminacao, FpQuebradeLinha,
                                                     sLineBreak, [rfReplaceAll]);
-
-  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
 
   LValor := ObterConteudo(ANode.Childrens.FindAnyNs('ISSRetido'), tcStr);
 
@@ -432,8 +459,6 @@ begin
   NFSe.Servico.Discriminacao := StringReplace(NFSe.Servico.Discriminacao, FpQuebradeLinha,
                                                   sLineBreak, [rfReplaceAll]);
 
-  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
-
   NFSe.ValorCargaTributaria := ObterConteudo(ANode.Childrens.FindAnyNs('ValorCargaTributaria'), tcDe2);
   NFSe.PercentualCargaTributaria := ObterConteudo(ANode.Childrens.FindAnyNs('PercentualCargaTributaria'), tcDe4);
   NFSe.Servico.FonteCargaTributaria := ObterConteudo(ANode.Childrens.FindAnyNs('FonteCargaTributaria'), tcStr);
@@ -483,6 +508,23 @@ begin
   NFSe.ConstrucaoCivil.nNumeroEncapsulamento := ObterConteudo(ANode.Childrens.FindAnyNs('NumeroEncapsulamento'), tcStr);
 
   LerXMLIBSCBSDPS(ANode.Childrens.FindAnyNs('IBSCBS'), NFSE.IBSCBS);
+
+  NFSe.Servico.Valores.RetencoesFederais := NFSe.Servico.Valores.ValorPis +
+                            NFSe.Servico.Valores.ValorCofins +
+                            NFSe.Servico.Valores.ValorInss +
+                            NFSe.Servico.Valores.ValorIr +
+                            NFSe.Servico.Valores.ValorCsll;
+
+  NFSe.Servico.Valores.ValorLiquidoNfse := NFSe.Servico.Valores.ValorServicos -
+                      (NFSe.Servico.Valores.RetencoesFederais +
+                      NFSe.Servico.Valores.ValorDeducoes +
+                      NFSe.Servico.Valores.ValorIssRetido +
+                      NFSe.Servico.Valores.DescontoCondicionado +
+                      NFSe.Servico.Valores.DescontoIncondicionado);
+
+  NFSe.Servico.Valores.ValorTotalNotaFiscal := NFSe.Servico.Valores.ValorServicos -
+                          NFSe.Servico.Valores.DescontoCondicionado -
+                          NFSe.Servico.Valores.DescontoIncondicionado;
 end;
 
 end.

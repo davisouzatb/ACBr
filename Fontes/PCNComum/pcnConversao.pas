@@ -267,6 +267,8 @@ const
   teSolicApropCredBensServicos = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teSolicApropCredBensServicos deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   teManifPedTransfCredIBSSucessao = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teManifPedTransfCredIBSSucessao deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   teManifPedTransfCredCBSSucessao = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teManifPedTransfCredCBSSucessao deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
+  teVinculoPgto = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teVinculoPgto deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
+  teCancVinculoPgto = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teCancVinculoPgto deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
 
   // Enumerados do TModal
 const
@@ -350,6 +352,7 @@ const
   cst81 = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cst81 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   cst90 = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cst90 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   cstPart10 = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cstPart10 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
+  cstPart20 = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cstPart20 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   cstPart90 = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cstPart90 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   cstRep41 = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cstRep41 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   cstVazio = {$IFDEF SUPPORTS_SCOPEDENUMS}TCSTIcms.{$ENDIF}cstVazio deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TCSTIcms da Unit ACBrDFe.Conversao.pas' {$ENDIF};
@@ -581,7 +584,7 @@ type
   end;
 
 const
-  TpcnTpEventoString : array[0..93] of String =('-99999', '110110', '110111',
+  TpcnTpEventoString : array[0..95] of String =('-99999', '110110', '110111',
                                                 '210200', '210210', '210220',
                                                 '210240', '110112', '110113',
                                                 '110114', '110160', '310620',
@@ -612,7 +615,7 @@ const
                                                 '211110', '211120', '211124',
                                                 '211128', '211130', '211140',
                                                 '211150', '212110', '212120',
-                                                '112150');
+                                                '112150', '110300', '110301');
 
   DFeUF: array[0..26] of String =
   ('AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA',
@@ -1069,11 +1072,11 @@ begin
   result := EnumeradoToStr(t, ['', '00', '10', '20', '30', '40', '41', '45', '50', '51',
                                '60', '70', '80', '81', '90', '90', 'SN',
                                '10', '90', '41', '60',
-                               '02', '15', '53', '61'],
+                               '02', '15', '53', '61', '20'],
                               [cstVazio, cst00, cst10, cst20, cst30, cst40, cst41, cst45, cst50, cst51,
                               cst60, cst70, cst80, cst81, cst90, cstICMSOutraUF, cstICMSSN,
                               cstPart10, cstPart90, cstRep41, cstRep60,
-                              cst02, cst15, cst53, cst61]);
+                              cst02, cst15, cst53, cst61, cstPart20]);
 end;
 
 function StrToCSTICMS(out ok: boolean; const s: string): TpcnCSTIcms;
@@ -1081,21 +1084,21 @@ begin
   result := StrToEnumerado(ok, s, ['', '00', '10', '20', '30', '40', '41', '45', '50', '51', '60',
                                    '70', '80', '81', '90', '91', 'SN',
                                    '10part', '90part', '41rep', '60rep',
-                                   '02', '15', '53', '61'],
+                                   '02', '15', '53', '61', '20part'],
                                   [cstVazio, cst00, cst10, cst20, cst30, cst40, cst41, cst45, cst50, cst51, cst60,
                                    cst70, cst80, cst81, cst90, cstICMSOutraUF, cstICMSSN,
                                    cstPart10, cstPart90, cstRep41, cstRep60,
-                                   cst02, cst15, cst53, cst61]);
+                                   cst02, cst15, cst53, cst61, cstPart20]);
 end;
 
 function CSTICMSToStrTagPos(const t: TpcnCSTIcms): string;
 begin
   result := EnumeradoToStr(t, ['02', '03', '04', '05', '06', '06', '06', '07',
                      '08', '09', '10', '11', '12', '10a', '10a', '10b', '10b',
-                     '13', '14', '15', '16'],
+                     '13', '14', '15', '16', '10a'],
     [cst00, cst10, cst20, cst30, cst40, cst41, cst50, cst51, cst60, cst70,
      cst80, cst81, cst90, cstPart10 , cstPart90 , cstRep41, cstRep60,
-     cst02, cst15, cst53, cst61]);
+     cst02, cst15, cst53, cst61, cstPart20]);
 end;
 
 function CSTICMSToStrTagPosText(const t: TpcnCSTIcms): string;
@@ -1125,11 +1128,12 @@ begin
     '02 - Tributação monofásica própria sobre combustíveis',
     '15 - Tributação monofásica própria e com responsabilidade pela retenção sobre combustíveis',
     '53 - Tributação monofásica sobre combustíveis com recolhimento diferido',
-    '61 - Tributação monofásica sobre combustíveis cobrada anteriormente'
+    '61 - Tributação monofásica sobre combustíveis cobrada anteriormente',
+    '10 - TRIBUTAÇÃO COM COBRANÇA DO ICMS POR SUBST. TRIBUTÁRIA'
     ],
     [cstVazio, cst00, cst10, cst20, cst30, cst40, cst41, cst45, cst50, cst51, cst60, cst70,
     cst80, cst81, cst90, cstICMSOutraUF, cstICMSSN, cstPart10, cstPart90, cstRep41, cstRep60,
-    cst02, cst15, cst53, cst61]);
+    cst02, cst15, cst53, cst61, cstPart20]);
 end;
 
 // CST PIS *********************************************************************
@@ -1225,7 +1229,7 @@ begin
               'AceiteDebitoApuracaoNotaCredito', 'ImobilizacaoItem',
               'SolicApropCredCombustivel', 'SolicApropCredBensServicos',
               'ManifPedTransfCredIBSSucessao', 'ManifPedTransfCredCBSSucessao',
-              'AtualizacaoDataPrevisaoEntrega'],
+              'AtualizacaoDataPrevisaoEntrega', 'VinculoPagamento', 'CancVinculoPgto'],
              [teNaoMapeado, teCCe, teCancelamento, teManifDestConfirmacao, teManifDestCiencia,
               teManifDestDesconhecimento, teManifDestOperNaoRealizada,
               teEncerramento, teEPEC, teInclusaoCondutor, teMultiModal,
@@ -1255,7 +1259,7 @@ begin
               teAceiteDebitoApuracaoNotaCredito, teImobilizacaoItem,
               teSolicApropCredCombustivel, teSolicApropCredBensServicos,
               teManifPedTransfCredIBSSucessao, teManifPedTransfCredCBSSucessao,
-              teAtualizacaoDataPrevisaoEntrega]);
+              teAtualizacaoDataPrevisaoEntrega, teVinculoPgto, teCancVinculoPgto]);
 end;
 
 function StrToEnumerado2(out ok: boolean; const s: string;

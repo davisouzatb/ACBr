@@ -10,7 +10,7 @@ using ACBrLib.IBGE;
 namespace ACBrLib.IBGE
 {
     /// <inheritdoc />
-    public sealed partial class ACBrIBGE : ACBrLibHandle
+    public sealed partial class ACBrIBGE : ACBrLibHandle, IACBrLibIBGE
     {
 				
         #region Constructors
@@ -18,12 +18,15 @@ namespace ACBrLib.IBGE
         public ACBrIBGE(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrIBGE64.dll" : "libacbribge64.so",
                                                                                       IsWindows ? "ACBrIBGE32.dll" : "libacbribge32.so")
         {
-            var inicializar = GetMethod<IBGE_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            Inicializar(eArqConfig, eChaveCrypt);
+            Config = new ACBrIBGEConfig(this);
+        }
 
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializarLib = GetMethod<IBGE_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
-
-            Config = new ACBrCEPConfig(this);
         }
 
         #endregion Constructors
@@ -62,7 +65,7 @@ namespace ACBrLib.IBGE
             }
         }
 
-        public ACBrCEPConfig Config { get; }
+        public ACBrIBGEConfig Config { get; }
 
         #endregion Properties
 
@@ -165,10 +168,10 @@ namespace ACBrLib.IBGE
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<IBGE_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<IBGE_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 

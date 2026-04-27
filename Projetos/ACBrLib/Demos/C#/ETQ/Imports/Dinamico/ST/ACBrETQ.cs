@@ -1,59 +1,58 @@
-﻿using ACBrLib.Core;
+using ACBrLib.Core;
 using System;
 using System.Text;
 using ACBrLib.Core.ETQ;
 
 namespace ACBrLib.ETQ
 {
-    public sealed partial class ACBrETQ : ACBrLibHandle
+    public sealed partial class ACBrETQ : ACBrLibHandle, IACBrLibETQ
     {
         #region Constructors
 
         public ACBrETQ(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrETQ64.dll" : "libacbretq64.so",
                                                                                IsWindows ? "ACBrETQ32.dll" : "libacbretq32.so")
         {
-            var inicializar = GetMethod<ETQ_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
-            CheckResult(ret);
-
+            Inicializar(eArqConfig, eChaveCrypt);
             Config = new ACBrETQConfig(this);
+        }
+
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializarLib = GetMethod<ETQ_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            CheckResult(ret);
         }
 
         #endregion Constructors
 
         #region Properties
 
-        public string Nome
+        /// <inheritdoc />
+        public string Nome()
         {
-            get
-            {
-                var bufferLen = BUFFER_LEN;
-                var buffer = new StringBuilder(bufferLen);
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
 
-                var method = GetMethod<ETQ_Nome>();
-                var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+            var method = GetMethod<ETQ_Nome>();
+            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
 
-                CheckResult(ret);
+            CheckResult(ret);
 
-                return ProcessResult(buffer, bufferLen);
-            }
+            return ProcessResult(buffer, bufferLen);
         }
 
-        public string Versao
+        /// <inheritdoc />
+        public string Versao()
         {
-            get
-            {
-                var bufferLen = BUFFER_LEN;
-                var buffer = new StringBuilder(bufferLen);
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
 
-                var method = GetMethod<ETQ_Versao>();
-                var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+            var method = GetMethod<ETQ_Versao>();
+            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
 
-                CheckResult(ret);
+            CheckResult(ret);
 
-                return ProcessResult(buffer, bufferLen);
-            }
+            return ProcessResult(buffer, bufferLen);
         }
 
         public ACBrETQConfig Config { get; }
@@ -241,10 +240,10 @@ namespace ACBrLib.ETQ
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<ETQ_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<ETQ_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 
@@ -306,6 +305,13 @@ namespace ACBrLib.ETQ
             CheckResult(ret);
 
             return ProcessResult(buffer, bufferLen);
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Finalizar();
+            GC.SuppressFinalize(this);
         }
 
         #endregion Private Methods

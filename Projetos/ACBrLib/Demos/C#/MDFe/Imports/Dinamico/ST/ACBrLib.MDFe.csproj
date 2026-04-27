@@ -15,7 +15,8 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.0.7.0</Version>
+    <Version>1.0.12.0</Version>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
@@ -130,6 +131,7 @@
     <Compile Include="..\Shared\Resposta\EventoResposta.cs" Link="Resposta\EventoResposta.cs" />
     <Compile Include="..\Shared\Resposta\NaoEncerradosResposta.cs" Link="Resposta\NaoEncerradosResposta.cs" />
     <Compile Include="..\Shared\Resposta\NaoEncerradosRespostaItem.cs" Link="Resposta\NaoEncerradosRespostaItem.cs" />
+    <Compile Include="..\Shared\IACBrLibMDFe.cs" Link="IACBrLibMDFe.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -312,7 +312,7 @@ begin
 
   if fpNFSe.Link <> '' then
   begin
-    rlmDadosAdicionais.Width := 643;
+    rlmDadosAdicionais.Width := 610;
     rbOutrasInformacoes.AutoSize := True;
 
     rlImgQrCode := TRLImage.Create(rbOutrasInformacoes);
@@ -528,7 +528,12 @@ begin
     rllNatOperacao.Lines.Text := ACBrStr(FProvider.NaturezaOperacaoDescricao(NaturezaOperacao));
     MostrarNaturezaOperacao := rllNatOperacao.Caption <> '';
     RLLabel137.Visible := MostrarNaturezaOperacao;
-    rllOpcaoSimples.Caption := ACBrStr(FProvider.SimNaoDescricao(OptanteSimplesNacional));
+
+    if OptanteSN <> osnNaoOptante then
+      rllOpcaoSimples.Caption := 'Sim'
+    else
+      rllOpcaoSimples.Caption := ACBrStr(FProvider.SimNaoDescricao(OptanteSimplesNacional));
+
     rllIncentivador.Caption := ACBrStr(FProvider.SimNaoDescricao(IncentivadorCultural));
 
     if fpDANFSe.Provedor = proPadraoNacional then

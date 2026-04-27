@@ -20,7 +20,7 @@ uses
   ACBrTEFTPagAPI, ACBrTEFAPIPayKit, ACBrTEFPayKitAPI, ACBrTEFAPIDirectPin, 
   ACBrTEFDirectPinAPI, ACBrTEFSmartTEFAPI, ACBrTEFSmartTEFInterface, 
   ACBrTEFSmartTEFSchemas, ACBrTEFTXTComum, ACBrTEFTXTGerenciadorPadrao, 
-  ACBrTEFAPITXT, LazarusPackageIntf;
+  ACBrTEFAPITXT, ACBrTEFTXTPayGo, LazarusPackageIntf;
 
 implementation
 

@@ -539,6 +539,7 @@ type
     edtEnderecoEmitenteNFSe: TEdit;
     edtExtratoAPISicoobClientID: TEdit;
     edtExtratoAPILogArquivo: TEdit;
+    edtLogoNFSe: TEdit;
     edtNumeroEmitenteNFSe: TEdit;
     edtBairroEmitenteNFSe: TEdit;
     edtComplementoEmitenteNFSe: TEdit;
@@ -914,6 +915,7 @@ type
     Label293: TLabel;
     Label294: TLabel;
     Label295: TLabel;
+    Label296: TLabel;
     lblExtratoAPIBBCertificado: TLabel;
     lblExtratoAPIInterCertificado: TLabel;
     lblExtratoAPIBBChavePrivada: TLabel;
@@ -1382,6 +1384,7 @@ type
     sbLogoMarca1: TSpeedButton;
     sbLogoMarcaNFCeSAT: TSpeedButton;
     sbLogoMarcaPrefeitura: TSpeedButton;
+    sbLogoNFSe: TSpeedButton;
     sbNomeDLL: TSpeedButton;
     sbNumeroSerieCert: TSpeedButton;
     sbPathArqTXT: TSpeedButton;
@@ -1841,6 +1844,7 @@ type
     procedure sbBALLogClick(Sender: TObject);
     procedure sbLogoMarcaClick(Sender: TObject);
     procedure sbLogoMarcaPrefeituraClick(Sender: TObject);
+    procedure sbLogoNFSeClick(Sender: TObject);
     procedure sbNomeDLLClick(Sender: TObject);
     procedure sbNumeroSerieCertClick(Sender: TObject);
     procedure sbPathArqTXTClick(Sender: TObject);
@@ -2159,7 +2163,10 @@ type
     procedure HelptabSheet;
     procedure ValidarIntegradorNFCe(ChaveNFe: String = '');
     function RespostaIntegrador():String;
-    function SubstituirVariaveis(const ATexto: String): String;
+    function SubstituirVariaveisNFeNFCe(const ATexto: String): String;
+    function SubstituirVariaveisCTe(const ATexto: String): String;
+    function SubstituirVariaveisMDFe(const ATexto: String): String;
+    function SubstituirVariaveisNFSe(const ATexto: String): String;
     procedure OnFormataDecimalSAT;
     procedure OnMensagemCanhotoNFe;
     procedure OnSATManual;
@@ -2280,18 +2287,19 @@ begin
   FDoNFe.OnDepoisDeImprimir := @DepoisDeImprimir;
   FDoNFe.OnConfiguraDANFe   := @ConfiguraDANFe;
   FDoNFe.OnValidarIntegradorNFCe:= @ValidarIntegradorNFCe;
-  FDoNFe.OnSubstituirVariaveis  := @SubstituirVariaveis;
+  FDoNFe.OnSubstituirVariaveis  := @SubstituirVariaveisNFeNFCe;
   FDoNFe.OnRespostaIntegrador   := @RespostaIntegrador;
 
   FDoCTe := TACBrObjetoCTe.Create(MonitorConfig, ACBrCTe1);
   FDoCTe.OnAntesDeImprimir := @AntesDeImprimir;
   FDoCTe.OnDepoisDeImprimir := @DepoisDeImprimir;
   FDoCTe.OnConfiguraDACTe   := @ConfiguraDACTe;
+  FDoCTe.OnSubstituirVariaveis := @SubstituirVariaveisCTe;
 
   FDoMDFe := TACBrObjetoMDFe.Create(MonitorConfig, ACBrMDFe1);
   FDoMDFe.OnAntesDeImprimir := @AntesDeImprimir;
   FDoMDFe.OnDepoisDeImprimir := @DepoisDeImprimir;
-  FDoMDFe.OnSubstituirVariaveis := @SubstituirVariaveis;
+  FDoMDFe.OnSubstituirVariaveis := @SubstituirVariaveisMDFe;
   
   FDoBoleto := TACBrObjetoBoleto.Create(MonitorConfig, ACBrBoleto1);
   FDoBoleto.OnAntesDeImprimir := @AntesDeImprimir;
@@ -2347,7 +2355,7 @@ begin
   FDoNFSe.OnAntesDeImprimir := @AntesDeImprimir;
   FDoNFSe.OnDepoisDeImprimir := @DepoisDeImprimir;
   FDoNFSe.OnConfiguraDANFSe   := @ConfiguraDANFSe;
-  FDoNFSe.OnSubstituirVariaveis  := @SubstituirVariaveis;
+  FDoNFSe.OnSubstituirVariaveis  := @SubstituirVariaveisNFSe;
 
   FDoExtratoAPI := TACBrObjetoExtratoAPI.Create(MonitorConfig, ACBrExtratoAPI1);
 
@@ -3974,8 +3982,8 @@ begin
     try
       sMensagem := TStringList.Create;
       try
-        sAssunto       := SubstituirVariaveis(edtEmailAssuntoNFe.Text);
-        sMensagem.Text := SubstituirVariaveis(mmEmailMsgNFe.Text);
+        sAssunto       := SubstituirVariaveisNFeNFCe(edtEmailAssuntoNFe.Text);
+        sMensagem.Text := SubstituirVariaveisNFeNFCe(mmEmailMsgNFe.Text);
 
         ACBrNFe1.NotasFiscais.Items[0].EnviarEmail(
           vPara,
@@ -6095,6 +6103,7 @@ begin
       edtLogoMarca.Text                := LogoMarca;
       edtLogoMarcaNFCeSAT.Text         := LogoMarcaNFCeSAT;
       edtLogoMarcaPrefeitura.Text      := LogoMarcaPrefeitura;
+      edtLogoNFSe.Text                 := LogoNFSe;
     end;
 
     with WebService do
@@ -6422,8 +6431,9 @@ begin
     ACBrBPe1.DABPe.ExpandeLogoMarca  := cbxExpandirLogo.Checked;
     ACBrBPe1.DABPe.UsaSeparadorPathPDF := cbxUsarSeparadorPathPDF.Checked;
 
-    ACBrNFSeX1.DANFSe.TipoDANFSE        := tpPadrao; //StrToTpImp(OK,IntToStr(rgTipoDanfe.ItemIndex+1));
+    ACBrNFSeX1.DANFSe.TipoDANFSE        := tpGeral; //StrToTpImp(OK,IntToStr(rgTipoDanfe.ItemIndex+1));
     ACBrNFSeX1.DANFSe.Logo              := edtLogoMarcaPrefeitura.Text;
+    ACBrNFSeX1.DANFSe.LogoNFSe          := edtLogoNFSe.Text;
     ACBrNFSeX1.DANFSe.Sistema           := edSH_RazaoSocial.Text;
     ACBrNFSeX1.DANFSe.Site              := edtSiteEmpresa.Text;
     ACBrNFSeX1.DANFSe.Email             := edtEmailEmpresa.Text;
@@ -7464,6 +7474,7 @@ begin
         PathSalvar               := edtPathLogs.Text;
         Impressora               := cbxImpressora.Text;
         LogoMarcaPrefeitura      := edtLogoMarcaPrefeitura.Text;
+        LogoNFSe                 := edtLogoNFSe.Text;
       end;
 
       with WebService do
@@ -9263,6 +9274,19 @@ begin
   if OpenDialog1.Execute then
   begin
     edtLogoMarcaPrefeitura.Text := OpenDialog1.FileName;
+  end;
+end;
+
+procedure TFrmACBrMonitor.sbLogoNFSeClick(Sender: TObject);
+begin
+  OpenDialog1.Title := 'Selecione o Logo';
+  OpenDialog1.DefaultExt := '*.png';
+  OpenDialog1.Filter :=
+    'Arquivos PNG (*.png)|*.png|Arquivos JPG (*.jpg)|*.jpg|Arquivos BMP (*.bmp)|*.bmp|Todos os Arquivos (*.*)|*.*';
+  OpenDialog1.InitialDir := ExtractFileDir(application.ExeName);
+  if OpenDialog1.Execute then
+  begin
+    edtLogoNFSe.Text := OpenDialog1.FileName;
   end;
 end;
 
@@ -11485,7 +11509,7 @@ begin
       (ACBrNFe1.DANFE as TACBrNFeDANFEClass).ImprimeDescPorPercentual := cbxImpDescPorc.Checked;
       (ACBrNFe1.DANFE as TACBrNFeDANFEClass).ExibeResumoCanhoto       := cbxExibeResumo.Checked;
       if (cbxExibeResumo.Checked) and (trim(edtMsgResumoCanhoto.Text) <> '') then
-        (ACBrNFe1.DANFE as TACBrNFeDANFEClass).TextoResumoCanhoto     := SubstituirVariaveis(edtMsgResumoCanhoto.Text)
+        (ACBrNFe1.DANFE as TACBrNFeDANFEClass).TextoResumoCanhoto     := SubstituirVariaveisNFeNFCe(edtMsgResumoCanhoto.Text)
       else
         (ACBrNFe1.DANFE as TACBrNFeDANFEClass).TextoResumoCanhoto     := edtMsgResumoCanhoto.Text;
 
@@ -11727,6 +11751,7 @@ begin
   begin
     ACBrNFSeX1.DANFSE.Logo := edtLogoMarcaPrefeitura.Text;
     ACBrNFSeX1.DANFSE.Prefeitura := edtNomePrefeitura.Text;
+    ACBrNFSeX1.DANFSe.LogoNFSe := edtLogoNFSe.Text;
     ACBrNFSeX1.DANFSE.Email := edtEmailEmpresa.Text;
     ACBrNFSeX1.DANFSE.NumCopias := edtNumCopia.Value;
     ACBrNFSeX1.DANFSE.MargemInferior := fspeMargemInf.Value;
@@ -12546,7 +12571,7 @@ begin
 
 end;
 
-function TFrmACBrMonitor.SubstituirVariaveis(const ATexto: String): String;
+function TFrmACBrMonitor.SubstituirVariaveisNFeNFCe(const ATexto: String): String;
 var
   TextoStr: String;
 begin
@@ -12577,6 +12602,148 @@ begin
         TextoStr := StringReplace(TextoStr,'[dtEmissao]',    FormatDateTime('dd/mm/yyyy', Ide.dEmi),          [rfReplaceAll, rfIgnoreCase]);
         TextoStr := StringReplace(TextoStr,'[dtSaida]',      FormatDateTime('dd/mm/yyyy', Ide.dSaiEnt),       [rfReplaceAll, rfIgnoreCase]);
         TextoStr := StringReplace(TextoStr,'[hrSaida]',      FormatDateTime('hh:mm:ss',   Ide.hSaiEnt),       [rfReplaceAll, rfIgnoreCase]);
+      end;
+    end;
+    Result := TextoStr;
+  end;
+end;
+
+function TFrmACBrMonitor.SubstituirVariaveisCTe(const ATexto: String): String;
+var
+  TextoStr, lAuxStr: String;
+  lAuxVal: Double;
+begin
+  if Trim(ATexto) = '' then
+    Result := ''
+  else
+  begin
+    TextoStr := ATexto;
+
+    if ACBrCTe1.Conhecimentos.Count > 0 then
+    begin
+      with ACBrCTe1.Conhecimentos.Items[0].CTe do
+      begin
+        TextoStr := StringReplace(TextoStr,'[EmitNome]',     Emit.xNome,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[EmitFantasia]', Emit.xFant,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[EmitCNPJCPF]',  Emit.CNPJ, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[EmitIE]',       Emit.IE,      [rfReplaceAll, rfIgnoreCase]);
+
+        lAuxStr := '';
+        lAuxStr := IfThen(toma.xNome<>'', toma.xNome, Ide.toma4.xNome);
+        TextoStr := StringReplace(TextoStr,'[TomaNome]', lAuxStr, [rfReplaceAll, rfIgnoreCase]);
+
+        lAuxStr := '';
+        lAuxStr := IfThen(toma.CNPJCPF<>'', toma.CNPJCPF, Ide.toma4.CNPJCPF);
+        TextoStr := StringReplace(TextoStr,'[TomaCNPJCPF]',  lAuxStr, [rfReplaceAll, rfIgnoreCase]);
+
+        lAuxStr := '';
+        lAuxStr := IfThen(toma.IE<>'', toma.IE, Ide.toma4.IE);
+        TextoStr := StringReplace(TextoStr,'[TomaIE]',       lAuxStr,      [rfReplaceAll, rfIgnoreCase]);
+
+        TextoStr := StringReplace(TextoStr,'[ChaveCTe]',     procCTe.chCTe, [rfReplaceAll, rfIgnoreCase]);
+
+        TextoStr := StringReplace(TextoStr,'[SerieCTe]',      FormatFloat('000',           Ide.serie),         [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[NumeroCTe]',     FormatFloat('000000000',     Ide.nCT),           [rfReplaceAll, rfIgnoreCase]);
+        lAuxVal := 0;
+        lAuxVal := IfThen(Total.vTPrest > 0, Total.vTPrest, vPrest.vTPrest);
+        TextoStr := StringReplace(TextoStr,'[ValorPrest]',    FormatFloat('0.00', lAuxVal), [rfReplaceAll, rfIgnoreCase]);
+        lAuxVal := 0;
+        lAuxVal := IfThen(Total.vTRec > 0, Total.vTRec, vPrest.vRec);
+        TextoStr := StringReplace(TextoStr,'[ValorRec]',     FormatFloat('0.00', lAuxVal), [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[dtEmissao]',    FormatDateTime('dd/mm/yyyy', Ide.dhEmi),          [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr, '[ModalCTe]',   ACBrStr(TpModalToStrText(Ide.modal)), [rfReplaceAll, rfIgnoreCase]);
+      end;
+    end;
+    Result := TextoStr;
+  end;
+end;
+
+function TFrmACBrMonitor.SubstituirVariaveisMDFe(const ATexto: String): String;
+var
+  TextoStr: String;
+begin
+  if Trim(ATexto) = '' then
+    Result := ''
+  else
+  begin
+    TextoStr := ATexto;
+
+    if ACBrMDFe1.Manifestos.Count > 0 then
+    begin
+      with ACBrMDFe1.Manifestos.Items[0].MDFe do
+      begin
+        TextoStr := StringReplace(TextoStr,'[EmitNome]',     Emit.xNome,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[EmitFantasia]', Emit.xFant,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[EmitCNPJCPF]',  Emit.CNPJCPF, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[EmitIE]',       Emit.IE,      [rfReplaceAll, rfIgnoreCase]);
+
+        TextoStr := StringReplace(TextoStr,'[ChaveMDFe]',    procMDFe.chDFe, [rfReplaceAll, rfIgnoreCase]);
+
+        TextoStr := StringReplace(TextoStr,'[SerieMDFe]',    FormatFloat('000',           Ide.serie),         [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[NumeroMDFe]',   FormatFloat('000000000',     Ide.nMDF),           [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[UFIni]', Ide.UFIni, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[UFFim]', Ide.UFFim, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[dtEmissao]',    FormatDateTime('dd/mm/yyyy', Ide.dhEmi),          [rfReplaceAll, rfIgnoreCase]);
+      end;
+    end;
+    Result := TextoStr;
+  end;
+end;
+
+function TFrmACBrMonitor.SubstituirVariaveisNFSe(const ATexto: String): String;
+var
+  TextoStr, lIdentificacaoParticipante: String;
+  lValLiqNFSe: Double;
+begin
+  if Trim(ATexto) = '' then
+    Result := ''
+  else
+  begin
+    TextoStr := ATexto;
+
+    if ACBrNFSeX1.NotasFiscais.Count > 0 then
+    begin
+      with ACBrNFSeX1.NotasFiscais.Items[0].NFSe do
+      begin
+        lIdentificacaoParticipante := IfThen(Prestador.IdentificacaoPrestador.CpfCnpj = '',
+                                             IfThen(Prestador.IdentificacaoPrestador.Cnpj = '',
+                                                    Prestador.IdentificacaoPrestador.Nif,
+                                                    Prestador.IdentificacaoPrestador.Cnpj),
+                                             Prestador.IdentificacaoPrestador.CpfCnpj);
+        TextoStr := StringReplace(TextoStr,'[PrestNome]',     Prestador.RazaoSocial,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[PrestFantasia]', Prestador.NomeFantasia,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[PrestCNPJCPF]',  lIdentificacaoParticipante, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[PrestIE]',       Prestador.IdentificacaoPrestador.InscricaoEstadual, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[PrestIM]',       Prestador.IdentificacaoPrestador.InscricaoMunicipal, [rfReplaceAll, rfIgnoreCase]);
+
+        lIdentificacaoParticipante := IfThen(Tomador.IdentificacaoTomador.CpfCnpj = '',
+                                             IfThen(Tomador.IdentificacaoTomador.Cnpj = '',
+                                                    Tomador.IdentificacaoTomador.Nif,
+                                                    Tomador.IdentificacaoTomador.Cnpj),
+                                             Tomador.IdentificacaoTomador.CpfCnpj);
+        TextoStr := StringReplace(TextoStr,'[TomaNome]',     Tomador.RazaoSocial,   [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[TomaFantasia]', Tomador.NomeFantasia, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[TomaCNPJCPF]',  lIdentificacaoParticipante, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[TomaIE]', Tomador.IdentificacaoTomador.InscricaoEstadual, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[TomaIM]', Tomador.IdentificacaoTomador.InscricaoMunicipal, [rfReplaceAll, rfIgnoreCase]);
+
+        TextoStr := StringReplace(TextoStr,'[CodigoVerificacao]', CodigoVerificacao, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[ChaveAcesso]', OnlyNumber(infNFSe.ID), [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[NumeroNFSe]', Numero, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[NumeroRPS]', IdentificacaoRps.Numero, [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[SerieRPS]', IdentificacaoRps.Serie, [rfReplaceAll, rfIgnoreCase]);
+
+        lValLiqNFSe := 0;
+        lValLiqNFSe := ifThen(infNFSe.valores.ValorLiquidoNfse > 0,
+                              infNFSe.valores.ValorLiquidoNfse,
+                              ifThen(ValoresNfse.ValorLiquidoNfse > 0,
+                                     ValoresNfse.ValorLiquidoNfse,
+                                     Servico.Valores.ValorLiquidoNfse));
+
+        TextoStr := StringReplace(TextoStr,'[ValorLiqNFSe]', FormatFloat('0.00', lValLiqNFSe), [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[ValorServicos]', FormatFloat('0.00', Servico.Valores.ValorServicos), [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[dtEmissao]', FormatDateTime('dd/mm/yyyy', IfThen(DataEmissaoRps > 0, DataEmissaoRps, DataEmissao)), [rfReplaceAll, rfIgnoreCase]);
+        TextoStr := StringReplace(TextoStr,'[dtCompet]', FormatDateTime('dd/mm/yyyy', Competencia), [rfReplaceAll, rfIgnoreCase]);
       end;
     end;
     Result := TextoStr;

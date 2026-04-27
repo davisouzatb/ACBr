@@ -199,7 +199,6 @@ type
     FProvedor: TnfseProvedor;
     FVersao: TVersaoNFSe;
     FxProvedor: String;
-    FxProvedorOrigem: String;
     FxMunicipio: String;
     FxUF: String;
     FCNPJPrefeitura: String;
@@ -215,8 +214,11 @@ type
     FFormDiscriminacao: TFormatoDiscriminacao;
     FParticularidades: TParticularidades;
     FAPIPropria: Boolean;
+    FGerarTodasSecoes: Boolean;
+    FDocumentar: Boolean;
 
     procedure SetCodigoMunicipio(const Value: Integer);
+    procedure SetVersao(const Value: TVersaoNFSe);
   public
     constructor Create(AOwner: TConfiguracoes); override;
     destructor Destroy; override;
@@ -229,9 +231,8 @@ type
   published
     property CodigoMunicipio: Integer read FCodigoMunicipio write SetCodigoMunicipio;
     property Provedor: TnfseProvedor read FProvedor write FProvedor;
-    property Versao: TVersaoNFSe read FVersao write FVersao;
+    property Versao: TVersaoNFSe read FVersao write SetVersao;
     property xProvedor: String read FxProvedor;
-    property xProvedorOrigem: String read FxProvedorOrigem;
     property xMunicipio: String read FxMunicipio;
     property xUF: String read FxUF;
     property CNPJPrefeitura: String read FCNPJPrefeitura write FCNPJPrefeitura;
@@ -251,6 +252,8 @@ type
     property FormatoDiscriminacao: TFormatoDiscriminacao read FFormDiscriminacao write FFormDiscriminacao default fdNenhum;
     property Particularidades: TParticularidades read FParticularidades write FParticularidades;
     property APIPropria: Boolean read FAPIPropria;
+    property GerarTodasSecoes: Boolean read FGerarTodasSecoes write FGerarTodasSecoes;
+    property Documentar: Boolean read FDocumentar write FDocumentar;
   end;
 
   { TArquivosConfNFSe }
@@ -437,6 +440,8 @@ begin
   FServicosDisponibilizados := TServicosDispobilizados.Create;
   FParticularidades := TParticularidades.Create;
   FAPIPropria := False;
+  FGerarTodasSecoes := False;
+  FDocumentar := False;
 end;
 
 destructor TGeralConfNFSe.Destroy;
@@ -463,6 +468,8 @@ begin
   AIni.WriteInteger(fpConfiguracoes.SessaoIni, 'Assinaturas', Integer(Assinaturas));
   AIni.WriteInteger(fpConfiguracoes.SessaoIni, 'FormatoDiscriminacao', Integer(FormatoDiscriminacao));
   AIni.WriteBool(fpConfiguracoes.SessaoIni, 'APIPropria', APIPropria);
+  AIni.WriteBool(fpConfiguracoes.SessaoIni, 'GerarTodasSecoes', GerarTodasSecoes);
+  AIni.WriteBool(fpConfiguracoes.SessaoIni, 'Documentar', Documentar);
 
   // Emitente
   with Emitente do
@@ -505,6 +512,8 @@ begin
   Assinaturas := TAssinaturas(AIni.ReadInteger(fpConfiguracoes.SessaoIni, 'Assinaturas', Integer(Assinaturas)));
   FormatoDiscriminacao := TFormatoDiscriminacao(AIni.ReadInteger(fpConfiguracoes.SessaoIni, 'FormatoDiscriminacao', Integer(FormatoDiscriminacao)));
   FAPIPropria := AIni.ReadBool(fpConfiguracoes.SessaoIni, 'APIPropria', APIPropria);
+  GerarTodasSecoes := AIni.ReadBool(fpConfiguracoes.SessaoIni, 'GerarTodasSecoes', GerarTodasSecoes);
+  Documentar := AIni.ReadBool(fpConfiguracoes.SessaoIni, 'Documentar', Documentar);
 
   // Emitente
   with Emitente do
@@ -537,7 +546,7 @@ end;
 procedure TGeralConfNFSe.LerParamsMunicipio;
 var
   Ok: Boolean;
-  CodIBGE, aValor: string;
+  CodIBGE, aValor, lVersaoNoProvedor, lVersaoNoMunicipio: string;
   ACBrNFSeXLocal: TACBrNFSeX;
 begin
   if not Assigned(fpConfiguracoes.Owner) then
@@ -561,24 +570,41 @@ begin
   FxMunicipio := FPIniParams.ReadString(CodIBGE, 'Nome', '');
   FxUF := FPIniParams.ReadString(CodIBGE, 'UF', '');
   FxProvedor := FPIniParams.ReadString(CodIBGE, 'Provedor', '');
-  FxProvedorOrigem := FxProvedor;
   FProvedor := StrToProvedor(FxProvedor);
 
   {
     Verifica se na seção do Provedor consta a versão,
     caso contrario usa a versão da seção do município.
   }
-  aValor := FPIniParams.ReadString(FxProvedor, 'Versao', '');
+  if FPIniParams.SectionExists(FxProvedor) then
+  begin
+    lVersaoNoProvedor := FPIniParams.ReadString(FxProvedor, 'Versao', '1.00');
+    lVersaoNoMunicipio := FPIniParams.ReadString(CodIBGE, 'Versao', '');
 
-  if aValor <> '' then
-    FVersao := StrToVersaoNFSe(Ok, aValor)
-  else
+    if (lVersaoNoProvedor <> '') and (lVersaoNoMunicipio <> '') then
+    begin
+      //Se eu tenho versão no provedor e no município, eu priorizo o município.
+      if lVersaoNoMunicipio <> '***' then
+        FVersao := StrToVersaoNFSe(Ok, lVersaoNoMunicipio);
+    end else
+      FVersao := StrToVersaoNFSe(Ok, lVersaoNoProvedor);
+  end else
   begin
     aValor := FPIniParams.ReadString(CodIBGE, 'Versao', '');
 
     if aValor <> '***' then
       FVersao := StrToVersaoNFSe(Ok, FPIniParams.ReadString(CodIBGE, 'Versao', '1.00'));
   end;
+
+//  if aValor <> '' then
+//    FVersao := StrToVersaoNFSe(Ok, aValor)
+//  else
+//  begin
+//    aValor := FPIniParams.ReadString(CodIBGE, 'Versao', '');
+//
+//    if aValor <> '***' then
+//      FVersao := StrToVersaoNFSe(Ok, FPIniParams.ReadString(CodIBGE, 'Versao', '1.00'));
+//  end;
 
   {
     Verifica se na seção do município consta o Params,
@@ -642,6 +668,8 @@ begin
   FAssinaturas           := DeGeralConfNFSe.Assinaturas;
   FFormDiscriminacao     := DeGeralConfNFSe.FormatoDiscriminacao;
   FAPIPropria            := DeGeralConfNFSe.APIPropria;
+  FGerarTodasSecoes      := DeGeralConfNFSe.GerarTodasSecoes;
+  FDocumentar            := DeGeralConfNFSe.Documentar;
 
   FEmitente.Assign(DeGeralConfNFSe.Emitente);
 
@@ -656,6 +684,23 @@ begin
 
   if FCodigoMunicipio <> 0 then
     LerParamsMunicipio;
+end;
+
+procedure TGeralConfNFSe.SetVersao(const Value: TVersaoNFSe);
+var
+  ACBrNFSeXLocal: TACBrNFSeX;
+begin
+  ACBrNFSeXLocal := TACBrNFSeX(fpConfiguracoes.Owner);
+  if Assigned(ACBrNFSeXLocal.Provider) then
+  begin
+    if not(ACBrNFSeXLocal.Provider.SuportaVersao(Value)) then
+      FVersao := ve100
+    else
+      FVersao := Value;
+    ACBrNFSeXLocal.Provider.AlteraVersao(FVersao);
+  end
+  else
+    FVersao := Value;
 end;
 
 { TArquivosConfNFSe }

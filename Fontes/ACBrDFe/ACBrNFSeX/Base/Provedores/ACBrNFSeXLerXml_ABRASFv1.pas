@@ -515,6 +515,8 @@ begin
   if not Assigned(ANode) then Exit;
 
   AuxNode := ANode.Childrens.FindAnyNs('InfNfse');
+  if AuxNode = nil then
+    AuxNode := ANode.Childrens.FindAnyNs('IdentificacaoNfse');
 
   if AuxNode <> nil then
   begin
@@ -554,6 +556,30 @@ begin
     LerIntermediarioServico(AuxNode);
     LerOrgaoGerador(AuxNode);
     LerConstrucaoCivil(AuxNode);
+  end;
+
+  if NFSe.Prestador.IdentificacaoPrestador.CpfCnpj = '' then
+  begin
+    NFSe.DataEmissaoRps := LerDataEmissaoRps(ANode);
+    NFSe.NaturezaOperacao := StrToNaturezaOperacao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('NaturezaOperacao'), tcStr));
+    NFSe.RegimeEspecialTributacao := FpAOwner.StrToRegimeEspecialTributacao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('RegimeEspecialTributacao'), tcStr));
+    NFSe.OptanteSimplesNacional := FpAOwner.StrToSimNao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('OptanteSimplesNacional'), tcStr));
+    NFSe.IncentivadorCultural := FpAOwner.StrToSimNao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('IncentivadorCultural'), tcStr));
+    NFSe.Competencia := LerCompetencia(ANode);
+    NFSe.NfseSubstituida := ObterConteudo(ANode.Childrens.FindAnyNs('NfseSubstituida'), tcStr);
+    NFSe.OutrasInformacoes := ObterConteudo(ANode.Childrens.FindAnyNs('OutrasInformacoes'), tcStr);
+    NFSe.OutrasInformacoes := StringReplace(NFSe.OutrasInformacoes, FpQuebradeLinha,
+                                                    sLineBreak, [rfReplaceAll]);
+
+    LerServico(ANode);
+
+    NFSe.ValorCredito := ObterConteudo(ANode.Childrens.FindAnyNs('ValorCredito'), tcDe2);
+
+    LerPrestadorServico(ANode);
+    LerTomadorServico(ANode);
+    LerIntermediarioServico(ANode);
+    LerOrgaoGerador(ANode);
+    LerConstrucaoCivil(ANode);
   end;
 end;
 
@@ -747,8 +773,6 @@ begin
       Discriminacao := StringReplace(Discriminacao, FpQuebradeLinha,
                                                     sLineBreak, [rfReplaceAll]);
 
-      VerificarSeConteudoEhLista(Discriminacao);
-
       CodigoMunicipio := ObterConteudo(AuxNode.Childrens.FindAnyNs('CodigoMunicipio'), tcStr);
 
       if CodigoMunicipio = '' then
@@ -926,6 +950,8 @@ begin
     Result := LerXmlNfse(XmlNode)
   else
     Result := LerXmlRps(XmlNode);
+
+  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
 
   FreeAndNil(FDocument);
 end;
@@ -1247,6 +1273,8 @@ begin
     NFSe.Servico.Discriminacao := ChangeLineBreak(AINIRec.ReadString(LSecao, 'Discriminacao', ''), FpAOwner.ConfigGeral.QuebradeLinha);
     NFSe.Servico.CodigoMunicipio := AINIRec.ReadString(LSecao, 'CodigoMunicipio', '');
     NFSe.Servico.CodigoNBS := AINIRec.ReadString(LSecao, 'CodigoNBS', '');
+    NFSe.Servico.cClassTrib := AINIRec.ReadString(LSecao, 'cClassTrib', '');
+    NFSe.Servico.INDOP := AINIRec.ReadString(LSecao, 'INDOP', '');
     {
     NFSe.Servico.MunicipioIncidencia := AINIRec.ReadInteger(LSecao, 'MunicipioIncidencia', 0);
     NFSe.Servico.xMunicipioIncidencia := AINIRec.ReadString(LSecao, 'xMunicipioIncidencia', '');

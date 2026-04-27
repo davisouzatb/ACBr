@@ -2441,12 +2441,9 @@ begin
             LLogoStringStream.Free;
           end;
         end;
-        if IsPNG(LStream, false) then
-        begin
-          SetLength(FLogo, LStream.Size);
-          LStream.Position := 0;
-          LStream.Read(FLogo[0], LStream.Size);
-        end;
+        SetLength(FLogo, LStream.Size);
+        LStream.Position := 0;
+        LStream.Read(FLogo[0], LStream.Size);
       finally
         LStream.Free;
       end;
@@ -2764,7 +2761,7 @@ begin
   PrintColuna('SEQUENCIAL NO ANO', Format('%.*d', [10, FProcEvento.InfEvento.nSeqEvento]));
   PrintColuna('ÓRGÃO', CUFtoUF(FProcEvento.InfEvento.cOrgao), False, True);
 
-  if FProcEvento.InfEvento.tpEvento = teCancelamento then
+  if FProcEvento.InfEvento.tpEvento in [teCancelamento, teCancSubst] then
   begin
     PrintColuna('DESCRIÇÃO', Format('%s', [FProcEvento.InfEvento.detEvento.descEvento]));
     PrintColuna('PROTOCOLO DE AUTORIZAÇÃO', Format('%s', [FProcEvento.InfEvento.detEvento.nProt]), False, True);

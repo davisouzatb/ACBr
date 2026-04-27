@@ -51,6 +51,9 @@ type
     FPathArquivoMunicipios: string;
     FValidarInscricoes: boolean;
     FValidarListaServicos: boolean;
+    // Propriedades a serem utilizadas na geração do arquivo INI
+    FGerarTodasSecoes: boolean;
+    FDocumentar: boolean;
 
   public
     property AjustarTagNro: boolean read FAjustarTagNro write FAjustarTagNro;
@@ -59,7 +62,9 @@ type
     property PathArquivoMunicipios: string read FPathArquivoMunicipios write FPathArquivoMunicipios;
     property ValidarInscricoes: boolean read FValidarInscricoes write FValidarInscricoes;
     property ValidarListaServicos: boolean read FValidarListaServicos write FValidarListaServicos;
-
+    // Propriedades a serem utilizadas na geração do arquivo INI
+    property GerarTodasSecoes: boolean read FGerarTodasSecoes write FGerarTodasSecoes;
+    property Documentar: boolean read FDocumentar write FDocumentar;
   end;
 
   TNFSeWClass = class(TACBrXmlWriter)
@@ -121,8 +126,8 @@ type
     FParamsTabW: TStrings;
     FIniParamsTabW: TMemIniFile;
 
-    function GetOpcoes: TACBrXmlWriterOptions;
-    procedure SetOpcoes(AValue: TACBrXmlWriterOptions);
+    function GetOpcoes: TXmlWriterOptions;
+    procedure SetOpcoes(AValue: TXmlWriterOptions);
     procedure SetParamsTabW(const Value: TStrings);
   protected
     FpAOwner: IACBrNFSeXProvider;
@@ -228,7 +233,7 @@ type
     function GerarXml: Boolean; Override;
     function GerarIni: string; virtual;
 
-    property Opcoes: TACBrXmlWriterOptions read GetOpcoes write SetOpcoes;
+    property Opcoes: TXmlWriterOptions read GetOpcoes write SetOpcoes;
 
     property NFSe: TNFSe                 read FNFSe           write FNFSe;
     property VersaoNFSe: TVersaoNFSe     read FVersaoNFSe     write FVersaoNFSe;
@@ -294,6 +299,7 @@ uses
   ACBrUtil.Strings,
   ACBrDFeConsts,
   ACBrDFeException,
+  ACBrNFSeX.GravarIni,
   ACBrNFSeX,
   ACBrNFSeXConsts;
 
@@ -310,6 +316,9 @@ begin
   TXmlWriterOptions(Opcoes).PathArquivoMunicipios := '';
   TXmlWriterOptions(Opcoes).ValidarInscricoes := False;
   TXmlWriterOptions(Opcoes).ValidarListaServicos := False;
+  // Propriedades a serem utilizadas na geração do arquivo INI
+  TXmlWriterOptions(Opcoes).GerarTodasSecoes := False;
+  TXmlWriterOptions(Opcoes).Documentar := False;
 
   FConteudoTxt := TStringList.Create;
   FConteudoTxt.Clear;
@@ -327,7 +336,6 @@ begin
   // Propriedades de Formatação de informações
   FFormatoEmissao := tcDatHor;
   FFormatoCompetencia := tcDatHor;
-  FFormDiscriminacao := fdNenhum;
   FFormItemLServico := filsComFormatacao;
 
   // Os 4 IF abaixo vão configurar o componente conforme a presença do
@@ -394,16 +402,22 @@ end;
 
 procedure TNFSeWClass.ConsolidarVariosItensServicosEmUmSo;
 var
-  i: Integer;
-  xDiscriminacao, xItemListaServ: string;
-  vValorDeducoes, vValorServicos, vDescontoCondicionado, vAliquota, vBaseCalculo,
-  vDescontoIncondicionado, vValorPis, vValorCofins, vValorInss, vValorIr,
-  vValorCsll, vValorIss, vAliquotaPis, vAliquotaCofins, vAliquotaInss,
-  vAliquotaIr, vAliquotaCsll, vValorIssRetido: Double;
+  i, UltimoItem: Integer;
+  xDiscriminacao: string;
+  vQtdeDiaria, vValorTaxaTurismo, vValorRecebido,
+  vValorDeducoes, vValorServicos, vDescontoCondicionado,
+  vBaseCalculo, vDescontoIncondicionado, vValorPis, vValorCofins, vValorInss, vValorIr,
+  vValorCsll, vValorIss,
+  vValorIssRetido: Double;
 begin
   if NFSe.Servico.ItemServico.Count > 0 then
   begin
     xDiscriminacao := '';
+
+    vQtdeDiaria := 0;
+    vValorTaxaTurismo := 0;
+    vValorRecebido := 0;
+
     vValorDeducoes := 0;
     vValorServicos := 0;
     vDescontoCondicionado := 0;
@@ -416,26 +430,15 @@ begin
     vValorCsll := 0;
     vValorIss := 0;
     vValorIssRetido := 0;
-    vAliquota := 0;
-    vAliquotaPis := 0;
-    vAliquotaCofins := 0;
-    vAliquotaInss := 0;
-    vAliquotaIr := 0;
-    vAliquotaCsll := 0;
 
     with FNFSe.Servico do
     begin
       for i := 0 to ItemServico.Count -1 do
       begin
-        xItemListaServ := ItemServico[i].ItemListaServico;
-        vAliquota := ItemServico[i].Aliquota;
-        vAliquotaPis := ItemServico[i].AliqRetPIS;
-        vAliquotaCofins := ItemServico[i].AliqRetCOFINS;
-        vAliquotaInss := ItemServico[i].AliqRetINSS;
-        vAliquotaIr := ItemServico[i].AliqRetIRRF;
-        vAliquotaCsll := ItemServico[i].AliqRetCSLL;
-
+        vQtdeDiaria := vQtdeDiaria + ItemServico[i].QtdeDiaria;
+        vValorTaxaTurismo := vValorTaxaTurismo + ItemServico[i].ValorTaxaTurismo;
         vValorDeducoes := vValorDeducoes + ItemServico[i].ValorDeducoes;
+        vValorRecebido := vValorRecebido + ItemServico[i].ValorRecebido;
         vValorServicos := vValorServicos + ItemServico[i].ValorTotal;
         vDescontoCondicionado := vDescontoCondicionado + ItemServico[i].DescontoCondicionado;
         vDescontoIncondicionado := vDescontoIncondicionado + ItemServico[i].DescontoIncondicionado;
@@ -481,15 +484,6 @@ begin
       end;
     end;
 
-    // Leva em consideração a informação do ultimo item da lista.
-    NFSe.Servico.ItemListaServico := xItemListaServ;
-    NFSe.Servico.Valores.Aliquota := vAliquota;
-    NFSe.Servico.Valores.AliquotaPis := vAliquotaPis;
-    NFSe.Servico.Valores.AliquotaCofins := vAliquotaCofins;
-    NFSe.Servico.Valores.AliquotaInss := vAliquotaInss;
-    NFSe.Servico.Valores.AliquotaIr := vAliquotaIr;
-    NFSe.Servico.Valores.AliquotaCsll := vAliquotaCsll;
-
     // Consolida todos os itens da lista.
     case FormatoDiscriminacao of
       fdTabulado:
@@ -501,18 +495,71 @@ begin
       NFSe.Servico.Discriminacao := xDiscriminacao;
     end;
 
-    NFSe.Servico.Valores.ValorDeducoes := vValorDeducoes;
-    NFSe.Servico.Valores.ValorServicos := vValorServicos;
-    NFSe.Servico.Valores.DescontoCondicionado := vDescontoCondicionado;
-    NFSe.Servico.Valores.DescontoIncondicionado := vDescontoIncondicionado;
-    NFSe.Servico.Valores.BaseCalculo := vBaseCalculo;
-    NFSe.Servico.Valores.ValorPis := vValorPis;
-    NFSe.Servico.Valores.ValorCofins := vValorCofins;
-    NFSe.Servico.Valores.ValorInss := vValorInss;
-    NFSe.Servico.Valores.ValorIr := vValorIr;
-    NFSe.Servico.Valores.ValorCsll := vValorCsll;
-    NFSe.Servico.Valores.ValorIss := vValorIss;
-    NFSe.Servico.Valores.ValorIssRetido := vValorIssRetido;
+    // Leva em consideração a informação do ultimo item da lista.
+    UltimoItem := FNFSe.Servico.ItemServico.Count -1;
+    NFSe.Servico.CodigoMunicipio := IntToStr(FNFSe.Servico.ItemServico[UltimoItem].CodigoMunicipio);
+    NFSe.Servico.CodigoPais := FNFSe.Servico.ItemServico[UltimoItem].CodigoPais;
+    NFSe.Servico.ItemListaServico := FNFSe.Servico.ItemServico[UltimoItem].ItemListaServico;
+    NFSe.Servico.xItemListaServico := FNFSe.Servico.ItemServico[UltimoItem].xItemListaServico;
+    NFSe.Servico.CodigoTributacaoMunicipio := FNFSe.Servico.ItemServico[UltimoItem].CodigoTributacaoMunicipio;
+    NFSe.Servico.CodigoNBS := FNFSe.Servico.ItemServico[UltimoItem].CodigoNBS;
+    NFSe.infNFSe.xNBS := FNFSe.Servico.ItemServico[UltimoItem].xNBS;
+    NFSe.Servico.CodigoInterContr := FNFSe.Servico.ItemServico[UltimoItem].CodigoInterContr;
+    NFSe.Servico.CodigoCnae := FNFSe.Servico.ItemServico[UltimoItem].CodigoCnae;
+    NFSe.Servico.ResponsavelRetencao := FNFSe.Servico.ItemServico[UltimoItem].ResponsavelRetencao;
+    NFSe.Servico.ExigibilidadeISS := FNFSe.Servico.ItemServico[UltimoItem].ExigibilidadeISS;
+    NFSe.Servico.MunicipioIncidencia := FNFSe.Servico.ItemServico[UltimoItem].MunicipioIncidencia;
+    NFSe.Servico.xMunicipioIncidencia := FNFSe.Servico.ItemServico[UltimoItem].xMunicipioIncidencia;
+    NFSe.Servico.NumeroProcesso := FNFSe.Servico.ItemServico[UltimoItem].NumeroProcesso;
+    NFSe.Servico.InfAdicional := FNFSe.Servico.ItemServico[UltimoItem].InfAdicional;
+    NFSe.Servico.CodigoServicoNacional := FNFSe.Servico.ItemServico[UltimoItem].CodigoServicoNacional;
+    NFSe.Servico.CodigoTributacaoNacional := FNFSe.Servico.ItemServico[UltimoItem].CodigoTributacaoNacional;
+
+    NFSe.Servico.Valores.Aliquota := FNFSe.Servico.ItemServico[UltimoItem].Aliquota;
+    NFSe.Servico.Valores.AliquotaDeducoes := FNFSe.Servico.ItemServico[UltimoItem].AliqDeducoes;
+    NFSe.Servico.Valores.AliquotaPis := FNFSe.Servico.ItemServico[UltimoItem].AliqRetPIS;
+    NFSe.Servico.Valores.AliquotaCofins := FNFSe.Servico.ItemServico[UltimoItem].AliqRetCOFINS;
+    NFSe.Servico.Valores.AliquotaInss := FNFSe.Servico.ItemServico[UltimoItem].AliqRetINSS;
+    NFSe.Servico.Valores.AliquotaIr := FNFSe.Servico.ItemServico[UltimoItem].AliqRetIRRF;
+    NFSe.Servico.Valores.AliquotaCsll := FNFSe.Servico.ItemServico[UltimoItem].AliqRetCSLL;
+    NFSe.Servico.Valores.RetidoCSLL := FNFSe.Servico.ItemServico[UltimoItem].RetidoCSLL;
+    NFSe.Servico.Valores.RetidoPIS := FNFSe.Servico.ItemServico[UltimoItem].RetidoPIS;
+    NFSe.Servico.Valores.RetidoCOFINS := FNFSe.Servico.ItemServico[UltimoItem].RetidoCOFINS;
+    NFSe.Servico.Valores.RetidoINSS := FNFSe.Servico.ItemServico[UltimoItem].RetidoINSS;
+    NFSe.Servico.Valores.RetidoIR := FNFSe.Servico.ItemServico[UltimoItem].RetidoIRRF;
+    NFSe.Servico.Valores.RetidoCPP := FNFSe.Servico.ItemServico[UltimoItem].RetidoCPP;
+
+    // Realiza a totalização dos valores
+    if NFSe.Servico.Valores.QtdeDiaria = 0 then
+      NFSe.Servico.Valores.QtdeDiaria := vQtdeDiaria;
+    if NFSe.Servico.Valores.ValorTaxaTurismo = 0 then
+      NFSe.Servico.Valores.ValorTaxaTurismo := vValorTaxaTurismo;
+    if NFSe.Servico.Valores.ValorDeducoes = 0 then
+      NFSe.Servico.Valores.ValorDeducoes := vValorDeducoes;
+    if NFSe.Servico.Valores.ValorRecebido = 0 then
+      NFSe.Servico.Valores.ValorRecebido := vValorRecebido;
+    if NFSe.Servico.Valores.ValorServicos = 0 then
+      NFSe.Servico.Valores.ValorServicos := vValorServicos;
+    if NFSe.Servico.Valores.DescontoCondicionado = 0 then
+      NFSe.Servico.Valores.DescontoCondicionado := vDescontoCondicionado;
+    if NFSe.Servico.Valores.DescontoIncondicionado = 0 then
+      NFSe.Servico.Valores.DescontoIncondicionado := vDescontoIncondicionado;
+    if NFSe.Servico.Valores.BaseCalculo = 0 then
+      NFSe.Servico.Valores.BaseCalculo := vBaseCalculo;
+    if NFSe.Servico.Valores.ValorPis = 0 then
+      NFSe.Servico.Valores.ValorPis := vValorPis;
+    if NFSe.Servico.Valores.ValorCofins = 0 then
+      NFSe.Servico.Valores.ValorCofins := vValorCofins;
+    if NFSe.Servico.Valores.ValorInss = 0 then
+      NFSe.Servico.Valores.ValorInss := vValorInss;
+    if NFSe.Servico.Valores.ValorIr = 0 then
+      NFSe.Servico.Valores.ValorIr := vValorIr;
+    if NFSe.Servico.Valores.ValorCsll = 0 then
+      NFSe.Servico.Valores.ValorCsll := vValorCsll;
+    if NFSe.Servico.Valores.ValorIss = 0 then
+      NFSe.Servico.Valores.ValorIss := vValorIss;
+    if NFSe.Servico.Valores.ValorIssRetido = 0 then
+      NFSe.Servico.Valores.ValorIssRetido := vValorIssRetido;
   end;
 end;
 
@@ -536,8 +583,8 @@ function TNFSeWClass.GerarJson(const xDescricao, xCodigoItem: string;
 begin
   Result := '{"Descricao":"' + xDescricao + '",' +
              '"ItemServico":"' + xCodigoItem + '",' +
-             '"ValorUnitario":' + FloatToStr(aValorUnitario) + ',' +
              '"Quantidade":' + FloatToStr(aQuantidade) + ',' +
+             '"ValorUnitario":' + FloatToStr(aValorUnitario) + ',' +
              '"ValorServico":' + FloatToStr(aValorServico) + ',' +
              '"ValorBaseCalculo":' + FloatToStr(aBaseCalculo) + ',' +
              '"Aliquota":' + FloatToStr(aAliquota) + '}';
@@ -655,7 +702,7 @@ begin
     Result := Codigo;
 end;
 
-function TNFSeWClass.GetOpcoes: TACBrXmlWriterOptions;
+function TNFSeWClass.GetOpcoes: TXmlWriterOptions;
 begin
   Result := TXmlWriterOptions(FOpcoes);
 end;
@@ -738,7 +785,7 @@ begin
   Result := ACBrStr(FIniParamsTabW.ReadString(OnlyNumber(ACodigo), 'Descricao', ''));
 end;
 
-procedure TNFSeWClass.SetOpcoes(AValue: TACBrXmlWriterOptions);
+procedure TNFSeWClass.SetOpcoes(AValue: TXmlWriterOptions);
 begin
   FOpcoes := AValue;
 end;
@@ -775,16 +822,28 @@ begin
 end;
 
 function TNFSeWClass.GerarIni: string;
+var
+  WIni: TNFSeIniWriter;
 begin
   // Usar o FpAOwner em vez de  FProvider
 
-//  if NFSe.tpXML = txmlRPS then
-  Result := GerarIniRps
-//  else
-//    Result := GerarIniNfse;
+  WIni := TNFSeIniWriter.Create(NFSe, FpAOwner);
 
-//  Result := '';
-//  raise EACBrNFSeException.Create(ClassName + '.GerarIni, não implementado');
+  try
+    WIni.IniParams := IniParams;
+    WIni.GerarSecaoOpcional := Opcoes.GerarTodasSecoes;
+    WIni.Documentar := Opcoes.Documentar;
+
+    Result := WIni.GerarArquivoIni;
+  finally
+    WIni.Free;
+  end;
+{
+  if NFSe.tpXML = txmlRPS then
+    Result := GerarIniRps
+  else
+    Result := GerarIniNfse;
+}
 end;
 
 function TNFSeWClass.GerarIniNfse: string;
@@ -1103,6 +1162,7 @@ begin
             begin
               INIRec.WriteString(sSecao, 'CEP', ConstrucaoCivil.Endereco.CEP);
               INIRec.WriteString(sSecao, 'xMunicipio', ConstrucaoCivil.Endereco.XMunicipio);
+              INIRec.WriteString(sSecao, 'CodigoMunicipio', ConstrucaoCivil.Endereco.CodigoMunicipio);
               INIRec.WriteString(sSecao, 'UF', ConstrucaoCivil.Endereco.UF);
               INIRec.WriteString(sSecao, 'Logradouro', ConstrucaoCivil.Endereco.Endereco);
               INIRec.WriteString(sSecao, 'Numero', ConstrucaoCivil.Endereco.Numero);
@@ -1118,6 +1178,10 @@ begin
           INIRec.WriteString(sSecao, 'nNumeroEncapsulamento', ConstrucaoCivil.nNumeroEncapsulamento);
           //Padrão Nacional
           INIRec.WriteString(sSecao, 'inscImobFisc', ConstrucaoCivil.inscImobFisc);
+          if ConstrucaoCivil.Cib > 0 then
+            INIRec.WriteInteger(sSecao, 'Cib', ConstrucaoCivil.Cib);
+          if ConstrucaoCivil.infobrasopcao > 0 then
+            INIRec.WriteInteger(sSecao, 'ObrasOpcao', ConstrucaoCivil.infobrasopcao);
         end;
       end;
 
@@ -1147,6 +1211,7 @@ begin
       //Padrão Nacional e IssNet
       INIRec.WriteString(sSecao, 'CodigoNBS', Servico.CodigoNBS);
       INIRec.WriteString(sSecao, 'CodigoInterContr', Servico.CodigoInterContr);
+      INIRec.WriteString(sSecao, 'xNBS', infNFSe.xNBS);
 
       // Provedor SoftPlan
       INIRec.WriteString(sSecao, 'CFPS', '');
@@ -1339,10 +1404,13 @@ begin
         INIRec.WriteDate(sSecao, 'dtIni', Servico.Evento.dtIni);
         INIRec.WriteDate(sSecao, 'dtFim', Servico.Evento.dtFim);
         INIRec.WriteString(sSecao, 'idAtvEvt', Servico.Evento.idAtvEvt);
+        INIRec.WriteInteger(sSecao, 'AtividadeEventoOpcao', Servico.Evento.infoatividadeeventoopcao);
         INIRec.WriteString(sSecao, 'CEP', Servico.Evento.Endereco.CEP);
+        INIRec.WriteString(sSecao, 'CodigoMunicipio', Servico.Evento.Endereco.CodigoMunicipio);
         INIRec.WriteString(sSecao, 'xMunicipio', Servico.Evento.Endereco.xMunicipio);
         INIRec.WriteString(sSecao, 'UF', Servico.Evento.Endereco.UF);
         INIRec.WriteString(sSecao, 'Logradouro', Servico.Evento.Endereco.Endereco);
+        INIRec.WriteString(sSecao, 'Numero', Servico.Evento.Endereco.Numero);
         INIRec.WriteString(sSecao, 'Complemento', Servico.Evento.Endereco.Complemento);
         INIRec.WriteString(sSecao, 'Bairro', Servico.Evento.Endereco.Bairro);
       end;
@@ -1373,6 +1441,7 @@ begin
       INIRec.WriteFloat(sSecao, 'ValorDeducoes', Servico.Valores.ValorDeducoes);
       INIRec.WriteFloat(sSecao, 'AliquotaDeducoes', Servico.Valores.AliquotaDeducoes);
       INIRec.WriteString(sSecao, 'JustificativaDeducao', Servico.Valores.JustificativaDeducao);
+      INIRec.WriteFloat(sSecao, 'BaseCalculoPISCOFINS', Servico.Valores.BaseCalculoPisCofins);
       INIRec.WriteFloat(sSecao, 'ValorPis', Servico.Valores.ValorPis);
       INIRec.WriteFloat(sSecao, 'AliquotaPis', Servico.Valores.AliquotaPis);
       INIRec.WriteString(sSecao, 'RetidoPis', FpAOwner.SimNaoToStr(Servico.Valores.RetidoPis));
@@ -1430,7 +1499,7 @@ begin
         INIRec.WriteString(sSecao, 'chNFSe', Servico.Valores.DocDeducao[i].chNFSe);
         INIRec.WriteString(sSecao, 'chNFe', Servico.Valores.DocDeducao[i].chNFe);
         INIRec.WriteString(sSecao, 'nDoc', Servico.Valores.DocDeducao[i].nDoc);
-        INIRec.WriteString(sSecao, 'tpDedRed', tpDedRedToStr(Servico.Valores.DocDeducao[i].tpDedRed));
+        INIRec.WriteString(sSecao, 'tpDedRed', FpAOwner.tpDedRedToStr(Servico.Valores.DocDeducao[i].tpDedRed));
         INIRec.WriteString(sSecao, 'xDescOutDed', Servico.Valores.DocDeducao[i].xDescOutDed);
         INIRec.WriteDate(sSecao, 'dtEmiDoc', Servico.Valores.DocDeducao[i].dtEmiDoc);
         INIRec.WriteFloat(sSecao, 'vDedutivelRedutivel', Servico.Valores.DocDeducao[i].vDedutivelRedutivel);
@@ -1499,6 +1568,9 @@ begin
         INIRec.WriteFloat(sSecao, 'vRetCP', Servico.Valores.tribFed.vRetCP);
         INIRec.WriteFloat(sSecao, 'vRetIRRF', Servico.Valores.tribFed.vRetIRRF);
         INIRec.WriteFloat(sSecao, 'vRetCSLL', Servico.Valores.tribFed.vRetCSLL);
+        INIRec.WriteFloat(sSecao, 'vBCPIRRF', Servico.Valores.tribFed.vBCPIRRF);
+        INIRec.WriteFloat(sSecao, 'vBCCSLL', Servico.Valores.tribFed.vBCCSLL);
+        INIRec.WriteFloat(sSecao, 'vBCPCP', Servico.Valores.tribFed.vBCPCP);
       end;
 
       sSecao := 'totTrib';
@@ -1937,11 +2009,13 @@ begin
     if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].dFeNacional.chaveDFe <> '' then
       Result[i].AppendChild(GerarXMLdFeNacional(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].dFeNacional))
     else
-    if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docFiscalOutro.cMunDocFiscal > 0 then
-      Result[i].AppendChild(GerarXMLdocFiscalOutro(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docFiscalOutro))
-    else
-    if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docOutro.nDoc <> '' then
-      Result[i].AppendChild(GerarXMLdocOutro(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docOutro));
+    begin
+      if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docFiscalOutro.cMunDocFiscal > 0 then
+        Result[i].AppendChild(GerarXMLdocFiscalOutro(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docFiscalOutro))
+      else
+      if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docOutro.nDoc <> '' then
+        Result[i].AppendChild(GerarXMLdocOutro(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].docOutro));
+    end;
 
     if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].fornec.xNome <> '' then
       Result[i].AppendChild(GerarXMLfornec(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].fornec));

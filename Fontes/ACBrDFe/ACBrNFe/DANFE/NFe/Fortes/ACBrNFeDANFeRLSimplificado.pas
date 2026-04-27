@@ -41,11 +41,21 @@ interface
 uses
   SysUtils, Classes,
   {$IFDEF CLX}
-  QGraphics, QControls, QForms, Qt,
+  QGraphics,
+  QControls,
+  QForms,
+  Qt,
   {$ELSE}
-  Graphics, Controls, Forms,
+  Graphics,
+  Controls,
+  Forms,
   {$ENDIF}
-  RLReport, RLBarcode, ACBrNFeDANFeRL, RLFilters, RLPDFFilter, math;
+  RLReport,
+  RLBarcode,
+  ACBrNFeDANFeRL,
+  RLFilters,
+  RLPDFFilter,
+  math;
 
 type
 
@@ -199,10 +209,17 @@ type
 implementation
 
 uses
-  StrUtils, DateUtils,
-  ACBrUtil.Base, ACBrUtil.Strings, ACBrUtil.DateTime,
-  ACBrValidador, ACBrDFeUtil,
-  ACBrDFeReportFortes, ACBrNFe.Classes, pcnConversao, pcnConversaoNFe;
+  StrUtils,
+  DateUtils,
+  ACBrUtil.Base,
+  ACBrUtil.Strings,
+  ACBrUtil.DateTime,
+  ACBrValidador,
+  ACBrDFeUtil,
+  ACBrDFeReportFortes,
+  ACBrNFe.Classes,
+  pcnConversao,
+  pcnConversaoNFe;
 
 {$IfNDef FPC}
   {$R *.dfm}
@@ -295,13 +312,13 @@ begin
   rllEntradaSaida.Caption := tpNFToStr(fpNFe.Ide.tpNF);
 
   if fpDANFe.FormatarNumeroDocumento then
-    lblNumero.Caption := ACBrStr('Número: ' + FormatFloat('000,000,000', fpNFe.Ide.nNF))
+    lblNumero.Caption := ACBrStr('Número: ') + FormatFloat('000,000,000', fpNFe.Ide.nNF)
   else
-    lblNumero.Caption := ACBrStr('Número: ' + IntToStr(fpNFe.Ide.nNF));
+    lblNumero.Caption := ACBrStr('Número: ') + IntToStr(fpNFe.Ide.nNF);
 
-  lblNumero.Caption :=  ACBrStr(lblNumero.Caption +' - Série: ' + FormatFloat('000', fpNFe.Ide.serie));
+  lblNumero.Caption :=  lblNumero.Caption + ACBrStr(' - Série: ') + FormatFloat('000', fpNFe.Ide.serie);
 
-  rllEmissao.Caption := ACBrStr('Emissão: ' + FormatDateTimeBr(fpNFe.Ide.dEmi));
+  rllEmissao.Caption := ACBrStr('Emissão: ') + FormatDateTimeBr(fpNFe.Ide.dEmi);
 end;
 
 procedure TfrlDANFeRLSimplificado.RLb04_DestinatarioBeforePrint(Sender: TObject; var PrintIt: Boolean);
@@ -321,6 +338,7 @@ begin
 
     rlmDestinatario.Lines.Add(ACBrStr('CPF/CNPJ: ' + FormatarCNPJouCPF(CNPJCPF) + ' IE: ' + IE));
   end;
+  rlmDestinatario.AutoSize := True;
 
   rllMsgTipoEmissao.Visible := False;
   if (fpNFe.Ide.tpAmb = taHomologacao) then
@@ -431,7 +449,7 @@ begin
 
     {=============== Ajusta o tamanho do quadro das faturas ===============}
 
-    rlbFatura.Height := iQuantDup * 22;
+    rlbFatura.Height := iQuantDup * 28;
   end;
 
 end;
@@ -630,6 +648,8 @@ end;
 
 procedure TfrlDANFeRLSimplificado.RLBand1BeforePrint(Sender: TObject; var
     PrintIt: Boolean);
+var
+   LTextoObservacao : string;
 begin
   inherited;
   if not fpDANFe.Etiqueta then
@@ -644,7 +664,13 @@ begin
   end;
   rlmDadosAdicionais.Lines.Clear;
   rlmDadosAdicionais.Lines.Add(ACBrStr('Informações Adicionais:'));
-  rlmDadosAdicionais.Lines.Add(fpNFe.infAdic.infCpl);
+
+  LTextoObservacao := Trim(fpNFe.infAdic.infCpl);
+  if LTextoObservacao <> '' then
+  begin
+     LTextoObservacao := StringReplace(LTextoObservacao, fpDANFe.CaractereQuebraDeLinha, sLineBreak, [rfReplaceAll]);
+     rlmDadosAdicionais.Lines.Add(LTextoObservacao);
+  end;
 end;
 
 procedure TfrlDANFeRLSimplificado.RLNFeDataRecord(Sender: TObject; RecNo, CopyNo: Integer; var EOF: Boolean; var RecordAction: TRLRecordAction);

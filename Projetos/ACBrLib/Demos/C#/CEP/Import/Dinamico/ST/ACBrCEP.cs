@@ -10,20 +10,28 @@ using ACBrLib.CEP;
 
 namespace ACBrLib.CEP
 {
-    /// <inheritdoc />
-    public sealed partial class ACBrCEP : ACBrLibHandle
+    /// <Summary>
+    /// Classe principal da biblioteca ACBrLibCEP, responsável por fornecer os métodos e propriedades para interação com o componente de consulta de CEP.
+    /// Baseado na documentação oficial: https://acbr.sourceforge.io/ACBrLib/MetodosCEP.html
+    /// </Summary>
+    public sealed partial class ACBrCEP : ACBrLibHandle, IACBrLibCEP
     {
         #region Constructors
-
+        
+        /// <inheritdoc/>
         public ACBrCEP(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrCEP64.dll" : "libacbrcep64.so",
                                                                                       IsWindows ? "ACBrCEP32.dll" : "libacbrcep32.so")
         {
-            var inicializar = GetMethod<CEP_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
-            CheckResult(ret);
-
+            Inicializar(eArqConfig, eChaveCrypt);
             Config = new ACBrCEPConfig(this);
+        }
+
+        /// <inheritdoc/>
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializarLib = GetMethod<CEP_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            CheckResult(ret);
         }
 
         #endregion Constructors
@@ -70,6 +78,7 @@ namespace ACBrLib.CEP
 
         #region Ini
 
+        /// <inheritdoc/>
         public override void ConfigGravar(string eArqConfig = "")
         {
             var gravarIni = GetMethod<CEP_ConfigGravar>();
@@ -78,6 +87,7 @@ namespace ACBrLib.CEP
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override void ImportarConfig(string eArqConfig)
         {
             var lerIni = GetMethod<CEP_ConfigImportar>();
@@ -86,6 +96,7 @@ namespace ACBrLib.CEP
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override string ExportarConfig()
         {
             var bufferLen = BUFFER_LEN;
@@ -99,6 +110,7 @@ namespace ACBrLib.CEP
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public override void ConfigLer(string eArqConfig = "")
         {
             var lerIni = GetMethod<CEP_ConfigLer>();
@@ -107,6 +119,7 @@ namespace ACBrLib.CEP
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override T ConfigLerValor<T>(ACBrSessao eSessao, string eChave)
         {
             var method = GetMethod<CEP_ConfigLerValor>();
@@ -120,6 +133,7 @@ namespace ACBrLib.CEP
             return ConvertValue<T>(value);
         }
 
+        /// <inheritdoc/>
         public override void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value)
         {
             if (value == null) return;
@@ -135,6 +149,7 @@ namespace ACBrLib.CEP
 
         #region Diversos
 
+        /// <inheritdoc/>
         public ACBrEndereco BuscarPorCep(string eCEP)
         {
             var bufferLen = BUFFER_LEN;
@@ -149,6 +164,7 @@ namespace ACBrLib.CEP
             return ini.Where(x => x.Name.StartsWith("Endereco")).Select(ACBrEndereco.LerResposta).SingleOrDefault();
         }
 
+        /// <inheritdoc/>
         public ACBrEndereco[] BuscarPorLogradouro(string eCidade, string eTipoLogradouro, string eLogradouro, string eUF, string eBairro)
         {
             var bufferLen = BUFFER_LEN;
@@ -167,13 +183,15 @@ namespace ACBrLib.CEP
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        /// <inheritdoc/>
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<CEP_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<CEP_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 
+        /// <inheritdoc/>
         protected override string GetUltimoRetorno(int iniBufferLen = 0)
         {
             var bufferLen = iniBufferLen < 1 ? BUFFER_LEN : iniBufferLen;
@@ -192,6 +210,7 @@ namespace ACBrLib.CEP
             return FromUTF8(buffer);
         }
 
+        /// <inheritdoc/>
         public override string OpenSSLInfo()
         {
             var bufferLen = BUFFER_LEN;

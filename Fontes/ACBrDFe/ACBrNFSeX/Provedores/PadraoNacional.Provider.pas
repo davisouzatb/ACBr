@@ -111,6 +111,8 @@ type
 
     function PrepararArquivoEnvio(const aXml: string; aMetodo: TMetodo): string; override;
     procedure ValidarSchema(Response: TNFSeWebserviceResponse; aMetodo: TMetodo); override;
+
+    function TrocaEscapeporConchete(const aXml: string): string;
   public
     function RegimeEspecialTributacaoToStr(const t: TnfseRegimeEspecialTributacao): string; override;
     function StrToRegimeEspecialTributacao(out ok: boolean; const s: string): TnfseRegimeEspecialTributacao; override;
@@ -465,8 +467,10 @@ begin
 
       if NFSeXml <> '' then
       begin
-//        NFSeXml := DecodeToString(DeCompress(DecodeBase64(NFSeXml)), True);
         NFSeXml := DeCompress(DecodeBase64(NFSeXml));
+
+        NFSeXml := TrocaEscapeporConchete(NFSeXml);
+
         LerNFSe(NFSeXml);
       end;
     except
@@ -592,7 +596,9 @@ begin
           vogais acentuadas e cedilha.
         }
         if NFSeXml <> '' then
-          NFSeXml := DecodeToString(DeCompress(DecodeBase64(NFSeXml)), True);
+          NFSeXml := DeCompress(DecodeBase64(NFSeXml));
+
+        NFSeXml := TrocaEscapeporConchete(NFSeXml);
 
         DocumentXml := TACBrXmlDocument.Create;
 
@@ -777,7 +783,9 @@ begin
 
       if EventoXml <> '' then
       begin
-        EventoXml := DecodeToString(DeCompress(DecodeBase64(EventoXml)), True);
+        EventoXml := DeCompress(DecodeBase64(EventoXml));
+
+        EventoXml := TrocaEscapeporConchete(EventoXml);
 
         DocumentXml := TACBrXmlDocument.Create;
 
@@ -937,7 +945,7 @@ begin
         else
           ArquivoXml := DeCompress(DecodeBase64(ArquivoXml));
 
-        ArquivoXml := DecodeToString(ArquivoXml, True);
+        ArquivoXml := TrocaEscapeporConchete(ArquivoXml);
 
         if ArquivoXml = '' then
         begin
@@ -1003,6 +1011,8 @@ procedure TACBrNFSeProviderPadraoNacional.PrepararConsultarDFe(
 begin
   if Response.ChaveNFSe <> '' then
     Path := '/NFSe/' + Response.ChaveNFSe + '/Eventos'
+  else if Response.Cnpj <> '' then
+    Path := '/DFe/' + IntToStr(Response.NSU) + '?cnpjConsulta=' + Response.Cnpj
   else
     Path := '/DFe/' + IntToStr(Response.NSU);
 
@@ -1060,8 +1070,9 @@ begin
           AResumo.TipoEvento := JSon.AsString['TipoEvento'];
 
           ArquivoXml := JSon.AsString['ArquivoXml'];
-//          ArquivoXml := DecodeToString(DeCompress(DecodeBase64(ArquivoXml)), True);
           ArquivoXml := DeCompress(DecodeBase64(ArquivoXml));
+
+          ArquivoXml := TrocaEscapeporConchete(ArquivoXml);
 
           if ArquivoXml = '' then
           begin
@@ -1485,6 +1496,8 @@ end;
 function TACBrNFSeProviderPadraoNacional.PrepararArquivoEnvio(
   const aXml: string; aMetodo: TMetodo): string;
 begin
+  Result := aXml;
+
   if aMetodo in [tmGerar, tmEnviarEvento] then
   begin
     Result := ChangeLineBreak(aXml, '');
@@ -1521,6 +1534,15 @@ begin
                          [retNenhum, retCooperativa, retEstimativa,
                          retMicroempresaMunicipal, retNotarioRegistrador,
                          retISSQNAutonomos, retSociedadeProfissionais, retOutros]);
+end;
+
+function TACBrNFSeProviderPadraoNacional.TrocaEscapeporConchete(
+  const aXml: string): string;
+begin
+  Result := StringReplace(aXml, '&amp;lt;', '[', [rfReplaceAll]);
+  Result := StringReplace(Result, '&amp;gt;', ']', [rfReplaceAll]);
+  Result := StringReplace(Result, '&lt;', '[', [rfReplaceAll]);
+  Result := StringReplace(Result, '&gt;', ']', [rfReplaceAll]);
 end;
 
 function TACBrNFSeProviderPadraoNacional.StrToRegimeEspecialTributacao(

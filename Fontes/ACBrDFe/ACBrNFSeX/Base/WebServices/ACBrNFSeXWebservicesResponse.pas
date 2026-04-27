@@ -80,6 +80,7 @@ type
     FSituacao: string;
     FDescSituacao: string;
     FLink: string;
+    FLinkVerificacao: string;
     FProtocolo: string;
     FSerieNota: string;
     FData: TDateTime;
@@ -102,6 +103,7 @@ type
     property Situacao: string read FSituacao write FSituacao;
     property DescSituacao: string read FDescSituacao write FDescSituacao;
     property Link: string read FLink write FLink;
+    property LinkVerificacao: string read FLinkVerificacao write FLinkVerificacao;
     property Protocolo: string read FProtocolo write FProtocolo;
     property SerieNota: string read FSerieNota write FSerieNota;
     property Data: TDateTime read FData write FData;
@@ -222,6 +224,7 @@ type
     FidNota: string;
     FidRps: string;
     FLink: string;
+    FLinkVerificacao: string;
     FStatus: Integer;
     FProtocolo: string;
     FNumeroRps: string;
@@ -265,6 +268,7 @@ type
     property idNota: string read FidNota write FidNota;
     property idRps: string read FidRps write FidRps;
     property Link: string read FLink write FLink;
+    property LinkVerificacao: string read FLinkVerificacao write FLinkVerificacao;
     property Status: Integer read FStatus write FStatus;
     property Protocolo: string read FProtocolo write FProtocolo;
     property NumeroRps: string read FNumeroRps write FNumeroRps;
@@ -296,6 +300,7 @@ type
     FMinRps: Integer;
     FModoEnvio: TmodoEnvio;
     FCodigoVerificacao: string;
+    FChaveNotaNacional: string;
     FNomeArq: string;
   public
     constructor Create;
@@ -307,6 +312,7 @@ type
     property MinRps: Integer read FMinRps write FMinRps;
     property ModoEnvio: TmodoEnvio read FModoEnvio write FModoEnvio;
     property CodigoVerificacao: string read FCodigoVerificacao write FCodigoVerificacao;
+    property ChaveNotaNacional: string read FChaveNotaNacional write FChaveNotaNacional;
     property NomeArq: string read FNomeArq write FNomeArq;
   end;
 
@@ -495,6 +501,7 @@ type
   private
     FNSU: Integer;
     FChaveNFSe: string;
+    FCnpj: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -503,7 +510,8 @@ type
 
     property NSU: Integer read FNSU write FNSU;
     property ChaveNFSe: string read FChaveNFSe write FChaveNFSe;
-  end;
+     property Cnpj: String read FCnpj write FCnpj;
+ end;
 
   TNFSeConsultarParamResponse = class(TNFSeWebserviceResponse)
   private
@@ -1065,6 +1073,7 @@ begin
 
   NSU := -1;
   ChaveNFSe := '';
+  FCnpj := '';
 end;
 
 constructor TNFSeConsultarDFeResponse.Create;

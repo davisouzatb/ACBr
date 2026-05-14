@@ -41,26 +41,14 @@ uses
   pcnConversao,
   ACBrDFe.Conversao,
   pcteConversaoCTe,
-  ACBrCTeConfiguracoes,
-{$IfNDef NOREPORT}
-  ACBrCTeDACTeRLClass,
-{$Else}
-  ACBrCTeDACTeFPDF,
-{$EndIf}
-  ACBrDFeReport,
-  ACBrCTeDACTEClass,
+  ACBrCTeConfiguracoes, ACBrCTeDACTeRLClass,
   ACBrLibComum,
-  ACBrLibConfig,
-  DFeReportConfig;
+  ACBrLibConfig, DFeReportConfig;
 
 type
 
   { TDACTeConfig }
-{$IfNDef NOREPORT}
   TDACTeConfig = class(TDFeReportConfig<TACBrCTeDACTeRL>)
-{$Else}
-  TDACTeConfig = class(TDFeReportConfig<TACBrCTeDACTeFPDF>)
-{$EndIf}
   private
     FCTeCancelada: Boolean;
     FEPECEnviado: Boolean;
@@ -78,11 +66,7 @@ type
   protected
     procedure LerIniChild(const AIni: TCustomIniFile); override;
     procedure GravarIniChild(const AIni: TCustomIniFile); override;
-  {$IfNDef NOREPORT}
     procedure ApplyChild(const DFeReport: TACBrCTeDACTeRL; const Lib: TACBrLib); override;
-  {$Else}
-    procedure ApplyChild(const DFeReport: TACBrCTeDACTeFPDF; const Lib: TACBrLib); override;
-  {$EndIf}
     procedure DefinirValoresPadroesChild; override;
 
   public
@@ -183,11 +167,7 @@ begin
   AIni.WriteBool(FSessao, CChaveImprimirDescPorc, FImprimirDescPorc);
 end;
 
-{$IfNDef NOREPORT}
 procedure TDACTeConfig.ApplyChild(const DFeReport: TACBrCTeDACTeRL; const Lib: TACBrLib);
-{$Else}
-procedure TDACTeConfig.ApplyChild(const DFeReport: TACBrCTeDACTeFPDF; const Lib: TACBrLib);
-{$EndIf}
 begin
   with DFeReport do
   begin

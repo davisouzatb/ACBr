@@ -13,15 +13,12 @@ namespace ACBrLib.GNRe
         public ACBrGNRe(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrGNRe64.dll" : "libacbrgnre64.so",
                                                                                 IsWindows ? "ACBrGNRe32.dll" : "libacbrgnre32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new GNReConfig(this);
-        }
+            var inicializar = GetMethod<GNRE_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ref libHandle, ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<GNRE_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ref libHandle,ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new GNReConfig(this);
         }
 
         #endregion Constructors
@@ -290,10 +287,10 @@ namespace ACBrLib.GNRe
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<GNRE_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib(libHandle));
+            var finalizar = GetMethod<GNRE_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar(libHandle));
             CheckResult(codRet);
         }
 
@@ -313,19 +310,6 @@ namespace ACBrLib.GNRe
 
             ExecuteMethod(() => ultimoRetorno(libHandle, buffer, ref bufferLen));
             return FromUTF8(buffer);
-        }
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<GNRE_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
         }
 
         #endregion Private Methods

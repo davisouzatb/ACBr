@@ -1,58 +1,59 @@
-using ACBrLib.Core;
+﻿using ACBrLib.Core;
 using System;
 using System.Text;
 using ACBrLib.Core.ETQ;
 
 namespace ACBrLib.ETQ
 {
-    public sealed partial class ACBrETQ : ACBrLibHandle, IACBrLibETQ
+    public sealed partial class ACBrETQ : ACBrLibHandle
     {
         #region Constructors
 
         public ACBrETQ(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrETQ64.dll" : "libacbretq64.so",
                                                                                IsWindows ? "ACBrETQ32.dll" : "libacbretq32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBrETQConfig(this);
-        }
+            var inicializar = GetMethod<ETQ_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<ETQ_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBrETQConfig(this);
         }
 
         #endregion Constructors
 
         #region Properties
 
-        /// <inheritdoc />
-        public string Nome()
+        public string Nome
         {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
+            get
+            {
+                var bufferLen = BUFFER_LEN;
+                var buffer = new StringBuilder(bufferLen);
 
-            var method = GetMethod<ETQ_Nome>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+                var method = GetMethod<ETQ_Nome>();
+                var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
 
-            CheckResult(ret);
+                CheckResult(ret);
 
-            return ProcessResult(buffer, bufferLen);
+                return ProcessResult(buffer, bufferLen);
+            }
         }
 
-        /// <inheritdoc />
-        public string Versao()
+        public string Versao
         {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
+            get
+            {
+                var bufferLen = BUFFER_LEN;
+                var buffer = new StringBuilder(bufferLen);
 
-            var method = GetMethod<ETQ_Versao>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+                var method = GetMethod<ETQ_Versao>();
+                var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
 
-            CheckResult(ret);
+                CheckResult(ret);
 
-            return ProcessResult(buffer, bufferLen);
+                return ProcessResult(buffer, bufferLen);
+            }
         }
 
         public ACBrETQConfig Config { get; }
@@ -240,10 +241,10 @@ namespace ACBrLib.ETQ
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<ETQ_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<ETQ_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -273,7 +274,6 @@ namespace ACBrLib.ETQ
             AddMethod<ETQ_ImprimirCaixa>("ETQ_ImprimirCaixa");
             AddMethod<ETQ_ImprimirImagem>("ETQ_ImprimirImagem");
             AddMethod<ETQ_ImprimirQRCode>("ETQ_ImprimirQRCode");
-            AddMethod<ETQ_OpenSSLInfo>("ETQ_OpenSSLInfo");
         }
 
         protected override string GetUltimoRetorno(int iniBufferLen = 0)
@@ -292,26 +292,6 @@ namespace ACBrLib.ETQ
 
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
-        }
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<ETQ_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            Finalizar();
-            GC.SuppressFinalize(this);
         }
 
         #endregion Private Methods

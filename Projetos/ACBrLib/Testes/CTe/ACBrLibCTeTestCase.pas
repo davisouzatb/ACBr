@@ -239,8 +239,7 @@ var
 begin
      // Iniciando a geração do PDF do DACTE
      AssertEquals(ErrOk, CTe_Inicializar(Handle, '',''));
-     CTe_CarregarXML(Handle, PChar(ExtractFilePath(ParamStr(0)) + '\xml.xml'));
-     AssertEquals('Erro ao gerar o PDF do DACTE', ErrOK, CTe_ImprimirPDF(Handle));
+     AssertEquals('Erro ao gerar o PDF do DACTE', ErrExecutandoMetodo, CTe_ImprimirPDF(Handle));
      AssertEquals(ErrOk, CTE_Finalizar(Handle));
 end;
 

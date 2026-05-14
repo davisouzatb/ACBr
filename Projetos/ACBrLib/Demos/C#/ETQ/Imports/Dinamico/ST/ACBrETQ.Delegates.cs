@@ -80,8 +80,5 @@ namespace ACBrLib.ETQ
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int ETQ_ImprimirQRCode(int vertical, int horizontal, string texto, int larguraModulo, int errorLevel, int tipo);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int ETQ_OpenSSLInfo(StringBuilder buffer, ref int bufferSize);
     }
 }

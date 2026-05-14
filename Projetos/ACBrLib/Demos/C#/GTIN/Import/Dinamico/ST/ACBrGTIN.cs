@@ -10,22 +10,19 @@ using ACBrLib.GTIN;
 namespace ACBrLib.GTIN
 {
     /// <inheritdoc />
-    public sealed partial class ACBrGTIN : ACBrLibHandle, IACBrLibGTIN
+    public sealed partial class ACBrGTIN : ACBrLibHandle
     {
         #region Constructors
 
         public ACBrGTIN(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrGTIN64.dll" : "libacbrgtin64.so",
                                                                                       IsWindows ? "ACBrGTIN32.dll" : "libacbrgtin32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBrGTINConfig(this);
-        }
+            var inicializar = GetMethod<GTIN_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<GTIN_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBrGTINConfig(this);
         }
 
         #endregion Constructors
@@ -133,7 +130,7 @@ namespace ACBrLib.GTIN
             CheckResult(ret);
         }
 
-        public override string OpenSSLInfo()
+        public string OpenSSLInfo()
         {
             var bufferLen = BUFFER_LEN;
             var buffer = new StringBuilder(bufferLen);
@@ -167,10 +164,10 @@ namespace ACBrLib.GTIN
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<GTIN_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<GTIN_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 

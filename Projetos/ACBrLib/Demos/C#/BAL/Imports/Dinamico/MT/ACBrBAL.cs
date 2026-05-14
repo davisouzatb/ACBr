@@ -1,49 +1,59 @@
 ﻿using System.Text;
 using ACBrLib.Core;
-using System;
-using System.IO;
 
 namespace ACBrLib.BAL
 {
-    /// <summary>
-    /// Implementação da interface <see cref="IACBrLibBAL"/> para comunicação com balanças via ACBrLib.
-    /// Responsável por encapsular as operações de configuração, ativação, leitura e interpretação de peso.
-    /// </summary>
-    public class ACBrBAL : ACBrLibBase, IACBrLibBAL
+    public sealed partial class ACBrBAL : ACBrLibHandle
     {
-
-        private readonly ACBrBALHandle acbrBALBridge;
-        private bool disposed = false;
-        private IntPtr libHandle = IntPtr.Zero; 
         #region Constructors
 
-        /// <summary>
-        /// Inicializa uma nova instância da classe <see cref="ACBrBAL"/>.
-        /// </summary>
-        /// <param name="eArqConfig">Caminho do arquivo de configuração INI.</param>
-        /// <param name="eChaveCrypt">Chave de criptografia para o arquivo de configuração.</param>
-        public ACBrBAL(string eArqConfig = "", string eChaveCrypt = "") :base(eArqConfig, eChaveCrypt)
-        {   
-            acbrBALBridge = ACBrBALHandle.Instance;
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new BALConfig(this);
-        }
-
-        /// <inheritdoc/>
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        public ACBrBAL(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrBAL64.dll" : "libacbrbal64.so",
+                                                                               IsWindows ? "ACBrBAL32.dll" : "libacbrbal32.so")
         {
-            var inicializarLib = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_Inicializar>();
-            var ret =acbrBALBridge.ExecuteMethod<int>(() => inicializarLib(ref libHandle, ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            var inicializar = GetMethod<BAL_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ref libHandle, ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+
             CheckResult(ret);
+
+            Config = new BALConfig(this);
         }
 
         #endregion Constructors
 
         #region Properties
 
-      
+        public string Nome
+        {
+            get
+            {
+                var bufferLen = BUFFER_LEN;
+                var buffer = new StringBuilder(bufferLen);
 
-        /// <inheritdoc/>
+                var method = GetMethod<BAL_Nome>();
+                var ret = ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
+
+                CheckResult(ret);
+
+                return ProcessResult(buffer, bufferLen);
+            }
+        }
+
+        public string Versao
+        {
+            get
+            {
+                var bufferLen = BUFFER_LEN;
+                var buffer = new StringBuilder(bufferLen);
+
+                var method = GetMethod<BAL_Versao>();
+                var ret = ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
+
+                CheckResult(ret);
+
+                return ProcessResult(buffer, bufferLen);
+            }
+        }
+
         public BALConfig Config { get; }
 
         #endregion Properties
@@ -52,106 +62,120 @@ namespace ACBrLib.BAL
 
         #region Ini
 
-        /// <inheritdoc/>
         public override void ConfigGravar(string eArqConfig = "")
         {
-            var gravarIni = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_ConfigGravar>();
-            var ret =acbrBALBridge.ExecuteMethod(() => gravarIni(libHandle, ToUTF8(eArqConfig)));
+            var gravarIni = GetMethod<BAL_ConfigGravar>();
+            var ret = ExecuteMethod(() => gravarIni(libHandle, ToUTF8(eArqConfig)));
 
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public override void ConfigLer(string eArqConfig = "")
         {
-            var lerIni = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_ConfigLer>();
-            var ret =acbrBALBridge.ExecuteMethod(() => lerIni(libHandle, ToUTF8(eArqConfig)));
+            var lerIni = GetMethod<BAL_ConfigLer>();
+            var ret = ExecuteMethod(() => lerIni(libHandle, ToUTF8(eArqConfig)));
 
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
+        public override T ConfigLerValor<T>(ACBrSessao eSessao, string eChave)
+        {
+            var method = GetMethod<BAL_ConfigLerValor>();
+
+            var bufferLen = BUFFER_LEN;
+            var pValue = new StringBuilder(bufferLen);
+            var ret = ExecuteMethod(() => method(libHandle, ToUTF8(eSessao.ToString()), ToUTF8(eChave), pValue, ref bufferLen));
+            CheckResult(ret);
+
+            var value = ProcessResult(pValue, bufferLen);
+            return ConvertValue<T>(value);
+        }
+
+        public override void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value)
+        {
+            if (value == null) return;
+
+            var method = GetMethod<BAL_ConfigGravarValor>();
+            var propValue = ConvertValue(value);
+
+            var ret = ExecuteMethod(() => method(libHandle, ToUTF8(eSessao.ToString()), ToUTF8(eChave), ToUTF8(propValue)));
+            CheckResult(ret);
+        }
+
         public override void ImportarConfig(string eArqConfig = "")
         {
-            var importarConfig = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_ConfigImportar>();
-            var ret =acbrBALBridge.ExecuteMethod(() => importarConfig(libHandle, ToUTF8(eArqConfig)));
+            var importarConfig = GetMethod<BAL_ConfigImportar>();
+            var ret = ExecuteMethod(() => importarConfig(libHandle, ToUTF8(eArqConfig)));
 
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public override string ExportarConfig()
         {
             var bufferLen = BUFFER_LEN;
             var buffer = new StringBuilder(bufferLen);
 
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_ConfigExportar>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
+            var method = GetMethod<BAL_ConfigExportar>();
+            var ret = ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
 
             CheckResult(ret);
 
-            return CheckBuffer(buffer, bufferLen);
+            return ProcessResult(buffer, bufferLen);
         }
 
         #endregion Ini
 
-        /// <inheritdoc/>
         public void Ativar()
         {
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_Ativar>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle));
+            var method = GetMethod<BAL_Ativar>();
+            var ret = ExecuteMethod(() => method(libHandle));
 
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public void Desativar()
         {
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_Desativar>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle));
+            var method = GetMethod<BAL_Desativar>();
+            var ret = ExecuteMethod(() => method(libHandle));
 
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public decimal LePeso(int MillisecTimeOut = 1000)
         {
             var peso = 0D;
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_LePeso>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle, MillisecTimeOut, ref peso));
+            var method = GetMethod<BAL_LePeso>();
+            var ret = ExecuteMethod(() => method(libHandle, MillisecTimeOut, ref peso));
 
             CheckResult(ret);
 
             return (decimal)peso;
         }
 
-        /// <inheritdoc/>
         public void SolicitarPeso()
         {
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_SolicitarPeso>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle));
+            var method = GetMethod<BAL_SolicitarPeso>();
+            var ret = ExecuteMethod(() => method(libHandle));
 
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public decimal UltimoPesoLido()
         {
             var peso = 0D;
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_UltimoPesoLido>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle, ref peso));
+            var method = GetMethod<BAL_UltimoPesoLido>();
+            var ret = ExecuteMethod(() => method(libHandle, ref peso));
 
             CheckResult(ret);
 
             return (decimal)peso;
         }
 
-        /// <inheritdoc/>
         public decimal InterpretarRespostaPeso(string resposta)
         {
             var peso = 0D;
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_InterpretarRespostaPeso>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle, ToUTF8(resposta), ref peso));
+            var method = GetMethod<BAL_InterpretarRespostaPeso>();
+            var ret = ExecuteMethod(() => method(libHandle, ToUTF8(resposta), ref peso));
 
             CheckResult(ret);
 
@@ -160,123 +184,32 @@ namespace ACBrLib.BAL
 
         #region Private Methods
 
-        /// <inheritdoc/>
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_Finalizar>();
-            var ret =acbrBALBridge.ExecuteMethod(() => finalizarLib(libHandle));
+            var finalizar = GetMethod<BAL_Finalizar>();
+            var ret = ExecuteMethod(() => finalizar(libHandle));
             CheckResult(ret);
-            libHandle = IntPtr.Zero;
         }
 
-        /// <inheritdoc/>
         protected override string GetUltimoRetorno(int iniBufferLen = 0)
         {
             var bufferLen = iniBufferLen < 1 ? BUFFER_LEN : iniBufferLen;
             var buffer = new StringBuilder(bufferLen);
-            var ultimoRetorno = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_UltimoRetorno>();
+            var ultimoRetorno = GetMethod<BAL_UltimoRetorno>();
 
             if (iniBufferLen < 1)
             {
-               acbrBALBridge.ExecuteMethod(() => ultimoRetorno(libHandle, buffer, ref bufferLen));
+                ExecuteMethod(() => ultimoRetorno(libHandle, buffer, ref bufferLen));
                 if (bufferLen <= BUFFER_LEN) return FromUTF8(buffer);
 
                 buffer.Capacity = bufferLen;
             }
 
-           acbrBALBridge.ExecuteMethod(() => ultimoRetorno(libHandle, buffer, ref bufferLen));
+            ExecuteMethod(() => ultimoRetorno(libHandle, buffer, ref bufferLen));
             return FromUTF8(buffer);
         }
 
         #endregion Private Methods
-
-
-        /// <inheritdoc/>
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_OpenSSLInfo>();
-            var ret =acbrBALBridge.ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return CheckBuffer(buffer, bufferLen);
-        }
-
-        /// <inheritdoc/>
-        public override string ConfigLerValor(string eSessao, string eChave)
-        {
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_ConfigLerValor>();
-
-            var bufferLen = BUFFER_LEN;
-            var pValue = new StringBuilder(bufferLen);
-            var ret = acbrBALBridge.ExecuteMethod(() => method(libHandle, ToUTF8(eSessao), ToUTF8(eChave), pValue, ref bufferLen));
-            CheckResult(ret);
-
-            return CheckBuffer(pValue, bufferLen);
-        }
-
-        /// <inheritdoc/>
-        public override void ConfigGravarValor(string eSessao, string eChave, string eValor)
-        {
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_ConfigGravarValor>();
-            var ret = acbrBALBridge.ExecuteMethod(() => method(libHandle, ToUTF8(eSessao.ToString()), ToUTF8(eChave), ToUTF8(eValor)));
-            CheckResult(ret);
-        }
-
-        /// <inheritdoc/>
-        public override string Versao()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_Versao>();
-            var ret = acbrBALBridge.ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return CheckBuffer(buffer, bufferLen);
-        }
-
-        /// <inheritdoc/>
-        public override string Nome()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = acbrBALBridge.GetMethod<ACBrBALHandle.BAL_Nome>();
-            var ret = acbrBALBridge.ExecuteMethod(() => method(libHandle, buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return CheckBuffer(buffer, bufferLen);
-        }
-
-        /// <summary>
-        /// Libera os recursos utilizados pela instância da classe <see cref="ACBrBAL"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Libera os recursos gerenciados e não gerenciados utilizados pela instância.
-        /// </summary>
-        /// <param name="disposing">Indica se deve liberar recursos gerenciados.</param>
-        protected void Dispose(bool disposing)
-        {
-            if (disposed) return;
-            if (disposing)
-            {
-               Finalizar();
-            }
-            disposed = true;
-        }
-
 
         #endregion Methods
     }

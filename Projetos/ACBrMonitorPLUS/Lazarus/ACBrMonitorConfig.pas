@@ -312,7 +312,6 @@ type
     Logomarca          : String;
     LogoMarcaNFCeSAT   : String;
     LogoMarcaPrefeitura: String;
-    LogoNFSe           : String;
     Salvar             : Boolean;
     PathSalvar         : String;
     Impressora         : String;
@@ -1150,7 +1149,6 @@ begin
       Ini.WriteString( CSecGeral, CKeyLogomarca, Logomarca );
       Ini.WriteString( CSecGeral, CKeyLogoMarcaNFCeSAT, LogoMarcaNFCeSAT );
       Ini.WriteString( CSecGeral, CKeyLogoMarcaPrefeitura, LogoMarcaPrefeitura );
-      Ini.WriteString( CSecGeral, CKeyLogoNFSe, LogoNFSe);
       Ini.WriteBool( CSecGeral, CKeySalvar, Salvar );
       Ini.WriteString( CSecGeral, CKeyPathSalvar, PathSalvar );
       Ini.WriteString( CSecGeral, CKeyImpressora, Impressora );
@@ -1987,7 +1985,6 @@ begin
       Logomarca                 := Ini.ReadString( CSecGeral, CKeyLogomarca, Logomarca );
       LogoMarcaNFCeSAT          := Ini.ReadString( CSecGeral, CKeyLogoMarcaNFCeSAT, LogoMarcaNFCeSAT );
       LogoMarcaPrefeitura       := Ini.ReadString( CSecGeral, CKeyLogoMarcaPrefeitura, LogoMarcaPrefeitura );
-      LogoNFSe                  := Ini.ReadString( CSecGeral, CKeyLogoNFSe, LogoNFSe);
       Salvar                    := Ini.ReadBool( CSecGeral, ckeysalvar, Salvar );
       PathSalvar                := Ini.ReadString( CSecGeral, CKeyPathSalvar, PathSalvar );
       Impressora                := Ini.ReadString( CSecGeral, CKeyImpressora, Impressora );

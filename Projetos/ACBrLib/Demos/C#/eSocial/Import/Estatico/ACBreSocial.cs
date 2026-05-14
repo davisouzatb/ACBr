@@ -11,28 +11,18 @@ namespace ACBrLib.eSocial
 {
     /// <inheritdoc />
     public sealed partial class ACBreSocial : ACBrLibHandle
-            public override void Finalizar()
-            {
-                var finalizarLib = GetMethod<eSocial_Finalizar>();
-                var ret = ExecuteMethod(() => finalizarLib(libHandle));
-                CheckResult(ret);
-                libHandle = IntPtr.Zero;
-            }
     {
         #region Constructors
 
         public ACBreSocial(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBreSocial64.dll" : "libacbresocial64.so",
                                                                                       IsWindows ? "ACBreSocial32.dll" : "libacbresocial32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBreSocialConfig(this);
-        }
+            var inicializar = GetMethod<eSocial_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<eSocial_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBreSocialConfig(this);
         }
 
         #endregion Constructors
@@ -290,10 +280,10 @@ namespace ACBrLib.eSocial
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<eSocial_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<eSocial_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 

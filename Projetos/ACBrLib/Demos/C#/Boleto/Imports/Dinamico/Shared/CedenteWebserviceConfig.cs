@@ -3,11 +3,11 @@ using ACBrLib.Core.Config;
 
 namespace ACBrLib.Boleto
 {
-    public sealed class CedenteWebserviceConfig : ACBrLibConfigBase<IACBrLibBoleto>
+    public sealed class CedenteWebserviceConfig : ACBrLibConfigBase<ACBrBoleto>
     {
         #region Constructors
 
-        public CedenteWebserviceConfig(IACBrLibBoleto acbrlib) : base(acbrlib, ACBrSessao.BoletoCedenteWS)
+        public CedenteWebserviceConfig(ACBrBoleto acbrlib) : base(acbrlib, ACBrSessao.BoletoCedenteWS)
         {
         }
 

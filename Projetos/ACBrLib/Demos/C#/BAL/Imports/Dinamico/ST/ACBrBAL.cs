@@ -3,41 +3,25 @@ using ACBrLib.Core;
 
 namespace ACBrLib.BAL
 {
-    /// <summary>
-    /// Implementação da interface IACBrLibBAL para comunicação com balanças via ACBrLib (ST).
-    /// Responsável por encapsular as operações de configuração, ativação, leitura e interpretação de peso.
-    /// </summary>
-    public sealed partial class ACBrBAL : ACBrLibHandle, IACBrLibBAL
+    public sealed partial class ACBrBAL : ACBrLibHandle
     {
         #region Constructors
 
-        /// <summary>
-        /// Inicializa uma nova instância da classe <see cref="ACBrBAL"/> (ST).
-        /// </summary>
-        /// <param name="eArqConfig">Caminho do arquivo de configuração INI.</param>
-        /// <param name="eChaveCrypt">Chave de criptografia para o arquivo de configuração.</param>
         public ACBrBAL(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrBAL64.dll" : "libacbrbal64.so",
                                                                                IsWindows ? "ACBrBAL32.dll" : "libacbrbal32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new BALConfig(this);
-        }
+            var inicializar = GetMethod<BAL_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        /// <inheritdoc/>
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<BAL_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new BALConfig(this);
         }
 
         #endregion Constructors
 
         #region Properties
 
-        /// <summary>
-        /// Retorna o nome da biblioteca ACBrLibBAL carregada.
-        /// </summary>
         public string Nome
         {
             get
@@ -54,9 +38,6 @@ namespace ACBrLib.BAL
             }
         }
 
-        /// <summary>
-        /// Retorna a versão da biblioteca ACBrLibBAL carregada.
-        /// </summary>
         public string Versao
         {
             get
@@ -73,7 +54,6 @@ namespace ACBrLib.BAL
             }
         }
 
-        /// <inheritdoc/>
         public BALConfig Config { get; }
 
         #endregion Properties
@@ -82,7 +62,6 @@ namespace ACBrLib.BAL
 
         #region Ini
 
-        /// <inheritdoc/>
         public override void ConfigGravar(string eArqConfig = "")
         {
             var gravarIni = GetMethod<BAL_ConfigGravar>();
@@ -91,7 +70,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public override void ConfigLer(string eArqConfig = "")
         {
             var lerIni = GetMethod<BAL_ConfigLer>();
@@ -100,7 +78,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public override T ConfigLerValor<T>(ACBrSessao eSessao, string eChave)
         {
             var method = GetMethod<BAL_ConfigLerValor>();
@@ -114,7 +91,6 @@ namespace ACBrLib.BAL
             return ConvertValue<T>(value);
         }
 
-        /// <inheritdoc/>
         public override void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value)
         {
             if (value == null) return;
@@ -126,7 +102,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public override void ImportarConfig(string eArqConfig = "")
         {
             var importarConfig = GetMethod<BAL_ConfigImportar>();
@@ -135,7 +110,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public override string ExportarConfig()
         {
             var bufferLen = BUFFER_LEN;
@@ -151,7 +125,6 @@ namespace ACBrLib.BAL
 
         #endregion Ini
 
-        /// <inheritdoc/>
         public void Ativar()
         {
             var method = GetMethod<BAL_Ativar>();
@@ -160,7 +133,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public void Desativar()
         {
             var method = GetMethod<BAL_Desativar>();
@@ -169,7 +141,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public decimal LePeso(int MillisecTimeOut = 1000)
         {
             var peso = 0D;
@@ -181,7 +152,6 @@ namespace ACBrLib.BAL
             return (decimal)peso;
         }
 
-        /// <inheritdoc/>
         public void SolicitarPeso()
         {
             var method = GetMethod<BAL_SolicitarPeso>();
@@ -190,7 +160,6 @@ namespace ACBrLib.BAL
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         public decimal UltimoPesoLido()
         {
             var peso = 0D;
@@ -202,7 +171,6 @@ namespace ACBrLib.BAL
             return (decimal)peso;
         }
 
-        /// <inheritdoc/>
         public decimal InterpretarRespostaPeso(string resposta)
         {
             var peso = 0D;
@@ -216,15 +184,13 @@ namespace ACBrLib.BAL
 
         #region Private Methods
 
-        /// <inheritdoc/>
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<BAL_Finalizar>();
-            var ret = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<BAL_Finalizar>();
+            var ret = ExecuteMethod(() => finalizar());
             CheckResult(ret);
         }
 
-        /// <inheritdoc/>
         protected override string GetUltimoRetorno(int iniBufferLen = 0)
         {
             var bufferLen = iniBufferLen < 1 ? BUFFER_LEN : iniBufferLen;
@@ -244,21 +210,6 @@ namespace ACBrLib.BAL
         }
 
         #endregion Private Methods
-
-
-        /// <inheritdoc/>
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<BAL_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
 
         #endregion Methods
     }

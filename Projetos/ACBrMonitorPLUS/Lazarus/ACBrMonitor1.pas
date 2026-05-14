@@ -539,7 +539,6 @@ type
     edtEnderecoEmitenteNFSe: TEdit;
     edtExtratoAPISicoobClientID: TEdit;
     edtExtratoAPILogArquivo: TEdit;
-    edtLogoNFSe: TEdit;
     edtNumeroEmitenteNFSe: TEdit;
     edtBairroEmitenteNFSe: TEdit;
     edtComplementoEmitenteNFSe: TEdit;
@@ -915,7 +914,6 @@ type
     Label293: TLabel;
     Label294: TLabel;
     Label295: TLabel;
-    Label296: TLabel;
     lblExtratoAPIBBCertificado: TLabel;
     lblExtratoAPIInterCertificado: TLabel;
     lblExtratoAPIBBChavePrivada: TLabel;
@@ -1384,7 +1382,6 @@ type
     sbLogoMarca1: TSpeedButton;
     sbLogoMarcaNFCeSAT: TSpeedButton;
     sbLogoMarcaPrefeitura: TSpeedButton;
-    sbLogoNFSe: TSpeedButton;
     sbNomeDLL: TSpeedButton;
     sbNumeroSerieCert: TSpeedButton;
     sbPathArqTXT: TSpeedButton;
@@ -1844,7 +1841,6 @@ type
     procedure sbBALLogClick(Sender: TObject);
     procedure sbLogoMarcaClick(Sender: TObject);
     procedure sbLogoMarcaPrefeituraClick(Sender: TObject);
-    procedure sbLogoNFSeClick(Sender: TObject);
     procedure sbNomeDLLClick(Sender: TObject);
     procedure sbNumeroSerieCertClick(Sender: TObject);
     procedure sbPathArqTXTClick(Sender: TObject);
@@ -6103,7 +6099,6 @@ begin
       edtLogoMarca.Text                := LogoMarca;
       edtLogoMarcaNFCeSAT.Text         := LogoMarcaNFCeSAT;
       edtLogoMarcaPrefeitura.Text      := LogoMarcaPrefeitura;
-      edtLogoNFSe.Text                 := LogoNFSe;
     end;
 
     with WebService do
@@ -6431,9 +6426,8 @@ begin
     ACBrBPe1.DABPe.ExpandeLogoMarca  := cbxExpandirLogo.Checked;
     ACBrBPe1.DABPe.UsaSeparadorPathPDF := cbxUsarSeparadorPathPDF.Checked;
 
-    ACBrNFSeX1.DANFSe.TipoDANFSE        := tpGeral; //StrToTpImp(OK,IntToStr(rgTipoDanfe.ItemIndex+1));
+    ACBrNFSeX1.DANFSe.TipoDANFSE        := tpPadrao; //StrToTpImp(OK,IntToStr(rgTipoDanfe.ItemIndex+1));
     ACBrNFSeX1.DANFSe.Logo              := edtLogoMarcaPrefeitura.Text;
-    ACBrNFSeX1.DANFSe.LogoNFSe          := edtLogoNFSe.Text;
     ACBrNFSeX1.DANFSe.Sistema           := edSH_RazaoSocial.Text;
     ACBrNFSeX1.DANFSe.Site              := edtSiteEmpresa.Text;
     ACBrNFSeX1.DANFSe.Email             := edtEmailEmpresa.Text;
@@ -7474,7 +7468,6 @@ begin
         PathSalvar               := edtPathLogs.Text;
         Impressora               := cbxImpressora.Text;
         LogoMarcaPrefeitura      := edtLogoMarcaPrefeitura.Text;
-        LogoNFSe                 := edtLogoNFSe.Text;
       end;
 
       with WebService do
@@ -9274,19 +9267,6 @@ begin
   if OpenDialog1.Execute then
   begin
     edtLogoMarcaPrefeitura.Text := OpenDialog1.FileName;
-  end;
-end;
-
-procedure TFrmACBrMonitor.sbLogoNFSeClick(Sender: TObject);
-begin
-  OpenDialog1.Title := 'Selecione o Logo';
-  OpenDialog1.DefaultExt := '*.png';
-  OpenDialog1.Filter :=
-    'Arquivos PNG (*.png)|*.png|Arquivos JPG (*.jpg)|*.jpg|Arquivos BMP (*.bmp)|*.bmp|Todos os Arquivos (*.*)|*.*';
-  OpenDialog1.InitialDir := ExtractFileDir(application.ExeName);
-  if OpenDialog1.Execute then
-  begin
-    edtLogoNFSe.Text := OpenDialog1.FileName;
   end;
 end;
 
@@ -11751,7 +11731,6 @@ begin
   begin
     ACBrNFSeX1.DANFSE.Logo := edtLogoMarcaPrefeitura.Text;
     ACBrNFSeX1.DANFSE.Prefeitura := edtNomePrefeitura.Text;
-    ACBrNFSeX1.DANFSe.LogoNFSe := edtLogoNFSe.Text;
     ACBrNFSeX1.DANFSE.Email := edtEmailEmpresa.Text;
     ACBrNFSeX1.DANFSE.NumCopias := edtNumCopia.Value;
     ACBrNFSeX1.DANFSE.MargemInferior := fspeMargemInf.Value;

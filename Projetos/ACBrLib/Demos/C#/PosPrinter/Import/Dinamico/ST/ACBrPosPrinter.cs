@@ -9,23 +9,19 @@ using ACBrLib.Core.PosPrinter;
 namespace ACBrLib.PosPrinter
 {
     /// <inheritdoc />
-    public sealed partial class ACBrPosPrinter : ACBrLibHandle, IACBrLibPosPrinter
+    public sealed partial class ACBrPosPrinter : ACBrLibHandle
     {
         #region Constructors
 
         public ACBrPosPrinter(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrPosPrinter64.dll" : "libacbrposprinter64.so",
                                                                                       IsWindows ? "ACBrPosPrinter32.dll" : "libacbrposprinter32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new PosPrinterConfig(this);
-        }
-
-        public override void Inicializar(string eArqConfig, string eChaveCrypt)
-        {
             var inicializar = GetMethod<POS_Inicializar>();
             var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+
             CheckResult(ret);
 
+            Config = new PosPrinterConfig(this);
         }
 
         #endregion Constructors
@@ -165,7 +161,7 @@ namespace ACBrLib.PosPrinter
             CheckResult(ret);
         }
 
-        public void InicializarPos()
+        public void Inicializar()
         {
             var method = GetMethod<POS_InicializarPos>();
             var ret = ExecuteMethod(() => method());
@@ -331,19 +327,6 @@ namespace ACBrLib.PosPrinter
             return ProcessResult(buffer, bufferLen);
         }
 
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<POS_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
-
         #endregion Diversos
 
         #region Imprimir
@@ -435,10 +418,10 @@ namespace ACBrLib.PosPrinter
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<POS_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<POS_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 

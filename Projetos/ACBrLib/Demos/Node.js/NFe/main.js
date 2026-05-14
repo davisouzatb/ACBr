@@ -37,7 +37,6 @@ const dotenv = require('dotenv')
 //importa a classe ACBrLibNFeMT
 // a classe ACBrLibNFeMT é exportada como default 
 const ACBrLibNFeMT = require('@projetoacbr/acbrlib-nfe-node/dist/src').default;
-const { AmbienteEmissaoDFe } = require('@projetoacbr/acbrlib-dfe-node/dist/src/dfe-comum')
 
 
 // define os caminhos para a lib e o arquivo de exemplo
@@ -81,7 +80,6 @@ let pathExemploNotaXML = path.resolve(__dirname, 'data', 'notas', 'nota-nfe.xml'
 let eArqConfig = path.resolve(__dirname, 'data', 'config', 'acbrlib.ini');
 let eChaveCrypt = '';
 let acbrNFe = new ACBrLibNFeMT(pathACBrLibNFe, eArqConfig, eChaveCrypt);
-let ambienteEmissao = AmbienteEmissaoDFe.HOMOLOGACAO
 
 
 /**
@@ -117,7 +115,7 @@ function configuraSessaoNFe() {
   acbrNFe.configGravarValor("NFE", "PathSalvar", path.resolve(__dirname, 'data', 'notas'));
 
   //seta ambiente de homologação
-  acbrNFe.configGravarValor("NFE", "Ambiente", ambienteEmissao.toString())
+  acbrNFe.configGravarValor("NFE", "Ambiente", "1")
 
   //seta o modelo da NFe
   // O é NFe
@@ -214,7 +212,7 @@ try {
     //obsevação para typescript: ao declarar a variavel com using o dispose é chamado automaticamente
     // nesse caso o symbol.dispose() não é necessário
     // o Symbol.dispose]() chama o método finalizar internamente
-    //acbrNFe[Symbol.dispose]()
+   //acbrNFe[Symbol.dispose]()
     acbrNFe = null
   }
 

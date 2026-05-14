@@ -7,7 +7,7 @@ namespace ACBrLib.Boleto
     /// <summary>
     /// Configurações da Sessão [BoletoBancoConfig]
     /// </summary>
-    public sealed class BancoConfig : ACBrLibConfigBase<IACBrLibBoleto>
+    public sealed class BancoConfig : ACBrLibConfigBase<ACBrBoleto>
     {
         #region Constructors
 
@@ -15,7 +15,7 @@ namespace ACBrLib.Boleto
         /// Inicializa uma nova instancia da classe  <see cref="BancoConfig"/>.
         /// </summary>
         /// <param name="acbrboleto">Instancia do ACBrBoleto</param>
-        public BancoConfig(IACBrLibBoleto acbrboleto) : base(acbrboleto, ACBrSessao.BoletoBancoConfig)
+        public BancoConfig(ACBrBoleto acbrboleto) : base(acbrboleto, ACBrSessao.BoletoBancoConfig)
         {
         }
 

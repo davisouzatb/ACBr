@@ -60,9 +60,6 @@ namespace ACBrLib.NCM
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         public delegate int NCM_BuscarPorDescricao(string cDesc, int nTipo, StringBuilder buffer, ref int bufferSize);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int NCM_OpenSSLInfo(StringBuilder buffer, ref int bufferSize);
-
         protected override void InitializeMethods()
         {
             AddMethod<NCM_Inicializar>("NCM_Inicializar");
@@ -82,7 +79,6 @@ namespace ACBrLib.NCM
             AddMethod<NCM_ObterNCMs>("NCM_ObterNCMs");
             AddMethod<NCM_BuscarPorCodigo>("NCM_BuscarPorCodigo");
             AddMethod<NCM_BuscarPorDescricao>("NCM_BuscarPorDescricao");
-            AddMethod<NCM_OpenSSLInfo>("NCM_OpenSSLInfo");
 
         }
     }

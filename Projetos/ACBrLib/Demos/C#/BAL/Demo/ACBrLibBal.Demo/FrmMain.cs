@@ -16,7 +16,7 @@ namespace ACBrLibBal.Demo
     {
         #region Fields
 
-        private IACBrLibBAL bal;
+        private ACBrBAL bal;
 
         #endregion Fields
 

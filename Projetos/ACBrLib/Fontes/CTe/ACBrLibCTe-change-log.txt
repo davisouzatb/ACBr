@@ -42,11 +42,6 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
-20/02/2026
--- ACBrLibCTe, ACBrLibCTeConfig, ACBrLibCTeConsoleMT, ACBrLibCTeConsoleMTDemo, ACBrLibCTeDataModule, ACBrLibCTeTest, ACBrLibCTeTestCase --
-[+] ACBR-8588: Implementados projetos ConsoleMT e ConsoleMTDemo
-  Por: Renato Rubinho
-
 01/10/2025
 -- ACBrLibCTeBase.pas, ACBrLibCTeConfig.pas --
 [-] : Alteração da distribuição DFe de pcn para ACBrXMLDocuments.

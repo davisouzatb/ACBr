@@ -14,7 +14,7 @@ namespace ACBrLib.MDFe.Demo
     {
         #region Fields
 
-        private IACBrLibMDFe ACBrMDFe;
+        private ACBrMDFe ACBrMDFe;
 
         #endregion Fields
 

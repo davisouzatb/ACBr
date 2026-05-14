@@ -13,7 +13,7 @@ namespace ACBrLibConsultaCNPJ.Demo
     {
         #region Fields
 
-        private IACBrLibConsultaCNPJ ACBrCNPJ;
+        private ACBrConsultaCNPJ ACBrCNPJ;
 
         #endregion Fields
 
@@ -91,7 +91,23 @@ namespace ACBrLibConsultaCNPJ.Demo
             }
         }
 
-    
+        private void btnConsultarCaptcha_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                var captchaPath = Path.Combine(Application.StartupPath, "Captcha");
+                if (!Directory.Exists(captchaPath))
+                    Directory.CreateDirectory(captchaPath);
+
+                ACBrCNPJ.ConsultarCaptcha(captchaPath);
+
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, @"Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         #endregion Methods
 

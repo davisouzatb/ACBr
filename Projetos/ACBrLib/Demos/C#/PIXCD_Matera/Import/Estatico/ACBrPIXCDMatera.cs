@@ -132,7 +132,7 @@ namespace ACBrLib.PIXCD
         #endregion Ini
 
         #region Diversos
-        public override string OpenSSLInfo()
+        public string OpenSSLInfo()
         {
             var bufferLen = BUFFER_LEN;
             var buffer = new StringBuilder(bufferLen);
@@ -332,10 +332,10 @@ namespace ACBrLib.PIXCD
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<PIXCD_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<PIXCD_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 

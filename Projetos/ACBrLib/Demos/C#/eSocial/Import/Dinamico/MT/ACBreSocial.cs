@@ -18,15 +18,12 @@ namespace ACBrLib.eSocial
         public ACBreSocial(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBreSocial64.dll" : "libacbresocial64.so",
                                                                                       IsWindows ? "ACBreSocial32.dll" : "libacbresocial32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBreSocialConfig(this);
-        }
+            var inicializar = GetMethod<eSocial_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ref libHandle, ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<eSocial_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ref libHandle, ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBreSocialConfig(this);
         }
 
         #endregion Constructors
@@ -295,7 +292,7 @@ namespace ACBrLib.eSocial
             return certificados.Length == 0 ? new InfoCertificado[0] : certificados.Select(x => new InfoCertificado(x)).ToArray();
         }
 
-        public override string OpenSSLInfo()
+        public string OpenSSLInfo()
         {
             var bufferLen = BUFFER_LEN;
             var buffer = new StringBuilder(bufferLen);
@@ -312,12 +309,11 @@ namespace ACBrLib.eSocial
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<eSocial_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib(libHandle));
+            var finalizar = GetMethod<eSocial_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar(libHandle));
             CheckResult(codRet);
-            libHandle = IntPtr.Zero;
         }
 
         protected override string GetUltimoRetorno(int iniBufferLen = 0)

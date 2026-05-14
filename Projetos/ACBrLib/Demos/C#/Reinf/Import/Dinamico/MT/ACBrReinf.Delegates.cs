@@ -1,11 +1,13 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using ACBrLib.Core;
+using System.Threading.Tasks;
 
 namespace ACBrLib.Reinf
 {
-    internal sealed class ACBrReinfHandle : ACBrLibHandleBase
+    public sealed partial class ACBrReinf
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int Reinf_Inicializar(ref IntPtr handle, string eArqConfig, string eChaveCrypt);
@@ -108,18 +110,5 @@ namespace ACBrLib.Reinf
             AddMethod<Reinf_SetVersaoDF>("Reinf_SetVersaoDF");
             AddMethod<Reinf_ObterCertificados>("Reinf_ObterCertificados");
         }
-
-        protected override string GetLibraryName()
-        {
-            var arch = Environment.Is64BitProcess ? "64" : "32";
-            if (PlatformID.Unix == Environment.OSVersion.Platform)
-                return $"libacbreinf{arch}.so";
-
-            return $"ACBrReinf{arch}.dll";
-        }
-
-        private static readonly Lazy<ACBrReinfHandle> instance = new Lazy<ACBrReinfHandle>(() => new ACBrReinfHandle());
-
-        public static ACBrReinfHandle Instance => instance.Value;
     }
 }

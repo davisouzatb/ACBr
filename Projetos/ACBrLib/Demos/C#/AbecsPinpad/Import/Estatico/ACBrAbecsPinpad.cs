@@ -11,21 +11,17 @@ namespace ACBrLib.AbecsPinpad
 {
     /// <inheritdoc />
     public sealed partial class ACBrAbecsPinpad : ACBrLibHandle
-
     {
 
         public ACBrAbecsPinpad(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrAbecsPinpad64.dll" : "libacbrabecspinpad64.so",
                                                                                       IsWindows ? "ACBrAbecsPinpad32.dll" : "libacbrabecspinpad32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new AbecsPinpadConfig(this);
-        }
+            var inicializar = GetMethod<AbecsPinpad_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<AbecsPinpad_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new AbecsPinpadConfig(this);
         }
 
         public string Nome
@@ -316,10 +312,10 @@ namespace ACBrLib.AbecsPinpad
             CheckResult(ret);
         }
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<AbecsPinpad_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<AbecsPinpad_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 

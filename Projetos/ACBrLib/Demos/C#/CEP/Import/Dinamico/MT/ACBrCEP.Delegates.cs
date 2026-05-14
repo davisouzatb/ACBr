@@ -4,14 +4,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using ACBrLib.Core;
 
 namespace ACBrLib.CEP
 {
-    /// <summary>
-    /// Handle class for ACBr CEP library operations.
-    /// </summary>
-    internal sealed class ACBrCEPHandle : ACBrLibHandleBase
+    public sealed partial class ACBrCEP
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int CEP_Inicializar(ref IntPtr handle, string eArqConfig, string eChaveCrypt);
@@ -52,9 +48,6 @@ namespace ACBrLib.CEP
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int CEP_BuscarPorLogradouro(IntPtr handle, string eCidade, string eTipo_Logradouro, string eLogradouro, string eUF, string eBairro, StringBuilder buffer, ref int bufferSize);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int CEP_OpenSSLInfo(IntPtr handle, StringBuilder buffer, ref int bufferSize);
-
         protected override void InitializeMethods()
         {
             AddMethod<CEP_Inicializar>("CEP_Inicializar");
@@ -70,25 +63,6 @@ namespace ACBrLib.CEP
             AddMethod<CEP_ConfigGravarValor>("CEP_ConfigGravarValor");
             AddMethod<CEP_BuscarPorCEP>("CEP_BuscarPorCEP");
             AddMethod<CEP_BuscarPorLogradouro>("CEP_BuscarPorLogradouro");
-            AddMethod<CEP_OpenSSLInfo>("CEP_OpenSSLInfo");
         }
-
-        protected override string GetLibraryName()
-        {
-            var arch = Environment.Is64BitProcess ? "64" : "32";
-            if ( PlatformID.Unix == Environment.OSVersion.Platform )
-                return $"libacbrcep{arch}.so";
-            
-            
-            return $"ACBrCEP{arch}.dll";
-        }
-
-
-       //singleton dessa classe, para garantir que apenas uma instância do handle seja criada durante a execução do programa
-        private static readonly Lazy<ACBrCEPHandle> instance = new Lazy<ACBrCEPHandle>(() => new ACBrCEPHandle());
-            public static ACBrCEPHandle Instance => instance.Value;
-
-
-        
-    }   
+    }
 }

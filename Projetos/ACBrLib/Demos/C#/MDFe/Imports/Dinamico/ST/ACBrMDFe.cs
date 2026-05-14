@@ -10,22 +10,19 @@ using ACBrLib.Core.MDFe;
 
 namespace ACBrLib.MDFe
 {
-    public sealed partial class ACBrMDFe : ACBrLibHandle, IACBrLibMDFe
+    public sealed partial class ACBrMDFe : ACBrLibHandle
     {
         #region Constructors
 
         public ACBrMDFe(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrMDFe64.dll" : "libacbrmdfe64.so",
                                                                                 IsWindows ? "ACBrMDFe32.dll" : "libacbrmdfe32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new MDFeConfig(this);
-        }
+            var inicializar = GetMethod<MDFE_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<MDFE_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new MDFeConfig(this);
         }
 
         #endregion Constructors
@@ -303,7 +300,7 @@ namespace ACBrLib.MDFe
             return certificados.Length == 0 ? new InfoCertificado[0] : certificados.Select(x => new InfoCertificado(x)).ToArray();
         }
 
-        public override string OpenSSLInfo()
+        public string OpenSSLInfo()
         {
             var bufferLen = BUFFER_LEN;
             var buffer = new StringBuilder(bufferLen);
@@ -555,12 +552,11 @@ namespace ACBrLib.MDFe
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<MDFE_Finalizar>();
-            var ret = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<MDFE_Finalizar>();
+            var ret = ExecuteMethod(() => finalizar());
             CheckResult(ret);
-            libHandle = IntPtr.Zero;
         }
 
         protected override string GetUltimoRetorno(int iniBufferLen = 0)

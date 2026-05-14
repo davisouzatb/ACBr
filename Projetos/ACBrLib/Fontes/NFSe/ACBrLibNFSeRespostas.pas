@@ -40,8 +40,7 @@ interface
 uses
   SysUtils, Classes, contnrs, ACBrLibResposta, ACBrNFSeXNotasFiscais,
   ACBrNFSeX, ACBrNFSeXWebservicesResponse, ACBrNFSeXWebserviceBase,
-  ACBrDFe.Conversao,ACBrNFSeXConversao, ACBrNFSeXConfiguracoes,
-  ACBrBase, ACBrLibConfig;
+  ACBrNFSeXConversao, ACBrNFSeXConfiguracoes, ACBrBase, ACBrLibConfig;
 
 type
 
@@ -283,7 +282,6 @@ type
   private
     FMetodo: TMetodo;
     FInfConsultaNFSe: TInfConsultaNFSe;
-    FSituacao: string;
 
   public 
     constructor Create(const ATipo: TACBrLibRespostaTipo; const AFormato: TACBrLibCodificacao); reintroduce;
@@ -294,7 +292,6 @@ type
   published
     property Metodo: TMetodo read FMetodo write FMetodo;
     property InfConsultaNFSe: TInfConsultaNFSe read FInfConsultaNFSe write FInfConsultaNFSe;
-    property Situacao: string read FSituacao write FSituacao;
   end;
 
   { TConsultarLinkNFSeResposta }
@@ -436,8 +433,6 @@ type
       FToken: string;
       FDataExpiracao: TDateTime;
       FInfEvento: TInfEvento;
-      FSucessoCanc: boolean;
-      FDescSituacao: string;
 
     public
       constructor Create(const ATipo: TACBrLibRespostaTipo; const AFormato: TACBrLibCodificacao); reintroduce;
@@ -449,8 +444,6 @@ type
       property Token: string read FToken write FToken;
       property DataExpiracao: TDateTime read FDataExpiracao write FDataExpiracao;
       property InfEvento: TInfEvento read FInfEvento write FInfEvento;
-      property SucessoCanc: boolean read FSucessoCanc write FSucessoCanc;
-      property DescSituacao: string read FDescSituacao write FDescSituacao;
   end;
 
   { TConsultaEventoResposta }
@@ -550,7 +543,7 @@ type
 implementation
 
 uses
-  pcnAuxiliar, ACBrUtil, ACBrLibNFSeConsts, ACBrLibConsts;
+  pcnAuxiliar, pcnConversao, ACBrUtil, ACBrLibNFSeConsts, ACBrLibConsts;
 
 { TObterInformacoesProvedorResposta }
 
@@ -957,7 +950,6 @@ begin
 
   Metodo:= Response.Metodo;
   InfConsultaNFSe:= Response.InfConsultaNFSe;
-  Situacao:= Response.Situacao;
 end;
 
 { TConsultarLinkNFSeResposta }
@@ -1093,18 +1085,6 @@ begin
   Token:= Response.Token;
   DataExpiracao:= Response.DataExpiracao;
   InfEvento:= Response.InfEvento;
-  case Response.tpEvento of
-    teCancelamento:
-      begin
-        SucessoCanc:= Response.SucessoCanc;
-        DescSituacao:= Response.DescSituacao;
-      end;
-  else
-    begin
-      SucessoCanc:= False;
-      DescSituacao:= '';
-    end;
-  end;
 end;
 
 { TConsultaEventoResposta }

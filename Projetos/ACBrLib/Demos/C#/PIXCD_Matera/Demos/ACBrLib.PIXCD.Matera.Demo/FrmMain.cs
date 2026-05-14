@@ -16,7 +16,7 @@ namespace ACBrLibPIXCD.Demo
     {
         #region Fields
 
-        private IACBrLibPIXCDMatera ACBrPIXCD;
+        private ACBrPIXCD ACBrPIXCD;
 
         #endregion Fields
 

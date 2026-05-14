@@ -48,9 +48,6 @@ namespace ACBrLib.CEP
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int CEP_BuscarPorLogradouro(string eCidade, string eTipo_Logradouro, string eLogradouro, string eUF, string eBairro, StringBuilder buffer, ref int bufferSize);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int CEP_OpenSSLInfo(StringBuilder buffer, ref int bufferSize);
-
         protected override void InitializeMethods()
         {
             AddMethod<CEP_Inicializar>("CEP_Inicializar");
@@ -66,7 +63,6 @@ namespace ACBrLib.CEP
             AddMethod<CEP_ConfigGravarValor>("CEP_ConfigGravarValor");
             AddMethod<CEP_BuscarPorCEP>("CEP_BuscarPorCEP");
             AddMethod<CEP_BuscarPorLogradouro>("CEP_BuscarPorLogradouro");
-            AddMethod<CEP_OpenSSLInfo>("CEP_OpenSSLInfo");
         }
     }
 }

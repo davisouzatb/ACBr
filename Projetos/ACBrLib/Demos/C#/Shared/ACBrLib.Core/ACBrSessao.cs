@@ -1,9 +1,5 @@
 ﻿namespace ACBrLib.Core
 {
-    /// <summary>
-    /// Enumeração que representa as sessões de configuração da ACBrLib.
-    /// <para>Cada sessão corresponde a um grupo de configurações específicas, como Principal, Sistema, Proxy, etc.</para>
-    /// </summary>
     public enum ACBrSessao
     {
         Principal,

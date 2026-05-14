@@ -39,14 +39,7 @@ interface
 uses
   Classes, SysUtils, syncobjs,
   ACBrLibComum, ACBrLibConfig, ACBrLibDataModule,
-  ACBrCTe,
-{$IfNDef NOREPORT}
-  ACBrCTeDACTeRLClass,
-{$Else}
-  ACBrCTeDACTeFPDF,
-{$EndIf}
-  ACBrCTeDACTEClass,
-  ACBrMail;
+  ACBrCTe, ACBrCTeDACTeRLClass, ACBrMail;
 
 type
 
@@ -56,11 +49,8 @@ type
     ACBrCTe1: TACBrCTe;
     ACBrMail1: TACBrMail;
   private
-  {$IfNDef NOREPORT}
     DACTe: TACBrCTeDACTeRL;
-  {$Else}
-    DACTe: TACBrCTeDACTeFPDF;
-  {$EndIf}
+
   public
     procedure AplicarConfiguracoes; override;
     procedure ConfigurarImpressao(NomeImpressora: String = ''; GerarPDF: Boolean = False;
@@ -130,12 +120,7 @@ begin
 
   GravarLog('ConfigurarImpressao - Iniciado', logNormal);
 
-{$IfNDef NOREPORT}
   DACTe := TACBrCTeDACTeRL.Create(nil);
-{$Else}
-  DACTe := TACBrCTeDACTeFPDF.Create(nil);
-{$EndIf}
-
   ACBrCTe1.DACTE := DACTe;
 
   LibConfig.DACTe.Apply(DACTe, Lib);

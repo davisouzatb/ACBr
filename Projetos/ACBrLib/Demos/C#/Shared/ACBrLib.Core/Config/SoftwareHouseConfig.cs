@@ -1,6 +1,6 @@
 ﻿namespace ACBrLib.Core.Config
 {
-    public sealed class SoftwareHouseConfig<TLib> : ACBrLibConfigBase<TLib> where TLib : IACBrLibBase
+    public sealed class SoftwareHouseConfig<TLib> : ACBrLibConfigBase<TLib> where TLib : ACBrLibHandle
     {
         #region Constructors
 

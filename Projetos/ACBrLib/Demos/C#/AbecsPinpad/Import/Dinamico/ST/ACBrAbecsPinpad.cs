@@ -16,15 +16,12 @@ namespace ACBrLib.AbecsPinpad
         public ACBrAbecsPinpad(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrAbecsPinpad64.dll" : "libacbrabecspinpad64.so",
                                                                                       IsWindows ? "ACBrAbecsPinpad32.dll" : "libacbrabecspinpad32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new AbecsPinpadConfig(this);
-        }
+            var inicializar = GetMethod<AbecsPinpad_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<AbecsPinpad_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new AbecsPinpadConfig(this);
         }
 
         public string Nome
@@ -315,10 +312,10 @@ namespace ACBrLib.AbecsPinpad
             CheckResult(ret);
         }
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<AbecsPinpad_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<AbecsPinpad_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -338,19 +335,6 @@ namespace ACBrLib.AbecsPinpad
 
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
-        }
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<AbecsPinpad_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
         }
     }
 }

@@ -95,7 +95,6 @@ const
   CChaveDetalharServico = 'DetalharServico';
   CChaveProducao = 'Producao';
   CChaveDataCompetenciaCompleta = 'DataCompetenciaCompleta';
-  CChaveLogoNFSe = 'LogoNFSe';
 
   ErrValidacaoNFSe = -11;
   ErrChaveNFSe = -12;

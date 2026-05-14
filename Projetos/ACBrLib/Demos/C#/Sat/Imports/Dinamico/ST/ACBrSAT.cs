@@ -5,7 +5,6 @@ using ACBrLib.Core;
 
 namespace ACBrLib.Sat
 {
-    [Obsolete("Desde 01/01/2026, O SAT foi descontinuado pela SEFAZ, além de não atender a RTC (Reforma Tributária), utilize a classe ACBrNFe.")]
     public sealed partial class ACBrSat : ACBrLibHandle
     {
         #region Constructors
@@ -13,18 +12,15 @@ namespace ACBrLib.Sat
         public ACBrSat(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrSAT64.dll" : "libacbrsat64.so",
             IsWindows ? "ACBrSAT32.dll" : "libacbrsat32.so")
         {
-            Inicializar(eArqConfig,eChaveCrypt);
+            var inicializar = GetMethod<SAT_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+
+            CheckResult(ret);
+
             Config = new SatBaseConfig(this);
         }
 
         #endregion Constructors
-
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<SAT_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-            CheckResult(ret);
-        }
 
         #region Properties
 
@@ -511,10 +507,10 @@ namespace ACBrLib.Sat
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<SAT_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<SAT_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -537,19 +533,6 @@ namespace ACBrLib.Sat
         }
 
         #endregion Private Methods
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<SAT_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
 
         #endregion Methods
     }

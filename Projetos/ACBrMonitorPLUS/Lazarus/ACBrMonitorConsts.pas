@@ -985,7 +985,6 @@ const
   CKeyLogomarca =                    'Logomarca';
   CKeyLogoMarcaNFCeSAT =             'LogoMarcaNFCeSAT';
   CKeyLogoMarcaPrefeitura =          'LogoMarcaPrefeitura';
-  CKeyLogoNFSe =                     'LogoNFSe';
   CKeySalvar =                       'Salvar';
   CKeyPathSalvar =                   'PathSalvar';
   CKeyImpressora =                   'Impressora';

@@ -139,11 +139,6 @@ namespace ACBrLib.Sat
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int SAT_SetNumeroSessao(string cNumeroSessao);
 
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int SAT_OpenSSLInfo(StringBuilder buffer, ref int bufferSize);
-
-
         protected override void InitializeMethods()
         {
             AddMethod<SAT_Inicializar>("SAT_Inicializar");
@@ -188,8 +183,7 @@ namespace ACBrLib.Sat
             AddMethod<SAT_ImprimirExtratoCancelamento>("SAT_ImprimirExtratoCancelamento");
             AddMethod<SAT_EnviarEmail>("SAT_EnviarEmail");
             AddMethod<SAT_SalvarPDF>("SAT_SalvarPDF");
-            AddMethod<SAT_SetNumeroSessao>("SAT_SetNumeroSessao");
-            AddMethod<SAT_OpenSSLInfo>("SAT_OpenSSLInfo");
+            AddMethod<SAT_SetNumeroSessao>("SAT_SetNumeroSessao");           
         }
     }
 }

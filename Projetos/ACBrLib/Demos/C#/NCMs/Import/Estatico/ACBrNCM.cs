@@ -17,15 +17,12 @@ namespace ACBrLib.NCM
         public ACBrNCM(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrNCMs64.dll" : "libacbrncms64.so",
                                                                                       IsWindows ? "ACBrNCMs32.dll" : "libacbrncms32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBrNCMConfig(this);
-        }
+            var inicializar = GetMethod<NCM_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<NCM_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBrNCMConfig(this);
         }
 
         #endregion Constructors
@@ -219,10 +216,10 @@ namespace ACBrLib.NCM
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<NCM_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<NCM_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 

@@ -10,7 +10,7 @@ using ACBrLib.IBGE;
 namespace ACBrLib.IBGE
 {
     /// <inheritdoc />
-    public sealed partial class ACBrIBGE : ACBrLibHandle, IACBrLibIBGE
+    public sealed partial class ACBrIBGE : ACBrLibHandle
     {
 				
         #region Constructors
@@ -18,15 +18,12 @@ namespace ACBrLib.IBGE
         public ACBrIBGE(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrIBGE64.dll" : "libacbribge64.so",
                                                                                       IsWindows ? "ACBrIBGE32.dll" : "libacbribge32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBrIBGEConfig(this);
-        }
+            var inicializar = GetMethod<IBGE_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<IBGE_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBrCEPConfig(this);
         }
 
         #endregion Constructors
@@ -65,7 +62,7 @@ namespace ACBrLib.IBGE
             }
         }
 
-        public ACBrIBGEConfig Config { get; }
+        public ACBrCEPConfig Config { get; }
 
         #endregion Properties
 
@@ -168,10 +165,10 @@ namespace ACBrLib.IBGE
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<IBGE_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<IBGE_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -191,19 +188,6 @@ namespace ACBrLib.IBGE
 
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
-        }
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<IBGE_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
         }
 
         #endregion Private Methods

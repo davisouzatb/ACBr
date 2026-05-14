@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,7 +9,7 @@ using ACBrLib.Sedex;
 namespace ACBrLib.Sedex
 {
     /// <inheritdoc />
-    public sealed partial class ACBrSedex : ACBrLibHandle, IACBrLibSedex
+    public sealed partial class ACBrSedex : ACBrLibHandle
     {
 				
         #region Constructors
@@ -17,16 +17,12 @@ namespace ACBrLib.Sedex
         public ACBrSedex(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrSedex64.dll" : "libacbrsedex64.so",
                                                                                       IsWindows ? "ACBrSedex32.dll" : "libacbrsedex32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBrSedexConfig(this);
-        }
-
-        public override void Inicializar(string eArqConfig, string eChaveCrypt)
-        {
             var inicializar = GetMethod<Sedex_Inicializar>();
             var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+
             CheckResult(ret);
-            
+
+            Config = new ACBrSedexConfig(this);
         }
 
         #endregion Constructors
@@ -168,10 +164,10 @@ namespace ACBrLib.Sedex
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<Sedex_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<Sedex_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -193,27 +189,8 @@ namespace ACBrLib.Sedex
             return FromUTF8(buffer);
         }
 
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<Sedex_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
-
         #endregion Private Methods
 
         #endregion Metodos
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            // ACBrLibHandle (SafeHandle) gerencia o ciclo de vida; interface IDisposable satisfeita.
-        }
     }
 }

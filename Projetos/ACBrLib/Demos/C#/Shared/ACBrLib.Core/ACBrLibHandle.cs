@@ -10,11 +10,8 @@ using System.Text;
 
 namespace ACBrLib.Core
 {
-    /// <summary>
-    /// ACBrLibHandle é uma classe descontinuada e não deve ser utilizada para desenvolvimento de novas bibliotecas ACBrLib em C#. Ela é mantida apenas para compatibilidade com bibliotecas legadas.
-    /// Gradualmente, as bibliotecas ACBrLib em C# estão migrando para uma nova estrutura baseada em ACBrLibBase, que é mais simples e fácil de usar, sem a necessidade de lidar diretamente com ponteiros e buffers.
-    /// </summary>
-    public abstract partial class ACBrLibHandle : SafeHandle, IACBrLibBase
+    /// <inheritdoc />
+    public abstract partial class ACBrLibHandle : SafeHandle
     {
         #region Fields
 
@@ -126,7 +123,7 @@ namespace ACBrLib.Core
                                                     pNewSession = LibLoader.LoadLibrary(Path.Combine(libraryNuget, dllName));
 
                                                 if (pNewSession == IntPtr.Zero || pNewSession == MinusOne)
-                                                    pastaPackage = "";
+                                                    pastaPackage = ""; 
                                                 else
                                                     break;
                                             }
@@ -212,8 +209,6 @@ namespace ACBrLib.Core
 
         public abstract string ExportarConfig();
 
-        public abstract string OpenSSLInfo();
-
         protected async void Base64ToStream(string base64, Stream aStream)
         {
             var pdfBytes = Convert.FromBase64String(base64);
@@ -224,11 +219,12 @@ namespace ACBrLib.Core
         }
 
         /// <inheritdoc />
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         protected override bool ReleaseHandle()
         {
             if (IsInvalid) return true;
 
-            Finalizar();
+            FinalizeLib();
 
             var ret = LibLoader.FreeLibrary(handle);
 
@@ -242,11 +238,7 @@ namespace ACBrLib.Core
 
         protected abstract string GetUltimoRetorno(int iniBufferLen = 0);
 
-        public abstract void Finalizar();
-
-        public abstract void Inicializar(string eArqConfig = "", string eChaveCrypt = "");
-
-
+        protected abstract void FinalizeLib();
 
         protected virtual T ConvertValue<T>(string value)
         {
@@ -319,6 +311,8 @@ namespace ACBrLib.Core
         /// <param name="method"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        /// <exception cref="ApplicationException"></exception>
+        [HandleProcessCorruptedStateExceptions]
         protected virtual T ExecuteMethod<T>(Func<T> method)
         {
             try
@@ -362,7 +356,6 @@ namespace ACBrLib.Core
         }
 
         protected string ProcessResult(StringBuilder buffer, int bufferLen) => bufferLen > BUFFER_LEN ? GetUltimoRetorno(bufferLen) : FromUTF8(buffer);
-
 
         protected virtual void CheckResult(int ret)
         {

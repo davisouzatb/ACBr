@@ -10,22 +10,19 @@ using ACBrLib.ConsultaCNPJ;
 namespace ACBrLib.ConsultaCNPJ
 {
     /// <inheritdoc />
-    public sealed partial class ACBrConsultaCNPJ : ACBrLibHandle, IACBrLibConsultaCNPJ 
+    public sealed partial class ACBrConsultaCNPJ : ACBrLibHandle
     {
         #region Constructors
 
         public ACBrConsultaCNPJ(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrConsultaCNPJ64.dll" : "libacbrconsultacnpj64.so",
                                                                                       IsWindows ? "ACBrConsultaCNPJ32.dll" : "libacbrconsultacnpj32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new ACBrCNPJConfig(this);
-        }
+            var inicializar = GetMethod<CNPJ_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<CNPJ_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+
+            Config = new ACBrCNPJConfig(this);
         }
 
 
@@ -138,7 +135,20 @@ namespace ACBrLib.ConsultaCNPJ
         #endregion Ini
 
         #region Diversos
-        
+
+        public string ConsultarCaptcha(string ePathDownload)
+        {
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
+
+            var method = GetMethod<CNPJ_ConsultarCaptcha>();
+            var ret = ExecuteMethod(() => method(ToUTF8(ePathDownload), buffer, ref bufferLen));
+
+            CheckResult(ret);
+
+            return ProcessResult(buffer, bufferLen);
+        }
+
         public string Consultar(string eCNPJ)
         {
             var bufferLen = BUFFER_LEN;
@@ -157,10 +167,10 @@ namespace ACBrLib.ConsultaCNPJ
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<CNPJ_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<CNPJ_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -180,19 +190,6 @@ namespace ACBrLib.ConsultaCNPJ
 
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
-        }
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<CNPJ_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
         }
 
         #endregion Private Methods

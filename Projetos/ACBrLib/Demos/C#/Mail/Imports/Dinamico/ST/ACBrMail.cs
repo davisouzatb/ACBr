@@ -1,26 +1,21 @@
-using System.Text;
+﻿using System.Text;
 using ACBrLib.Core;
 using ACBrLib.Core.Mail;
 
 namespace ACBrLib.Mail
 {
-    /// <inheritdoc />
-    public sealed partial class ACBrMail : ACBrLibHandle, IACBrLibMail
+    public sealed partial class ACBrMail : ACBrLibHandle
     {
         #region Constructors
 
         public ACBrMail(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrMail64.dll" : "libacbrmail64.so",
                                                                                 IsWindows ? "ACBrMail32.dll" : "libacbrmail32.so")
         {
-            Inicializar(eArqConfig, eChaveCrypt);
-            Config = new MailConfig(this);
-        }
+            var inicializar = GetMethod<MAIL_Inicializar>();
+            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
 
-        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
-        {
-            var inicializarLib = GetMethod<MAIL_Inicializar>();
-            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
             CheckResult(ret);
+            Config = new MailConfig(this);
         }
 
         #endregion Constructors
@@ -228,10 +223,10 @@ namespace ACBrLib.Mail
 
         #region Private Methods
 
-        public override void Finalizar()
+        protected override void FinalizeLib()
         {
-            var finalizarLib = GetMethod<MAIL_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizarLib());
+            var finalizar = GetMethod<MAIL_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizar());
             CheckResult(codRet);
         }
 
@@ -252,20 +247,6 @@ namespace ACBrLib.Mail
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
         }
-
-        public override string OpenSSLInfo()
-        {
-            var bufferLen = BUFFER_LEN;
-            var buffer = new StringBuilder(bufferLen);
-
-            var method = GetMethod<MAIL_OpenSSLInfo>();
-            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
-
-            CheckResult(ret);
-
-            return ProcessResult(buffer, bufferLen);
-        }
-
 
         #endregion Private Methods
 

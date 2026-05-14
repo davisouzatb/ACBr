@@ -48,7 +48,9 @@ uses
   PadraoNacional.Provider,
   ACBrNFSeXWebserviceBase,
   ACBrNFSeXWebservicesResponse,
-  ACBrJson;
+  ACBrJson,
+  ACBrBase,
+  synacode;
 
 type
   TACBrNFSeXWebserviceModernizacaoPublica202 = class(TACBrNFSeXWebserviceSoap11)
@@ -83,7 +85,7 @@ type
 
   TACBrNFSeXWebserviceModernizacaoPublicaAPIPropria = class(TACBrNFSeXWebservicePadraoNacional)
   protected
-
+    procedure SetHeaders(aHeaderReq: THTTPHeader); override;
   public
 
     function TratarXmlRetornado(const aXML: string): string; override;
@@ -438,6 +440,8 @@ end;
 function TACBrNFSeProviderModernizacaoPublicaAPIPropria.PrepararArquivoEnvio(
   const aXml: string; aMetodo: TMetodo): string;
 begin
+  Result := aXml;
+
   if aMetodo in [tmGerar, tmEnviarEvento] then
   begin
     Result := ChangeLineBreak(aXml, '');
@@ -523,25 +527,27 @@ var
 
       if JSonLista.Count > 0 then
         LerListaErrosAlertas(JSonLista, Collection);
-    end;
-
-    if LJson.IsJSONObject(aNome) then
-    begin
-      JSon := LJson.AsJSONObject[aNome];
-
-      if JSon <> nil then
-        AdicionaCollectionItem(JSon, Collection);
     end
     else
     begin
-      Codigo := LJson.AsString[aNome];
-
-      if Codigo <> '' then
+      if LJson.IsJSONObject(aNome) then
       begin
-        AItem := Collection.New;
-        AItem.Codigo := Codigo;
-        AItem.Descricao := LJson.AsString['mensagem'];
-        AItem.Correcao := '';
+        JSon := LJson.AsJSONObject[aNome];
+
+        if JSon <> nil then
+          AdicionaCollectionItem(JSon, Collection);
+      end
+      else
+      begin
+        Codigo := LJson.AsString[aNome];
+
+        if Codigo <> '' then
+        begin
+          AItem := Collection.New;
+          AItem.Codigo := Codigo;
+          AItem.Descricao := LJson.AsString['mensagem'];
+          AItem.Correcao := '';
+        end;
       end;
     end;
   end;
@@ -560,19 +566,44 @@ end;
 
 { TACBrNFSeXWebserviceModernizacaoPublicaAPIPropria }
 
+procedure TACBrNFSeXWebserviceModernizacaoPublicaAPIPropria.SetHeaders(
+  aHeaderReq: THTTPHeader);
+var
+  Auth: string;
+begin
+  // Necessário para emitir em Produção
+  with TConfiguracoesNFSe(FPConfiguracoes).Geral.Emitente do
+    Auth := 'Basic ' + string(EncodeBase64(AnsiString(WSUser + ':' +
+      AnsiString(WSSenha))));
+
+  aHeaderReq.AddHeader('Authorization', Auth);
+end;
+
 function TACBrNFSeXWebserviceModernizacaoPublicaAPIPropria.TratarXmlRetornado(
   const aXML: string): string;
 var
   lJSON, lErroJSON: TACBrJSONObject;
   lJSONArray: TACBrJSONArray;
 begin
-//  Result := inherited TratarXmlRetornado(aXML);
-
   Result := AnsiToNativeString(aXML);
 
   if not StringIsPDF(Result) then
   begin
-//    Result := UTF8Decode(Result);
+    if StringIsJSON(Result) then
+    begin
+      if Pos('"sucesso":"false"', Result) > 0 then
+      begin
+        lJSON := TACBrJsonObject.Parse(Result);
+
+//        lJSON := TACBrJSONObject.Create;
+        try
+          Result := lJSON.AsString['mensagem'];
+        finally
+          FreeAndNil(lJSON);
+//          lJSON.Free;
+        end;
+      end;
+    end;
 
     if not StringIsJSON(Result) then
     begin

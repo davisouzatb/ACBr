@@ -95,7 +95,7 @@ begin
   NrOcorrCodigoPaisTomador := 0;
   NrOcorrCidadeNome := 0;
 
-  FormatoItemListaServico := filsSemFormatacao;
+  FormatoItemListaServico := filsNaoSeAplica;
   NrOcorrRespRetencao := -1;
   NrOcorrValorDeducoes := 1;
   NrOcorrDescIncond := 1;

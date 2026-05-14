@@ -153,6 +153,8 @@ type
     FNrOcorrInfAdicional: Integer;
     FNrOcorrCidadeNome: Integer;
 
+    FGerarAtividadeEventoAposConstrucaoCivil : Boolean;
+    FGerarAtividadeEventoAposIncentivoFiscal : Boolean;
   protected
     procedure Configuracao; override;
 
@@ -173,6 +175,9 @@ type
     function GerarIntermediarioServico: TACBrXmlNode; virtual;
     function GerarIdentificacaoIntermediarioServico: TACBrXmlNode; virtual;
     function GerarConstrucaoCivil: TACBrXmlNode; virtual;
+    function GeraAtividadeEvento: TACBrXmlNode; virtual;
+    function GerarEnderecoEvento: TACBrXmlNode; virtual;
+    function GerarEnderecoExteriorEvento: TACBrXmlNode; virtual;
     function GerarStatus: TACBrXmlNode; virtual;
     function GerarTipoRPS: TACBrXmlNode; virtual;
     function GerarListaServicos: TACBrXmlNode; virtual;
@@ -342,6 +347,9 @@ type
 
     property TagTomador: String read FTagTomador write FTagTomador;
     property TagIntermediario: String read FTagIntermediario write FTagIntermediario;
+
+    property GerarAtividadeEventoAposConstrucaoCivil: Boolean read FGerarAtividadeEventoAposConstrucaoCivil write FGerarAtividadeEventoAposConstrucaoCivil;
+    property GerarAtividadeEventoAposIncentivoFiscal: Boolean read FGerarAtividadeEventoAposIncentivoFiscal write FGerarAtividadeEventoAposIncentivoFiscal;
   end;
 
 implementation
@@ -478,6 +486,9 @@ begin
 
   FTagTomador := 'Tomador';
   FTagIntermediario := 'Intermediario';
+
+  FGerarAtividadeEventoAposConstrucaoCivil := False;
+  FGerarAtividadeEventoAposIncentivoFiscal := False;
 end;
 
 function TNFSeW_ABRASFv2.GerarXml: Boolean;
@@ -576,6 +587,9 @@ begin
   Result.AppendChild(GerarIntermediarioServico);
   Result.AppendChild(GerarConstrucaoCivil);
 
+  if GerarAtividadeEventoAposConstrucaoCivil then
+    Result.AppendChild(GeraAtividadeEvento);
+
   Result.AppendChild(AddNode(tcStr, '#6', 'RegimeEspecialTributacao', 1, 2, NrOcorrRegimeEspecialTributacao,
    FpAOwner.RegimeEspecialTributacaoToStr(NFSe.RegimeEspecialTributacao), DSC_REGISSQN));
 
@@ -587,6 +601,9 @@ begin
 
   Result.AppendChild(AddNode(tcStr, '#8', 'IncentivoFiscal', 1, 1, NrOcorrIncentCultural,
               FpAOwner.SimNaoToStr(NFSe.IncentivadorCultural), DSC_INDINCCULT));
+
+  if GerarAtividadeEventoAposIncentivoFiscal then
+    Result.AppendChild(GeraAtividadeEvento);
 
   Result.AppendChild(AddNode(tcStr, '#9', 'PercentualCargaTributaria', 1, 5, NrOcorrPercCargaTrib,
                                            NFSe.PercentualCargaTributaria, ''));
@@ -1584,4 +1601,19 @@ begin
   end;
 end;
 *)
+function TNFSeW_ABRASFv2.GeraAtividadeEvento: TACBrXmlNode;
+begin
+  Result := nil;
+end;
+
+function TNFSeW_ABRASFv2.GerarEnderecoEvento: TACBrXmlNode;
+begin
+  Result := nil;
+end;
+
+function TNFSeW_ABRASFv2.GerarEnderecoExteriorEvento: TACBrXmlNode;
+begin
+  Result := nil;
+end;
+
 end.

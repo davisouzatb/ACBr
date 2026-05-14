@@ -380,8 +380,25 @@ begin
           end;
         end;
 
-      proFacundo:  Result :=TACBrNFSeProviderFacundo.Create(ACBrNFSe);
-      proFGMaiss:  Result :=TACBrNFSeProviderFGMaiss.Create(ACBrNFSe);
+      proFacundo:
+        begin
+          case Versao of
+            ve100: Result := TACBrNFSeProviderFacundo.Create(ACBrNFSe);
+            ve101: Result := TACBrNFSeProviderFacundo101.Create(ACBrNFSe);
+            else
+              Result := nil;
+          end;
+        end;
+
+      proFGMaiss:
+        begin
+          case Versao of
+            ve100: Result := TACBrNFSeProviderFGMaiss.Create(ACBrNFSe);
+            ve101: Result := TACBrNFSeProviderFGMaiss101.Create(ACBrNFSe);
+            else
+              Result := nil;
+          end;
+        end;
 
       profintelISS:
         begin
@@ -593,7 +610,16 @@ begin
         Result := TACBrNFSeProviderPadraoNacional.Create(ACBrNFSe);
 
       proPrescon: Result := TACBrNFSeProviderPrescon.Create(ACBrNFSe);
-      proPriMax:  Result := TACBrNFSeProviderPriMax.Create(ACBrNFSe);
+      proPriMax:
+      begin
+        case Versao of
+          ve100: Result := TACBrNFSeProviderPriMax.Create(ACBrNFSe);
+          //Layout alterado para Reforma Tributária
+          ve101: Result := TACBrNFSeProviderPriMax101.Create(ACBrNFSe);
+          else
+            Result := nil;
+        end;
+      end;
       proProdata: Result := TACBrNFSeProviderProdata201.Create(ACBrNFSe);
       proPRODAUB: Result := TACBrNFSeProviderPRODAUB204.Create(ACBrNFSe);
 
@@ -631,7 +657,15 @@ begin
           end;
         end;
 
-      proSam:    Result := TACBrNFSeProviderSam.Create(ACBrNFSe);
+      proSam:
+      begin
+        case Versao of
+          ve100: Result := TACBrNFSeProviderSam.Create(ACBrNFSe);
+          ve101: Result := TACBrNFSeProviderSam101.Create(ACBrNFSe);
+          else
+            Result := nil;
+        end;
+      end;
 
       proSaatri:
         begin
@@ -794,8 +828,14 @@ begin
       proVirtual: Result := TACBrNFSeProviderVirtual202.Create(ACBrNFSe);
 
       proWebFisco:
-        Result := TACBrNFSeProviderWebFisco.Create(ACBrNFSe);
-
+      begin
+        case Versao of
+          ve100: Result := TACBrNFSeProviderWebFisco.Create(ACBrNFSe);
+          ve101: Result := TACBrNFSeProviderWebFisco101.Create(ACBrNFSe);
+          else
+            Result := nil;
+        end;
+      end;
       proWebISS:
         begin
           case Versao of

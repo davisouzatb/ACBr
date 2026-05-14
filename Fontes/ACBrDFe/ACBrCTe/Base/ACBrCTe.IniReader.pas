@@ -360,6 +360,7 @@ begin
   Ler_Emitente(AINIRec, FCTe.emit);
   Ler_Tomador(AINIRec, FCTe.toma);
   Ler_ValorPrestacao(AINIRec, FCTe.vPrest);
+  Ler_ValorPrestacaoComposicao(AINIRec, FCTe.vPrest.Comp);
   Ler_Imposto(AINIRec, FCTe.imp);
   Ler_PagamentosVinculados(AINIRec, FCTe.pgtoVinc.pgto);
 

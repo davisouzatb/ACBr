@@ -536,6 +536,7 @@ type
     FValorTotalNotaFiscal: Double;
     FPercentualADeduzir: Double;
     FValorADeduzir: Double;
+    FDeducaoPor: TDeducaoPor;
   public
     property TipoDeducao: TTipoDeducao read FTipoDeducao write FTipoDeducao;
     property CpfCnpj: string read FCpfCnpj write FCpfCnpj;
@@ -543,6 +544,7 @@ type
     property ValorTotalNotaFiscal: Double read FValorTotalNotaFiscal write FValorTotalNotaFiscal;
     property PercentualADeduzir: Double read FPercentualADeduzir write FPercentualADeduzir;
     property ValorADeduzir: Double read FValorADeduzir write FValorADeduzir;
+    property DeducaoPor: TDeducaoPor read FDeducaoPor write FDeducaoPor;
   end;
 
   TDadosProfissionalParceiro = class(TObject)
@@ -632,6 +634,30 @@ type
     FDadosProfissionalParceiro: TDadosProfissionalParceiro;
     FidCnae: string;
     FtotalAproxTribServ: Double;
+    FCodigoMunicipio: Integer;
+    FCodigoPais: Integer;
+    FCodigoTributacaoMunicipio: string;
+    FCodigoNBS: string;
+    FCodigoInterContr: string;
+    FxNBS: string;
+    FRetidoCSLL: TnfseSimNao;
+    FRetidoPIS: TnfseSimNao;
+    FRetidoCOFINS: TnfseSimNao;
+    FRetidoINSS: TnfseSimNao;
+    FRetidoIRRF: TnfseSimNao;
+    FAliqRetCPP: Double;
+    FValorBCCPP: Double;
+    FRetidoCPP: TnfseSimNao;
+    FValorCPP: Double;
+    FExigibilidadeISS: TnfseExigibilidadeISS;
+    FxMunicipioIncidencia: string;
+    FInfAdicional: string;
+    FNumeroProcesso: string;
+    FMunicipioIncidencia: Integer;
+    FResponsavelRetencao: TnfseResponsavelRetencao;
+    FCodigoServicoNacional: string;
+    FEndereco: TEndereco;
+    FCodigoTributacaoNacional: string;
     FValorRecebido: Double;
     FAliqDeducoes: Double;
     FxCodigoTributacaoMunicipio: string;
@@ -707,23 +733,33 @@ type
 
     property ValorBCCSLL: Double read FValorBCCSLL write FValorBCCSLL;
     property AliqRetCSLL: Double read FAliqRetCSLL write FAliqRetCSLL;
+    property RetidoCSLL: TnfseSimNao read FRetidoCSLL write FRetidoCSLL;
     property ValorCSLL: Double read FValorCSLL write FValorCSLL;
 
     property ValorBCPIS: Double read FValorBCPIS write FValorBCPIS;
     property AliqRetPIS: Double read FAliqRetPIS write FAliqRetPIS;
+    property RetidoPIS: TnfseSimNao read FRetidoPIS write FRetidoPIS;
     property ValorPIS: Double read FValorPIS write FValorPIS;
 
     property ValorBCCOFINS: Double read FValorBCCOFINS write FValorBCCOFINS;
     property AliqRetCOFINS: Double read FAliqRetCOFINS write FAliqRetCOFINS;
+    property RetidoCOFINS: TnfseSimNao read FRetidoCOFINS write FRetidoCOFINS;
     property ValorCOFINS: Double read FValorCOFINS write FValorCOFINS;
 
     property ValorBCINSS: Double read FValorBCINSS write FValorBCINSS;
     property AliqRetINSS: Double read FAliqRetINSS write FAliqRetINSS;
+    property RetidoINSS: TnfseSimNao read FRetidoINSS write FRetidoINSS;
     property ValorINSS: Double read FValorINSS write FValorINSS;
 
     property ValorBCRetIRRF: Double read FValorBCRetIRRF write FValorBCRetIRRF;
     property AliqRetIRRF: Double read FAliqRetIRRF write FAliqRetIRRF;
+    property RetidoIRRF: TnfseSimNao read FRetidoIRRF write FRetidoIRRF;
     property ValorIRRF: Double read FValorIRRF write FValorIRRF;
+
+    property ValorBCCPP: Double read FValorBCCPP write FValorBCCPP;
+    property AliqRetCPP: Double read FAliqRetCPP write FAliqRetCPP;
+    property RetidoCPP: TnfseSimNao read FRetidoCPP write FRetidoCPP;
+    property ValorCPP: Double read FValorCPP write FValorCPP;
 
     // Provedor EloTech
     property Tributavel: TnfseSimNao read FTributavel write FTributavel;
@@ -744,8 +780,28 @@ type
 
     // Provedor SoftPlan
     property idCnae: string read FidCnae write FidCnae;
+
     // Provedor Infisc
     property totalAproxTribServ: Double read FtotalAproxTribServ write FtotalAproxTribServ;
+
+    // Provedores que usam o layout da ABRASF
+    property CodigoMunicipio: Integer read FCodigoMunicipio write FCodigoMunicipio;
+    property CodigoPais: Integer read FCodigoPais write FCodigoPais;
+    property CodigoTributacaoMunicipio: string read FCodigoTributacaoMunicipio write FCodigoTributacaoMunicipio;
+    property CodigoNBS: string read FCodigoNBS write FCodigoNBS;
+    property xNBS: string read FxNBS write FxNBS;
+    property CodigoInterContr: string read FCodigoInterContr write FCodigoInterContr;
+    property ResponsavelRetencao: TnfseResponsavelRetencao read FResponsavelRetencao write FResponsavelRetencao;
+    property ExigibilidadeISS: TnfseExigibilidadeISS read FExigibilidadeISS write FExigibilidadeISS;
+    property MunicipioIncidencia: Integer read FMunicipioIncidencia write FMunicipioIncidencia;
+    property xMunicipioIncidencia: string read FxMunicipioIncidencia write FxMunicipioIncidencia;
+    property NumeroProcesso: string read FNumeroProcesso write FNumeroProcesso;
+    property InfAdicional: string read FInfAdicional write FInfAdicional;
+    property CodigoServicoNacional: string read FCodigoServicoNacional write FCodigoServicoNacional;
+
+    property Endereco: TEndereco read FEndereco write FEndereco;
+    // Provedor iiBrasil
+    property CodigoTributacaoNacional: string read FCodigoTributacaoNacional write FCodigoTributacaoNacional;
     // Provedor PadraoNacionl
     property ValorRecebido: Double read FValorRecebido write FValorRecebido;
 
@@ -1018,6 +1074,7 @@ type
     FxPed: String;
     FnItemPed: String;
     FCodigoAnexoCnae: string;
+    FCodigoTributacaoNacional: string;
 
     procedure SetItemServico(Value: TItemServicoCollection);
     procedure SetDeducao(const Value: TDeducaoCollection);
@@ -1111,6 +1168,9 @@ type
 
     // Provedor Conam
     property CodigoAnexoCnae: string read FCodigoAnexoCnae write FCodigoAnexoCnae;
+
+    // Provedor iiBrasil
+    property CodigoTributacaoNacional: string read FCodigoTributacaoNacional write FCodigoTributacaoNacional;
   end;
 
   TDadosPessoa = class(TObject)
@@ -2973,12 +3033,14 @@ begin
 
   FDadosDeducao := TDadosDeducao.Create;
   FDadosProfissionalParceiro := TDadosProfissionalParceiro.Create;
+  FEndereco := TEndereco.Create;
 end;
 
 destructor TItemServicoCollectionItem.Destroy;
 begin
   FDadosDeducao.Free;
   FDadosProfissionalParceiro.Free;
+  FEndereco.Free;
 
   inherited Destroy;
 end;

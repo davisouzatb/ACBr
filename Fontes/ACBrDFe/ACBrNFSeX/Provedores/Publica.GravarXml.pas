@@ -210,7 +210,7 @@ begin
         if Tamanho <> 11 then
         begin
           CNPJCPF := PadLeft(CNPJCPF, 11, '0');
-          Tamanho := 11;
+//          Tamanho := 11;
         end;
 
         TipoDestinatario := '1';
@@ -220,7 +220,7 @@ begin
         if (Tamanho > 0) and (Tamanho <> 14) then
         begin
           CNPJCPF := PadLeft(CNPJCPF, 14, '0');
-          Tamanho := 14;
+//          Tamanho := 14;
         end;
 
         TipoDestinatario := '2';
@@ -490,7 +490,7 @@ function TNFSeW_Publica.GerarServico: TACBrXmlNode;
 begin
   Result := inherited GerarServico;
 
-  Result.AppendChild(AddNode(tcInt, '#1', 'CodigoMunicipioLocalPestacao', 7, 7, 0,
+  Result.AppendChild(AddNode(tcInt, '#1', 'CodigoMunicipioLocalPrestacao', 7, 7, 0,
                                NFSe.Servico.CodigoMunicipioLocalPrestacao, ''));
 
   Result.AppendChild(AddNode(tcInt, '#1', 'CodigoPaisLocalPrestacao', 4, 4, 0,

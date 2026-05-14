@@ -837,17 +837,19 @@ end;
 function TACBrNFSeProviderCittaAPIPropria.PrepararArquivoEnvio(
   const aXml: string; aMetodo: TMetodo): string;
 begin
+  Result := aXml;
+
   if aMetodo in [tmGerar, tmEnviarEvento] then
   begin
     case aMetodo of
       tmGerar:
         begin
-          Result := '{"LoteXmlGZipB64":["' + Result + '"]}';
+          Result := '{"LoteXmlGZipB64":["' + aXml + '"]}';
         end;
 
       tmEnviarEvento:
         begin
-          Result := '{"LoteXmlGZipB64":["' + EncodeBase64(GZipCompress(Result)) + '"]}';
+          Result := '{"LoteXmlGZipB64":["' + EncodeBase64(GZipCompress(aXml)) + '"]}';
           Path := '/eventos';
         end;
     else

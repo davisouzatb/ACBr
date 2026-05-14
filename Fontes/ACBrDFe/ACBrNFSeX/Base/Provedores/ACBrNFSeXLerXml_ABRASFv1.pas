@@ -77,6 +77,10 @@ type
 
     procedure LerOrgaoGerador(const ANode: TACBrXmlNode);
     procedure LerConstrucaoCivil(const ANode: TACBrXmlNode); virtual;
+    procedure LerAtividadeEvento(const ANode: TACBrXmlNode); virtual;
+    procedure LerCondicaoPagamento(const ANode: TACBrXmlNode); virtual;
+    procedure LerDestinatario(const ANode: TACBrXmlNode); virtual;
+    procedure LerImovel(const ANode: TACBrXmlNode); virtual;
 
     procedure LerNfseCancelamento(const ANode: TACBrXmlNode);
     procedure LerConfirmacao(const ANode: TACBrXmlNode);
@@ -227,6 +231,26 @@ begin
       Art        := ObterConteudo(AuxNode.Childrens.FindAnyNs('Art'), tcStr);
     end;
   end;
+end;
+
+procedure TNFSeR_ABRASFv1.LerAtividadeEvento(const ANode: TACBrXmlNode);
+begin
+  // Implementar na classe filha, caso necessário
+end;
+
+procedure TNFSeR_ABRASFv1.LerCondicaoPagamento(const ANode: TACBrXmlNode);
+begin 
+  // Implementar na classe filha, caso necessário
+end;
+
+procedure TNFSeR_ABRASFv1.LerDestinatario(const ANode: TACBrXmlNode);
+begin
+  // Implementar na classe filha, caso necessário
+end;
+
+procedure TNFSeR_ABRASFv1.LerImovel(const ANode: TACBrXmlNode);
+begin
+  // Implementar na classe filha, caso necessário
 end;
 
 procedure TNFSeR_ABRASFv1.LerContatoPrestador(const ANode: TACBrXmlNode);
@@ -491,6 +515,8 @@ begin
   if not Assigned(ANode) then Exit;
 
   AuxNode := ANode.Childrens.FindAnyNs('InfNfse');
+  if AuxNode = nil then
+    AuxNode := ANode.Childrens.FindAnyNs('IdentificacaoNfse');
 
   if AuxNode <> nil then
   begin
@@ -530,6 +556,30 @@ begin
     LerIntermediarioServico(AuxNode);
     LerOrgaoGerador(AuxNode);
     LerConstrucaoCivil(AuxNode);
+  end;
+
+  if NFSe.Prestador.IdentificacaoPrestador.CpfCnpj = '' then
+  begin
+    NFSe.DataEmissaoRps := LerDataEmissaoRps(ANode);
+    NFSe.NaturezaOperacao := StrToNaturezaOperacao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('NaturezaOperacao'), tcStr));
+    NFSe.RegimeEspecialTributacao := FpAOwner.StrToRegimeEspecialTributacao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('RegimeEspecialTributacao'), tcStr));
+    NFSe.OptanteSimplesNacional := FpAOwner.StrToSimNao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('OptanteSimplesNacional'), tcStr));
+    NFSe.IncentivadorCultural := FpAOwner.StrToSimNao(Ok, ObterConteudo(ANode.Childrens.FindAnyNs('IncentivadorCultural'), tcStr));
+    NFSe.Competencia := LerCompetencia(ANode);
+    NFSe.NfseSubstituida := ObterConteudo(ANode.Childrens.FindAnyNs('NfseSubstituida'), tcStr);
+    NFSe.OutrasInformacoes := ObterConteudo(ANode.Childrens.FindAnyNs('OutrasInformacoes'), tcStr);
+    NFSe.OutrasInformacoes := StringReplace(NFSe.OutrasInformacoes, FpQuebradeLinha,
+                                                    sLineBreak, [rfReplaceAll]);
+
+    LerServico(ANode);
+
+    NFSe.ValorCredito := ObterConteudo(ANode.Childrens.FindAnyNs('ValorCredito'), tcDe2);
+
+    LerPrestadorServico(ANode);
+    LerTomadorServico(ANode);
+    LerIntermediarioServico(ANode);
+    LerOrgaoGerador(ANode);
+    LerConstrucaoCivil(ANode);
   end;
 end;
 
@@ -966,6 +1016,10 @@ begin
     LerTomadorServico(AuxNode);
     LerIntermediarioServico(AuxNode);
     LerConstrucaoCivil(AuxNode);
+    LerAtividadeEvento(AuxNode);
+    LerCondicaoPagamento(AuxNode);
+    LerDestinatario(AuxNode);
+    LerImovel(AuxNode);
   end;
 end;
 

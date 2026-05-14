@@ -971,12 +971,14 @@ begin
   sSecao := 'Servico';
   if AINIRec.SectionExists(sSecao) then
   begin
+    NFSe.Servico.ItemListaServico := AINIRec.ReadString(sSecao, 'ItemListaServico', '');
     NFSe.Servico.CodigoCnae := AINIRec.ReadString(sSecao, 'CodigoCnae', '');
     NFSe.Servico.CodigoTributacaoMunicipio := AINIRec.ReadString(sSecao, 'CodigoTributacaoMunicipio', '');
     NFSe.Servico.ExigibilidadeISS := FpAOwner.StrToExigibilidadeISS(Ok, AINIRec.ReadString(sSecao, 'ExigibilidadeISS', '1'));
     NFSe.Servico.MunicipioIncidencia := AINIRec.ReadInteger(sSecao, 'MunicipioIncidencia', 0);
     NFSe.Servico.NumeroProcesso := AINIRec.ReadString(sSecao, 'NumeroProcesso', '');
     NFSe.Servico.ResponsavelRetencao := FpAOwner.StrToResponsavelRetencao(Ok, AINIRec.ReadString(sSecao, 'ResponsavelRetencao', ''));
+    NFSe.Servico.CodigoNBS := AINIRec.ReadString(sSecao, 'CodigoNBS', '');
 
     if NFSe.tpXML = txmlNFSe then
     begin
@@ -1027,6 +1029,7 @@ begin
 
     Item := NFSe.Servico.ItemServico.New;
 
+    Item.ItemListaServico := AINIRec.ReadString(sSecao, 'ItemListaServico', '');
     Item.CodServ := AINIRec.ReadString(sSecao, 'CodServico', '');
     Item.Descricao := StringReplace(sFim, FpAOwner.ConfigGeral.QuebradeLinha, sLineBreak, [rfReplaceAll]);
     Item.CodigoCnae := AINIRec.ReadString(sSecao, 'CodigoCnae', '');

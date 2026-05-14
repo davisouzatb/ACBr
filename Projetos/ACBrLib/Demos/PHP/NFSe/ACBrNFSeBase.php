@@ -264,6 +264,22 @@
                                 <option value="8">teOffLine</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="versaoDF">Versão Documento Fiscal - Situação Especial, somente para provedor com mais de uma versão ativa</label>
+                            <select id="versaoDF" name="versaoDF">
+                                <option value="" selected>Padrão - Não se aplica</option>
+                                <option value="1.00">1.00</option>option>
+                                <option value="1.01">1.01</option>option>
+                                <option value="1.02">1.02</option>option>
+                                <option value="1.03">1.03</option>option>
+                                <option value="2.00">2.00</option>option>
+                                <option value="2.01">2.01</option>option>
+                                <option value="2.02">2.02</option>option>
+                                <option value="2.03">2.03</option>option>
+                                <option value="2.04">2.04</option>option>
+                                <option value="3.02">3.02</option>option>
+                            </select>
+                        </div>
                         <div class="grid2Col">
                             <label for="retirarAcentos">Retirar Acentos dos XMLs enviados</label>
                             <input type="checkbox" id="retirarAcentos">
@@ -303,6 +319,7 @@
                             <select id="LayoutNFSe">
                                 <option value="0" selected>lnfsProvedor</option>
                                 <option value="1">lnfsPadraoNacionalv1</option>
+                                <option value="2">lnfsPadraoNacionalv101</option>
                             </select>
                         </div>
                     </div>
@@ -1448,6 +1465,8 @@
             var modo = "<?php echo $modo; ?>";
             if (modo == "")
                 modo = "MT";
+
+            infoData.VersaoDF = $('#versaoDF').val();
 
             $.ajax({
                 url: modo + '/ACBrNFSeServicos' + modo + '.php',

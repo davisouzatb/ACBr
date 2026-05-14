@@ -678,6 +678,13 @@ namespace ACBrLib.NFSe
             return ProcessResult(buffer, bufferLen);
         }
 
+        public void SetVersaoDF(string aVersao)
+        {
+            var method = acbrNFseBridge.GetMethod<ACBrNFSeHandle.NFSE_SetVersaoDF>();
+            var ret = acbrNFseBridge.ExecuteMethod(() => method(libHandle, aVersao));
+            CheckResult(ret);
+        }
+
         #endregion Diversos
 
         #region Private Methods

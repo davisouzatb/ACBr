@@ -120,7 +120,7 @@ type
                   teAceiteDebitoApuracaoNotaCredito, teImobilizacaoItem,
                   teSolicApropCredCombustivel, teSolicApropCredBensServicos,
                   teManifPedTransfCredIBSSucessao, teManifPedTransfCredCBSSucessao,
-                  teAtualizacaoDataPrevisaoEntrega);
+                  teAtualizacaoDataPrevisaoEntrega, teVinculoPgto, teCancVinculoPgto);
 
 const
   TACBrTipoEventoArrayStrings: array[TACBrTipoEvento] of string = ('-99999', '110110',
@@ -137,7 +137,7 @@ const
     '110190', '110191', '110192', '110193', '110750', '110751', '510630',
     '110001', '112110', '112120', '112130', '112140', '211110', '211120',
     '211124', '211128', '211130', '211140', '211150', '212110', '212120',
-    '112150');
+    '112150', '110300', '110301');
 
   TACBrTipoEventoDescricaoArrayStrings: array[TACBrTipoEvento] of string = ('NaoMapeado',
     'CCe', 'Cancelamento', 'ManifDestConfirmacao', 'ManifDestCiencia',
@@ -171,7 +171,7 @@ const
     'AceiteDebitoApuracaoNotaCredito', 'ImobilizacaoItem',
     'SolicApropCredCombustivel', 'SolicApropCredBensServicos',
     'ManifPedTransfCredIBSSucessao', 'ManifPedTransfCredCBSSucessao',
-    'AtualizacaoDataPrevisaoEntrega');
+    'AtualizacaoDataPrevisaoEntrega', 'VinculoPagamento', 'CancVinculoPgto');
 
 type
   TStrToTpEvento = function (out ok: boolean; const s: string): TACBrTipoEvento;
@@ -252,18 +252,18 @@ type
   TCSTIcms = (cstVazio, cst00, cst10, cst20, cst30, cst40, cst41, cst45, cst50,
     cst51, cst60, cst70, cst80, cst81, cst90, cstICMSOutraUF, cstICMSSN,
     cstPart10, cstPart90, cstRep41, cstRep60, cst02, cst15, cst53, cst61, cst01,
-    cst12, cst13, cst14, cst21, cst72, cst73, cst74); //80 e 81 apenas para CTe
+    cst12, cst13, cst14, cst21, cst72, cst73, cst74, cstPart20); //80 e 81 apenas para CTe
 
 const
   TCSTIcmsArrayStringsEnt: array[TCSTIcms] of string = ('', '00', '10', '20', '30',
     '40', '41', '45', '50', '51', '60', '70', '80', '81', '90', '91', 'SN',
     '10part', '90part', '41rep', '60rep', '02', '15', '53', '61', '01', '12',
-    '13', '14', '21', '72', '73', '74');
+    '13', '14', '21', '72', '73', '74', '20part');
 
   TCSTIcmsArrayStringsSai: array[TCSTIcms] of string = ('', '00', '10', '20', '30',
     '40', '41', '45', '50', '51', '60', '70', '80', '81', '90', '90', 'SN',
     '10', '90', '41', '60', '02', '15', '53', '61', '01', '12', '13', '14', '21',
-    '72', '73', '74');
+    '72', '73', '74', '20');
 
   TCSTIcmsDescricaoArrayStrings: array[TCSTIcms] of string = ('VAZIO',
     '00 - TRIBUTAÇÃO NORMAL DO ICMS',
@@ -297,7 +297,8 @@ const
     '21',
     '72',
     '73',
-    '74');
+    '74',
+    '20');
 
 type
   // NFe e SAT
@@ -551,16 +552,18 @@ const
   // Reforma Tributária
 type
   TtpEnteGov = (tcgNenhum, tcgUniao, tcgEstados, tcgDistritoFederal,
-                tcgMunicipios);
+                tcgMunicipios, tcConsorcioPublico, tcComiteGestorIBS);
 
 const
-  TtpEnteGovArrayStrings: array[TtpEnteGov] of string = ('', '1', '2', '3', '4');
+  TtpEnteGovArrayStrings: array[TtpEnteGov] of string = ('', '1', '2', '3', '4',
+    '5', '6');
 
 type
-  TtpOperGov = (togNenhum, togFornecimento, togRecebimentoPag);
+  TtpOperGov = (togNenhum, togFornecimento, togRecebimentoPag,
+                togFornecimentoPagRealizado, togRecebimentoPagFornecPosterior);
 
 const
-  TtpOperGovArrayStrings: array[TtpOperGov] of string = ('', '1', '2');
+  TtpOperGovArrayStrings: array[TtpOperGov] of string = ('', '1', '2', '3', '4');
 
 type
   TCSTIBSCBS = (cstNenhum,
@@ -1191,10 +1194,10 @@ function CSTICMSToStrTagPos(const t: TCSTIcms): string;
 begin
   Result := EnumeradoToStr(t, ['02', '03', '04', '05', '06', '06', '06', '07',
                      '08', '09', '10', '11', '12', '10a', '10a', '10b', '10b',
-                     '13', '14', '15', '16'],
+                     '13', '14', '15', '16', '10a'],
     [cst00, cst10, cst20, cst30, cst40, cst41, cst50, cst51, cst60, cst70,
      cst80, cst81, cst90, cstPart10 , cstPart90 , cstRep41, cstRep60,
-     cst02, cst15, cst53, cst61]);
+     cst02, cst15, cst53, cst61, cstPart20]);
 end;
 
 function CSTICMSToStrTagPosText(const t: TCSTIcms): string;

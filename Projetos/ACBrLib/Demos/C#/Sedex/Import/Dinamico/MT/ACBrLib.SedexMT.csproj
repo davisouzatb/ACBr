@@ -15,10 +15,11 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <Version>1.0.2.0</Version>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <FileVersion>1.0.8.0</FileVersion>
+    <Version>1.0.8.0</Version>
     <Platforms>AnyCPU;x86;x64</Platforms>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
@@ -90,7 +91,24 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Shared\ACBrLib.Core\ACBrLib.Core.csproj" />
+    <Compile Remove="ACBrSedex.Delegates.cs" />
+    <Compile Remove="ACBrSedexConfig.cs" />
+    <Compile Include="..\Shared\IACBrLibSedex.cs" Link="IACBrLibSedex.cs" />
+    <Compile Include="..\Shared\ACBrSedexConfig.cs" Link="ACBrSedexConfig.cs" />
   </ItemGroup>
+
+   <Choose>
+    <When Condition=" '$(IsPacking)' == 'true' ">
+
+      <ItemGroup>
+        <PackageReference Include="ACBrLib.Core" Version="[1.2.48,)" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Shared\ACBrLib.Core\ACBrLib.Core.csproj" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   
 </Project>

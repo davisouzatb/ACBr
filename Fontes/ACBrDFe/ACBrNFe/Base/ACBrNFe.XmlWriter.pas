@@ -1882,9 +1882,9 @@ begin
   Result.AppendChild(AddNode(tcDe2, 'M02', 'vTotTrib', 01, 15, 0,
     NFe.Det[i].Imposto.vTotTrib, DSC_VTOTTRIB));
 
-  if (not (nfe.Ide.finNFe in [fnCredito, fnDebito])) or (nfe.ide.tpNFCredito = tcRetorno) then
+  if (((not (nfe.Ide.finNFe in [fnCredito, fnDebito])) or (nfe.ide.tpNFCredito = tcRetorno)) and
+   (nfe.Ide.gCompraGov.tpOperGov <> togRecebimentoPag)) then
   begin
-
     if ((NFe.Det[i].Imposto.ISSQN.cSitTrib <> ISSQNcSitTribVazio) or
       ((NFe.infNFe.Versao > 3) and (NFe.Det[i].Imposto.ISSQN.cListServ <> ''))) then
     begin
@@ -2192,9 +2192,24 @@ begin
                   motDesICMSToStr(nfe.Det[i].Imposto.ICMS.motDesICMSST), DSC_MOTDESICMSST));
               end;
             end;
+
+            if (NFe.infNFe.Versao >= 4) and
+              (NFe.Det[i].Imposto.ICMS.vICMSDeson > 0) and
+              (NFe.Det[i].Imposto.ICMS.CST = cstPart10) then
+            begin
+              xmlNode.AppendChild(AddNode(tcDe2, 'N27a', 'vICMSDeson',
+                01, 15, 1, NFe.Det[i].Imposto.ICMS.vICMSDeson, DSC_VICMSDESON));
+              xmlNode.AppendChild(AddNode(tcStr, 'N28', 'motDesICMS',
+                01, 02, 1, motDesICMSToStr(NFe.Det[i].Imposto.ICMS.motDesICMS),
+                DSC_MOTDESICMS));
+
+              xmlNode.AppendChild(AddNode(tcStr, 'N28b', 'indDeduzDeson', 1, 1, 0,
+                     TIndicadorExToStr(NFe.Det[i].Imposto.ICMS.indDeduzDeson)));
+            end;
           end;
 
-          cst20:
+          cst20,
+          cstPart20:
           begin
             xmlNode.AppendChild(AddNode(tcStr, 'N13', 'modBC',
               01, 01, 1, modBCToStr(NFe.Det[i].Imposto.ICMS.modBC), DSC_MODBC));
@@ -2208,6 +2223,7 @@ begin
               NFe.Det[i].Imposto.ICMS.pICMS, DSC_PICMS));
             xmlNode.AppendChild(AddNode(tcDe2, 'N17', 'vICMS',
               01, 15, 1, NFe.Det[i].Imposto.ICMS.vICMS, DSC_VICMS));
+
             if (NFe.infNFe.Versao >= 4) then
             begin
               if (NFe.Det[i].Imposto.ICMS.vBCFCP > 0) or
@@ -2223,7 +2239,14 @@ begin
                   01, 15, 1, NFe.Det[i].Imposto.ICMS.vFCP, DSC_VFCP));
               end;
             end;
-            if (NFe.infNFe.Versao >= 3.10) and
+
+            if ((
+                (NFe.infNFe.Versao >= 3.1) and
+                (NFe.Det[i].Imposto.ICMS.CST = cst20)
+              ) or (
+                (NFe.infNFe.Versao >= 4) and
+                (NFe.Det[i].Imposto.ICMS.CST = cstPart20)
+              )) and
               (NFe.Det[i].Imposto.ICMS.vICMSDeson > 0) then
             begin
               xmlNode.AppendChild(AddNode(tcDe2, 'N27a', 'vICMSDeson',
@@ -2235,8 +2258,8 @@ begin
               if (NFe.infNFe.Versao >= 4) then
                 xmlNode.AppendChild(AddNode(tcStr, 'N28b', 'indDeduzDeson', 1, 1, 0, TIndicadorExToStr(NFe.Det[i].Imposto.ICMS.indDeduzDeson)));
             end;
-
           end;
+
           cst30:
           begin
             xmlNode.AppendChild(AddNode(tcStr, 'N18', 'modBCST',
@@ -2543,9 +2566,32 @@ begin
               xmlNode.AppendChild(AddNode(FormatoValor4ou2,
                 'N14', 'pRedBC', 01, IfThen(FpUsar_tcDe4, 07, 05), 0,
                 NFe.Det[i].Imposto.ICMS.pRedBC, DSC_PREDBC));
+
+              xmlNode.AppendChild(AddNode(tcStr, 'N14a', 'cBenefRBC',
+                08, 10, 0, NFe.Det[i].Imposto.ICMS.cBenefRBC, DSC_CBENEFRBC));
+
               xmlNode.AppendChild(AddNode(FormatoValor4ou2,
                 'N16', 'pICMS', 01, IfThen(FpUsar_tcDe4, 07, 05), 1,
                 NFe.Det[i].Imposto.ICMS.pICMS, DSC_PICMS));
+
+              if (NFe.infNFe.Versao >= 4) and (NFe.Det[i].Imposto.ICMS.CST = cst90) then
+              begin
+                if (NFe.Det[i].Imposto.ICMS.vICMSOp > 0) or
+                   (NFe.Det[i].Imposto.ICMS.pDif > 0) or
+                   (NFe.Det[i].Imposto.ICMS.vICMSDif > 0) then
+                begin
+                  xmlNode.AppendChild(AddNode(tcDe2, 'N16b', 'vICMSOp', 1, 15, 1,
+                                     NFe.Det[i].Imposto.ICMS.vICMSOp, DSC_VICMS));
+
+                  xmlNode.AppendChild(AddNode(FormatoValor4ou2,
+                  'N16c', 'pDif', 01, IfThen(FpUsar_tcDe4, 7, 5), 1,
+                                       NFe.Det[i].Imposto.ICMS.pDif, DSC_PDIF));
+
+                  xmlNode.AppendChild(AddNode(tcDe2, 'N16d', 'vICMSDif', 1, 15, 1,
+                                  NFe.Det[i].Imposto.ICMS.vICMSDif, DSC_VICMS));
+                end;
+              end;
+
               xmlNode.AppendChild(AddNode(tcDe2, 'N17', 'vICMS',
                 01, 15, 1, NFe.Det[i].Imposto.ICMS.vICMS, DSC_VICMS));
             end;
@@ -2563,6 +2609,24 @@ begin
                   NFe.Det[i].Imposto.ICMS.pFCP, DSC_PFCP));
                 xmlNode.AppendChild(AddNode(tcDe2, 'N17c', 'vFCP',
                   01, 15, 0, NFe.Det[i].Imposto.ICMS.vFCP, DSC_VFCP));
+              end;
+            end;
+
+            if (NFe.infNFe.Versao >= 4) then
+            begin
+              if (nfe.Det[i].Imposto.ICMS.pFCPDif > 0) or
+                 (nfe.Det[i].Imposto.ICMS.vFCPDif > 0) or
+                 (nfe.Det[i].Imposto.ICMS.vFCPEfet > 0) then
+              begin
+                xmlNode.AppendChild(AddNode(FormatoValor4ou2,
+                  'N17d', 'pFCPDif', 01, IfThen(FpUsar_tcDe4,07,05), 1,
+                                 nfe.Det[i].Imposto.ICMS.pFCPDif, DSC_PFCPDIF));
+
+                xmlNode.AppendChild(AddNode(tcDe2, 'N17e', 'vFCPDif', 1, 15, 1,
+                                 nfe.Det[i].Imposto.ICMS.vFCPDif, DSC_VFCPDIF));
+
+                xmlNode.AppendChild(AddNode(tcDe2, 'N17f', 'vFCPEfet', 1, 15, 0,
+                               nfe.Det[i].Imposto.ICMS.vFCPEfet, DSC_VFCPEFET));
               end;
             end;
 
@@ -2602,8 +2666,7 @@ begin
               end;
             end;
 
-            if (NFe.Det[i].Imposto.ICMS.CST = cst90) and
-               (NFe.infNFe.Versao >= 3.10) and
+            if (NFe.infNFe.Versao >= 3.10) and
                (NFe.Det[i].Imposto.ICMS.vICMSDeson > 0) then
             begin
               xmlNode.AppendChild(AddNode(tcDe2, 'N27a', 'vICMSDeson',

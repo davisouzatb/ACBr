@@ -60,5 +60,8 @@ namespace ACBrLib.Core.PIXCD
 
         [Description("AppLess")]
         pspAppLess = 18,
+
+        [Description("QQPag")]
+        pspQQPag = 19,
     }
 }

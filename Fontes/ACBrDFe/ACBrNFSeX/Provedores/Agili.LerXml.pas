@@ -744,6 +744,8 @@ begin
   else
     Result := LerXmlRps(XmlNode);
 
+  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
+
   FreeAndNil(FDocument);
 end;
 
@@ -1031,6 +1033,9 @@ begin
     Item.Quantidade := StringToFloatDef(AINIRec.ReadString(sSecao, 'Quantidade', ''), 0);
     Item.ValorUnitario := StringToFloatDef(AINIRec.ReadString(sSecao, 'ValorUnitario', ''), 0);
     Item.DescontoIncondicionado := StringToFloatDef(AINIRec.ReadString(sSecao, 'DescontoIncondicionado', ''), 0);
+
+    Item.AliqIBS := StringToFloatDef(AINIRec.ReadString(sSecao, 'AliqIBS', ''), 0);
+    Item.AliqCBS := StringToFloatDef(AINIRec.ReadString(sSecao, 'AliqCBS', ''), 0);
 
     LerINIDadosProfissionalParceiro(AINIRec, Item.DadosProfissionalParceiro, i);
     Inc(i);

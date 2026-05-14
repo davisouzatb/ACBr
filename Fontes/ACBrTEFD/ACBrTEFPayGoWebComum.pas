@@ -3,7 +3,7 @@
 {  Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
 { mentos de Automação Comercial utilizados no Brasil                           }
 {                                                                              }
-{ Direitos Autorais Reservados (c) 2024 Daniel Simoes de Almeida               }
+{ Direitos Autorais Reservados (c) 2026 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
@@ -568,10 +568,12 @@ type
     fAmbiente: SmallInt;
     fExibeMensagemCheckout: Boolean;
     fExibicaoQRCode: TACBrTEFPGWebAPIExibicaoQRCode;
+    fIdioma: SmallInt;
     fImprimeViaClienteReduzida: Boolean;
     fInicializada: Boolean;
     fCarregada: Boolean;
     fEmTransacao: Boolean;
+    fNomeImagemNoPinPad: String;
     fIsDebug: Boolean;
     fMensagemPinPad: String;
     fPerguntarCartaoDigitadoAposCancelarLeitura: Boolean;
@@ -821,6 +823,7 @@ type
     property PortaPinPad: Integer read fPortaPinPad write fPortaPinPad;
     property ParametrosAdicionais: TACBrTEFParametros read fParametrosAdicionais;
     property Ambiente: SmallInt read fAmbiente write fAmbiente;
+    property Idioma: SmallInt read fIdioma write fIdioma default 0;   // 0: Português; 1: Inglês; 2: Espanhol
 
     Property SuportaSaque: Boolean read fSuportaSaque write fSuportaSaque;
     Property SuportaDesconto: Boolean read fSuportaDesconto write fSuportaDesconto;
@@ -874,7 +877,7 @@ implementation
 
 uses
   StrUtils, dateutils, math, typinfo,
-  ACBrConsts,
+  ACBrConsts, ACBrTEFAPIComum,
   ACBrUtil.Strings,
   ACBrUtil.Base,
   ACBrUtil.FilesIO,
@@ -1180,6 +1183,7 @@ begin
   fDiretorioTrabalho := '';
   fAtualizaPGWebLibAutomaticamente := True;
   fEmTransacao := False;
+  fNomeImagemNoPinPad := '';
   fUsouPinPad := False;
   fTempoTarefasAutomaticas := '';
   fUltimoQRCode := '';
@@ -1196,6 +1200,7 @@ begin
   fPortaTCP := '';
   fPortaPinPad := 0;
   fAmbiente := -1;
+  fIdioma := 0;
   fConfirmarTransacoesPendentesNoHost := True;
   fPerguntarCartaoDigitadoAposCancelarLeitura := False;
 
@@ -1252,7 +1257,9 @@ begin
     ExibicaoQRCode := qreExibirNoPinPad;
 
   if (fDiretorioTrabalho = '') then
-    fDiretorioTrabalho := ApplicationPath + 'TEF' + PathDelim + 'PGWeb';
+    fDiretorioTrabalho := ApplicationPath + 'TEF' + PathDelim + 'PGWeb' + PathDelim
+  else
+    fDiretorioTrabalho := PathWithDelim(Trim(fDiretorioTrabalho));
 
   if not DirectoryExists(fDiretorioTrabalho) then
     ForceDirectories(fDiretorioTrabalho);
@@ -1268,11 +1275,11 @@ begin
 
   SetPGWebLibPermiteAtualiza(False);
 
-  if (PontoCaptura <> '') then
-    ACBrUtil.FilesIO.SetGlobalEnvironment('PontoDeCaptura', PontoCaptura);
+  //if (PontoCaptura <> '') then
+  //  ACBrUtil.FilesIO.SetGlobalEnvironment('PontoDeCaptura', PontoCaptura);
 
-  if (CNPJEstabelecimento <> '') then
-    ACBrUtil.FilesIO.SetGlobalEnvironment('CPFCNPJ', CNPJEstabelecimento);
+  //if (CNPJEstabelecimento <> '') then
+  //  ACBrUtil.FilesIO.SetGlobalEnvironment('CPFCNPJ', CNPJEstabelecimento);
 
   LoadLibFunctions;
 
@@ -1534,6 +1541,17 @@ begin
   VerificarCarregada;
   if EmTransacao then
     DoException(ACBrStr(sErrPWRET_TRNINIT));
+
+  if (fNomeImagemNoPinPad <> '') then
+  begin
+    if Assigned(xPW_iPPEndDisplayImage) then
+    begin
+      GravarLog('PW_iPPEndDisplayImage');
+      iRet := xPW_iPPEndDisplayImage;
+      GravarLog('  '+PWRETToString(iRet));
+    end;
+    fNomeImagemNoPinPad := '';
+  end;
 
   GravarLog('PW_iNewTransac( '+PWOPERToString(iOPER)+' )');
   iRet := xPW_iNewTransac(iOPER);
@@ -2196,17 +2214,19 @@ var
   MsgError: String;
   ImageName: AnsiString;
 begin
-  GravarLog('TACBrTEFPGWebAPI.ExibirImagemPinPad( '+NomeImagem+', '+
+  ImageName := Trim(NomeImagem);
+  GravarLog('TACBrTEFPGWebAPI.ExibirImagemPinPad( '+ImageName+', '+
             IntToStr(TimeOutSec)+', '+BoolToStr(AguardaTecla, True)+' )');
 
   VerificarCarregada;
   if not Assigned(xPW_iPPDisplayLoadedImage) then
     DoException(Format(sErrBibliotecaNaoTemMetodo, ['PW_iPPDisplayLoadedImage']));
 
-  ImageName := Trim(NomeImagem);
   GravarLog('PW_iPPDisplayLoadedImage( '+ImageName+', '+IntToStr(TimeOutSec)+', '+BoolToStr(AguardaTecla, True)+' )');
   iRetPP := xPW_iPPDisplayLoadedImage( PAnsiChar(ImageName), TimeOutSec, AguardaTecla);
   GravarLog('  '+PWRETToString(iRetPP));
+
+  // TODO: Fazer e tratar loop, quando "AguardaTecla = True";
 
   MsgError := '';
   if (iRetPP <> PWRET_OK) then
@@ -2222,6 +2242,8 @@ begin
 
   if (MsgError <> '') then
     DoException(ACBrStr(MsgError));
+
+  fNomeImagemNoPinPad := ImageName;
 end;
 
 procedure TACBrTEFPGWebAPI.DefinirMensagemPinPad(const AMensagem,
@@ -2231,14 +2253,16 @@ var
   MsgError: String;
   IdleMesage, IdleImage: AnsiString;
 begin
-  GravarLog('TACBrTEFPGWebAPI.DefinirMensagemPinPad( '+AMensagem+', '+NomeImagem+' )');
+  IdleMesage := Trim(AMensagem);
+  IdleImage := Trim(NomeImagem);
+  if (IdleImage <> '') then
+    IdleImage := PadRight(IdleImage, 8);
+  GravarLog('TACBrTEFPGWebAPI.DefinirMensagemPinPad( '+IdleMesage+', '+IdleImage+' )');
 
   VerificarCarregada;
   if not Assigned(xPW_iPPSetIdleImage) then
     DoException(Format(sErrBibliotecaNaoTemMetodo, ['PW_iPPSetIdleImage']));
 
-  IdleMesage := Trim(AMensagem);
-  IdleImage := Trim(NomeImagem);
   GravarLog('PW_iPPSetIdleImage( '+IdleMesage+', '+IdleImage+' )');
   iRetPP := xPW_iPPSetIdleImage( PAnsiChar(IdleMesage), PAnsiChar(IdleImage) );
   GravarLog('  '+PWRETToString(iRetPP));
@@ -3036,6 +3060,7 @@ begin
   AdicionarParametro(PWINFO_MERCHADDDATA4, CACBrTEFPGWebAPIName+' '+CACBrTEFPGWebAPIVersao);
   if (fExibicaoQRCode > qreAuto) then
     AdicionarParametro(PWINFO_DSPQRPREF, IfThen(fExibicaoQRCode=qreExibirNoCheckOut, '2', '1') );
+  AdicionarParametro(PWINFO_LANGUAGE, IntToStr(Integer(Idioma)));
 end;
 
 function TACBrTEFPGWebAPI.CalcularCapacidadesDaAutomacao: Integer;
@@ -3100,10 +3125,10 @@ begin
   if (PathNovo <> '') then
   begin
     if not FileExists(PathNovo) then
-      raise EACBrTEFPayGoWeb.CreateFmt(sErrLibNaoEncontrada, [PathNovo]);
+      raise EACBrTEFPayGoWeb.CreateFmt(ACBrStr(sErrLibNaoEncontrada), [PathNovo]);
 
     if not SetPathPGWebLib(PathNovo) then
-      raise EACBrTEFPayGoWeb.CreateFmt(sErrVarDef, [PathNovo, GetVarPathPGWebLib]);
+      raise EACBrTEFPayGoWeb.CreateFmt(ACBrStr(sErrVarDef), [PathNovo, GetVarPathPGWebLib]);
   end;
 
   fIsDebug := AValue;
@@ -3318,9 +3343,9 @@ procedure TACBrTEFPGWebAPI.LoadLibFunctions;
       begin
         LibPointer := NIL ;
         if FuncIsRequired then
-          DoException(Format(ACBrStr('Erro ao carregar a função: %s de: %s'),[FuncName, LibName]))
+          DoException(Format(ACBrStr(sACBrTEFAPIErroAoCarregarMetodoDeLib),[FuncName, LibName]))
         else
-          GravarLog(Format(ACBrStr('     Função não requerida: %s não encontrada em: %s'),[FuncName, LibName]));
+          GravarLog(Format(ACBrStr('     '+ACBrStr(sACBrTEFAPIMetodoNaoRequeridoNaoEncontrado)),[FuncName, LibName]));
         end ;
     end ;
   end;

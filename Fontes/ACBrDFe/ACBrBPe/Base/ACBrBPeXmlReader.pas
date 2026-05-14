@@ -40,7 +40,7 @@ uses
   Classes, SysUtils,
   ACBrXmlBase,
   ACBrDFe.Conversao,
-  pcnConversao,
+//  pcnConversao,
   ACBrXmlDocument,
   ACBrXmlReader,
   ACBrBPeClass;
@@ -76,6 +76,8 @@ type
 
     procedure Ler_imp(const ANode: TACBrXmlNode);
     procedure Ler_pag(const ANode: TACBrXmlNode);
+    procedure Ler_pgtoVinc(const ANode: TACBrXmlNode);
+    procedure Ler_pgto(const ANode: TACBrXmlNode);
 
     // BPe TM
     procedure Ler_detBPeTM(const ANode: TACBrXmlNode);
@@ -203,8 +205,6 @@ begin
 end;
 
 procedure TBPeXmlReader.Ler_ProtBPe(const ANode: TACBrXmlNode);
-var
-  ok: Boolean;
 begin
   if not Assigned(ANode) then Exit;
 
@@ -261,6 +261,8 @@ begin
     begin
       Ler_pag(ANodes[i]);
     end;
+
+    Ler_pgtoVinc(ANode.Childrens.Find('pgtoVinc'));
   end;
 
   ANodes := ANode.Childrens.FindAll('autXML');
@@ -614,6 +616,36 @@ begin
   end;
 end;
 
+procedure TBPeXmlReader.Ler_pgtoVinc(const ANode: TACBrXmlNode);
+var
+  i: Integer;
+  ANodes: TACBrXmlNodeArray;
+begin
+  if not Assigned(ANode) then Exit;
+
+  ANodes := ANode.Childrens.FindAll('pgto');
+  for i := 0 to Length(ANodes) - 1 do
+  begin
+    Ler_pgto(ANodes[i]);
+  end;
+end;
+
+procedure TBPeXmlReader.Ler_pgto(const ANode: TACBrXmlNode);
+var
+  Item: TpgtoCollectionItem;
+begin
+  if not Assigned(ANode) then Exit;
+
+  Item := BPe.pgtoVinc.pgto.New;
+
+  Item.nPag := StrToInt(ObterConteudoTag(ANode.Attributes.Items['nPag']));
+  Item.idTransacao := ObterConteudoTag(ANode.Attributes.Items['idTransacao']);
+
+  Item.tpMeioPgto := ObterConteudo(ANode.Childrens.Find('tpMeioPgto'), tcStr);
+  Item.CNPJReceb := ObterConteudo(ANode.Childrens.Find('CNPJReceb'), tcStr);
+  Item.CNPJBasePSP := ObterConteudo(ANode.Childrens.Find('CNPJBasePSP'), tcDe2);
+end;
+
 procedure TBPeXmlReader.Ler_detBPeTM(const ANode: TACBrXmlNode);
 var
   Item: TdetBPeTMCollectionItem;
@@ -775,22 +807,33 @@ end;
 // Reforma Tributária
 procedure TBPeXmlReader.Ler_gCompraGov(gCompraGov: TgCompraGovReduzido;
   const ANode: TACBrXmlNode);
+var
+  i: Integer;
+  ANodes: TACBrXmlNodeArray;
 begin
   if not Assigned(ANode) then Exit;
 
   gCompraGov.tpEnteGov := StrTotpEnteGov(ObterConteudo(ANode.Childrens.Find('tpEnteGov'), tcStr));
   gCompraGov.pRedutor := ObterConteudo(ANode.Childrens.Find('pRedutor'), tcDe4);
+  gCompraGov.tpOperGov := StrTotpOperGov(ObterConteudo(ANode.Childrens.Find('tpOperGov'), tcStr));
+
+  gCompraGov.refDFe.Clear;
+  ANodes := ANode.Childrens.FindAllAnyNs('refDFeAnt');
+
+  for i := 0 to Length(ANodes) - 1 do
+  begin
+    gCompraGov.refDFe.New;
+    gCompraGov.refDFe[i].refDFeAnt := ObterConteudo(ANodes[i].Childrens.FindAnyNs('refDFeAnt'), tcStr);
+  end;
 end;
 
 procedure TBPeXmlReader.Ler_IBSCBS(const ANode: TACBrXmlNode; IBSCBS: TIBSCBS);
-var
-  ok: Boolean;
 begin
   if not Assigned(ANode) then Exit;
 
   IBSCBS.CST := StrToCSTIBSCBS(ObterConteudo(ANode.Childrens.Find('CST'), tcStr));
   IBSCBS.cClassTrib := ObterConteudo(ANode.Childrens.Find('cClassTrib'), tcStr);
-  IBSCBS.indDoacao := pcnConversao.StrToTIndicadorEx(ok, ObterConteudo(ANode.Childrens.Find('indDoacao'), tcStr));
+  IBSCBS.indDoacao := StrToTIndicadorEx(ObterConteudo(ANode.Childrens.Find('indDoacao'), tcStr));
 
   Ler_IBSCBS_gIBSCBS(ANode.Childrens.Find('gIBSCBS'), IBSCBS.gIBSCBS);
   Ler_gEstornoCred(ANode.Childrens.Find('gEstornoCred'), IBSCBS.gEstornoCred);

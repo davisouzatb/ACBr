@@ -118,14 +118,16 @@ type
   TDeducaoPor = (dpNenhum, dpPercentual, dpValor);
 
   TTipoDeducao = (tdNenhum, tdMateriais, tdSubEmpreitada, tdValor, tdVeiculacao,
-                  tdPercentual, tdPercMateriais, tdIntermediacao, tdEquipamento);
+                  tdPercentual, tdPercMateriais, tdIntermediacao, tdEquipamento,
+                  tdServicos, tdConstrucaoCivil, tdMercadorias, tdDeducaoVal,
+                  tdDecisJudicial, tdDeducaoIncentivoFiscal);
 
   TnfseProvedor = (proNenhum,
                    proPadraoNacional,
                    proAbaco, proABase, proActcon, proAdm, proADPM, proAEG,
                    proAgili, proAspec, proAssessorPublico, proAsten, proBauhaus,
-                   proBetha, proBHISS, proCenti, proCIGA, proCitta, proConam,
-                   proContass, proCoplan, proCTA, proCTAConsult, proDataSmart,
+                   proBetha, proBHISS, proBWSistemas, proCenti, proCIGA, proCitta,
+                   proConam, proContass, proCoplan, proCTA, proCTAConsult, proDataSmart,
                    proDBSeller, proDeISS, proDesenvolve, proDigifred, proDSF,
                    proeGoverneISS, proeISS, proEL, proElmar, proEloTech, proEquiplano,
                    proeReceita, proEtherium, proFacundo, proFGMaiss, profintelISS,
@@ -234,14 +236,14 @@ type
                            no110, no111, no112, no113, no114, no115, no116, no117, no118,
                            no119,
                            no121,
-                           no200, no201,
-                           no300, no301, no305,
-                           no400,
+                           no200, no201, no202, no203,
+                           no300, no301, no302, no304, no305,
+                           no400, no401,
                            no501, no511, no512, no515, no521, no522,
                            no539, no541, no549, no551,
                            no601, no602, no603,
                            no611, no612, no613, no615, no616, no621, no622,
-                           no701, no711, no712,
+                           no701, no702, no704, no705, no711, no712,
                            no901, no902, no911, no912, no921, no931, no951, no952, no971,
                            no981, no991,
                            noNenhum);
@@ -257,12 +259,15 @@ const
     '91',
     '101', '102', '103', '104', '105', '106', '107', '108',
     '109', '110', '111', '112', '113', '114', '115', '116',
-    '117', '118', '119', '121', '200', '201', '300', '301', '305',
-    '400',
+    '117', '118', '119', '121',
+    '200', '201', '202', '203',
+    '300', '301', '302', '304', '305',
+    '400', '401',
     '501', '511', '512', '515', '521', '522', '539', '541',
     '549', '551', '601', '602', '603',
     '611', '612', '613', '615', '616',
-    '621', '622', '701', '711', '712', '901', '902', '911',
+    '621', '622',
+    '701', '702', '704', '705', '711', '712', '901', '902', '911',
     '912', '921', '931', '951', '952', '971', '981', '991',
     '');
 
@@ -289,11 +294,11 @@ const
 
 type
   TVersaoNFSe = (ve100, ve101, ve102, ve103,
-                 ve200, ve201, ve202, ve203, ve204);
+                 ve200, ve201, ve202, ve203, ve204, ve302);
 
 const
   TVersaoNFSeArrayStrings: array[TVersaoNFSe] of string = ('1.00', '1.01',
-    '1.02', '1.03', '2.00', '2.01', '2.02', '2.03', '2.04');
+    '1.02', '1.03', '2.00', '2.01', '2.02', '2.03', '2.04', '3.02');
 
 type
   TnfseFrete = (tfPrestador, tfTomador);
@@ -509,10 +514,10 @@ const
   TtpRetISSQNArrayStrings: array[TtpRetISSQN] of string = ('1', '2', '3');
 
 type
-  TtpBM = (tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota);
+  TtpBM = (tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota, tbNenhum);
 
 const
-  TtpBMArrayStrings: array[TtpBM] of string = ('1', '2', '3', '4');
+  TtpBMArrayStrings: array[TtpBM] of string = ('1', '2', '3', '4', '');
 
 type
   TtpSusp = (tsNenhum, tsDecisaoJudicial, tsProcessoAdm);
@@ -522,19 +527,23 @@ const
 
 type
   TCST = (cstVazio, cst00, cst01, cst02, cst03, cst04, cst05, cst06, cst07,
-          cst08, cst09);
+          cst08, cst09, cst49, cst50, cst51, cst52, cst53, cst54, cst55, cst56,
+          cst60, cst61, cst62, cst63, cst64, cst65, cst66, cst67, cst70, cst71,
+          cst72, cst73, cst74, cst75, cst98, cst99);
 
 const
   TCSTArrayStrings: array[TCST] of string = ('', '00', '01', '02', '03', '04',
-    '05', '06', '07', '08', '09');
+    '05', '06', '07', '08', '09', '49', '50', '51', '52', '53', '54', '55',
+    '56', '60', '61', '62', '63', '64', '65', '66', '67', '70', '71', '72',
+    '73', '74', '75', '98', '99');
 
 type
   TCSTPis = (cstPisVazio, cstPis00, cstPis01, cstPis02, cstPis03, cstPis04,
-             cstPis05, cstPis06, cstPis07, cstPis08, cstPis09);
+             cstPis05, cstPis06, cstPis07, cstPis08, cstPis09, cstPis49);
 
 const
   TCSTPisArrayStrings: array[TCSTPis] of string = ('', '00', '01', '02', '03',
-    '04', '05', '06', '07', '08', '09');
+    '04', '05', '06', '07', '08', '09', '49');
 
 type
   TtpRetPisCofins = (trpcRetido, trpcNaoRetido, trpcPISRetido, trpcCOFINSRetido);
@@ -647,10 +656,10 @@ const
 // Reforma Tributária
 
 type
-  TfinNFSe = (fnfsRegular);
+  TfinNFSe = (fnfsRegular, fnfsCredito, fnfsDebito);
 
 const
-  TfinNFSeArrayStrings: array[TfinNFSe] of string = ('0');
+  TfinNFSeArrayStrings: array[TfinNFSe] of string = ('0', '1', '2');
 
 type
   TindFinal = (ifSim, ifNao);
@@ -822,9 +831,6 @@ function StrTocategVeic(out ok: Boolean; const s: string): TcategVeic;
 function rodagemToStr(const t: Trodagem): string;
 function StrTorodagem(out ok: Boolean; const s: string): Trodagem;
 
-function tpDedRedToStr(const t: TtpDedRed): string;
-function StrTotpDedRed(out ok: Boolean; const s: string): TtpDedRed;
-
 function tribISSQNToStr(const t: TtribISSQN): string;
 function StrTotribISSQN(out ok: Boolean; const s: string): TtribISSQN;
 
@@ -848,6 +854,7 @@ function StrToCSTPis(out ok: Boolean; const s: string): TCSTPis;
 
 function tpRetPisCofinsToStr(const t: TtpRetPisCofins): string;
 function StrTotpRetPisCofins(out ok: Boolean; const s: string): TtpRetPisCofins;
+function tpRetPisCofinsDescricao(const t: TtpRetPisCofins): string;
 
 function indTotTribToStr(const t: TindTotTrib): string;
 function StrToindTotTrib(out ok: Boolean; const s: string): TindTotTrib;
@@ -12867,78 +12874,23 @@ end;
 
 function NaturezaOperacaoToStr(const t: TnfseNaturezaOperacao): string;
 begin
-  Result := EnumeradoToStr(t,
-                           ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                            '10', '11', '12', '13', '14', '15', '17', '18',
-                            '50', '51', '52', '53', '54', '55', '56', '57', '58', '59',
-                            '60', '61', '62', '63', '64', '65', '66', '67', '68', '69',
-                            '70', '71', '72', '78', '79',
-                            '81',
-                            '91',
-                            '101', '102', '103', '104', '105', '106', '107', '108',
-                            '109', '110', '111', '112', '113', '114', '115', '116',
-                            '117', '118', '119', '121', '200', '201', '300', '301', '305',
-                            '400',
-                            '501', '511', '512', '515', '521', '522', '539', '541',
-                            '549', '551', '601', '602', '603',
-                            '611', '612', '613', '615', '616',
-                            '621', '622', '701', '711', '712', '901', '902', '911',
-                            '912', '921', '931', '951', '952', '971', '981', '991'
-                           ],
-                           [no0, no1, no2, no3, no4, no5, no6, no7, no8, no9,
-                            no10, no11, no12, no13, no14, no15, no17, no18,
-                            no50, no51, no52, no53, no54, no55, no56, no57, no58, no59,
-                            no60, no61, no62, no63, no64, no65, no66, no67, no68, no69,
-                            no70, no71, no72, no78, no79,
-                            no81,
-                            no91,
-                            no101, no102, no103, no104, no105, no106, no107, no108,
-                            no109, no110, no111, no112, no113, no114, no115, no116,
-                            no117, no118, no119, no121, no200, no201, no300, no301, no305,
-                            no400,
-                            no501, no511, no512, no515, no521, no522, no539, no541,
-                            no549, no551, no601, no602, no603,
-                            no611, no612, no613, no615, no616,
-                            no621, no622, no701, no711, no712, no901, no902, no911,
-                            no912, no921, no931, no951, no952, no971, no981, no991]);
+  Result := TNaturezaOperacaoArrayStrings[t];
 end;
 
 function StrToNaturezaOperacao(out ok: boolean; const s: string): TnfseNaturezaOperacao;
+var
+  idx: TnfseNaturezaOperacao;
 begin
-  Result := StrToEnumerado(ok, s,
-                           ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                            '10', '11', '12', '13', '14', '15', '17', '18',
-                            '50', '51', '52', '53', '54', '55', '56', '57', '58', '59',
-                            '60', '61', '62', '63', '64', '65', '66', '67', '68', '69',
-                            '70', '71', '72', '78', '79',
-                            '81',
-                            '91',
-                            '101', '102', '103', '104', '105', '106', '107', '108',
-                            '109', '110', '111', '112', '113', '114', '115', '116',
-                            '117', '118', '119', '121', '200', '201', '300', '301', '305',
-                            '400',
-                            '501', '511', '512', '515', '521', '522', '539', '541',
-                            '549', '551', '601', '602', '603',
-                            '611', '612', '613', '615', '616',
-                            '621', '622', '701', '711', '712', '901', '902', '911',
-                            '912', '921', '931', '951', '952', '971', '981', '991'
-                           ],
-                           [no0, no1, no2, no3, no4, no5, no6, no7, no8, no9,
-                            no10, no11, no12, no13, no14, no15, no17, no18,
-                            no50, no51, no52, no53, no54, no55, no56, no57, no58, no59,
-                            no60, no61, no62, no63, no64, no65, no66, no67, no68, no69,
-                            no70, no71, no72, no78, no79,
-                            no81,
-                            no91,
-                            no101, no102, no103, no104, no105, no106, no107, no108,
-                            no109, no110, no111, no112, no113, no114, no115, no116,
-                            no117, no118, no119, no121, no200, no201, no300, no301, no305,
-                            no400,
-                            no501, no511, no512, no515, no521, no522, no539, no541,
-                            no549, no551, no601, no602, no603,
-                            no611, no612, no613, no615, no616,
-                            no621, no622, no701, no711, no712, no901, no902, no911,
-                            no912, no921, no931, no951, no952, no971, no981, no991]);
+  for idx:= Low(TNaturezaOperacaoArrayStrings) to High(TNaturezaOperacaoArrayStrings) do
+  begin
+    if (TNaturezaOperacaoArrayStrings[idx] = s) then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+
+  raise EACBrException.CreateFmt('Valor string inválido para TnfseNaturezaOperacao: %s', [s]);
 end;
 
 function IndicacaoCpfCnpjToStr(const t: TIndicacaoCpfCnpj): string;
@@ -12994,17 +12946,17 @@ end;
 function VersaoNFSeToStr(const t: TVersaoNFSe): string;
 begin
   Result := EnumeradoToStr(t, ['1.00', '1.01', '1.02', '1.03',
-                               '2.00', '2.01', '2.02', '2.03', '2.04'],
+                               '2.00', '2.01', '2.02', '2.03', '2.04', '3.02'],
                               [ve100, ve101, ve102, ve103,
-                               ve200, ve201, ve202, ve203, ve204]);
+                               ve200, ve201, ve202, ve203, ve204, ve302]);
 end;
 
 function StrToVersaoNFSe(out ok: Boolean; const s: string): TVersaoNFSe;
 begin
   Result := StrToEnumerado(ok, s, ['1.00', '1.01', '1.02', '1.03',
-                                   '2.00', '2.01', '2.02', '2.03', '2.04'],
+                                   '2.00', '2.01', '2.02', '2.03', '2.04', '3.02'],
                                   [ve100, ve101, ve102, ve103,
-                                   ve200, ve201, ve202, ve203, ve204]);
+                                   ve200, ve201, ve202, ve203, ve204, ve302]);
 end;
 
 function TipoFreteToStr(const t: TnfseFrete): string;
@@ -13400,24 +13352,6 @@ begin
                            [trSimples, trDupla]);
 end;
 
-function tpDedRedToStr(const t: TtpDedRed): string;
-begin
-  result := EnumeradoToStr(t,
-                           ['1', '2', '3', '4', '5', '6', '7', '8', '9', '99'],
-    [drAlimentacao, drMateriais, drProducaoExt, drReembolso, drRepasseConsorciado,
-     drRepassePlanoSaude, drServicos, drSubEmpreitada, drProfissionalParceiro,
-     drOutrasDeducoes]);
-end;
-
-function StrTotpDedRed(out ok: Boolean; const s: string): TtpDedRed;
-begin
-  result := StrToEnumerado(ok, s,
-                           ['1', '2', '3', '4', '5', '6', '7', '8', '9', '99'],
-    [drAlimentacao, drMateriais, drProducaoExt, drReembolso, drRepasseConsorciado,
-     drRepassePlanoSaude, drServicos, drSubEmpreitada, drProfissionalParceiro,
-     drOutrasDeducoes]);
-end;
-
 function tribISSQNToStr(const t: TtribISSQN): string;
 begin
   result := EnumeradoToStr(t,
@@ -13465,15 +13399,15 @@ end;
 function tpBMToStr(const t: TtpBM): string;
 begin
   result := EnumeradoToStr(t,
-                           ['1', '2', '3', '4'],
-                           [tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota]);
+                           ['1', '2', '3', '4', ''],
+                           [tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota, tbNenhum]);
 end;
 
 function StrTotpBM(out ok: Boolean; const s: string): TtpBM;
 begin
   result := StrToEnumerado(ok, s,
-                           ['1', '2', '3', '4'],
-                           [tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota]);
+                           ['1', '2', '3', '4', ''],
+                           [tbIsencao, tbReducaoBCperc, tbReducaoBCvalor, tbAliquota, tbNenhum]);
 end;
 
 function tpSuspToStr(const t: TtpSusp): string;
@@ -13493,33 +13427,43 @@ end;
 function CSTToStr(const t: TCST): string;
 begin
   result := EnumeradoToStr(t,
-        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09'],
+        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', 
+         '49', '50', '51', '52', '53', '54', '55', '56', '60', '61', '62', 
+         '63', '64', '65', '66', '67', '70', '71', '72', '73', '74', '75',
+         '98', '99'],
         [cstVazio, cst00, cst01, cst02, cst03, cst04, cst05, cst06, cst07,
-         cst08, cst09]);
+         cst08, cst09, cst49, cst50, cst51, cst52, cst53, cst54, cst55, cst56,
+         cst60, cst61, cst62, cst63, cst64, cst65, cst66, cst67, cst70, cst71,
+         cst72, cst73, cst74, cst75, cst98, cst99]);
 end;
 
 function StrToCST(out ok: Boolean; const s: string): TCST;
 begin
   result := StrToEnumerado(ok, s,
-        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09'],
+        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', 
+         '49', '50', '51', '52', '53', '54', '55', '56', '60', '61', '62', 
+         '63', '64', '65', '66', '67', '70', '71', '72', '73', '74', '75',
+         '98', '99'],
         [cstVazio, cst00, cst01, cst02, cst03, cst04, cst05, cst06, cst07,
-         cst08, cst09]);
+         cst08, cst09, cst49, cst50, cst51, cst52, cst53, cst54, cst55, cst56,
+         cst60, cst61, cst62, cst63, cst64, cst65, cst66, cst67, cst70, cst71,
+         cst72, cst73, cst74, cst75, cst98, cst99]);
 end;
 
 function CSTPisToStr(const t: TCSTPis): string;
 begin
   result := EnumeradoToStr(t,
-        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09'],
+        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '49'],
         [cstPisVazio, cstPis00, cstPis01, cstPis02, cstPis03, cstPis04,
-         cstPis05, cstPis06, cstPis07, cstPis08, cstPis09]);
+         cstPis05, cstPis06, cstPis07, cstPis08, cstPis09, cstPis49]);
 end;
 
 function StrToCSTPis(out ok: Boolean; const s: string): TCSTPis;
 begin
   result := StrToEnumerado(ok, s,
-        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09'],
+        ['', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '49'],
         [cstPisVazio, cstPis00, cstPis01, cstPis02, cstPis03, cstPis04,
-         cstPis05, cstPis06, cstPis07, cstPis08, cstPis09]);
+         cstPis05, cstPis06, cstPis07, cstPis08, cstPis09, cstPis49]);
 end;
 
 function tpRetPisCofinsToStr(const t: TtpRetPisCofins): string;
@@ -13536,6 +13480,24 @@ begin
                            ['1', '2', '3', '4'],
                            [trpcRetido, trpcNaoRetido, trpcPISRetido,
                             trpcCOFINSRetido]);
+end;
+
+function tpRetPisCofinsDescricao(const t: TtpRetPisCofins): string;
+begin
+  case t of
+    trpiscofinscsllNaoRetido: Result := 'PIS/COFINS/CSLL Não Retidos';
+    trpcRetido: Result := 'PIS/COFINS Retidos';
+    trpcNaoRetido: Result := 'PIS/COFINS Não Retidos';
+    trpiscofinscsllRetido: Result := 'PIS/COFINS/CSLL Retidos';
+    trpiscofinsRetidocsllNaoRetido: Result := 'PIS/COFINS Retidos, CSLL Não Retido';
+    trPisRetidoCofinsCsllNaoRetido: Result := 'PIS Retido, COFINS/CSLL Não Retido';
+    trCofinsRetidoPisCsllNaoRetido: Result := 'COFINS Retido, PIS/CSLL Não Retido';
+    trCofinsCsllRetidoPisNaoRetido: Result := 'PIS Não Retido, COFINS/CSLL Retidos';
+    trCsllRetidoPisCofinsNaoRetido: Result := 'PIS/COFINS Não Retidos, CSLL Retido';
+    trPisCsllRetidoCofinsNaoRetido: Result := 'COFINS Não Retido, PIS/CSLL Retidos';
+  else
+    Result := '-';
+  end;
 end;
 
 function indTotTribToStr(const t: TindTotTrib): string;

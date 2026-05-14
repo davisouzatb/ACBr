@@ -912,8 +912,14 @@ type
                   codAjEstorno,             // '06' // Estorno
                   codAjCPRBAdocaoRegCaixa,  // '07' // Ajuste da CPRB: Adoção do Regime de Caixa
                   codAjCPRBDiferValRecPer,  // '08' // Ajuste da CPRB: Diferimento de Valores a Recolher no Período
-                  codAjCPRBAdicValDifPerAnt // '09' // Ajuste da CPRB: Adição de Valores Diferidos em Período(s) Anterior(es)
+                  codAjCPRBAdicValDifPerAnt,// '09' // Ajuste da CPRB: Adição de Valores Diferidos em Período(s) Anterior(es)
+                                     // 10, 11, 12  // Ajuste referente à redução linear dos incentivos e benefícios de natureza tributária, financeira ou creditícia
+                  codAjLCP224Isencao,       // '10' // isenção (LCP nº 224/2025 e art. 8º da IN RFB nº 2.305/2025)
+                  codAjLCP224AliqZero,      // '11' // alíquota zero (LCP nº 224/2025 e art. 8º da IN RFB nº 2.305/2025)
+                  codAjLCP224ConcesCredTrib,// '12' // concessão de crédito tributário (LCP nº 224/2025 e art. 10º da IN RFB nº 2.305/2025)
+                  codAjIcmsDestDFCompl      // '25' // ICMS destacado em documento fiscal complementar, referente a receitas tributadas em períodos anteriores
                 );
+
   //Indicador da Natureza da Receita
   TACBrIndNatRec = (
                     inrNaoCumulativa = 0, // 0 // Receita de Natureza Não Cumulativa
@@ -1449,7 +1455,7 @@ begin
   if AValue = '01' then
     Result := codAjAcaoJudicial
   else if AValue = '02' then
-    Result :=  codAjAcaoJudicial
+    Result :=  codAjProAdministrativo
   else if AValue = '03' then
     Result := codAjLegTributaria
   else if AValue = '04' then
@@ -1458,8 +1464,22 @@ begin
     Result := codAjOutrasSituacaoes
   else if AValue = '06' then
     Result := codAjEstorno
-   else
-     raise Exception.Create(format('Valor informado [%s] deve estar entre (01,02,03,04,05 e 06)',[AValue]));
+  else if AValue = '07' then
+    Result := codAjCPRBAdocaoRegCaixa
+  else if AValue = '08' then
+    Result := codAjCPRBDiferValRecPer
+  else if AValue = '09' then
+    Result := codAjCPRBAdicValDifPerAnt
+  else if AValue = '10' then
+    Result := codAjLCP224Isencao
+  else if AValue = '11' then
+    Result := codAjLCP224AliqZero
+  else if AValue = '12' then
+    Result := codAjLCP224ConcesCredTrib
+  else if AValue = '25' then
+    Result := codAjIcmsDestDFCompl
+  else
+     raise Exception.Create(format('Valor informado [%s] deve estar entre (01 a 12, ou 25)',[AValue]));
 end;
 
 function StrToIndAJ(const AValue: string):TACBrIndAJ;
@@ -2190,6 +2210,14 @@ begin
     Result := '08'
   else if AValue = codAjCPRBAdicValDifPerAnt then
     Result := '09'
+  else if AValue = codAjLCP224Isencao then
+    Result := '10'
+  else if AValue = codAjLCP224AliqZero then
+    Result := '11'
+  else if AValue = codAjLCP224ConcesCredTrib then
+    Result := '12'
+  else if AValue = codAjIcmsDestDFCompl then
+    Result := '25'
   else
     raise Exception.Create('Valor informado inválido para ser convertido em TACBrCodAj');
 end;

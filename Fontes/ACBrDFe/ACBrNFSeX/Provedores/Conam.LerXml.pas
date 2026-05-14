@@ -182,6 +182,8 @@ begin
   else
     Result := LerXmlRps(XmlNode);
 
+  VerificarSeConteudoEhLista(NFSe.Servico.Discriminacao);
+
   FreeAndNil(FDocument);
 end;
 
@@ -270,8 +272,6 @@ begin
     Servico.Discriminacao    := ObterConteudo(AuxNode.Childrens.FindAnyNs('DiscrSrv'), tcStr);
     Servico.Discriminacao := StringReplace(Servico.Discriminacao, FpQuebradeLinha,
                                                     sLineBreak, [rfReplaceAll]);
-
-    VerificarSeConteudoEhLista(Servico.Discriminacao);
 
     Servico.ItemListaServico := ObterConteudo(AuxNode.Childrens.FindAnyNs('CodSrv'), tcStr);
 
@@ -369,8 +369,6 @@ begin
     Servico.Discriminacao := ObterConteudo(AuxNode.Childrens.FindAnyNs('DiscrSrv'), tcStr);
     Servico.Discriminacao := StringReplace(Servico.Discriminacao, FpQuebradeLinha,
                                                     sLineBreak, [rfReplaceAll]);
-
-    VerificarSeConteudoEhLista(Servico.Discriminacao);
 
     aValor := ObterConteudo(AuxNode.Childrens.FindAnyNs('RetFonte'), tcStr);
 
@@ -583,7 +581,7 @@ end;
 
 procedure TNFSeR_Conam.LerINIDadosServico(AINIRec: TMemIniFile);
 var
-  sSecao: string;
+  sSecao, lUF: string;
 begin
   sSecao := 'Servico';
   if AINIRec.SectionExists(sSecao) then
@@ -592,6 +590,25 @@ begin
     NFSe.Servico.Discriminacao := AINIRec.ReadString(sSecao, 'Discriminacao', '');
     NFSe.Servico.Discriminacao := StringReplace(NFSe.Servico.Discriminacao,
                 FpAOwner.ConfigGeral.QuebradeLinha, sLineBreak, [rfReplaceAll]);
+    NFSe.Servico.CodigoCnae := AINIRec.ReadString(sSecao, 'CodigoCnae', '');
+    NFSe.Servico.CodigoAnexoCnae := AINIRec.ReadString(sSecao, 'CodigoAnexoSN', '');
+    NFSe.Servico.CodigoServicoNacional := AINIRec.ReadString(sSecao, 'CodigoCTN', AINIRec.ReadString(sSecao, 'CodigoServicoNacional', ''));
+    NFSe.Servico.CodigoNBS := AINIRec.ReadString(sSecao, 'CodigoNBS', '');
+    NFSe.Servico.InfAdicional := AINIRec.ReadString(sSecao, 'InfAdicional', '');
+
+    NFSe.Servico.Endereco.Endereco := AINIRec.ReadString(sSecao, 'Logradouro', '');
+    NFSe.Servico.Endereco.Numero := AINIRec.ReadString(sSecao, 'Numero', '');
+    NFSe.Servico.Endereco.Bairro := AINIRec.ReadString(sSecao, 'Bairro', '');
+    NFSe.Servico.Endereco.Complemento := AINIRec.ReadString(sSecao, 'Complemento', '');
+    NFSe.Servico.Endereco.CEP := AINIRec.ReadString(sSecao, 'CEP', '');
+    NFSe.Servico.Endereco.CodigoPais := AINIRec.ReadInteger(sSecao, 'CodigoPais', 1058);
+    NFSe.Servico.Endereco.UF := AINIRec.ReadString(sSecao, 'UF', '');
+    NFSe.Servico.Endereco.xPais := AINIRec.ReadString(sSecao, 'xPais', 'BRASIL');
+    NFSe.Servico.Endereco.CodigoMunicipio := AINIRec.ReadString(sSecao, 'CodigoMunicipio', '');
+    NFSe.Servico.Endereco.xMunicipio := AINIRec.ReadString(sSecao, 'xMunicipio', '');
+    lUF := '';
+    if NFSe.Servico.Endereco.xMunicipio = '' then
+      NFSe.Servico.Endereco.xMunicipio := ObterNomeMunicipioUF(StrToIntDef(NFSe.Servico.Endereco.CodigoMunicipio, 0), lUF);
 
     if NFSe.tpXML = txmlNFSe then
     begin
@@ -624,6 +641,7 @@ begin
     NFSe.Servico.Valores.AliquotaInss := StringToFloatDef(AINIRec.ReadString(sSecao, 'AliquotaInss', ''), 0);
     NFSe.Servico.Valores.ValorIr := StringToFloatDef(AINIRec.ReadString(sSecao, 'ValorIr', ''), 0);
     NFSe.Servico.Valores.AliquotaIr := StringToFloatDef(AINIRec.ReadString(sSecao, 'AliquotaIr', ''), 0);
+    NFSe.Servico.Valores.DescontoIncondicionado := StringToFloatDef(AINIRec.ReadString(sSecao, 'DescontoIncondicionado', ''), 0);
 
     if NFSe.tpXML = txmlNFSe then
     begin
@@ -691,6 +709,8 @@ begin
     NFSe.Prestador.Endereco.Bairro := UTF8ToNativeString(AINIRec.ReadString(sSecao, 'Bairro', ''));
     NFSe.Prestador.Endereco.CEP := AINIRec.ReadString(sSecao, 'CEP', '');
 
+    NFSe.OptanteSimplesNacional := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(sSecao, 'OptanteSN', '1'));
+
     if NFSe.tpXML = txmlNFSe then
     begin
       NFSe.Prestador.RazaoSocial := AINIRec.ReadString(sSecao, 'RazaoSocial', '');
@@ -704,7 +724,6 @@ begin
       NFSe.SituacaoNFSe := StrToStatusNFSe(Ok, AINIRec.ReadString(sSecao, 'StatusNFSe', ''));
       NFSe.MotivoCancelamento := AINIRec.ReadString(sSecao, 'MotivoCancelamento', '');
 
-      NFSe.OptanteSimplesNacional := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(sSecao, 'OptanteSN', '1'));
       NFSe.DataOptanteSimplesNacional := AINIRec.ReadDateTime(sSecao, 'DataOptanteSimplesNacional', 0);
     end;
   end;

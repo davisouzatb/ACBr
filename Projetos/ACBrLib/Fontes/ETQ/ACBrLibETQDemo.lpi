@@ -16,11 +16,11 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
+      <AutoIncrementBuild Value="False"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="686"/>
+      <BuildNr Value="699"/>
       <Language Value="0416"/>
       <Attributes pvaPreRelease="True"/>
       <StringTable CompanyName="Projeto ACBr" FileDescription="ACBrETQ - Biblioteca para impressão de Etiquetas" InternalName="ACBrLibETQ" LegalCopyright="Projeto ACBr" LegalTrademarks="Projeto ACBr" ProductName="ETQ" ProductVersion="0.0.1.30"/>

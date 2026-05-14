@@ -90,6 +90,7 @@ uses
   ADPM.Provider,
   AEG.Provider,
   Asten.Provider,
+  BWSistemas.Provider,
   Centi.Provider,
   Citta.Provider,
   Coplan.Provider,
@@ -271,6 +272,7 @@ begin
         end;
 
       proBHISS:     Result := TACBrNFSeProviderBHISS.Create(ACBrNFSe);
+      proBWSistemas: Result := TACBrNFSeProviderBWSistemas200.Create(ACBrNFSe);
       proCenti:     Result := TACBrNFSeProviderCenti202.Create(ACBrNFSe);
       proCIGA:      Result := TACBrNFSeProviderCIGA.Create(ACBrNFSe);
 
@@ -300,11 +302,16 @@ begin
 
       proDBSeller:
         begin
-          case Versao of
-            ve100: Result := TACBrNFSeProviderDBSeller.Create(ACBrNFSe);
-            ve204: Result := TACBrNFSeProviderDBSeller204.Create(ACBrNFSe);
+          if APIPropria then
+            Result := TACBrNFSeProviderDBSellerAPIPropria.Create(ACBrNFSe)
           else
-            Result := nil;
+          begin
+            case Versao of
+              ve100: Result := TACBrNFSeProviderDBSeller.Create(ACBrNFSe);
+              ve204: Result := TACBrNFSeProviderDBSeller204.Create(ACBrNFSe);
+            else
+              Result := nil;
+            end;
           end;
         end;
 
@@ -390,8 +397,12 @@ begin
       proFiorilli:
         begin
           if APIPropria then
-            Result := TACBrNFSeProviderFiorilliAPIPropria.Create(ACBrNFSe)
-          else
+          begin
+            case Versao of
+              ve100: Result := TACBrNFSeProviderFiorilliAPIPropria.Create(ACBrNFSe);
+              ve101: Result := TACBrNFSeProviderFiorilliAPIPropria101.Create(ACBrNFSe);
+            end;
+          end else
             Result := TACBrNFSeProviderFiorilli200.Create(ACBrNFSe);
         end;
 
@@ -495,7 +506,18 @@ begin
             Result := TACBrNFSeProviderISSDigital200.Create(ACBrNFSe);
         end;
 
-      proISSDSF:     Result := TACBrNFSeProviderISSDSF.Create(ACBrNFSe);
+      proISSDSF:
+        begin
+          case Versao of
+            // Layout Próprio
+            ve100: Result := TACBrNFSeProviderISSDSF.Create(ACBrNFSe);
+            // Layout ABRASF
+            ve203: Result := TACBrNFSeProviderISSDSF203.Create(ACBrNFSe);
+          else
+            Result := nil;
+          end;
+        end;
+
       proISSe:       Result := TACBrNFSeProviderISSe201.Create(ACBrNFSe);
 
       proISSFortaleza:
@@ -712,7 +734,16 @@ begin
       proSSInformatica:
         Result := TACBrNFSeProviderSSInformatica203.Create(ACBrNFSe);
 
-      proSudoeste:  Result := TACBrNFSeProviderSudoeste202.Create(ACBrNFSe);
+      proSudoeste:
+        begin
+          case Versao of
+            ve202: Result := TACBrNFSeProviderSudoeste202.Create(ACBrNFSe);
+            ve302: Result := TACBrNFSeProviderSudoeste302.Create(ACBrNFSe);
+          else
+            Result := nil;
+          end;
+        end;
+
       proSystemPro: Result := TACBrNFSeProviderSystemPro201.Create(ACBrNFSe);
       proSysISS:    Result := TACBrNFSeProviderSysISS202.Create(ACBrNFSe);
       proTcheInfo:  Result := TACBrNFSeProviderTcheInfo204.Create(ACBrNFSe);

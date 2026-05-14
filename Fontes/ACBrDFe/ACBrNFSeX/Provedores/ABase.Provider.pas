@@ -73,16 +73,13 @@ type
     procedure TratarRetornoConsultaNFSeporRps(Response: TNFSeConsultaNFSeporRpsResponse); override;
   end;
 
-  TACBrNFSeXWebserviceABaseAPIPropria = class(TACBrNFSeXWebserviceRest)
+  TACBrNFSeXWebserviceABaseAPIPropria = class(TACBrNFSeXWebservicePadraoNacional)
   protected
     procedure SetHeaders(aHeaderReq: THTTPHeader); override;
 
   public
-    function GerarNFSe(const ACabecalho, AMSG: string): string; override;
     function ConsultarLote(const ACabecalho, AMSG: String): string; override;
-    function ConsultarNFSePorChave(const ACabecalho, AMSG: string): string; override;
-
-    // Cancelamento sendo implementado pelo provedor
+    function EnviarEvento(const ACabecalho, AMSG: string): string; override;
 
     function TratarXmlRetornado(const aXML: string): string; override;
   end;
@@ -112,10 +109,11 @@ type
     procedure PrepararConsultaLoteRps(Response: TNFSeConsultaLoteRpsResponse); override;
     procedure TratarRetornoConsultaLoteRps(Response: TNFSeConsultaLoteRpsResponse); override;
 
-    procedure PrepararConsultaNFSeporChave(Response: TNFSeConsultaNFSeResponse); override;
-    procedure TratarRetornoConsultaNFSeporChave(Response: TNFSeConsultaNFSeResponse); override;
+    procedure PrepararConsultaNFSeporRps(Response: TNFSeConsultaNFSeporRpsResponse); override;
+    procedure TratarRetornoConsultaNFSeporRps(Response: TNFSeConsultaNFSeporRpsResponse); override;
 
-    // Cancelamento sendo implementado pelo provedor
+    procedure PrepararEnviarEvento(Response: TNFSeEnviarEventoResponse); override;
+    procedure TratarRetornoEnviarEvento(Response: TNFSeEnviarEventoResponse); override;
   end;
 
 implementation
@@ -124,6 +122,7 @@ uses
   ACBrUtil.XMLHTML,
   ACBrUtil.Strings,
   ACBrUtil.Base,
+  ACBrUtil.FilesIO,
   ACBrDFeException,
   ACBrDFe.Conversao,
   ACBrNFSeXConsts,
@@ -409,7 +408,12 @@ begin
     FormatoArqEnvioSoap := tfaXml;
     FormatoArqRetornoSoap := tfaXml;
 
+    ConfigGeral.ServicosDisponibilizados.EnviarEvento := True;
+    ConfigSchemas.EnviarEvento := 'pedRegEvento_v1.01.xsd';
+
     ServicosDisponibilizados.ConsultarLote := True;
+
+    Autenticacao.RequerChaveAcesso := True;
   end;
 end;
 
@@ -430,16 +434,21 @@ end;
 function TACBrNFSeProviderABaseAPIPropria.CriarServiceClient(
   const AMetodo: TMetodo): TACBrNFSeXWebservice;
 var
-  URL: string;
+  URL, AMimeType: string;
 begin
   URL := GetWebServiceURL(AMetodo);
+
+  if AMetodo in [tmGerar, tmEnviarEvento] then
+    AMimeType := 'application/xml; charset=utf-8'
+  else
+    AMimeType := 'application/json';
 
   if URL <> '' then
   begin
     URL := URL + Path;
 
     Result := TACBrNFSeXWebserviceABaseAPIPropria.Create(FAOwner, AMetodo, URL,
-      Method, 'application/xml');
+      Method, AMimeType);
   end
   else
   begin
@@ -566,21 +575,16 @@ end;
 function TACBrNFSeProviderABaseAPIPropria.PrepararArquivoEnvio(
   const aXml: string; aMetodo: TMetodo): string;
 begin
+  Result := aXml;
+
   if aMetodo in [tmGerar, tmEnviarEvento] then
   begin
     Result := ChangeLineBreak(aXml, '');
 
     case aMetodo of
-      tmGerar:
-        begin
-          Path := '/recepcionardps';
-        end;
+      tmGerar: Path := '/recepcionardps';
 
-      tmEnviarEvento:
-        begin
-          Result := '{"pedidoRegistroEventoXmlGZipB64":"' + Result + '"}';
-          Path := '/nfse/' + Chave + '/eventos';
-        end;
+      tmEnviarEvento: Path := '/CancelarNfse';
     else
       begin
         Result := '';
@@ -688,16 +692,16 @@ begin
   end;
 end;
 
-procedure TACBrNFSeProviderABaseAPIPropria.PrepararConsultaNFSeporChave(
-  Response: TNFSeConsultaNFSeResponse);
+procedure TACBrNFSeProviderABaseAPIPropria.PrepararConsultaNFSeporRps(
+  Response: TNFSeConsultaNFSeporRpsResponse);
 var
   AErro: TNFSeEventoCollectionItem;
 begin
   if EstaVazio(Response.NumeroRps) then
   begin
     AErro := Response.Erros.New;
-    AErro.Codigo := Cod126;
-    AErro.Descricao := ACBrStr(Desc126);
+    AErro.Codigo := Cod102;
+    AErro.Descricao := ACBrStr(Desc102);
     Exit;
   end;
 
@@ -706,8 +710,8 @@ begin
   Method := 'GET';
 end;
 
-procedure TACBrNFSeProviderABaseAPIPropria.TratarRetornoConsultaNFSeporChave(
-  Response: TNFSeConsultaNFSeResponse);
+procedure TACBrNFSeProviderABaseAPIPropria.TratarRetornoConsultaNFSeporRps(
+  Response: TNFSeConsultaNFSeporRpsResponse);
 var
   Document: TACBrXmlDocument;
   AErro: TNFSeEventoCollectionItem;
@@ -738,11 +742,12 @@ begin
       Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('DataHoraRecebimento'), tcDatHor);
       Response.Situacao := ObterConteudoTag(ANode.Childrens.FindAnyNs('StatusProcessamento'), tcStr);
       Response.idNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('ChaveAcesso'), tcStr);
-      aXML := SepararDados(ANode.OuterXml, '<NFSe ', True);
+      aXML := SepararDados(ANode.OuterXml, 'NFSe', True);
 
       if aXml <> '' then
       begin
         try
+          DocumentXml := TACBrXmlDocument.Create;
           try
             DocumentXml.LoadFromXml(aXml);
 
@@ -792,42 +797,99 @@ begin
   end;
 end;
 
-{ TACBrNFSeXWebserviceABaseAPIPropria }
-
-function TACBrNFSeXWebserviceABaseAPIPropria.GerarNFSe(const ACabecalho,
-  AMSG: string): string;
-var
-  Request: string;
+procedure TACBrNFSeProviderABaseAPIPropria.PrepararEnviarEvento(
+  Response: TNFSeEnviarEventoResponse);
 begin
-  FPMsgOrig := AMSG;
+  inherited;
+  // Utiliza a lógica padrão de montagem do XML pedRegEvento definida na classe base
+  inherited PrepararEnviarEvento(Response);
 
-  Request := AMSG;
-
-  Result := Executar('', Request, [], []);
+  // Define o Path específico para o cancelamento conforme solicitado
+  Path := '/CancelarNfse';
+  Method := 'POST';
 end;
+
+procedure TACBrNFSeProviderABaseAPIPropria.TratarRetornoEnviarEvento(
+  Response: TNFSeEnviarEventoResponse);
+var
+  Document: TACBrXmlDocument;
+  ANode, NodeErro: TACBrXmlNode;
+  AErro: TNFSeEventoCollectionItem;
+  i: Integer;
+begin
+  // Verifica se o retorno é o XML específico de Cancelamento da ABase (Customizado)
+  if Pos('<CancelarNfseResponse>', Response.ArquivoRetorno) > 0 then
+  begin
+    Document := TACBrXmlDocument.Create;
+    try
+      try
+        Document.LoadFromXml(Response.ArquivoRetorno);
+        ANode := Document.Root;
+
+        // Tenta ler a Data de Recebimento
+        Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('DataHoraRecebimento'), tcDatHor);
+
+        // Processa lista de erros
+        ANode := ANode.Childrens.FindAnyNs('Erros');
+        if Assigned(ANode) then
+        begin
+          for i := 0 to ANode.Childrens.Count - 1 do
+          begin
+            NodeErro := ANode.Childrens[i];
+
+            if NodeErro.Name = 'Erro' then
+            begin
+              AErro := Response.Erros.New;
+
+              AErro.Codigo := ObterConteudoTag(NodeErro.Childrens.FindAnyNs('Codigo'), tcStr);
+              AErro.Descricao := ObterConteudoTag(NodeErro.Childrens.FindAnyNs('Descricao'), tcStr);
+              AErro.Correcao := ObterConteudoTag(NodeErro.Childrens.FindAnyNs('Correcao'), tcStr);
+            end;
+          end;
+        end;
+
+        // Define sucesso: Se não tiver erros na lista e o status não for PROCESSADO_COM_ERROS
+        Response.Sucesso := (Response.Erros.Count = 0);
+
+        // Se desejar preencher o protocolo ou ID, verifique se existem outras tags no XML,
+        // mas para erros, o código acima é suficiente.
+
+      except
+        on E: Exception do
+        begin
+          AErro := Response.Erros.New;
+          AErro.Codigo := Cod999;
+          AErro.Descricao := ACBrStr(Desc999 + E.Message);
+        end;
+      end;
+    finally
+      FreeAndNil(Document);
+    end;
+  end
+  else
+  begin
+    // Se não for o XML específico de cancelamento, chama o tratamento padrão
+    // (Útil caso eles retornem JSON ou o XML padrão nacional em outros cenários)
+    inherited TratarRetornoEnviarEvento(Response);
+  end;
+end;
+
+{ TACBrNFSeXWebserviceABaseAPIPropria }
 
 function TACBrNFSeXWebserviceABaseAPIPropria.ConsultarLote(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
-  Result := Executar('', Request, [], []);
+  Result := Executar('', AMSG, [], []);
 end;
 
-function TACBrNFSeXWebserviceABaseAPIPropria.ConsultarNFSePorChave(
-  const ACabecalho, AMSG: string): string;
-var
-  Request: string;
+function TACBrNFSeXWebserviceABaseAPIPropria.EnviarEvento(const ACabecalho,
+  AMSG: string): string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
-  Result := Executar('', Request, [], []);
+  Result := Executar('', AMSG, [], []);
 end;
 
 procedure TACBrNFSeXWebserviceABaseAPIPropria.SetHeaders(
@@ -846,26 +908,29 @@ function TACBrNFSeXWebserviceABaseAPIPropria.TratarXmlRetornado(
 var
   aMsg: string;
 begin
-  Result := inherited TratarXmlRetornado(aXML);
+  Result := GetSoapBody(aXML);
 
-  Result := RemoverCaracteresDesnecessarios(Result);
-  Result := ParseText(Result);
-  Result := RemoverIdentacao(Result);
-  Result := RemoverDeclaracaoXML(Result);
-
-  Result := RemoverPrefixosDesnecessarios(Result);
-
-  if Pos('<Erro>', Result) = 1 then
+  if not StringIsPDF(Result) then
   begin
-    aMsg := LerTagXML(Result, 'Erro');
-    Result := '<a>' +
-                '<Erros>' +
-                  '<Erro>' +
-                    '<Codigo></Codigo>' +
-                    '<Descricao>' + aMsg + '</Descricao>' +
-                  '</Erro>' +
-                '</Erros>' +
-              '</a>';
+    Result := RemoverCaracteresDesnecessarios(Result);
+    Result := ParseText(Result);
+    Result := RemoverIdentacao(Result);
+    Result := RemoverDeclaracaoXML(Result);
+
+    Result := RemoverPrefixosDesnecessarios(Result);
+
+    if Pos('<Erro>', Result) = 1 then
+    begin
+      aMsg := SepararDados(Result, 'Erro');
+      Result := '<a>' +
+                  '<Erros>' +
+                    '<Erro>' +
+                      '<Codigo></Codigo>' +
+                      '<Descricao>' + aMsg + '</Descricao>' +
+                    '</Erro>' +
+                  '</Erros>' +
+                '</a>';
+    end;
   end;
 end;
 

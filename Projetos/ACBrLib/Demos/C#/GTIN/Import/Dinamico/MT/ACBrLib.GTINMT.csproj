@@ -4,7 +4,7 @@
     <TargetFrameworks>net8;net452;netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>Projeto ACBr</Company>
-    <Product>ACBrLib.CEP</Product>
+    <Product>ACBrLib.GTIN</Product>
     <Authors>Projeto ACBr</Authors>
     <Copyright>Copyright © Projeto ACBr 2018 - 2021</Copyright>
     <PackageProjectUrl>http://projetoacbr.com.br/</PackageProjectUrl>
@@ -15,10 +15,11 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <Version>1.0.2.0</Version>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <FileVersion>1.0.8.0</FileVersion>
+    <Version>1.0.8.0</Version>
     <Platforms>AnyCPU</Platforms>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
@@ -49,8 +50,23 @@
     <DocumentationFile>..\..\bin\Release\netstandard2.0\ACBrLib.CEP.xml</DocumentationFile>
   </PropertyGroup>
   
+   <Choose>
+    <When Condition=" '$(IsPacking)' == 'true' ">
+
+      <ItemGroup>
+        <PackageReference Include="ACBrLib.Core" Version="[1.2.48,)" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Shared\ACBrLib.Core\ACBrLib.Core.csproj" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Shared\ACBrLib.Core\ACBrLib.Core.csproj" />
+    <Compile Include="..\Shared\IACBrLibGTIN.cs" Link="IACBrLibGTIN.cs" />
+    <Compile Include="..\Shared\ACBrGTINConfig.cs" Link="ACBrGTINConfig.cs" />
   </ItemGroup>
 	
   

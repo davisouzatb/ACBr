@@ -48,6 +48,127 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+
+07/05/2026
+-- ACBrBoletoW_Sicoob_V3.pas --
+[*] Adicionado no comando de alteração a ocorrencia ToRemessaConcederAbatimento 
+   [ACBR-9343] - https://www.projetoacbr.com.br/forum/topic/92121-sicoob-erro-ao-conceder-abatimento/
+   Por: Valter Patrick
+
+13/04/2026
+-- ACBrBancoSicredi.pas --
+[-] Correção no comportamento do CNAB240 propriedade MultaValorFixo
+   [ACBR-8920] - https://www.projetoacbr.com.br/forum/topic/84603-banco-sicredi-n%C3%A3o-est%C3%A1-convertendo-multa-de-valor-fixo-para-percentual-cnab-240/
+   Por: Igor Rafael Martins / Valter Patrick
+
+09/04/2026
+-- ACBrBancoInter.pas --
+[-] Corrigido MontarCodigoBarras devido a divirgencia entre as carteiras 110/112;
+   [ACBR-9236] - https://www.projetoacbr.com.br/forum/topic/91415-boleto-inter-linha-digit%C3%A1vel
+   Por: Daniel de Morais InfoCotidano / Victor H. Gonzales Pandaaaa
+
+08/04/2026
+-- Particularidades --
+[*] Adicionado particularidades C6 responsavel da emissao que impacta na barras e linha digitavel do boleto.
+   Por: Daniel de Morais InfoCotidano
+
+07/04/2026
+-- ACBrBoletoW_Banrisul.pas --
+[*] ACBR-9008 - Adicionado a opção de Alterar Data de Vencimento e Alterar Valor do Abatimento
+   https://www.projetoacbr.com.br/forum/topic/89444-acbr-9008-boleto-api-banrisul-adicionado-a-op%C3%A7%C3%A3o-de-alterar-data-de-vencimento-e-alterar-valor-do-abatimento
+   Por: Pablo Cerbaro
+
+02/04/2026
+-- ACBrBoletoRet_Sicoob_V3.pas --
+[*] ACBR-8474 - Quando erro de credenciais, não retorna json e sim string, isso gerava erro na hora do parse
+   https://www.projetoacbr.com.br/forum/topic/87538-erro-no-parse-do-retws-no-siccob-v3/#comment-568732
+   Por: Sady Martins Membros / Validado Valter Patrick
+
+01/04/2026
+-- ACBrBoletoW_BancoBrasil_API --
+[*] ACBr-8818 - Implementado TpAltera: Baixa e Cancelamento de Negativação
+   https://www.projetoacbr.com.br/forum/topic/89573-acbr-8818-altera%C3%A7%C3%A3o-negativa%C3%A7%C3%A3o-boletos-banco-do-brasil/
+   Por: Desenvolvimento Eagle / Daniel Morais InfoCotidiano
+
+25/03/2026
+-- ACBrBoletoW_Itau_API --
+[-] ACBR-8971 - Corrigidos vazamentos de memória - https://www.projetoacbr.com.br/forum/topic/90184-acbr-8971-bolecode-ita%C3%BA-api-memory-leak-no-envio-do-boleto-acbrboletow_itau_apipas/
+   Por: Luizfern
+
+-- ACBrBoleto --
+[+] ACBR-8582 - Implementados dados recebidos no parâmetro AReplyTo no EnviarEmail() do ACBrBoleto - https://www.projetoacbr.com.br/forum/topic/88308-acbr-8582-par%C3%A2metro-areplyto-est%C3%A1-sendo-ignorado-no-m%C3%A9todo-tacbrboletoenviaremail/ 
+-- uDemoBoleto --
+[+] ACBR-8582 - Atribuído ACBrMail ao ACBrBoleto na criação dos componentes do programa de exemplo
+   Por: Renato Rubinho
+
+23/03/2026
+-- ACBrBancoDaycoval --
+[-] ACBr-8883 - Ajustado LerNossoNumeroCompleto qdo fpLayoutVersaoArquivo = 6  
+	https://www.projetoacbr.com.br/forum/topic/89820-leitura-do-nosso-n%C3%BAmero-no-retorno-cortando-banco-daycoval/
+   Por: Daniel Morais InfoCotidiano
+
+16/03/2026
+-- ACBrBancoBradesco --
+[-] ACBr-9140 - Ajustado CNAB 400 do Bradesco, para gerar ValorMoraJuros qdo for maior que zero. ja que no 400, não envia Codigo Mora segundo manual.
+	https://www.projetoacbr.com.br/forum/topic/90963-d%C3%BAvida-juros-n%C3%A3o-aparece-no-arquivo-de-remessa
+   Por: Daniel Morais InfoCotidiano
+
+03/03/2026
+-- ACBrBancoAmazonia --
+[-] ACBr-9049 - Ajustado conforme documentação para enviar 7 posições
+	https://www.projetoacbr.com.br/forum/topic/90617-acbr-9049-nosso-n%C3%BAmero-portador-banco-da-amaz%C3%B4nia
+   Por: Daniel Morais InfoCotidiano
+
+03/03/2026
+-- ACBrBancoBanrisul --
+[-] ACBR-8922 - Definindo especies do titulo (DM, DMI, DS, etc) como padrao dos outros bancos, pois estava hardcoded '02' ao gerar a remessa.
+	https://www.projetoacbr.com.br/forum/topic/89969-acbr-8922-banco-banrisul/ 
+   Por: Simons/Cleomar Pacheco/ Daniel Morais InfoCotidiano
+
+02/03/2026
+-- ACBrBoletoW_Sicoob_V3 --
+[-] ACBR-8936 - Corrigidos vazamentos de memória na criação de objetos desnecessários - https://www.projetoacbr.com.br/forum/topic/90135-acbr-8936-boleto-sicoob-api-memory-leak-na-fun%C3%A7%C3%A3o-gerarinstrucao-acbrboletow_sicoob_v3pas/
+   Por: Luizfern
+
+26/02/2026
+-- ACBrBoletoW_BancoBrasil_API  --
+[*] Remoção dos zeros a esquerda agencia e conta na consulta conforma orientação do banco. evitando erro Contrato de cobrança não localizado.
+   https://discord.com/channels/798697718800318484/809129039159230514/1476317837982175299
+   Por: UpSolucoes
+
+23/02/2026
+-- ACBrBoletoW_Bradesco.pas, ACBrBoletoRet_Bradesco.pas  --
+[*] Implementação de Lista de Boletos Liquido com QR CODE Bradesco via API do site bradesco developers
+   https://www.projetoacbr.com.br/forum/topic/88636-acbr-8655implementa%C3%A7%C3%A3o-de-lista-de-boletos-liquido-com-qr-code-bradesco-via-api-do-site-bradesco-developers
+   Por: Jhonlenon Ribeiro
+
+23/02/2026
+-- ACBrBoletoW_Safra.pas  --
+[*] Ajsutes para Consutas Banco Safra Homologação.
+   https://www.projetoacbr.com.br/forum/topic/85230-problema-na-homologa%C3%A7%C3%A3o-banco-safra
+   Por: João Vitor Bogo / Daniel de Morais InfoCotidano
+
+18/02/2026
+-- ACBrBoletoW_Santander_API  --
+[-] Correção quando o EnvioAuxiliar ou EnvioComplementar receberem um json inválido
+   Por: Renato Rubinho
+
+12/02/2026
+-- ACBrBoletoW_BancoBrasil_API  --
+[*]Permitir enviar um boleto sem o nossoNumero para que o banco possa gerar o NN 
+   ACBR-8930 https://www.projetoacbr.com.br/forum/topic/86064-acbr-8930-acbr-boleto-gera%C3%A7%C3%A3o-de-boleto-do-banco-do-brasil-via-api/
+   Por: Sergio Fuchs
+
+10/02/2026
+-- ACBrBoletoW_Bradesco  --
+[-] Corrigido a propriedade cindcdEconmMoeda conforme manual Hibrido (portal/legado), tbm corrigido ctpoPrzCobr, adicionado validacao no metodo AdicionarDescontoJSON
+   ACBR-8543 https://www.projetoacbr.com.br/forum/topic/88007-boleto-bradesco-api/
+   Por: Fernanda Penteado
+-- ACBrBancoCredisan --
+[+] Implementado número sequencial como sufixo do nome do arquivo do banco 089-Credisan quando houverem mais de um arquivo gerados no mesmo dia
+   https://www.projetoacbr.com.br/forum/topic/90227-remessa-banco-credisan-89-substitui-arquivo-do-mesmo-dia/
+   Por: Renato Rubinho
+
 04/02/2026
 -- ACBrBoletoW_BancoBrasil_API  --
 [*] Criado regras de validação para quantidadeDiasProtesto conforme manual BB

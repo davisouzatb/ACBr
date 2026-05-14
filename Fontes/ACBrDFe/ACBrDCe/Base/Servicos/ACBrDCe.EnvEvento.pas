@@ -47,8 +47,6 @@ uses
   ACBrXmlBase,
   ACBrDFe.Conversao,
   ACBrDFeConsts,
-  pcnSignature,
-//  ACBrDFeComum.SignatureClass,
   ACBrDCe.Consts,
   ACBrDCe.EventoClass,
   ACBrBase,
@@ -235,7 +233,7 @@ begin
                     EmitenteDCeToStr(Evento[Idx].InfEvento.tpEmit), DSC_TPEMIT));
 
   { Segundo o Manual }
-  sDoc := OnlyNumber(Evento[Idx].InfEvento.CNPJCPF);
+  sDoc := OnlyAlphaNum(Evento[Idx].InfEvento.CNPJCPF);
 
   if EstaVazio(sDoc) then
     sDoc := ExtrairCNPJCPFChaveAcesso(Evento[Idx].InfEvento.chDCe);
@@ -250,7 +248,7 @@ begin
 
   if EstaVazio(sDoc) then
   begin
-    sDoc := OnlyNumber(Evento[Idx].InfEvento.CNPJCPFEmit);
+    sDoc := OnlyAlphaNum(Evento[Idx].InfEvento.CNPJCPFEmit);
 
     if Length(sDoc) = 14 then
     begin
@@ -400,7 +398,7 @@ begin
     while true do
     begin
       sSecao := 'EVENTO' + IntToStrZero(I, 3);
-      sFim := INIRec.ReadString(sSecao, 'chNFe', 'FIM');
+      sFim := INIRec.ReadString(sSecao, 'chDCe', 'FIM');
 
       if (sFim = 'FIM') or (Length(sFim) <= 0) then
         break ;

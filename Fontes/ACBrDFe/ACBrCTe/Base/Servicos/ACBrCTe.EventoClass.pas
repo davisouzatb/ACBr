@@ -43,11 +43,28 @@ uses
   {$ELSEIF DEFINED(DELPHICOMPILER16_UP)}
    System.Contnrs,
   {$IfEnd}
-  pcnConversao, pcteConversaoCTe,
+  pcnConversao,
+  pcteConversaoCTe,
   ACBrBase;
 
 type
   EventoException = class(Exception);
+
+  Tpgto = class
+  private
+    FtpMeioPgto: string;
+    FCNPJReceb: string;
+    FCNPJBasePSP: string;
+    FnPag: Integer;
+    FidTransacao: string;
+  public
+
+    property tpMeioPgto: string read FtpMeioPgto write FtpMeioPgto;
+    property CNPJReceb: string read FCNPJReceb write FCNPJReceb;
+    property CNPJBasePSP: string read FCNPJBasePSP write FCNPJBasePSP;
+    property nPag: Integer read FnPag write FnPag;
+    property idTransacao: string read FidTransacao write FidTransacao;
+  end;
 
   TInfCorrecaoCollectionItem = class(TObject)
   private
@@ -242,6 +259,8 @@ type
     Fplaca: string;
     FchMDFe: string;
     FSegCodBarras: string;
+    Fpgto: Tpgto;
+    FnProtVincPgto: string;
 
     procedure SetinfCorrecao(const Value: TInfCorrecaoCollection);
     procedure SetxCondUso(const Value: string);
@@ -307,6 +326,8 @@ type
     property placa: string read Fplaca write Fplaca;
     property chMDFe: string read FchMDFe write FchMDFe;
     property SegCodBarras: string read FSegCodBarras write FSegCodBarras;
+    property pgto: Tpgto read Fpgto write Fpgto;
+    property nProtVincPgto: string read FnProtVincPgto write FnProtVincPgto;
   end;
 
   TInfEvento = class
@@ -497,6 +518,8 @@ begin
     teCancPrestDesacordo          : Result := 'Cancelamento Prestacao do Servico em Desacordo';
     teInsucessoEntregaCTe         : Result := 'Insucesso na Entrega do CT-e';
     teCancInsucessoEntregaCTe     : Result := 'Cancelamento do Insucesso de Entrega do CT-e';
+    teVinculoPgto                 : Result := 'Vinculacao do Pagamento';
+    teCancVinculoPgto             : Result := 'Cancelamento da vinculacao do pagamento';
   else
     Result := '';
   end;
@@ -555,6 +578,8 @@ begin
     teCancPrestDesacordo       : Result := 'Cancelamento Prestacao do Servico em Desacordo';
     teInsucessoEntregaCTe      : Result := 'Insucesso na Entrega do CT-e';
     teCancInsucessoEntregaCTe  : Result := 'Cancelamento do Insucesso de Entrega do CT-e';
+    teVinculoPgto              : Result := 'Vinculacao do Pagamento';
+    teCancVinculoPgto          : Result := 'Cancelamento da vinculacao do pagamento';
   else
     Result := 'Não Definido';
   end;
@@ -596,6 +621,7 @@ begin
   FinfEntrega := TInfEntregaCollection.Create;
   FMDFe := TMDFe.Create;
   Femit := TInfRemDest.Create;
+  Fpgto := Tpgto.Create;
 end;
 
 destructor TDetEvento.Destroy;
@@ -605,6 +631,7 @@ begin
   FinfEntrega.Free;
   FMDFe.Free;
   Femit.Free;
+  Fpgto.Free;
 
   inherited;
 end;

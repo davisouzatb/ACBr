@@ -40,7 +40,7 @@ uses
   SysUtils, Classes,
   ACBrDFe.Conversao,
   ACBrXmlBase,
-  ACBrXmlDocument,
+  ACBrXmlDocument, ACBrNFSeXConversao,
   ACBrNFSeXProviderBase, ACBrNFSeXWebservicesResponse;
 
 type
@@ -138,6 +138,9 @@ type
                                      Response: TNFSeWebserviceResponse;
                                      const AListTag: string = 'ListaMensagemRetorno';
                                      const AMessageTag: string = 'MensagemRetorno'); virtual;
+  public
+    procedure AlteraVersao(const AVersao: TVersaoNFSe); override;
+    function SuportaVersao(const AVersao: TVersaoNFSe): Boolean; override;
 
   end;
 
@@ -147,9 +150,14 @@ uses
   ACBrUtil.Base, ACBrUtil.Strings, ACBrUtil.XMLHTML,
   ACBrDFeException,
   ACBrNFSeX, ACBrNFSeXConfiguracoes, ACBrNFSeXNotasFiscais, ACBrNFSeXConsts,
-  ACBrNFSeXConversao, ACBrNFSeXWebserviceBase;
+  ACBrNFSeXWebserviceBase;
 
 { TACBrNFSeProviderABRASFv1 }
+
+procedure TACBrNFSeProviderABRASFv1.AlteraVersao(const AVersao: TVersaoNFSe);
+begin
+  //Não vai fazer nada aqui, sobrescrever na herança
+end;
 
 procedure TACBrNFSeProviderABRASFv1.Configuracao;
 const
@@ -1644,13 +1652,13 @@ begin
 
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
 
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Substituir NFSe']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosSubstituiNFSe(
   Response: TNFSeSubstituiNFSeResponse; Params: TNFSeParamsResponse);
 begin
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Substituir NFSe']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.LerCancelamento(ANode: TACBrXmlNode;
@@ -1710,7 +1718,7 @@ end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoSubstituiNFSe(Response: TNFSeSubstituiNFSeResponse);
 begin
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Tratar Retorno Substitui NFSe']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosGerarToken(
@@ -1718,7 +1726,7 @@ procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosGerarToken(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Token']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.PrepararGerarToken(
@@ -1726,7 +1734,7 @@ procedure TACBrNFSeProviderABRASFv1.PrepararGerarToken(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Gerar Token']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoGerarToken(
@@ -1740,7 +1748,7 @@ procedure TACBrNFSeProviderABRASFv1.PrepararEnviarEvento(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Enviar Evento']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosEnviarEvento(
@@ -1748,7 +1756,7 @@ procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosEnviarEvento(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Enviar Evento']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoEnviarEvento(
@@ -1762,7 +1770,7 @@ procedure TACBrNFSeProviderABRASFv1.PrepararConsultarEvento(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Consultar Evento']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarEvento(
@@ -1770,7 +1778,7 @@ procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarEvento(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Consultar Evento']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoConsultarEvento(
@@ -1784,7 +1792,7 @@ procedure TACBrNFSeProviderABRASFv1.PrepararConsultarDFe(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Consultar DFe']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarDFe(
@@ -1792,7 +1800,7 @@ procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarDFe(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Consultar DFe']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoConsultarDFe(
@@ -1806,7 +1814,7 @@ procedure TACBrNFSeProviderABRASFv1.PrepararConsultarParam(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Consultar Param']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarParam(
@@ -1814,7 +1822,7 @@ procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarParam(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Consultar Param']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoConsultarParam(
@@ -1827,14 +1835,14 @@ procedure TACBrNFSeProviderABRASFv1.PrepararConsultarSeqRps(Response: TNFSeConsu
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Consultar Seq RPS']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultarSeqRps(Response: TNFSeConsultarSeqRpsResponse);
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Consultar Seq RPS']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoConsultarSeqRps(Response: TNFSeConsultarSeqRpsResponse);
@@ -1846,14 +1854,14 @@ procedure TACBrNFSeProviderABRASFv1.PrepararObterDANFSE(Response: TNFSeObterDANF
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Obter Danfse']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosObterDANFSE(Response: TNFSeObterDANFSEResponse);
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Gerar MSG Dados Obter Danfse']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.TratarRetornoObterDANFSE(Response: TNFSeObterDANFSEResponse);
@@ -1866,7 +1874,7 @@ procedure TACBrNFSeProviderABRASFv1.PrepararConsultaLinkNFSe(
 begin
   // Deve ser implementado para cada provedor que tem o seu próprio layout
   TACBrNFSeX(FAOwner).SetStatus(stNFSeIdle);
-  raise EACBrDFeException.Create(ERR_NAO_IMP);
+  raise EACBrDFeException.Create(Format(ERR_NAO_IMP, ['Preparar Consulta Link NFSe']));
 end;
 
 procedure TACBrNFSeProviderABRASFv1.GerarMsgDadosConsultaLinkNFSe(
@@ -1920,6 +1928,11 @@ begin
       AErro.Correcao := ObterConteudoTag(ANodeArray[I].Childrens.FindAnyNs('Correcao'), tcStr);
     end;
   end;
+end;
+
+function TACBrNFSeProviderABRASFv1.SuportaVersao(const AVersao: TVersaoNFSe): Boolean;
+begin
+  Result := True;
 end;
 
 end.

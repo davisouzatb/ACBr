@@ -65,6 +65,8 @@ type
 
     property NameSpace: string read GetNameSpace;
     property SoapAction: string read GetSoapAction;
+
+    function TratarXmlRetornado(const aXML: string): string; override;
   end;
 
   TACBrNFSeProviderTinus = class (TACBrNFSeProviderABRASFv1)
@@ -74,8 +76,6 @@ type
     function CriarGeradorXml(const ANFSe: TNFSe): TNFSeWClass; override;
     function CriarLeitorXml(const ANFSe: TNFSe): TNFSeRClass; override;
     function CriarServiceClient(const AMetodo: TMetodo): TACBrNFSeXWebservice; override;
-    procedure TratarRetornoEmitir(Response: TNFSeEmiteResponse); override;
-    procedure TratarRetornoConsultaNFSeporRps(Response: TNFSeConsultaNFSeporRpsResponse); override;
 
     procedure ValidarSchema(Response: TNFSeWebserviceResponse; aMetodo: TMetodo); override;
   end;
@@ -93,13 +93,7 @@ type
     function GerarNFSe(const ACabecalho, AMSG: String): string; override;
     function ConsultarLote(const ACabecalho, AMSG: String): string; override;
     function ConsultarNFSePorRps(const ACabecalho, AMSG: String): string; override;
-    {
-    function ConsultarNFSePorFaixa(const ACabecalho, AMSG: String): string; override;
-    function ConsultarNFSeServicoPrestado(const ACabecalho, AMSG: String): string; override;
-    function ConsultarNFSeServicoTomado(const ACabecalho, AMSG: String): string; override;
-    }
     function Cancelar(const ACabecalho, AMSG: String): string; override;
-//    function SubstituirNFSe(const ACabecalho, AMSG: String): string; override;
 
     function TratarXmlRetornado(const aXML: string): string; override;
   end;
@@ -135,7 +129,10 @@ uses
   ACBrDFe.Conversao,
   ACBrNFSeX,
   ACBrNFSeXConfiguracoes,
-  ACBrNFSeXNotasFiscais, Tinus.GravarXml, Tinus.LerXml, ACBrNFSeXConsts,
+  ACBrNFSeXNotasFiscais,
+  Tinus.GravarXml,
+  Tinus.LerXml,
+  ACBrNFSeXConsts,
   ACBrUtil.Strings;
 
 { TACBrNFSeXWebserviceTinus }
@@ -251,6 +248,15 @@ begin
                      [NameSpace]);
 end;
 
+function TACBrNFSeXWebserviceTinus.TratarXmlRetornado(
+  const aXML: string): string;
+begin
+  Result := inherited TratarXmlRetornado(aXML);
+
+  Result := ParseText(Result);
+  Result := RemoverPrefixosDesnecessarios(Result);
+end;
+
 { TACBrNFSeProviderTinus }
 
 procedure TACBrNFSeProviderTinus.Configuracao;
@@ -297,33 +303,6 @@ begin
       raise EACBrDFeException.Create(ERR_SEM_URL_PRO)
     else
       raise EACBrDFeException.Create(ERR_SEM_URL_HOM);
-  end;
-end;
-
-procedure TACBrNFSeProviderTinus.TratarRetornoEmitir(Response: TNFSeEmiteResponse);
-var
-  Retorno: TTrataXmlEnvio;
-begin
-  // USA PADRAO NACIONAL
-  Retorno := TTrataXmlEnvio.Create(FAOwner);
-  try
-    Retorno.TratarRetornoEmitir(Response);
-  finally
-    Retorno.Free;
-  end;
-end;
-
-procedure TACBrNFSeProviderTinus.TratarRetornoConsultaNFSeporRps(
-  Response: TNFSeConsultaNFSeporRpsResponse);
-var
-  Retorno: TTrataXmlConsulta;
-begin
-  // USA PADRAO NACIONAL
-  Retorno := TTrataXmlConsulta.Create(FAOwner);
-  try
-    Retorno.TratarRetornoConsultaNFSeporRpsPublic(Response);
-  finally
-    Retorno.Free;
   end;
 end;
 
@@ -384,165 +363,70 @@ end;
 
 function TACBrNFSeXWebserviceTinus203.Recepcionar(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
   Result := Executar('http://nfse.abrasf.org.br/WSNFSE203.Service2.nfseSOAP.EnviarLoteRpsEnvio',
-                     Request,
+                     AMSG,
                      ['outputXML', 'EnviarLoteRpsResposta'],
                      ['']);
 end;
 
 function TACBrNFSeXWebserviceTinus203.RecepcionarSincrono(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
   Result := Executar('http://nfse.abrasf.org.br/WSNFSE203.Service2.nfseSOAP.EnviarLoteRpsSincronoEnvio',
-                     Request,
+                     AMSG,
                      ['outputXML', 'EnviarLoteRpsSincronoResposta'],
                      ['xmlns:nfse="http://nfse.abrasf.org.br"']);
 end;
 
 function TACBrNFSeXWebserviceTinus203.GerarNFSe(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
   Result := Executar('http://nfse.abrasf.org.br/WSNFSE203.Service2.nfseSOAP.GerarNfseEnvio',
-                     Request,
+                     AMSG,
                      ['outputXML', 'GerarNfseResposta'],
                      ['xmlns:nfse="http://nfse.abrasf.org.br"']);
 end;
 
 function TACBrNFSeXWebserviceTinus203.ConsultarLote(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
   Result := Executar('http://nfse.abrasf.org.br/WSNFSE203.Service2.nfseSOAP.ConsultarLoteRpsEnvio',
-                     Request,
+                     AMSG,
                      ['outputXML', 'ConsultarLoteRpsResposta'],
                      ['xmlns:nfse="http://nfse.abrasf.org.br"']);
 end;
 
 function TACBrNFSeXWebserviceTinus203.ConsultarNFSePorRps(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
   Result := Executar('http://nfse.abrasf.org.br/WSNFSE203.Service2.nfseSOAP.ConsultarNfseRpsEnvio',
-                     Request,
+                     AMSG,
                      ['outputXML', 'ConsultarNfseRpsResposta'],
                      ['xmlns:nfse="http://nfse.abrasf.org.br"']);
 end;
-(*
-function TACBrNFSeXWebserviceTinus203.ConsultarNFSePorFaixa(const ACabecalho,
-  AMSG: String): string;
-var
-  Request: string;
-begin
-  FPMsgOrig := AMSG;
 
-  Request := '<nfse:ConsultarNfsePorFaixaRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
-  Request := Request + '</nfse:ConsultarNfsePorFaixaRequest>';
-
-  Result := Executar('http://nfse.abrasf.org.br/ConsultarNfsePorFaixa',
-                     Request,
-                     ['outputXML', 'ConsultarNfseFaixaResposta'],
-                     ['xmlns:nfse="http://nfse.abrasf.org.br"']);
-end;
-
-function TACBrNFSeXWebserviceTinus203.ConsultarNFSeServicoPrestado(
-  const ACabecalho, AMSG: String): string;
-var
-  Request: string;
-begin
-  FPMsgOrig := AMSG;
-
-  Request := '<nfse:ConsultarNfseServicoPrestadoRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
-  Request := Request + '</nfse:ConsultarNfseServicoPrestadoRequest>';
-
-  Result := Executar('http://nfse.abrasf.org.br/ConsultarNfseServicoPrestado',
-                     Request,
-                     ['outputXML', 'ConsultarNfseServicoPrestadoResposta'],
-                     ['xmlns:nfse="http://nfse.abrasf.org.br"']);
-end;
-
-function TACBrNFSeXWebserviceTinus203.ConsultarNFSeServicoTomado(
-  const ACabecalho, AMSG: String): string;
-var
-  Request: string;
-begin
-  FPMsgOrig := AMSG;
-
-  Request := '<nfse:ConsultarNfseServicoTomadoRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
-  Request := Request + '</nfse:ConsultarNfseServicoTomadoRequest>';
-
-  Result := Executar('http://nfse.abrasf.org.br/ConsultarNfseServicoTomado',
-                     Request,
-                     ['outputXML', 'ConsultarNfseServicoTomadoResposta'],
-                     ['xmlns:nfse="http://nfse.abrasf.org.br"']);
-end;
-*)
 function TACBrNFSeXWebserviceTinus203.Cancelar(const ACabecalho,
   AMSG: String): string;
-var
-  Request: string;
 begin
   FPMsgOrig := AMSG;
 
-  Request := AMSG;
-
   Result := Executar('http://nfse.abrasf.org.br/WSNFSE203.Service2.nfseSOAP.CancelarNfseEnvio',
-                     Request,
+                     AMSG,
                      ['outputXML', 'CancelarNfseResposta'],
                      ['xmlns:nfse="http://nfse.abrasf.org.br"']);
 end;
-(*
-function TACBrNFSeXWebserviceTinus203.SubstituirNFSe(const ACabecalho,
-  AMSG: String): string;
-var
-  Request: string;
-begin
-  FPMsgOrig := AMSG;
 
-  Request := '<nfse:SubstituirNfseRequest>';
-  Request := Request + '<nfseCabecMsg>' + XmlToStr(ACabecalho) + '</nfseCabecMsg>';
-  Request := Request + '<nfseDadosMsg>' + XmlToStr(AMSG) + '</nfseDadosMsg>';
-  Request := Request + '</nfse:SubstituirNfseRequest>';
-
-  Result := Executar('http://nfse.abrasf.org.br/SubstituirNfse', Request,
-                     ['outputXML', 'SubstituirNfseResposta'],
-                     ['xmlns:nfse="http://nfse.abrasf.org.br"']);
-end;
-*)
 function TACBrNFSeXWebserviceTinus203.TratarXmlRetornado(
   const aXML: string): string;
 begin
@@ -560,7 +444,11 @@ begin
   with ConfigGeral do
   begin
     QuebradeLinha := '\s\n';
-    ConsultaPorFaixaPreencherNumNfseFinal := True;
+
+    ServicosDisponibilizados.ConsultarFaixaNfse := False;
+    ServicosDisponibilizados.ConsultarServicoPrestado := False;
+    ServicosDisponibilizados.ConsultarServicoTomado := False;
+    ServicosDisponibilizados.SubstituirNfse := False;
   end;
 
   with ConfigAssinar do
@@ -642,7 +530,6 @@ begin
           '</' + Prefixo2 + 'InfPedidoCancelamento>' +
         '</' + Prefixo2 + 'Pedido>' +
       '</' + Prefixo + 'CancelarNfseEnvio>';
-
   end;
 end;
 
@@ -653,7 +540,7 @@ var
   ANode, AuxNode, AuxNode2: TACBrXmlNode;
   AErro: TNFSeEventoCollectionItem;
   ANota: TNotaFiscal;
-  NumNFSe, NumRps: String;
+  NumNFSe, NumRps: string;
 begin
   // USA PADRAO NACIONAL
 
@@ -716,8 +603,9 @@ begin
         with Response do
         begin
           NumeroNota := NumNFSe;
-          CodigoVerificacao := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('nDFSe'), tcStr);
+          CodigoVerificacao := OnlyNumber(ObterConteudoTag(AuxNode.Attributes.Items['Id']));
           Data := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('dhProc'), FpFormatoDataEmissao);
+          Status := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('cStat'), tcInt);
         end;
 
         ANota := TACBrNFSeX(FAOwner).NotasFiscais.FindByNFSe(NumNFSe);
@@ -779,7 +667,6 @@ begin
   finally
     FreeAndNil(Document);
   end;
-
 end;
 
 procedure TACBrNFSeProviderTinus203.TratarRetornoEmitir(

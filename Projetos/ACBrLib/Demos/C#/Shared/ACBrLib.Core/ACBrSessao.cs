@@ -70,6 +70,7 @@
         MercadoPago,
         C6Bank,
         AppLess,
+        QQPag,
         IBGE,
         AbecsPinpad,
         AbecsPinpad_Device

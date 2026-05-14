@@ -52,6 +52,22 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+26/03/2026
+-- pcesS1202 --
+[-] Ajuste para que o grupo infPerAnt seja gerado a partir do INI apenas se informado remunOrgSuc
+  Por: Diego Folieni
+  Veja: https://www.projetoacbr.com.br/forum/topic/91369-erro-envio-evento-s1202-esocial/ 
+
+13/03/2026
+-- pcesS2410 --
+[*] ACBR-9111 - Adiciona a rotina de leitura do INI para o evento S-2410 (evtCdBenIn)
+  Por: Diego Folieni
+  Veja: https://www.projetoacbr.com.br/forum/topic/90897-acbr-9111-erro-envio-evento-s2410-esocial/ 
+27/02/2026
+-- Diversos --
+[*] ACBR-9037: Implementada NT 2026/006 e atualizados schemas
+  Por: Renato Rubinho
+
 25/11/2025
 -- Diversos --
 [*] ACBR-8343: Implementada NT 2025/005

@@ -4,11 +4,18 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using ACBrLib.Core;
 
 namespace ACBrLib.NFSe
 {
-    public sealed partial class ACBrNFSe
+
+    /// <summary>
+    /// ACBrNFSeHandle é a classe bridge para os métodos nativos da biblioteca ACBrLibNFSe. Ela é responsável por carregar a biblioteca, mapear os métodos nativos e fornecer uma interface para que o ACBrNFSe possa chamar esses métodos de forma segura e eficiente.
+    /// A classe utiliza o padrão Singleton para garantir que apenas uma instância do handle seja criada durante a execução do programa, evitando problemas de concorrência e garantindo o gerenciamento adequado dos recursos.
+    /// </summary>
+    internal sealed class ACBrNFSeHandle : ACBrLibHandleBase
     {
+        
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int NFSE_Inicializar(ref IntPtr handle, string eArqConfig, string eChaveCrypt);
 
@@ -180,6 +187,11 @@ namespace ACBrLib.NFSe
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int NFSE_ObterInformacoesProvedor(IntPtr handle, StringBuilder buffer, ref int bufferSize);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int NFSE_SetVersaoDF(IntPtr handle, string aVersao);
+        /// <summary>
+        /// Inicializa os métodos nativos da biblioteca ACBrLibNFSe, mapeando cada método nativo para um delegate correspondente. Essa configuração é essencial para que o ACBrNFSe possa chamar os métodos nativos de forma segura e eficiente, garantindo a correta comunicação entre o código gerenciado em C# e a biblioteca nativa.
+        /// </summary>
         protected override void InitializeMethods()
         {
             AddMethod<NFSE_Inicializar>("NFSE_Inicializar");
@@ -239,6 +251,24 @@ namespace ACBrLib.NFSe
             AddMethod<NFSE_ObterDANFSE>("NFSE_ObterDANFSE");
             AddMethod<NFSE_ConsultarParametros>("NFSE_ConsultarParametros");
             AddMethod<NFSE_ObterInformacoesProvedor>("NFSE_ObterInformacoesProvedor");
+            AddMethod<NFSE_SetVersaoDF>("NFSE_SetVersaoDF");
         }
+
+        /// <inheritdoc />
+        protected override string GetLibraryName()
+        {
+            var arch = Environment.Is64BitProcess ? "64" : "32";
+            if (PlatformID.Unix == Environment.OSVersion.Platform)
+                return $"libacbrnfse{arch}.so";
+
+            return $"ACBrNFSe{arch}.dll";
+        }
+
+        private static readonly Lazy<ACBrNFSeHandle> instance = new Lazy<ACBrNFSeHandle>(() => new ACBrNFSeHandle());
+        /// <summary>
+        /// Retorna a instância singleton do ACBrNFSeHandle, garantindo que apenas uma instância seja criada durante a execução do programa. Essa abordagem é eficiente e segura para o gerenciamento dos recursos da biblioteca ACBrLibNFSe, evitando problemas de concorrência e garantindo que os métodos nativos sejam acessados de forma consistente.
+        /// </summary>
+        public static ACBrNFSeHandle Instance => instance.Value;
+
     }
 }

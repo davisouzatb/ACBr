@@ -151,6 +151,7 @@ type
     FGerarTagRps: Boolean;
     FNrOcorrDataPagamento: Integer;
     FNrOcorrInfAdicional: Integer;
+    FNrOcorrCidadeNome: Integer;
 
   protected
     procedure Configuracao; override;
@@ -229,7 +230,7 @@ type
 
   public
     function GerarXml: Boolean; override;
-    function GerarIni: string; override;
+//    function GerarIni: string; override;
 
     property NrOcorrComplTomador: Integer read FNrOcorrComplTomador write FNrOcorrComplTomador;
     property NrOcorrFoneTomador: Integer  read FNrOcorrFoneTomador  write FNrOcorrFoneTomador;
@@ -330,6 +331,7 @@ type
     property NrOcorrCodigoNBS: Integer read FNrOcorrCodigoNBS write FNrOcorrCodigoNBS;
     property NrOcorrDataPagamento: Integer read FNrOcorrDataPagamento write FNrOcorrDataPagamento;
     property NrOcorrInfAdicional: Integer read FNrOcorrInfAdicional write FNrOcorrInfAdicional;
+    property NrOcorrCidadeNome: Integer read FNrOcorrCidadeNome write FNrOcorrCidadeNome;
 
     property GerarTagServicos: Boolean read FGerarTagServicos write FGerarTagServicos;
     property GerarIDDeclaracao: Boolean read FGerarIDDeclaracao write FGerarIDDeclaracao;
@@ -462,6 +464,7 @@ begin
   FNrOcorrAliquotaCpp := -1;
   FNrOcorrRetidoCpp := -1;
   FNrOcorrInfAdicional := -1;
+  FNrOcorrCidadeNome := -1;
 
   FGerarTagServicos := True;
   FGerarIDDeclaracao := True;
@@ -1003,6 +1006,8 @@ begin
 end;
 
 function TNFSeW_ABRASFv2.GerarEnderecoTomador: TACBrXmlNode;
+var
+  lUf: String;
 begin
   Result := nil;
 
@@ -1035,6 +1040,9 @@ begin
 
     Result.AppendChild(AddNode(tcStr, '#43', 'CodigoMunicipio', 7, 7, 0,
                   OnlyNumber(NFSe.Tomador.Endereco.CodigoMunicipio), DSC_CMUN));
+
+    Result.AppendChild(AddNode(tcStr, '#46', 'CidadeNome', 1, 50, NrOcorrCidadeNome,
+                      ObterNomeMunicipioUF(StrToIntDef(NFSe.Tomador.Endereco.CodigoMunicipio, 0), lUF), ''));
 
     Result.AppendChild(AddNode(tcStr, '#44', 'Uf', 2, 2, NrOcorrUFTomador,
                                              NFSe.Tomador.Endereco.UF, DSC_UF));
@@ -1352,6 +1360,8 @@ begin
   AINIRec.WriteString(FpSecao, 'MunicipioPrestacaoServico', NFSe.Servico.MunicipioPrestacaoServico);
   AINIRec.WriteFloat(FpSecao,'ValorTotalRecebido', NFSe.Servico.ValorTotalRecebido);
   AINIRec.WriteString(FpSecao, 'CodigoNBS', NFSe.Servico.CodigoNBS);
+  AINIRec.WriteString(FpSecao, 'ResponsavelRetencao', FpAOwner.ResponsavelRetencaoToStr(NFSe.Servico.ResponsavelRetencao));
+  AINIRec.WriteInteger(FpSecao, 'CodigoPais', NFSe.Servico.CodigoPais);
 end;
 
 procedure TNFSeW_ABRASFv2.GerarINISecaoServicos(const AINIRec: TMemIniFile);
@@ -1519,7 +1529,7 @@ procedure TNFSeW_ABRASFv2.GerarINISecaoParcelas(const AINIRec: TMemIniFile);
 begin
   //Não faz nada neste leiaute...
 end;
-
+(*
 function TNFSeW_ABRASFv2.GerarIni: string;
 var
   LINIRec: TMemIniFile;
@@ -1573,5 +1583,5 @@ begin
     end;
   end;
 end;
-
+*)
 end.

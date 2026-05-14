@@ -50,8 +50,10 @@ uses
   ACBrDFe.Conversao,
   pcnConversao,
   pcnConversaoNFe,
-  pcnSignature,
-//  ACBrDFeComum.SignatureClass,
+  ACBrXmlBase,
+  {$IFNDEF USE_ACBr_XMLDOCUMENT}
+   pcnSignature,
+  {$ENDIF}
   pcnProcNFe,
   ACBrBase;
 

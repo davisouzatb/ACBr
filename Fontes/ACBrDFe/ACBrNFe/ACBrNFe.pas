@@ -195,11 +195,7 @@ uses
   ACBrUtil.DateTime,
   synacode;
 
-{$IFDEF FPC}
- {$R ACBrNFeServicos.rc}
-{$ELSE}
- {$R ACBrNFeServicos.res}
-{$ENDIF}
+{$R ACBrNFeServicos.res}
 
 { TACBrNFe }
 
@@ -978,7 +974,7 @@ begin
 
       if trim(EventoNFe.Evento.Items[i].infEvento.detEvento.nProt) = '' then
       begin
-        if EventoNFe.Evento.Items[i].infEvento.tpEvento = teCancelamento then
+        if EventoNFe.Evento.Items[i].infEvento.tpEvento in [teCancelamento, teCancSubst] then
         begin
           EventoNFe.Evento.Items[i].infEvento.detEvento.nProt := NotasFiscais.Items[j].NFe.procNFe.nProt;
 

@@ -3,7 +3,7 @@
 {  Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
 { mentos de Automação Comercial utilizados no Brasil                           }
 {                                                                              }
-{ Direitos Autorais Reservados (c) 2020 Daniel Simoes de Almeida               }
+{ Direitos Autorais Reservados (c) 2026 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
@@ -108,11 +108,7 @@ var
 
 implementation
 
-{$IFDEF FPC}
- {$R ACBrTEFPayGo.rc}
-{$ELSE}
- {$R ACBrTEFPayGo.res}
-{$ENDIF}
+{$R ACBrTEFPayGo.res}
 
 uses
   Types,

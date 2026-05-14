@@ -290,7 +290,7 @@ begin
       GerarPagador(LJsonDocumento);
       GeraMensagem(LJsonDocumento);
 
-      AJson.AddPair('Documento',LJsonDocumento);
+      AJson.AddPair('documento',LJsonDocumento);
     end;
   end;
 end;

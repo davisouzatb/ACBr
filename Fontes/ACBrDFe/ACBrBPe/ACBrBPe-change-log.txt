@@ -45,6 +45,29 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+17/04/2026
+-- ACBrBPeXmlWriter --
+[*] ACBr-9119: Ajustes para gerar a tag CST com o valor correto quando for 
+    empresa do Simples Nacional.
+   Por: WLE
+
+15/04/2026
+-- Diversos --
+[*] ACBr-9136: Ajustes para o envio dos eventos de Vinculação de Pagamento e 
+    Cancelamento de Vinculação de Pagamento.
+   Por: Italo Giurizzato Junior
+
+10/04/2026
+-- Diversos --
+[*] ACBr-9136: Implementação dos novos campos constantes nas NT de 2025 e 2026 bem como 
+    os novos eventos de Vinculação de Pagamento e Cancelamento de Vinculação de Pagamento.
+   Por: Italo Giurizzato Junior
+
+25/02/2026
+-- ACBrBPeBilhetes --
+[*] Alteração visando remover se necessário os bytes do UTF8 BOM ao carregar um XML.
+   Por: Italo Giurizzato Junior
+
 11/10/2025
 -- Diversos --
 [*] Mais ajustes para a correta geração/leitura do arquivo XML e INI.

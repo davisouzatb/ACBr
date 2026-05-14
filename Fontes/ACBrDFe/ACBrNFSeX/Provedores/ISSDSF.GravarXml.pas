@@ -41,7 +41,8 @@ uses
   ACBrBase,
   ACBrXmlBase,
   ACBrXmlDocument,
-  ACBrNFSeXGravarXml;
+  ACBrNFSeXGravarXml,
+  ACBrNFSeXGravarXml_ABRASFv2;
 
 type
   { TNFSeW_ISSDSF }
@@ -58,6 +59,13 @@ type
   public
     function GerarXml: Boolean; override;
 
+  end;
+
+  { TNFSeW_ISSDSF203 }
+
+  TNFSeW_ISSDSF203 = class(TNFSeW_ABRASFv2)
+  protected
+    procedure Configuracao; override;
   end;
 
 implementation
@@ -90,10 +98,7 @@ begin
 
     sDeducaoPor := FpAOwner.DeducaoPorToStr(NFSe.Servico.Deducao.Items[i].DeducaoPor);
 
-    sTipoDeducao := EnumeradoToStr( NFSe.Servico.Deducao.Items[i].TipoDeducao,
-      ['', 'Despesas com Materiais', 'Despesas com Subempreitada',
-       'Deducao de Valor', 'Servicos de Veiculacao e Divulgacao'],
-      [tdNenhum, tdMateriais, tdSubEmpreitada, tdValor, tdVeiculacao]);
+    sTipoDeducao := FpAOwner.TipoDeducaoToStr(NFSe.Servico.Deducao.Items[i].TipoDeducao);
 
     Result[i].AppendChild(AddNode(tcStr, '#', 'DeducaoPor', 1, 20, 1,
                                                               sDeducaoPor, ''));
@@ -453,6 +458,22 @@ begin
   NFSeNode.AppendChild(xmlNode);
 
   Result := True;
+end;
+
+{ TNFSeW_ISSDSF203 }
+
+procedure TNFSeW_ISSDSF203.Configuracao;
+begin
+  inherited Configuracao;
+
+  NrOcorrCodigoPaisTomador := 0;
+  NrOcorrDiscriminacao_1 := -1;
+  NrOcorrCodigoMunic_1 := -1;
+
+  NrOcorrDiscriminacao_2 := 1;
+  NrOcorrCodigoMunic_2 := 1;
+
+  GerarNSRps := False;
 end;
 
 end.

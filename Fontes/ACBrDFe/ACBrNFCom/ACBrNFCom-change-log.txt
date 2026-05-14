@@ -42,6 +42,27 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+16/04/2026
+-- Diversos --
+[*] ACBr-9136: Implementação dos novos campos constantes nas NT de 2025 e 2026 bem como 
+    os novos eventos de Vinculação de Pagamento e Cancelamento de Vinculação de Pagamento.
+   Por: Italo Giurizzato Junior
+
+30/03/2026
+-- ACBrNFComXmlReader --
+[-] Adiciona função de conversão de StrToCRT na leitura do XML.
+  Por: Celso Junior
+
+26/03/2026
+-- ACBrNFComXmlReader --
+[+] Expõe a leitura da propriedade CRT do nó Emit
+   Por: doszapro
+
+25/02/2026
+-- ACBrNFComNotasFiscais --
+[*] Alteração visando remover se necessário os bytes do UTF8 BOM ao carregar um XML.
+   Por: Italo Giurizzato Junior
+
 30/01/2026
 -- ACBrNFComXmlReader --
 [-] Ajuste visando a correta leitura do grupo ICMS conforme as varias tags possíveis.

@@ -377,7 +377,7 @@ end;
 
 function TNFSeW_PadraoNacional.GerarXMLValoresNFSe: TACBrXmlNode;
 var
-  LvTotalRet: double;
+  LValor: double;
 begin
   Result := CreateElement('valores');
 
@@ -414,14 +414,18 @@ begin
                                             NFSe.Servico.Valores.ValorIss, ''));
 
   if NFSe.infNFSe.valores.vTotalRet > 0 then
-    LvTotalRet := NFSe.infNFSe.valores.vTotalRet
+    LValor := NFSe.infNFSe.valores.vTotalRet
   else
-    LvTotalRet := NFSe.Servico.Valores.ValorIssRetido;
+    LValor := NFSe.Servico.Valores.ValorIssRetido;
 
-  Result.AppendChild(AddNode(tcDe2, '#1', 'vTotalRet', 1, 15, 0, LvTotalRet, ''));
+  Result.AppendChild(AddNode(tcDe2, '#1', 'vTotalRet', 1, 15, 0, LValor, ''));
 
-  Result.AppendChild(AddNode(tcDe2, '#1', 'vLiq', 1, 15, 1,
-                                    NFSe.Servico.Valores.ValorLiquidoNfse, ''));
+  if NFSe.infNFSe.valores.ValorLiquidoNfse > 0 then
+    LValor := NFSe.infNFSe.valores.ValorLiquidoNfse
+  else
+    LValor := NFSe.Servico.Valores.ValorLiquidoNfse;
+
+  Result.AppendChild(AddNode(tcDe2, '#1', 'vLiq', 1, 15, 1, LValor, ''));
 
   if VersaoNFSe = ve100 then
     Result.AppendChild(AddNode(tcStr, '#1', 'xOutInf', 1, 2000, 0,
@@ -513,7 +517,10 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'xLocPrestacao', 1, 150, 1,
                                                             xLocPrestacao, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'nNFSe', 1, 13, 1,
+  if NrOcorrnNFSe = -1 then
+    Result.AppendChild(AddNode(tcStr, '#1', 'nNFSe', 1, 13, 1, 0, ''))
+  else
+    Result.AppendChild(AddNode(tcStr, '#1', 'nNFSe', 1, 13, 1,
                                              NFSe.IdentificacaoRps.Numero, ''));
 
   if NFSe.infNFSe.cLocIncid > 0 then
@@ -561,8 +568,8 @@ begin
   }
   Result.AppendChild(AddNode(tcInt, '#1', 'cStat', 1, 3, 1, '100', ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'tpAmb', 1, 1, NrOcorrtpAmb,
-                                              TipoAmbienteToStr(Ambiente), ''));
+//  Result.AppendChild(AddNode(tcStr, '#1', 'tpAmb', 1, 1, NrOcorrtpAmb,
+//                                              TipoAmbienteToStr(Ambiente), ''));
 
   if NFSe.infNFSe.dhProc > 0 then
     ldhProc := DateTimeTodh(NFSe.infNFSe.dhProc) + GetUTC(NFSe.Prestador.Endereco.UF, NFSe.infNFSe.dhProc)
@@ -581,7 +588,7 @@ begin
 
   {Uso da Administração Tributária Municipal}
   if VersaoNFSe = ve101 then
-    Result.AppendChild(AddNode(tcStr, '#1', 'xOutInf', 1, 15, 0,
+    Result.AppendChild(AddNode(tcStr, '#1', 'xOutInf', 1, 2000, 0,
                                                    NFSe.OutrasInformacoes, ''));
 
 //  if GerarIBSCBSNFSe and (NFSe.OptanteSN = osnNaoOptante) then

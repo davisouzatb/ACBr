@@ -45,8 +45,6 @@ uses
   {$IfEnd}
   ACBrDFeConsts,
   pcteConversaoCTe,
-  pcnSignature,
-//  ACBrDFeComum.SignatureClass,
   ACBrCTe.Consts,
   ACBrCTe.EventoClass,
   ACBrBase,
@@ -161,6 +159,7 @@ uses
   ACBrUtil.Strings,
   ACBrUtil.DateTime,
   ACBrUtil.FilesIO,
+  ACBrUtil.XMLHTML,
   ACBrCTe.RetEnvEvento;
 
 { TEventoCTe }
@@ -871,7 +870,7 @@ begin
   RetEventoCTe := TRetEventoCTe.Create;
 
   try
-    RetEventoCTe.XmlRetorno := AXML;
+    RetEventoCTe.XmlRetorno := RemoverUTF8Bom(AXML);
     Result := RetEventoCTe.LerXml;
 
     with FEvento.New do

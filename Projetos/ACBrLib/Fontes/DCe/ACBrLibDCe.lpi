@@ -18,9 +18,13 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
+      <AutoIncrementBuild Value="False"/>
+      <BuildNr Value="2"/>
       <Language Value="0416"/>
-      <StringTable Comments="Projeto ACBr" CompanyName="ACBrDCe - Biblioteca para uso do DCe" FileDescription="ACBrLibDCe" InternalName="ACBrLibDCe" LegalCopyright="Projeto ACBr" LegalTrademarks="ProjetoACBr" ProductName="DCe" ProductVersion="0.0.0.0"/>
+      <StringTable Comments="Projeto ACBr" CompanyName="Projeto ACBr" FileDescription="ACBrDCe - Biblioteca para uso do DCe" InternalName="ACBrLibDCe" LegalCopyright="Projeto ACBr" LegalTrademarks="ProjetoACBr" ProductName="DCe" ProductVersion="0.0.0.0"/>
+      <MajorVersionNr Value="1"/>
+      <MinorVersionNr Value="0"/>
+      <RevisionNr Value="0"/>
     </VersionInfo>
     <BuildModes Count="13">
       <Item1 Name="Win32-i386-CDECL" Default="True"/>
@@ -516,7 +520,17 @@
       <UseFileFilters Value="True"/>
     </PublishOptions>
     <RunParams>
+      <local>
+        <HostApplicationFilename Value="$(ProjSrcPath)\..\..\Testes\DCe\bin\ACBrLibDCeTest.exe"/>
+      </local>
       <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <HostApplicationFilename Value="$(ProjSrcPath)\..\..\Testes\DCe\bin\ACBrLibDCeTest.exe"/>
+          </local>
+        </Mode0>
+      </Modes>
     </RunParams>
     <RequiredPackages Count="5">
       <Item1>

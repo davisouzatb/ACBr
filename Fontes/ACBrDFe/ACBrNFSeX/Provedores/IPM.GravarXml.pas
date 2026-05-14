@@ -162,6 +162,8 @@ begin
 
   FDocument.Root := NFSeNode;
 
+  ConsolidarVariosItensServicosEmUmSo;
+
   if (VersaoNFSe in [ve100, ve101]) and (Ambiente = taHomologacao) then
   begin
     if not FpNaoGerarGrupoRps then
@@ -612,7 +614,7 @@ begin
                                            NFSe.Servico.Valores.ValorCsll, ''));
 
   Result.AppendChild(AddNode(tcDe2, '#1', 'valor_rps', 1, 15, 0,
-                                                                        0, ''));
+                                     NFSe.Servico.Valores.OutrasRetencoes, ''));
 
   if Nfse.Servico.Valores.RetidoPis = snNao then
     Result.AppendChild(GerarPisCofinsNaoRetido);
@@ -657,7 +659,7 @@ begin
   TagTomador := 'TomadorServico';
 
   // Reforma Tributária
-  NrOcorrtpOper := -1;
+  NrOcorrtpOper := 0;
   NrOcorrindDest := -1;
   GerarDest := False;
   GerargReeRepRes := False;

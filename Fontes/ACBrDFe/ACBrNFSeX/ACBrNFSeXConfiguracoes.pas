@@ -612,10 +612,19 @@ begin
   }
   aValor := FPIniParams.ReadString(CodIBGE, 'Params', '');
 
-  if aValor = '' then
-    FAPIPropria := (Pos('APIPropria:', FPIniParams.ReadString(FxProvedor, 'Params', '')) > 0)
+  //Se o Params tiver um * na seção do município eu ignoro ele e vou direto no provedor, do contrário eu concateno o conteúdo de ambos...
+  if aValor = '*' then
+    aValor := FPIniParams.ReadString(FxProvedor, 'Params', '')
   else
+    aValor := aValor + FPIniParams.ReadString(FxProvedor, 'Params', '');
+
+//  if aValor = '' then
+//    FAPIPropria := (Pos('APIPropria:', aValor) > 0)
+//  else
     FAPIPropria := (Pos('APIPropria:', aValor) > 0);
+
+  if not (FVersao in [ve100, ve101]) and FAPIPropria then
+    FAPIPropria := False;
 
   {
     Verifica se o componente esta configurado com o layout PadraoNacionalv1 ou

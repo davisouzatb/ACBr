@@ -155,6 +155,7 @@ type
     fvalue: Double;
     fpayment_type: TACBrSmartTEFPaymentType;
     finstallments: Integer;
+    fmin_installments: Integer;
     fcharge_id: String;
     forder_type: TACBrSmartTEFOrderType;
     fextras: TACBrSmartTEFOrderExtras;
@@ -176,6 +177,7 @@ type
     property value: Double read fvalue write fvalue;
     property payment_type: TACBrSmartTEFPaymentType read fpayment_type write fpayment_type;
     property installments: Integer read finstallments write finstallments;
+    property min_installments: Integer read fmin_installments write fmin_installments;
     property charge_id: String read fcharge_id write fcharge_id;
     property order_type: TACBrSmartTEFOrderType read forder_type write forder_type;
     property extras: TACBrSmartTEFOrderExtras read GetExtras;
@@ -1804,6 +1806,7 @@ begin
   fvalue := Source.value;
   fpayment_type := Source.payment_type;
   finstallments := Source.installments;
+  fmin_installments := Source.min_installments;
   fcharge_id := Source.charge_id;
   forder_type := Source.order_type;
   extras.Assign(Source.extras);
@@ -1824,6 +1827,7 @@ begin
   fvalue := 0;
   fpayment_type := stpNone;
   finstallments := 0;
+  fmin_installments := 0;
   fcharge_id := EmptyStr;
   forder_type := sotNone;
   if Assigned(fextras) then
@@ -1858,6 +1862,7 @@ begin
     .Value('value', fvalue)
     .Value('payment_type', sPaymentType)
     .Value('installments', finstallments)
+    .Value('min_installments', fmin_installments)
     .Value('charge_id', fcharge_id)
     .Value('order_type', sOrderType)
     .Value('serial_pos', fserial_pos)
@@ -1884,6 +1889,7 @@ begin
     .AddPair('value', fvalue)
     .AddPair('payment_type', SmartTEFPaymentTypeToString(fpayment_type), False)
     .AddPair('installments', finstallments, False)
+    .AddPair('min_installments', fmin_installments, False)
     .AddPair('charge_id', fcharge_id, False)
     .AddPair('order_type', SmartTEFOrderTypeToString(forder_type), False)
     .AddPair('serial_pos', fserial_pos, False)
@@ -1908,6 +1914,7 @@ begin
     EstaZerado(fvalue) and
     (fpayment_type = stpNone) and
     EstaZerado(finstallments) and
+    EstaZerado(fmin_installments) and
     EstaVazio(fcharge_id) and
     (forder_type = sotNone) and
     (not Assigned(fextras) or fextras.IsEmpty) and

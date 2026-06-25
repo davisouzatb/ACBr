@@ -1389,7 +1389,7 @@ object frmACBrCIOT: TfrmACBrCIOT
           Height = 25
           Caption = 'Consultar por descri'#231#227'o'
           TabOrder = 3
-          OnClick = btnGerarCIOTClick
+          OnClick = Button1Click
         end
         object Button2: TButton
           Left = 9
@@ -1399,6 +1399,28 @@ object frmACBrCIOT: TfrmACBrCIOT
           Caption = 'Consultar por Codigo'
           TabOrder = 4
           OnClick = Button2Click
+        end
+      end
+      object tsOutros: TTabSheet
+        Caption = 'Outros'
+        ImageIndex = 2
+        object btnLerArqINI: TButton
+          Left = 9
+          Top = 8
+          Width = 177
+          Height = 25
+          Caption = 'Ler Arquivo INI/Gerar XML'
+          TabOrder = 0
+          OnClick = btnLerArqINIClick
+        end
+        object btnGerarArqINI: TButton
+          Left = 192
+          Top = 8
+          Width = 177
+          Height = 25
+          Caption = 'Gerar Arquivo INI'
+          TabOrder = 1
+          OnClick = btnGerarArqINIClick
         end
       end
     end

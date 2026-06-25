@@ -670,6 +670,7 @@ begin
             if (RespBuffer = '') then
             begin
               DefinicaoCampo.OcultarDadosDigitados := False;
+              DefinicaoCampo.ValidacaoDado := valdNenhuma;
               DefinicaoCampo.TipoCampo := TipoCampo;
               DefinicaoCampo.TituloPergunta := ACBrStr(Mensagem);
               DefinicaoCampo.TamanhoMaximo := TamanhoMaximo;
@@ -689,6 +690,12 @@ begin
 
               if (ProximoComando = 41) then
                 DefinicaoCampo.OcultarDadosDigitados := True;
+
+              if (TipoCampo = 500) then
+              begin
+                DefinicaoCampo.ValidacaoDado := valdSenhaGerente;
+                DefinicaoCampo.OcultarDadosDigitados := True;
+              end;
 
               RespBuffer := DoPerguntarCampo(DefinicaoCampo);
             end;

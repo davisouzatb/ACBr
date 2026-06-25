@@ -85,7 +85,7 @@ uses
 constructor TACBrBancoVortx.Create(AOwner: TACBrBanco);
 begin
   inherited Create(AOwner);
-  fpDigito := 0;
+  fpDigito := 7;
   fpNome := 'VORTX';
   fpNumero := 310;
   fpTamanhoMaximoNossoNum := 11;
@@ -271,7 +271,7 @@ begin
   end;
 
   // Nº Inscrição do Pagador
-  LNrIncricaoPagador := PadLeft(OnlyNumber(ACBrTitulo.Sacado.CNPJCPF), 14, '0');
+  LNrIncricaoPagador := PadLeft(OnlyCPFCNPJAlphaNum(ACBrTitulo.Sacado.CNPJCPF), 14, '0');
 
   // Nome do Pagador
   LNomeDoPagador := PadRight(TiraAcentos(ACBrTitulo.Sacado.NomeSacado), 40, ' ');
@@ -300,7 +300,7 @@ begin
 
   LLinha := '1' +                                                         // 001 a 001 Identificação do registro de transação
     '00' +                                                                // 002 a 003 Zeros
-    PadLeft(OnlyNumber(ACBrTitulo.ACBrBoleto.Cedente.CNPJCPF), 14, '0') + // 004 a 017 CNPJ do beneficiário
+    PadLeft(OnlyCPFCNPJAlphaNum(ACBrTitulo.ACBrBoleto.Cedente.CNPJCPF), 14, '0') + // 004 a 017 CNPJ do beneficiário
     PadLeft(LCarteira, 7, '0') +                                          // 018 a 024 Código da Carteira
                                                                           // Identificação da empresa beneficiária no Vórtx
     PadLeft(IntToStr(StrToInt(LBoleto.Cedente.Agencia)), 5, '0') +        // 025 a 029 Zero + Código da Agência(5)
@@ -713,6 +713,8 @@ end;
 function TACBrBancoVortx.CalcularDigitoCodigoBarras(const CodigoBarras: String): String;
 begin
   Result := CalcularDV(CodigoBarras);
+  if Result = '0' then
+    Result := '1';
 end;
 
 function TACBrBancoVortx.CalcularDigitoVerificador(const ACBrTitulo: TACBrTitulo): String;

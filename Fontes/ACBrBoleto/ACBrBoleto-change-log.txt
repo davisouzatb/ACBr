@@ -48,7 +48,113 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+23/06/2026
+-- ACBrBancoVortx --
+[*] Correção DV linha digitavel.
+    https://www.projetoacbr.com.br/forum/topic/93006-linha-digitavel-banco-vortx/ 
+  Por: Victor H. Gonzales Pandaaaa / Daniel de Morais
 
+12/06/2026
+-- ACBrBoletoW_BancoBrasil_API --
+[*] Correção para CNPJ alfanumérico.
+    https://www.projetoacbr.com.br/forum/topic/92862-erro-cnpj-alfanum%C3%A9rico-banco-do-brasil-api/
+  Por: Allan Hilário
+
+27/05/2026
+-- ACBrBancoBradescoMoneyPlus.pas, ACBrBoleto.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel Morais
+
+27/05/2026
+-- ACBrBoletoW_Sicredi_APIV2.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel Morais
+
+27/05/2026
+-- ACBrBoletoW_Caixa.pas, ACBrBoletoW_Cora.pas, ACBrBoletoW_Cresol.pas, ACBrBoletoW_Inter_API.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Larissa Santos
+
+27/05/2026
+-- ACBrBoletoW_Asaas.pas, ACBrBoletoW_BancoBrasil.pas, ACBrBoletoW_BancoBrasil_API.pas, ACBrBoletoW_Banrisul.pas, 
+ACBrBoletoW_Bradesco.pas, ACBrBoletoW_BTGPactual.pas,ACBrBoletoW_C6.pas, ACBrBoletoW_Itau_API.pas, ACBrBoletoW_Kobana.pas,
+ACBrBoletoW_PenseBank_API.pas, ACBrBoletoW_Safra.pas, ACBrBoletoW_Santander_API.pas, ACBrBoletoW_Sicoob.pas
+ACBrBoletoW_Sicoob_V3.pas,ACBrBoletoW_Sicredi_APIECOMM.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+26/05/2026
+-- ACBrBancoMercantil.pas, ACBrBancoNordeste.pas, ACBrBancoOriginal.pas, ACBrBancoPefisa.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Larissa Santos
+
+26/05/2026
+-- ACBrBancoFibra.pas, ACBrBancoHSBC.pas,ACBrBancoIndustrialBrasil.pas,ACBrBancoInter.pas,ACBrBancoItau.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Larissa Santos
+
+26/05/2026
+-- ACBrBancoUniprime.pas, ACBrBancoVortx.pas,ACBrBancoVotorantim.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+26/05/2026
+-- ACBrBancoSofisaItau.pas, ACBrBancoSulcredi.pas, ACBrBancoUnicredES.pas, ACBrBancoUnicredRS.pas, ACBrBancoUnicredSC.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+26/05/2026
+-- ACBrBancoSicoob.pas, ACBrBancoSicredi.pas, ACBrBancoSisprime.pas, ACBrBancoSofisa.pas, ACBrBancoSofisaSantander.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+26/05/2026
+-- ACBrBancoPine.pas, ACBrBancoRendimento.pas, ACBrBancoSafra.pas, ACBrBancoSafraBradesco.pas, ACBrBancoSantander.pas, --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+26/05/2026
+-- ACBrBancoCredisan.pas, ACBrBancoCredisis.pas, ACBrBancoCresol.pas ,ACBrBancoCresolSCRS.pas ,ACBrBancoDaycoval.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+   
+26/05/2026
+-- ACBrBancoC6.pas,ACBrBancoCaixa.pas,ACBrBancoCaixaSICOB.pas,ACBrBancoCitiBank.pas,ACBrBancoCora.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+26/05/2026
+-- ACBrBancoBradescoSICOOB.pas, ACBrBancoBrasilSicoob.pas, ACBrBancoBRB.pas, ACBrBancoBS2.pas, ACBrBancoBTGPactual.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+25/05/2026
+-- ACBrBancoBanese.pas, ACBrBancoBanestes.pas, ACBrBancoBanrisul.pas, ACBrBancoBic.pas, ACBrBancoBocomBBM.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+25/05/2026
+-- ACBrBancoABCBrasil.pas, ACBrBancoAilos.pas, ACBrBancoAlfa.pas, ACBrBancoAmazonia.pas, ACBrBancoBradesco.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+25/05/2026
+-- ACBrBancoBrasil.pas, ACBrBoleto.pas --
+[*][ACBR-9326] Ajustado para utilizar campo alfa CNPJ
+   Por: Daniel de Morais
+
+19/05/2026
+-- ACBrBoletoW_Bradesco.pas --
+[*] Ajustadada nova propriedade qtdDecurPrz p/  boleto hibrido. nao consta no manual para boleto convencional.
+   [ACBR-9373] - https://www.projetoacbr.com.br/forum/topic/92279-acbr-9373-corre%C3%A7%C3%A3o-acbrboleto-bradesco-envio-do-campo-qtddecurprz/?_rid=16767
+   Por: isolopak 
+
+18/05/2026
+-- ACBrBoleto.pas, ACBrBancoAilos.pas --
+[*] Ajustados novos codigos de retorno CNAB240 ocorrencia, e criado um novo enumerado toRetornoConfirmacaoInstrucaoAnuencia na classe
+   [ACBR-8950] - https://www.projetoacbr.com.br/forum/topic/90209-acbr-8950-retorno-ocorr%C3%AAncia-boleto-ailos/
+   Por: Daniel de Morais InfoCotidiano
+   
 07/05/2026
 -- ACBrBoletoW_Sicoob_V3.pas --
 [*] Adicionado no comando de alteração a ocorrencia ToRemessaConcederAbatimento 

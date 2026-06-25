@@ -39,7 +39,7 @@ interface
 uses
   Classes, SysUtils,
   ACBrDFeSSL,
-  {$IfDef MSWINDOWS}ACBrDFeWinCrypt, ACBr_WinCrypt,{$EndIf}
+  {$IfDef MSWINDOWS}ACBrDFeWinCrypt, ACBr_WinCrypt, ACBrDFeCry.WinUtils,{$EndIf}
   OpenSSLExt;
 
 resourcestring
@@ -182,7 +182,7 @@ begin
      PFXDataToCertContextWinApi( FpDFeSSL.DadosPFX, FpDFeSSL.Senha,
                                  FStoreWinApi, FCertContextWinApi);
   {$Else}
-   FCertContextWinApi := Nil;
+  FCertContextWinApi := Nil;
   {$EndIf}
 
   Result := FCertContextWinApi;

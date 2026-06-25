@@ -36,6 +36,16 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+25/05/2026
+-- ACBrUtil.Strings.pas --
+[*] Ajuste na função OnlyCPFCNPJAlphaNum para devolver sempre maiúsculo.
+  Por: Victor H. Gonzales Pandaaa
+
+21/05/2026
+-- ACBrUtil.FilesIO --
+[*] Incluído a função StreamIsPDF e alterado a função CarregarArquivo para usar o
+    TMemoryStream em vez do TStringList, pois este costuma mudar o encoding do arquivo.
+  Por: Italo Giurizzato Junior
 
 23/02/2026
 -- ACBrUtil.XMLHTML --

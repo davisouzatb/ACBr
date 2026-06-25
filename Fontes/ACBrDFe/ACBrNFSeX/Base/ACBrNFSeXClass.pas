@@ -1771,6 +1771,7 @@ type
 
     Fvalores: TvaloresIBSCBS;
     FtotCIBS: TtotCIBS;
+    FUFLocalidadeIncid: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -1778,9 +1779,9 @@ type
     property cLocalidadeIncid: Integer read FcLocalidadeIncid write FcLocalidadeIncid;
     property xLocalidadeIncid: string read FxLocalidadeIncid write FxLocalidadeIncid;
     property pRedutor: Double read FpRedutor write FpRedutor;
-
     property valores: TvaloresIBSCBS read Fvalores write Fvalores;
     property totCIBS: TtotCIBS read FtotCIBS write FtotCIBS;
+    property UFLocalidadeIncid: string read FUFLocalidadeIncid write FUFLocalidadeIncid;
   end;
 
   { TinfNFSe }
@@ -1807,6 +1808,7 @@ type
     Fvalores: TValoresNfse;
     // Reforma Tributaria
     FIBSCBS: TIBSCBSNfse;
+    FUFLocEmi: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -1829,6 +1831,7 @@ type
     property nDFSe: string read FnDFSe write FnDFSe;
     property emit: TDadosPessoa read Femit write Femit;
     property valores: TValoresNfse read Fvalores write Fvalores;
+    property UFLocEmi: string read FUFLocEmi write FUFLocEmi;
     // Reforma Tributaria
     property IBSCBS: TIBSCBSNfse read FIBSCBS write FIBSCBS;
   end;
@@ -2235,6 +2238,7 @@ type
     FConsumoPessoal: TIndicador;
     FIndOpeOne: TIndicador;
     FvlrReeRepRes: Double;
+    FIdLocalIncidencia: TIdLocalIncidencia;
 
     procedure SetgRefNFSe(const Value: TgRefNFSeCollection);
   public
@@ -2261,6 +2265,9 @@ type
     // Incluido para atender o provedor Conam
     property IndOpeOne: TIndicador read FIndOpeOne write FIndOpeOne;
     property vlrReeRepRes: Double read FvlrReeRepRes write FvlrReeRepRes;
+
+    // Incluido para atender o provedor eGoverneISS
+    property IdLocalIncidencia: TIdLocalIncidencia read FIdLocalIncidencia write FIdLocalIncidencia;
   end;
 
   TNFSe = class(TPersistent)

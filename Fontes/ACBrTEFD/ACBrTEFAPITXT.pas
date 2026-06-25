@@ -106,6 +106,7 @@ type
       MinLen: SmallInt = 0; MaxLen: SmallInt = 0): String; override;
     function MenuPinPad(const Titulo: String; Opcoes: TStrings; TimeOut: Integer = 30000):
       Integer; override;
+    function VerificarPresencaPinPad: Byte; override;
 
     function VersaoAPI: String; override;
 
@@ -431,8 +432,28 @@ end;
 
 function TACBrTEFAPIClassTXT.MenuPinPad(const Titulo: String; Opcoes: TStrings;
   TimeOut: Integer): Integer;
+var
+  lCmdExiste: Boolean;
+  tp: Char;
 begin
-  Result := inherited MenuPinPad(Titulo, Opcoes, TimeOut);
+  lCmdExiste := False;
+  if (fTEFTXT is TACBrTEFTXTPayGo) then
+  begin
+    with TACBrTEFTXTPayGo(fTEFTXT) do
+    begin
+      lCmdExiste := True;
+      Result := MNU(Titulo, Opcoes);
+    end;
+  end;
+
+  if not lCmdExiste then
+    fpACBrTEFAPI.DoException(Format(ACBrStr(CErroComandoNaoExisteEmTEF), ['CPD', fTEFTXT.ModeloTEF]));
+end;
+
+function TACBrTEFAPIClassTXT.VerificarPresencaPinPad: Byte;
+begin
+  fTEFTXT.ATV;
+  Result := 0;
 end;
 
 procedure TACBrTEFAPIClassTXT.ResolverTransacaoPendente(

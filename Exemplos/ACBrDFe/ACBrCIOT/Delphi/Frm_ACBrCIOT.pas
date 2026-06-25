@@ -212,6 +212,9 @@ type
     rgOperacao: TRadioGroup;
     Button1: TButton;
     Button2: TButton;
+    tsOutros: TTabSheet;
+    btnLerArqINI: TButton;
+    btnGerarArqINI: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure btnSalvarConfigClick(Sender: TObject);
@@ -247,6 +250,9 @@ type
     procedure btnCriarEnviarClick(Sender: TObject);
     procedure btnEnviarCiotEmailClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure btnLerArqINIClick(Sender: TObject);
+    procedure btnGerarArqINIClick(Sender: TObject);
   private
     { Private declarations }
     sToken: string;
@@ -465,6 +471,10 @@ begin
                CepOrigem := '';
                CepDestino := '';
                DistanciaPercorrida := 100;
+               LatitudeOrigem := 0;
+               LongitudeOrigem := 0;
+               LatitudeDestino := 0;
+               LongitudeDestino := 0;
 
                Valores.TotalOperacao := 50;
                Valores.TotalViagem := 50;
@@ -531,6 +541,10 @@ begin
                TipoPagamento := TransferenciaBancaria; //TransferenciaBancaria(EmissaoGratuita = true); eFRETE (EmissaoGratuita = false)
                Categoria := tcpSemCategoria;//Para os TipoViagem Frota e TAC_Agregado são suportadas as Categorias Frota e SemCategoria. Para o TipoViagem Padrão todas as categorias são suportadas.
                Documento := ''; //Documento relacionado a viagem.
+               IndicadorPagamento := '';
+               CpfCnpjCreditado := '';
+               NumeroParcela := 0;
+               CodigoPagamento := '';
 
                InformacoesBancarias.InstituicaoBancaria := '756'; //Bancoob
                InformacoesBancarias.Agencia := '';
@@ -538,6 +552,10 @@ begin
                InformacoesBancarias.TipoConta := tcContaCorrente;
 
                InformacaoAdicional := '';
+               TipoChavePix := '';
+               ValorChavePix := '';
+               IdentificadorPix := '';
+
                //CNPJ que deve ser gerada a Nota Fiscal do abastecimento,
                //sendo da mesma raíz do CNPJ da matriz do contratante,
                //apenas aplicável para Categoria Frota (Abastecimento)
@@ -549,14 +567,14 @@ begin
              //Para o TipoViagem Frota o Contratado será a própria empresa que está declarando a operação.
              with Contratado do
              begin
-               CpfOuCnpj := '12345678910';
+               CpfOuCnpj := '12345678000195';
                RNTRC := '12345678';
              end;
 
              with Motorista do
              begin
-               CpfOuCnpj := '12345678910';
-               CNH := '12345678910';
+               CpfOuCnpj := '12345678000195';
+               CNH := '12345678000195';
 
                Celular.DDD := 49;
                Celular.Numero := 123456789;
@@ -594,7 +612,7 @@ begin
              with Contratante do
              begin
                NomeOuRazaoSocial := 'teste';
-               CpfOuCnpj := '12345678910';
+               CpfOuCnpj := '12345678000195';
 
                EMail := 'teste@teste.com.br';
                ResponsavelPeloPagamento := False;
@@ -738,6 +756,14 @@ begin
              CodigoTipoCarga := tpNaoAplicavel;
              AltoDesempenho := True;
              DestinacaoComercial := True;
+
+             with ContratantesCargaFracionada.New do
+             begin
+               CpfOuCnpj := '12345678000195';
+             end;
+
+             ComposicaoVeicular := False;
+             RetornoVazio := False;
              FreteRetorno := False;
              CepRetorno := '';
              DistanciaRetorno := 100;
@@ -762,6 +788,10 @@ begin
                CodigoMunicipioDestino := 4217303; //Saudades SC
                CepOrigem := '';
                CepDestino := '';
+               LatitudeOrigem := 0;
+               LongitudeOrigem := 0;
+               LatitudeDestino := 0;
+               LongitudeDestino := 0;
                DistanciaPercorrida := 100;
 
                Valores.TotalOperacao := 50;
@@ -818,6 +848,9 @@ begin
                TipoPagamento := TransferenciaBancaria; //TransferenciaBancaria(EmissaoGratuita = true); eFRETE (EmissaoGratuita = false)
                Categoria := tcpSemCategoria;//Para os TipoViagem Frota e TAC_Agregado são suportadas as Categorias Frota e SemCategoria. Para o TipoViagem Padrão todas as categorias são suportadas.
                Documento := ''; //Documento relacionado a viagem.
+               IndicadorPagamento := '';
+               CpfCnpjCreditado := '';
+               NumeroParcela := 0;
 
                InformacoesBancarias.InstituicaoBancaria := '756'; //Bancoob
                InformacoesBancarias.Agencia := '';
@@ -825,6 +858,9 @@ begin
                InformacoesBancarias.TipoConta := tcContaCorrente;
 
                InformacaoAdicional := '';
+               TipoChavePix := '';
+               ValorChavePix := '';
+               IdentificadorPix := '';
                //CNPJ que deve ser gerada a Nota Fiscal do abastecimento,
                //sendo da mesma raíz do CNPJ da matriz do contratante,
                //apenas aplicável para Categoria Frota (Abastecimento)
@@ -851,6 +887,9 @@ begin
                TipoPagamento := TransferenciaBancaria; //TransferenciaBancaria(EmissaoGratuita = true); eFRETE (EmissaoGratuita = false)
                Categoria := tcpSemCategoria;//Para os TipoViagem Frota e TAC_Agregado são suportadas as Categorias Frota e SemCategoria. Para o TipoViagem Padrão todas as categorias são suportadas.
                Documento := ''; //Documento relacionado a viagem.
+               IndicadorPagamento := '';
+               CpfCnpjCreditado := '';
+               NumeroParcela := 0;
 
                InformacoesBancarias.InstituicaoBancaria := '756'; //Bancoob
                InformacoesBancarias.Agencia := '';
@@ -858,6 +897,9 @@ begin
                InformacoesBancarias.TipoConta := tcContaCorrente;
 
                InformacaoAdicional := '';
+               TipoChavePix := '';
+               ValorChavePix := '';
+               IdentificadorPix := '';
                //CNPJ que deve ser gerada a Nota Fiscal do abastecimento,
                //sendo da mesma raíz do CNPJ da matriz do contratante,
                //apenas aplicável para Categoria Frota (Abastecimento)
@@ -1229,19 +1271,67 @@ begin
   end;
 end;
 
-procedure TfrmACBrCIOT.btnGerarCIOTClick(Sender: TObject);
+procedure TfrmACBrCIOT.Button1Click(Sender: TObject);
 var
   vAux : String;
+  LUF : String;
   Codigo: Integer;
-
 begin
   vAux := '';
   if not (InputQuery('Consultar por Descrição', 'Nome da Cidade', vAux)) then
     exit;
 
-  Codigo := ObterCodigoMunicipio(vAux, 'SP', 'C:\Erp\Txt\Blt' );
+  LUF := '';
+  if not (InputQuery('Consultar por Descrição', 'UF do Estado', LUF)) then
+    exit;
+
+  Codigo := ObterCodigoMunicipio(vAux, LUF, edtPathLogs.Text);
 
   ShowMessage('Codigo: ' + IntToStr(Codigo));
+end;
+
+procedure TfrmACBrCIOT.btnGerarArqINIClick(Sender: TObject);
+var
+  SaveDlg: TSaveDialog;
+  ArqINI: TStringList;
+begin
+  ACBrCIOT1.Contratos.Clear;
+  AlimentarComponente;
+  ACBrCIOT1.Contratos.GerarCIOT;
+
+  ArqINI := TStringList.Create;
+  SaveDlg := TSaveDialog.Create(nil);
+  try
+    ArqINI.Text := ACBrCIOT1.Contratos.GerarIni;
+
+    SaveDlg.Title := 'Escolha o local onde salvar o INI';
+    SaveDlg.DefaultExt := '*.ini';
+    SaveDlg.Filter := 'Arquivo INI(*.INI)|*.INI|Arquivo ini(*.ini)|*.ini|Todos os arquivos(*.*)|*.*';
+
+    if SaveDlg.Execute then
+      ArqINI.SaveToFile(SaveDlg.FileName);
+
+    memoLog.Lines.Add('Arquivo Salvo: ' + SaveDlg.FileName);
+  finally
+    SaveDlg.Free;
+    ArqINI.Free;
+  end;
+end;
+
+procedure TfrmACBrCIOT.btnGerarCIOTClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  ACBrCIOT1.Contratos.Clear;
+  AlimentarComponente;
+  ACBrCIOT1.Contratos.GerarCIOT;
+  ACBrCIOT1.Contratos.GravarXML;
+
+  MemoResp.Clear;
+  for i := 0 to ACBrCIOT1.Contratos.Count-1 do
+    MemoResp.Lines.Add(ACBrCIOT1.Contratos[i].NomeArq);
+
+  pgRespostas.ActivePage := TabSheet5;
 end;
 
 procedure TfrmACBrCIOT.btnIssuerNameClick(Sender: TObject);
@@ -1272,6 +1362,37 @@ begin
     //  ShowMessage('ERRO: '+Erro)
 
     pgRespostas.ActivePageIndex := 0;
+  end;
+end;
+
+procedure TfrmACBrCIOT.btnLerArqINIClick(Sender: TObject);
+begin
+  OpenDialog1.Title := 'Selecione o Arquivo INI';
+  OpenDialog1.DefaultExt := '*.ini';
+  OpenDialog1.Filter :=
+    'Arquivos INI (*.ini)|*.ini|Todos os Arquivos (*.*)|*.*';
+  OpenDialog1.InitialDir := ACBrCIOT1.Configuracoes.Arquivos.PathSalvar;
+
+  if OpenDialog1.Execute then
+  begin
+    ACBrCIOT1.Contratos.Clear;
+    ACBrCIOT1.Contratos.LoadFromIni(OpenDialog1.FileName);
+    ACBrCIOT1.Contratos.Assinar;
+    ACBrCIOT1.Contratos.GravarXML();
+
+    memoLog.Lines.Add('Arquivo gerado em: ' + ACBrCIOT1.Contratos[0].NomeArq);
+
+    try
+      if ACBrCIOT1.Contratos[0].Alertas <> '' then
+        memoLog.Lines.Add('Alertas: '+ ACBrCIOT1.Contratos[0].Alertas);
+
+      ShowMessage('CIOT Valido');
+    except
+      on E: Exception do
+      begin
+        memoLog.Lines.Add('Exception: ' + E.Message);
+      end;
+    end;
   end;
 end;
 
@@ -1309,7 +1430,7 @@ begin
   if not (InputQuery('Consultar por Codigo', 'Codigo da Cidade', vAux)) then
     exit;
 
-  Nome := ObterNomeMunicipio(UFparaCodigoUF('SP'), vAux, 'C:\Erp\Txt\Blt' );
+  Nome := ObterNomeMunicipio(StrToIntDef(vAux,0), vAux, edtPathLogs.Text);
 
   ShowMessage('Nome: ' + Nome);
 end;

@@ -280,7 +280,7 @@ end;
 
 function TMDFeXmlWriter.ObterNomeArquivo: string;
 begin
-  Result := OnlyNumber(FMDFe.infMDFe.ID) + '-MDFe.xml';
+  Result := RemoverLiteralChave(FMDFe.infMDFe.ID) + '-MDFe.xml';
 end;
 
 function TMDFeXmlWriter.GerarXml: boolean;
@@ -1647,10 +1647,10 @@ begin
   begin
     Result[i] := FDocument.CreateElement('infCTe');
 
-    Result[i].AppendChild(AddNode(tcEsp, '#049', 'chCTe', 44, 44, 1,
-        OnlyNumber(MDFe.infDoc.infMunDescarga[Idx].infCTe[i].chCTe), DSC_REFCTE));
+    Result[i].AppendChild(AddNode(tcStr, '#049', 'chCTe', 44, 44, 1,
+        RemoverLiteralChave(MDFe.infDoc.infMunDescarga[Idx].infCTe[i].chCTe), DSC_REFCTE));
 
-    if OnlyNumber(MDFe.infDoc.infMunDescarga[Idx].infCTe[i].chCTe) <> '' then
+    if RemoverLiteralChave(MDFe.infDoc.infMunDescarga[Idx].infCTe[i].chCTe) <> '' then
       if not ValidarChave(MDFe.infDoc.infMunDescarga[Idx].infCTe[i].chCTe) then
         wAlerta('#049', 'chCTe', DSC_REFCTE, ERR_MSG_INVALIDO);
 
@@ -2041,10 +2041,10 @@ begin
   begin
     Result[i] := FDocument.CreateElement('infNFe');
 
-    Result[i].AppendChild(AddNode(tcEsp, '#049', 'chNFe', 44, 44, 1,
-        OnlyNumber(MDFe.infDoc.infMunDescarga[Idx].infNFe[i].chNFe), DSC_REFNFE));
+    Result[i].AppendChild(AddNode(tcStr, '#049', 'chNFe', 44, 44, 1,
+        RemoverLiteralChave(MDFe.infDoc.infMunDescarga[Idx].infNFe[i].chNFe), DSC_REFNFE));
 
-    if OnlyNumber(MDFe.infDoc.infMunDescarga[Idx].infNFe[i].chNFe) <> '' then
+    if RemoverLiteralChave(MDFe.infDoc.infMunDescarga[Idx].infNFe[i].chNFe) <> '' then
       if not ValidarChave(MDFe.infDoc.infMunDescarga[Idx].infNFe[i].chNFe) then
         wAlerta('#049', 'chNFe', DSC_REFNFE, ERR_MSG_INVALIDO);
 
@@ -2392,10 +2392,10 @@ begin
   begin
     Result[i] := FDocument.CreateElement('infMDFeTransp');
 
-    Result[i].AppendChild(AddNode(tcEsp, '#049', 'chMDFe', 44, 44, 1,
-        OnlyNumber(MDFe.infDoc.infMunDescarga[Idx].infMDFeTransp[i].chMDFe), DSC_REFNFE));
+    Result[i].AppendChild(AddNode(tcStr, '#049', 'chMDFe', 44, 44, 1,
+        RemoverLiteralChave(MDFe.infDoc.infMunDescarga[Idx].infMDFeTransp[i].chMDFe), DSC_REFNFE));
 
-    if OnlyNumber(MDFe.infDoc.infMunDescarga[Idx].infMDFeTransp[i].chMDFe) <> '' then
+    if RemoverLiteralChave(MDFe.infDoc.infMunDescarga[Idx].infMDFeTransp[i].chMDFe) <> '' then
       if not ValidarChave(MDFe.infDoc.infMunDescarga[Idx].infMDFeTransp[i].chMDFe) then
         wAlerta('#049', 'chMDFe', DSC_REFNFE, ERR_MSG_INVALIDO);
 

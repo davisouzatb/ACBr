@@ -133,7 +133,7 @@ type
                    proeReceita, proEtherium, proFacundo, proFGMaiss, profintelISS,
                    proFiorilli, proFisco, proFISSLex, proFuturize, proGeisWeb,
                    progeNFe, proGestaoISS, proGiap, proGinfes, proGiss, proGovBR,
-                   proGovDigital, proGoverna, proHorus, proiiBrasil, proInfisc,
+                   proGovDigital, proGoverna, proHM2, proHorus, proiiBrasil, proInfisc,
                    proIntertec, proIPM, proIsaneto, proISSBarueri, proISSCamacari,
                    proISSCambe, proISSCampinas, proISSCuritiba, proISSDigital,
                    proISSDSF, proISSe, proISSFortaleza, proISSGoiania, proISSIntel,
@@ -665,6 +665,15 @@ const
     ('ConsultarNFSeRPS', 'ConsultarNFSePorChave', 'EnviarEvento',
      'ConsultarEvento', 'ConsultarDFe', 'ConsultarParam', 'ObterDANFSE');
 
+type
+  TIdLocalIncidencia = (liMunicipio, liMunicipioAdquirente, liLocalEntrega,
+    liLocalPrestacao, liLocalEvento, liLocalImovel, liLocalIncidenciaIBS,
+    liViaExplorada);
+
+const
+  TIdLocalIncidenciaArrayStrings: array[TIdLocalIncidencia] of string =
+    ('0', '1', '2', '3', '4', '5', '6', '7');
+
 // Reforma Tributária
 
 type
@@ -672,6 +681,8 @@ type
 
 const
   TfinNFSeArrayStrings: array[TfinNFSe] of string = ('0', '1', '2');
+  TfinNFSeDescricaoArrayStrings: array[TfinNFSe] of string = ('Regular',
+    'Crédito', 'Débito');
 
 type
   TindFinal = (ifSim, ifNao);
@@ -873,6 +884,7 @@ function StrToindTotTrib(out ok: Boolean; const s: string): TindTotTrib;
 
 function ambGerToStr(const t: TambGer): string;
 function StrToambGer(out ok: Boolean; const s: string): TambGer;
+function ambGerToStrText(const t: TambGer): string;
 
 function tpEmisToStr(const t: TtpEmis): string;
 function StrTotpEmis(out ok: Boolean; const s: string): TtpEmis;
@@ -917,9 +929,15 @@ function StrToServicoAPIPadraoNacional(const s: string): TServicoAPIPadraoNacion
 
 function MoedaBACENToMoedaISO(const ACodigoMoedaBACEN: Integer): Integer;
 
+function IdLocalIncidenciaToStr(t: TIdLocalIncidencia): string;
+function StrToIdLocalIncidencia(const s: string): TIdLocalIncidencia;
+
 // Reforma Tributária
+function cStatToStr(const t: Integer): string;
+
 function finNFSeToStr(const t: TfinNFSe): string;
 function StrTofinNFSe(const s: string): TfinNFSe;
+function finNFSeToStrText(const t: TfinNFSe): string;
 
 function indFinalToStr(const t: TindFinal): string;
 function StrToindFinal(const s: string): TindFinal;
@@ -940,10 +958,18 @@ function tpOperGovNFSeToStr(const t: TtpOperGovNFSe): string;
 function TryStrTotpOperGovNFSe(const s: string; out Value: TtpOperGovNFSe): Boolean;
 function StrTotpOperGovNFSe(const s: string): TtpOperGovNFSe;
 
-(*
-function modoPrestServToStr(const t: TmodoPrestServ): string;
-function StrTomodoPrestServ(const s: string): TmodoPrestServ;
-*)
+function StrTipoRPSToEnum(const s: string): TTipoRPS;
+function EnumToStrTipoRPS(const t: TTipoRPS): string;
+function ListaStrTipoRPS: string;
+
+function StrSimNaoToEnum(const s: string): TnfseSimNao;
+function EnumToStrSimNao(const t: TnfseSimNao): string;
+function ListaStrSimNao: string;
+
+function StrTipoPessoaToEnum(const s: string): TTipoPessoa;
+function EnumToStrTipoPessoa(const t: TTipoPessoa): string;
+function ListaStrTipoPessoa: string;
+
 type
   TPais = record
     CodPaisIBGE: Integer;
@@ -13725,6 +13751,13 @@ begin
                            [agPrefeitura, agSistemaNacional]);
 end;
 
+function ambGerToStrText(const t: TambGer): string;
+begin
+  result := EnumeradoToStr(t,
+                           ['Prefeitura', 'Sistema Nacional'],
+                           [agPrefeitura, agSistemaNacional]);
+end;
+
 function tpEmisToStr(const t: TtpEmis): string;
 begin
   result := EnumeradoToStr(t,
@@ -14066,7 +14099,40 @@ begin
   Result := MoedaISO;
 end;
 
+function IdLocalIncidenciaToStr(t: TIdLocalIncidencia): string;
+begin
+  Result := TIdLocalIncidenciaArrayStrings[t];
+end;
+
+function StrToIdLocalIncidencia(const s: string): TIdLocalIncidencia;
+var
+  idx: TIdLocalIncidencia;
+begin
+  for idx:= Low(TIdLocalIncidenciaArrayStrings) to High(TIdLocalIncidenciaArrayStrings) do
+  begin
+    if (TIdLocalIncidenciaArrayStrings[idx] = s) then
+    begin
+      Result := idx;
+      exit;
+    end;
+  end;
+  raise EACBrException.CreateFmt('Valor string inválido para TIdLocalIncidencia: %s', [s]);
+end;
+
+
 // Reforma Tributária
+function cStatToStr(const t: Integer): string;
+begin
+  case t of
+    100: Result := 'NFS-e Gerada';
+    101: Result := 'NFS-e de Substituição Gerada';
+    102: Result := 'NFS-e de Decisão Judicial';
+    103: Result := 'NFS-e Avulsa';
+  else
+    Result := IntToStr(t);
+  end;
+end;
+
 function finNFSeToStr(const t: TfinNFSe): string;
 begin
   Result := TfinNFSeArrayStrings[t];
@@ -14085,6 +14151,11 @@ begin
     end;
   end;
   raise EACBrException.CreateFmt('Valor string inválido para TfinNFSe: %s', [s]);
+end;
+
+function finNFSeToStrText(const t: TfinNFSe): string;
+begin
+  Result := TfinNFSeDescricaoArrayStrings[t];
 end;
 
 function indFinalToStr(const t: TindFinal): string;
@@ -14219,25 +14290,111 @@ begin
     raise EACBrException.CreateFmt('Valor string inválido para TtpOperGovNFSe: %s', [s]);
 end;
 
-(*
-function modoPrestServToStr(const t: TmodoPrestServ): string;
+// Funções de conversão de Enumerados para String e vice versa
+
+function StrTipoRPSToEnum(const s: string): TTipoRPS;
+var
+  LStr: string;
+  Code: Integer;
 begin
-  Result := TmodoPrestServArrayStrings[t];
+  LStr := 'tr' + s;
+
+  Code := GetEnumValue(TypeInfo(TTipoRPS), LStr);
+
+  if Code = -1 then
+    Result := trRPS
+  else
+    Result := TTipoRPS(Code);
 end;
 
-function StrTomodoPrestServ(const s: string): TmodoPrestServ;
-var
-  idx: TmodoPrestServ;
+function EnumToStrTipoRPS(const t: TTipoRPS): string;
 begin
-  for idx:= Low(TmodoPrestServArrayStrings) to High(TmodoPrestServArrayStrings) do
-  begin
-    if (TmodoPrestServArrayStrings[idx] = s) then
-    begin
-      Result := idx;
-      exit;
-    end;
-  end;
-  raise EACBrException.CreateFmt('Valor string inválido para TmodoPrestServ: %s', [s]);
+  Result := GetEnumName(TypeInfo(TTipoRPS), Ord(t));
+  Result := Copy(Result, 3, Length(Result));
 end;
-*)
+
+function ListaStrTipoRPS: string;
+var
+  idx: TTipoRPS;
+  Lista: string;
+begin
+  Lista := '';
+  for idx := Low(TTipoRPS) to High(TTipoRPS) do
+  begin
+    Lista := Lista + '; ' + EnumToStrTipoRPS(idx);
+  end;
+
+  Result := Copy(Lista, 3, Length(Lista));
+end;
+
+function StrSimNaoToEnum(const s: string): TnfseSimNao;
+var
+  LStr: string;
+  Code: Integer;
+begin
+  LStr := 'sn' + s;
+
+  Code := GetEnumValue(TypeInfo(TnfseSimNao), LStr);
+
+  if Code = -1 then
+    Result := snNao
+  else
+    Result := TnfseSimNao(Code);
+end;
+
+function EnumToStrSimNao(const t: TnfseSimNao): string;
+begin
+  Result := GetEnumName(TypeInfo(TnfseSimNao), Ord(t));
+  Result := Copy(Result, 3, Length(Result));
+end;
+
+function ListaStrSimNao: string;
+var
+  idx: TnfseSimNao;
+  Lista: string;
+begin
+  Lista := '';
+  for idx := Low(TnfseSimNao) to High(TnfseSimNao) do
+  begin
+    Lista := Lista + '; ' + EnumToStrSimNao(idx);
+  end;
+
+  Result := Copy(Lista, 3, Length(Lista));
+end;
+
+function StrTipoPessoaToEnum(const s: string): TTipoPessoa;
+var
+  LStr: string;
+  Code: Integer;
+begin
+  LStr := 'tp' + s;
+
+  Code := GetEnumValue(TypeInfo(TTipoPessoa), LStr);
+
+  if Code = -1 then
+    Result := tpPFNaoIdentificada
+  else
+    Result := TTipoPessoa(Code);
+end;
+
+function EnumToStrTipoPessoa(const t: TTipoPessoa): string;
+begin
+  Result := GetEnumName(TypeInfo(TTipoPessoa), Ord(t));
+  Result := Copy(Result, 3, Length(Result));
+end;
+
+function ListaStrTipoPessoa: string;
+var
+  idx: TTipoPessoa;
+  Lista: string;
+begin
+  Lista := '';
+  for idx := Low(TTipoPessoa) to High(TTipoPessoa) do
+  begin
+    Lista := Lista + '; ' + EnumToStrTipoPessoa(idx);
+  end;
+
+  Result := Copy(Lista, 3, Length(Lista));
+end;
+
 end.

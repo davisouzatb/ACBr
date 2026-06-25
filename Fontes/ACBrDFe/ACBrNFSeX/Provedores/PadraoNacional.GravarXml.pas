@@ -78,7 +78,7 @@ type
 
     function GerarXMLTomador: TACBrXmlNode;
     function GerarXMLEnderecoTomador: TACBrXmlNode;
-    function GerarXMLEnderecoNacionalTomador: TACBrXmlNode;
+    function GerarXMLEnderecoNacionalTomador: TACBrXmlNode; virtual;
     function GerarXMLEnderecoExteriorTomador: TACBrXmlNode;
 
     function GerarXMLIntermediario: TACBrXmlNode;
@@ -598,6 +598,11 @@ begin
      (NFSe.IBSCBS.imovel.ender.endExt.cEndPost <> '') or
      (NFSe.IBSCBS.valores.trib.gIBSCBS.CST <> cstNenhum) then
   begin
+    if NFSe.infNFSe.IBSCBS.cLocalidadeIncid = 0 then
+    begin
+      NFSe.infNFSe.IBSCBS.cLocalidadeIncid := cLocIncid;
+      NFSe.infNFSe.IBSCBS.xLocalidadeIncid := xLocIncid;
+    end;
     xmlNode := GerarXMLIBSCBSNFSe;
     Result.AppendChild(xmlNode);
   end;

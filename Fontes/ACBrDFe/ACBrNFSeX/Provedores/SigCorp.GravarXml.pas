@@ -90,6 +90,12 @@ begin
   NrOcorrValorIss := 1;
   NrOcorrDescIncond := 1;
   NrOcorrDescCond := 1;
+
+  NrOcorrDiscriminacao_1 := -1;
+  NrOcorrCodigoMunic_1 := -1;
+
+  NrOcorrDiscriminacao_2 := 1;
+  NrOcorrCodigoMunic_2 := 1;
 end;
 
 { TNFSeW_SigCorp204 }
@@ -105,6 +111,12 @@ begin
   NrOcorrAliquota := 1;
   NrOcorrCodigoPaisTomador := -1;
   NrOcorrCodigoNBS := -1;
+
+  NrOcorrDiscriminacao_1 := -1;
+  NrOcorrCodigoMunic_1 := -1;
+
+  NrOcorrDiscriminacao_2 := 1;
+  NrOcorrCodigoMunic_2 := 1;
 
   TagTomador := 'TomadorServico';
 end;
@@ -168,6 +180,9 @@ begin
 
   Result.AppendChild(AddNode(tcStr, '#15', 'CofinsRetido', 1, 1, 0,
             FpAOwner.SimNaoToStr(NFSe.Servico.Valores.RetidoCofins), DSC_VPIS));
+
+  Result.AppendChild(AddNode(tcStr, '#15', 'CsllRetido', 1, 1, 0,
+            FpAOwner.SimNaoToStr(NFSe.Servico.Valores.RetidoCsll), DSC_VPIS));
 
   Result.AppendChild(AddNode(tcStr, '#21', 'ResponsavelRetencao', 1, 1, 0,
      FpAOwner.ResponsavelRetencaoToStr(NFSe.Servico.ResponsavelRetencao), DSC_INDRESPRET));

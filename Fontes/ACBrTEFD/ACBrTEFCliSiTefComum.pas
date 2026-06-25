@@ -369,6 +369,15 @@ begin
         136: BIN := LinStr;
         139: ValorEntradaCDC := Linha.Informacao.AsFloat;
         140: DataEntradaCDC := Linha.Informacao.AsDate;
+        146:
+        begin
+          ValorOriginal := Linha.Informacao.AsFloat;
+          if (ValorTotal = 0) then
+          begin
+            ValorTotal := ValorOriginal;
+            Conteudo.GravaInformacao(899, CTEF_RESP_VALOR_TRANSACAO, '0');
+          end;
+        end;
         156: Rede := LinStr;
         157: Estabelecimento := LinStr;
         158: CodigoRedeAutorizada := LinStr; 

@@ -73,7 +73,7 @@ implementation
 uses
   Variants, DateUtils,
   ACBrUtil.Base, ACBrUtil.Strings,
-  ACBrDFeException;
+  ACBrPagFor;
 
 { TArquivoWClass }
 
@@ -114,7 +114,7 @@ end;
 function TArquivoWClass.GerarTxt: Boolean;
 begin
   Result := False;
-  raise EACBrDFeException.Create(ClassName + '.GerarTxt, não implementado');
+  raise EACBrPagForException.Create(ClassName + '.GerarTxt, não implementado');
 end;
 
 procedure TArquivoWClass.GravarCampo(Campo: Variant; Tamanho: Integer;
@@ -137,6 +137,11 @@ begin
     tcStrZero:
       begin
         xCampo := TBStrZero(Trim(VarToStr(Campo)), Tamanho);
+      end;
+
+    tcStrCNPJ:
+      begin
+        xCampo := OnlyAlphaNum(TBStrZero(Trim(VarToStr(Campo)), Tamanho));
       end;
 
     tcDat:

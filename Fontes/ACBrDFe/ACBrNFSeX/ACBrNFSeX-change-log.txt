@@ -42,6 +42,282 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+25/06/2026
+-- ACBrNFSeXServicos --
+[*] ACBr-9527 - O municipio de Guaraquecaba/PR trocou de provedor para Elotech
+	Por: Light System Software
+	Veja: https://www.projetoacbr.com.br/forum/topic/92960-acbr-9527-erro-na-emissao-para-o-municipio-de-guaraquecaba-pr/
+[-] ACBr-9472 - Mudança de layout e URL para o município de Macae/RJ para a nova API do Padrão Nacional
+	Por: Larissa Santos
+	Veja: https://www.projetoacbr.com.br/forum/topic/92723-acbr-9472-rejei%C3%A7%C3%A3o-l9999-ao-tentar-emitir-uma-nfs-e-para-o-exterior/
+-- ISSNet.GravarXml --
+[*] O que tudo indica o provedor liberou todas as cidades para realizar testes em ambiente de homologação
+    do seu novo WS que recepciona o XML segundo o layout do Padrão Nacional.
+   Por: Italo Giurizzato Junior
+
+23/06/2026
+-- SpeedGov.GravarXml --
+[*] ACBR-9541 - Adiciona regra para que a tag regEspTrib seja gerada com valor diferente de RegimeEspecialTributacao conforme condições especificas.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/92734-acbr-9541-campo-regesptrib-com-valor-diferente-do-configurado/ 
+22/06/2026
+-- ACBrNFSeXServicos --
+[*] ACBR-9481 - Adiciona param para gerar a tag cPais no grupo endNac do tomador.
+   Por: Diego Folieni
+-- PadraoNacional.GravarXml/SilTecnologia.GravarXml --
+[*] ACBR-9481 - Adiciona a tag cPais no grupo endNac do tomador
+   Por: Diego Folieni
+-- Tecnos.GravarXml --
+[*] ACBR-9514 - Adiciona as tags CodigoSituacaoTributariaPisCofins e TipoRetencaoPisCofins na geração do XML.
+   Por: Daniel Ostoic / Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/92933-acbr-9514-obrigatoriamente-o-envio-des-seguintes-tags-provedor-tecnos/ 
+-- Betha.GravarXml/Betha.LerXml --
+[*] ACBR-9537 - O que tudo indica que agora o provedor esta trabalhando com o layout atualizado e não mais com 
+    o que foi publicado na NT 003 versão 1.2, alteração visando usar o layout atualizado.
+   Por: Italo Giurizzato Junior
+
+12/06/2026
+-- ACBrNFSeXServicos --
+[*] A cidade de Bataguassu/MS mudou para o provedor Fiorilli - Padrão Nacional versão 1.01
+   Por: Italo Giurizzato Junior
+-- Ginfes.Provider --
+[*] ACBR-9474 - Sobrescreve a rotina StrToSimNao para considerar zero como Não caso o provedor devolva assim na tag.
+   Por: Valter Patrick
+   Veja: https://www.projetoacbr.com.br/forum/topic/92705-acbr-9474-nfse-tag-incentivadorcultural-retornando-valor-zero-no-xml/
+-- ACBrNFSeXServicos --
+[-] Adiciona versão e Params que ficaram faltando para Aracati/CE
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/92804-solicita%C3%A7%C3%A3o-de-inclus%C3%A3o-do-munic%C3%ADpio-de-aracatice-no-acbrx/
+[*] ACBR-9020 - Atualiza a cidade de Promissão/SP para a versão 1.01 com API Propria do Fiorilli.
+   Por: Diego Folieni
+[*] Atualiza a cidade de Chapadao do Sul/MS para a versão 1.01 com API Propria do Fiorilli.
+   Por: Diego Folieni
+
+11/06/2026
+-- ACBrNFSeXSErvicos.ini --
+[*] ACBR-9437 - Munícipio de Nova Serrana/MG mudou para o Padrão Nacional
+   Por: Larissa dos Santos
+   Veja: https://discordapp.com/channels/798697718800318484/800042186783588364/1509254133105033276
+[*] ACBR-9436 - Atualização da versão 1.00 para 1.01 no município de Assis/SP  
+   Por: Larissa dos Santos
+   Veja: https://www.projetoacbr.com.br/forum/topic/92559-nfs-e-assissp/
+
+08/06/2026
+-- SpeedGov.Provider --
+[*] Transcreve as rotinas de conversão da informação do RegEspTrib visando maior compatibilidade com os valores válidos para o provedor.
+   Por: Diego Folieni
+05/06/2026
+-- SigISS.LerXml --
+[-] ACBR-9395 - Alteração visando a correta leitura da informação da tag dt_conversao
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/92351-acbr-9395-problema-na-impress%C3%A3o-da-nfs-e-data-e-hora-de-emiss%C3%A3o-fixa-no-provedor-sigiss/
+-- ACBrNFSeXDANFSeRLPadraoNacional --
+[*] Ajuste na posição do QR-Code
+   Por: Italo Giurizzato Junior
+-- HM2.GravarXml/HM2.LerXml/HM2.Provider --
+[+] ACBR-9105 - Implementado os Métodos de consultas e de cancelamento.
+   Por: Italo Giurizzato Junior
+-- Diversos --
+[*] Eliminação de Hits
+   Por: Italo Giurizzato Junior
+
+03/06/2026
+-- HM2.Provider --
+[+] ACBR-9105 - Implementado o Método Emitir, falta os demais.
+   Por: Italo Giurizzato Junior
+-- Tinus.Provider --
+[*] Removida a linha que desativava a validação do XML antes do seu envio para o WebService do provedor.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXClass/ACBrNFSeXLerXml/PadraoNacional.LerXml/ACBrNFSeXDANFSeRLPadraoNacional --
+[*] Alterações visando atender a versão 2.00 do DANFSE - Padrão Nacional em Fortes Report.
+   Por: Italo Giurizzato Junior
+
+02/06/2026
+-- ACBrNFSeXConversao/ACBrNFSeXProviderManager --
+[+] ACBR-9105 - Criado o enumerado para o provedor HM2 (proHM2).
+   Por: Italo Giurizzato Junior
+-- HM2.GravarXml/HM2.LerXml/HM2.Provider --
+[+] ACBR-9105 - Implementação do provedor HM2 para a cidade de Carpina/PE, não esta 100%.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-9234 - O município de Santa Maria de Jetiba/ES mudou de provedor padrão nacional para o provedor EL
+   Por: Larissa Santos
+   Veja: https://www.projetoacbr.com.br/forum/topic/91667-acbr-9234-acbrnfsexservicosini-santa-maria-de-jetibaes-ibge-n%C2%BA-3204559/#comment-605446
+[*] Ajuste nas URLs e versão das cidades atendidas pelo provedor GeisWeb.
+   Por: Italo Giurizzato Junior
+-- GeisWeb.GravarXml/GeisWeb.Provider --
+[*] Ajustes para atender tanto a versão 1.00 quanto a 1.01 que gera os campos da RTC.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] Ajuste nas URLs da cidade de Itapeva/MG.
+   Por: Italo Giurizzato Junior
+-- Fiorilli.Provider --
+[-] Correção no SoapAction das consultas da versão 1.01
+   Por: Italo Giurizzato Junior
+
+01/06/2026
+-- ACBrNFSeXServicos --
+[*] Incluída a cidade de Carpina/PE, O provedor é HM2
+   Por: Italo Giurizzato Junior
+-- SimplISS.Provider --
+[*] ACBR-9445 - Possível solução para o envio do evento de cancelamento.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-9201 - A cidade de Cataguases/MG trocou de provedor, agora é o IPM na versão 2.04
+   Por: André Cravo
+   Veja: https://www.projetoacbr.com.br/forum/topic/91418-acbr-9201-atualiza%C3%A7%C3%A3o-provedor-cidade-cataguases-mg/
+[*] ACBR-9352 - A cidade de Rio Claro/SP trocou de provedor, agora é o Giss na versão 2.04
+   Por: Gabriel Herdt
+   Veja: https://www.projetoacbr.com.br/forum/topic/92349-acbr-9352-ginfes-para-gissonline-rio-claro-sp-0106/
+[*] ACBR-9406 - A cidade  Jaraguá do Sul/SC trocou de provedor, agora é o Padrão Nacional
+   Por: Ademar Scariot
+[*] ACBR-9429 - Atualiza as URLs da cidade de Santa Helena de Goiás/GO
+   Por: Prime Software
+   Veja: https://www.projetoacbr.com.br/forum/topic/91298-acbr-9429acbr-9186-santa-helena-de-goias-go-provedor-centi/#comment-604085
+
+29/05/2026
+-- PadraoNacional.Provider --
+[-] Altera a mensagem devolvida quando não informa o chNFSe ao enviar evento de "Nenhum evento adicionado" para "Chave da NFSe não informada".
+   Por: Diego Folieni
+-- PadraoNacional.GravarXml --
+[*] Ajuste para que cLocalidadeIncid e xLocalidadeIncid sejam preenchidos automaticamente quando estiverem vazios usando valores que geram as tags cLocIncid e xLocIncid.
+   Por: Diego Folieni
+
+28/05/2026
+-- ACBrNFSeXConfiguracoes --
+[*] ACBR-9402 - Alteração para que asterísco na chave Params do município ignore a seção provedor e permita parâmetros específicos da seção.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/92385-acbr-9402-nfse-juazeiro-do-norte-ce-speedgov-parou-de-funcionar/
+
+27/05/2026
+-- ACBrNFSeXProviderABRASFv2/SigCorp.LerXml --
+[*] ACBR-9390 - Alterações visando a leitura da Chave de Acesso do Padrão Nacional
+    retornada no XML da NFS-e.
+   Por: Italo Giurizzato Junior
+
+26/05/2026
+-- ACBr.DANFSeX.FPDFPadraoNacional --
+[-] Ajustes visando compatibilização com o Delphi 7.
+   Por: Diego Folieni
+-- ACBr.DANFSeX.Classes/ACBrNFSeXDANFSeFPDFClass --
+[-] Revert visando evitar problema de compilação com o Delphi 7.
+   Por: Diego Folieni
+
+25/05/2026
+-- IPM.Provider --
+[-] Ajuste visando correção de compilação no D7.
+   Por: Diego Folieni
+-- Tecnos.GravarXml --
+[*] ACBR-9204 - Implementado a geração do grupo ComercioExterior.
+   Por: Italo Giurizzato Junior
+-- IPM.Provider --
+[*] ACBR-9192 - Sobrescrito o AssinarConsultarNFSe, pois para a consulta pelo código de verificação não
+    exige a assinatura.
+   Por: Pedro A. Araújo
+
+22/05/2026
+-- ACBrNFSeXServicos --
+[+] Adiciona a cidade de Horizonte/CE, provedor é o SpeedGov com APIPropria.
+   Por: Diego Folieni
+-- Fiorilli.GravarXml --
+[-] Adiciona parâmetro para que não seja formatado o ItemListaServico na versão 2.00
+   Por: Diego Folieni
+-- ACBrNFSeXLerXml --
+[*] Ajuste para ler todos os campos da seção ItensXXX.
+   Por: Italo Giurizzato Junior
+-- ISSSaoPaulo.GravarXml --
+[*] Ajuste para normatizar a alíquota informada antes de gerar a tag AliquotaServico.
+   Por: Italo Giurizzato Junior
+-- Tinus.LerXml --
+[*] Implementado a leitura do arquivo INI.
+   Por: Daniel Morais/Italo Giurizzato Junior
+-- ACBrNFSeXClass/ACBrNFSeXConversao/ACBrNFSeX.GravarIni/ACBrNFSeX.LerIni --
+-- ACBrNFSeXLerXml/eGoverneISS.GravarXml --
+[*] ACBR-9375 - Implementado o campo enumerado IdLocalIncidencia para atender o provedor eGoverneISS.
+   Por: Daniel Morais/Italo Giurizzato Junior
+-- ACBrNFSeXConfiguracoes/ACBrNFSeXServicos --
+[-] ACBR-9402 - Ajustes visando permitir convivência do leiaute alterado e da API própria para o SpeedGov.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/92385-acbr-9402-nfse-juazeiro-do-norte-ce-speedgov-parou-de-funcionar/ 
+
+21/05/2026
+-- ACBrNFSeXGravarXml --
+[*] Ajustes para tratar o ItemListaServico com 6 dígitos.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[-] As cidades de Cotia/SP, Embu das Artes/SP e Carapicuíba/SP atualizaram suas URLs.
+   Por: Diego
+   Veja: https://www.projetoacbr.com.br/forum/topic/92428-altera%C3%A7%C3%A3o-nos-endere%C3%A7os-dos-webservices-do-provedor-giap/
+-- Giap.Provider --
+[-] Ajuste para que não ocorra erro de conversão quando não vier informação de data na consulta.
+   Por: Diego Folieni 
+-- SigCorp.GravarXml --
+[*] ACBr-9346 - Inclusão do campo CsllRetido ao gerar o XML.
+   Por: ADMINFO
+-- Tinus.GravarXml --
+[*] ACBr-9374 - Inclusão de novos campos.
+   Por: Italo Giurizzato Junior
+
+20/05/2026
+-- ModernizacaoPublica.Provider --
+[*] ACBr-9354 - Ajustes para o correto leitura do retorno do envio.
+   Por: C4Dev/Italo Giurizzato Junior
+-- BWSistemas.GravarXml/BWSistemas.Provider --
+[*] ACBr-9328 - Ajustes para o correto envio e uma possível solução para o cancelamento.
+   Por: Diego Folieni/Italo Giurizzato Junior
+-- Etherium.Provider --
+[*] ACBr-9323 - Alteração visando gerar a tag MotivoCancelamento no pedido de cancelamento de uma nota.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos.ini --
+[*] ACBr-9398 - mudança de URL de produção  para o município de São Gabriel do Oeste/MS.
+  Por: Larissa Santos
+  Veja: https://www.projetoacbr.com.br/forum/topic/92372-mudan%C3%A7a-url-prefeitura-s%C3%A3o-gabriel-do-oeste/
+[*] ACBr-9397 - O município de Muzambinho/MG aderiu ao Padrão Nacional.
+  Por: Larissa Santos
+  Veja: https://www.projetoacbr.com.br/forum/topic/92363-muzambinho-mg-provedor-           nacional/
+
+19/05/2026
+-- EloTech.GravarXml --
+[*] Alterações necessárias para gerar o grupo IBSCBS dentro do grupo Serviço.
+   Por: Italo Giurizzato Junior
+-- SigCorp.GravarXml --
+[*] Alterações necessárias para a cidade de Bacabal/MA.
+   Por: Italo Giurizzato Junior
+-- SigISS.GravarXml --
+[*] ACBr-9305 - Alterações visando os novos campos referente a RTC.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBr-9382 - Alteração nas URLs da cidade de Bacabal/MA, o provedor continua o mesmo.
+   Por: Prime Software
+-- ACBrNFSeXProviderManager --
+-- SpeedGov.GravarXml/SpeedGov.LerXml/SpeedGov.Provider --
+[*] ACBr-9292 - Alterações nos fontes para atender a API Rest do provedor SpeedGov que 
+    adotou o layout do Padrão Nacional.
+[*] ACBr-9386 - Alterações nos fontes para atender os novos campos do provedor SpeedGov que 
+    que alterou o layout da ABRASF visando a Reforma Tributária.
+   Por: Italo Giurizzato Junior
+
+18/05/2026
+-- ACBrNFSeXServicos.ini -- 
+[*] ACBr-9363 - Alteração na URL da cidade de Montividiu/GO que passa a usar o novo WS do provedor.
+-- Fiorilli.Provider --
+[-] ACBr-9363 - Corrigido a nomenclatura da tag de leitura do Protocolo.
+   Por: C4Dev
+-- Publica.GravarXml --
+[-] ACBr-9360 - Corrigido a nomenclatura da tag.
+   Por: Store Brasil
+
+15/05/2026
+-- ACBrNFSeXServicos.ini -- 
+[*] ACBr-9292 - Alteração na URL da cidade de Ubajara/CE que passa a usar a API Rest
+    do provedor SpeedGov que adotou o layout do Padrão Nacional.
+[*] A cidade de Alto Paraiso/PR na verdade usa o provedor Pronim e não Padrão Nacional.
+   Por: Italo Giurizzato Junior
+-- ISSSaoPaulo.GravarXml/ISSSaoPaulo.LerXml --
+[*] Alteração visando gerar a tag RetencaoPisCofins para indicar o tipo de 
+    retenção do Pis/Cofins.
+   Por: Italo Giurizzato Junior
+
 13/05/2026
 -- ACBrNFSeX.GravarIni/ACBrNFSeX.LerIni --
 [*] Atualização das Units de escrita e leitura do arquivo INI padronizado.

@@ -152,8 +152,6 @@ type
   end;
 
   TACBrNFSeProviderFiorilliAPIPropria101 = class(TACBrNFSeProviderFiorilliAPIPropria)
-  private
-    FNaoAssinar: Boolean;
   protected
     function CriarGeradorXml(const ANFSe: TNFSe): TNFSeWClass; override;
     function CriarLeitorXml(const ANFSe: TNFSe): TNFSeRClass; override;
@@ -889,6 +887,9 @@ var
 begin
   AResponse.Data := ObterConteudoTag(ARootNode.Childrens.FindAnyNs('DataRecebimento'), tcDatHor);
   AResponse.Protocolo := ObterConteudoTag(ARootNode.Childrens.FindAnyNs('protocolo'), tcStr);
+  if AResponse.Protocolo = '' then
+    AResponse.Protocolo :=
+      ObterConteudoTag(ARootNode.Childrens.FindAnyNs('Protocolo'), tcStr);
   AResponse.Situacao := ObterConteudoTag(ARootNode.Childrens.FindAnyNs('Status'), tcStr);
 
   ANode := ARootNode.Childrens.FindAnyNs('NFSe');
@@ -992,7 +993,6 @@ procedure TACBrNFSeProviderFiorilliAPIPropria.TratarRetornoEmitir(
 var
   Document: TACBrXmlDocument;
   AErro: TNFSeEventoCollectionItem;
-  ANode: TACBrXmlNode;
 begin
   Document := TACBrXmlDocument.Create;
   try
@@ -1501,9 +1501,7 @@ end;
 procedure TACBrNFSeProviderFiorilliAPIPropria101.PrepararEmitir(
   Response: TNFSeEmiteResponse);
 var
-  Nota: TNotaFiscal;
   IdAttr, ListaDps: string;
-  I: Integer;
   lParams: TNFSeParamsResponse;
 begin
   if not(QuantidadeDeNotasValida(Response)) then Exit;
@@ -1531,7 +1529,6 @@ procedure TACBrNFSeProviderFiorilliAPIPropria101.TratarRetornoEmitir(
 var
   Document: TACBrXmlDocument;
   AErro: TNFSeEventoCollectionItem;
-  ANode: TACBrXmlNode;
 begin
   Document := TACBrXmlDocument.Create;
   try
@@ -1842,7 +1839,7 @@ begin
 
   Request := RemoverDeclaracaoXML(AMSG);
 
-  Result := Executar('ConsultarNfseEnvio', Request, [],
+  Result := Executar('consultarNfse', Request, [],
                     [{'xmlns:fio="http://www.fiorilli.com.br/nfse-nacional"'}]);
 end;
 
@@ -1855,7 +1852,7 @@ begin
 
   Request := RemoverDeclaracaoXML(AMSG);
 
-  Result := Executar('ConsultarNfseEnvio', Request, [],
+  Result := Executar('consultarNfse', Request, [],
                     [{'xmlns:fio="http://www.fiorilli.com.br/nfse-nacional"'}]);
 end;
 

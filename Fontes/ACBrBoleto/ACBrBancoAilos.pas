@@ -288,7 +288,7 @@ begin
              '0'                                             + // 8 - Tipo de registro - Registro header de arquivo
              StringOfChar(' ', 9)                            + // 9 a 17 Uso exclusivo FEBRABAN/CNAB
              ATipoInscricao                                  + // 18 - Tipo de inscrição do cedente
-             PadLeft(OnlyNumber(CNPJCPF), 14, '0')           + // 19 a 32 -Número de inscrição do cedente
+             PadLeft(OnlyCPFCNPJAlphaNum(CNPJCPF), 14, '0')           + // 19 a 32 -Número de inscrição do cedente
              PadRight(Convenio, 20, ' ')                     + // 33 a 52 - Código do convênio
              aAgencia                                        + // 53 a 57 - Código da agência do cedente
              PadRight(AgenciaDigito, 1 , '0')                + // 58 - Dígito da agência do cedente
@@ -319,7 +319,7 @@ begin
              PadLeft(IntToStr(fpLayoutVersaoLote), 3, '0')   + // 14 a 16 - Número da versão do layout do lote
              ' '                                             + // 17 - Uso exclusivo FEBRABAN/CNAB
              ATipoInscricao                                  + // 18 - Tipo de inscrição do cedente
-             PadLeft(OnlyNumber(CNPJCPF), 15, '0')           + // 19 a 33 -Número de inscrição do cedente
+             PadLeft(OnlyCPFCNPJAlphaNum(CNPJCPF), 15, '0')           + // 19 a 33 -Número de inscrição do cedente
              PadRight(Convenio, 20, ' ')                     + // 34 a 43 - Código do convênio
              aAgencia                                        + // 54 a 58 - Código da agência do cedente
              PadRight(AgenciaDigito, 1 , '0')                + // 59 - Dígito da agência do cedente
@@ -557,7 +557,7 @@ begin
              ' '                                                                      + // 15 - Uso exclusivo FEBRABAN/CNAB: Branco
              ATipoOcorrencia                                                          + // 16 a 17 - Codigo de movimento remessa
              IfThen(Sacado.Pessoa = pJuridica,'2','1')                                + // 18 - Tipo inscricao
-             PadLeft(OnlyNumber(Sacado.CNPJCPF), 15, '0')                             + // 19 a 33 - Número de Inscrição
+             PadLeft(OnlyCPFCNPJAlphaNum(Sacado.CNPJCPF), 15, '0')                             + // 19 a 33 - Número de Inscrição
              PadRight(Sacado.NomeSacado, 40, ' ')                                     + // 34 a 73 - Nome sacado
              PadRight(Sacado.Logradouro + ' ' + Sacado.Numero + ' '+
                       Sacado.Complemento , 40, ' ')                                   + // 74 a 113 - Endereco sacado
@@ -758,7 +758,7 @@ begin
       begin
          wLinha:= '7' +                                                         // 001 a 001 - ID Registro
                   ATipoCendente +                                               // 002 a 003 - Tipo de inscrição da empresa 01-CPF / 02-CNPJ
-                  PadLeft(OnlyNumber(Cedente.CNPJCPF),14,'0') +                 // 004 a 017 - Inscrição da empresa
+                  PadLeft(OnlyCPFCNPJAlphaNum(Cedente.CNPJCPF),14,'0') +                 // 004 a 017 - Inscrição da empresa
                   aAgencia +                                                    // 018 a 021 - Prefixo da agência
                   PadRight( Cedente.AgenciaDigito, 1)  +                        // 022 a 022 - DV-prefixo da agencia
                   aConta +                                                      // 023 a 030 - Código do cendete/nr. conta corrente da empresa
@@ -790,7 +790,7 @@ begin
                   IntToStrZero(0,13) +                                          // 193 a 205 - Zeros
                   IntToStrZero( round( ValorAbatimento * 100 ), 13) +           // 206 a 218 - Valor do abatimento permitido
                   ATipoSacado +                                                 // 219 a 220 - Tipo de inscricao do sacado
-                  PadLeft(OnlyNumber(Sacado.CNPJCPF),14,'0') +                  // 221 a 234 - CNPJ ou CPF do sacado
+                  PadLeft(OnlyCPFCNPJAlphaNum(Sacado.CNPJCPF),14,'0') +                  // 221 a 234 - CNPJ ou CPF do sacado
                   PadRight( Sacado.NomeSacado, 37) +                            // 235 a 271 - Nome do sacado
                   '   '  +                                                      // 272 a 274 - Brancos
                   PadRight(trim(Sacado.Logradouro) + ', ' +
@@ -896,20 +896,25 @@ begin
       toRetornoLiquidadoAposBaixaOuNaoRegistro        : Result := '17';
       toRetornoRecebimentoInstrucaoProtestar          : Result := '19';
       toRetornoRecebimentoInstrucaoSustarProtesto     : Result := '20';
+      toRetornoEntradaEmCartorio                      : Result := '22';
       toRetornoEncaminhadoACartorio                   : Result := '23';
       toRetornoRetiradoDeCartorio                     : Result := '24';
       toRetornoBaixaPorProtesto                       : Result := '25';
       toRetornoInstrucaoRejeitada                     : Result := '26';
       toRetornoAlteracaoUsoCedente                    : Result := '27';
       toRetornoDebitoTarifas                          : Result := '28';
+      toRetornoConfirmacaoEmailSMS                    : Result := '36';
+      toRetornoEmailSMSRejeitado                      : Result := '37';
       toRetornoRecebimentoInstrucaoAlterarNomeSacado  : Result := '42';
       toRetornoProtestoOuSustacaoEstornado            : Result := '46';
-      //                                              : Result := '76';
-      //                                              : Result := '77';
-      //                                              : Result := '91';
+      toRetornoTituloDDAReconhecidoPagador            : Result := '51';
+      toRetornoTituloDDANaoReconhecidoPagador         : Result := '52';
+      toRetornoDevolvidoPeloCartorio                  : Result := '89';
+      toRetornoPagadorDDA                             : Result := '91';
       toRetornoEntradaNegativacaoRejeitada            : Result := '92';
       toRetornoInclusaoNegativacao                    : Result := '93';
       toRetornoExclusaoNegativacao                    : Result := '94';
+      toRetornoConfirmacaoInstrucaoAnuencia           : Result := '97';
     end;
   end
   else
@@ -978,20 +983,29 @@ begin
       17: Result := '17-Liquidação Após Baixa ou Liquidação Título Não Registrado';
       19: Result := '19-Confirmação Recebimento Instrução de Protesto';
       20: Result := '20-Confirmação Recebimento Instrução de Sustação/Cancelamento de Protesto';
+      22: Result := '22-Título Enviado ao Cartório';
       23: Result := '23-Remessa a Cartório (Aponte em Cartório)';
       24: Result := '24-Retirada de Cartório e Manutenção em Carteira';
       25: Result := '25-Protestado e Baixado (Baixa por Ter Sido Protestado)';
       26: Result := '26-Instrução Rejeitada';
       27: Result := '27-Confirmação do Pedido de Alteração de Outros Dados';
       28: Result := '28-Débito de Tarifas/Custas';
+      36: Result := '36-Confirmação de envio de e-mail e SMS';
+      37: Result := '37-Envio de e-mail/SMS rejeitado';
       42: Result := '42-Confirmação da alteração dos dados do Sacado';
       46: Result := '46-Instrução para cancelar protesto confirmada';
-    //76: Result := '76-Liquidação de boleto cooperativa emite e expede';
-    //77: Result := '77-Liquidação de boleto após baixa ou não registrado cooperativa emite e expede';
-    //91: Result := '91-Título em aberto não enviado ao pagador';
+      51: Result := '51-Título DDA reconhecido pelo Pagador';
+      52: Result := '52-Título DDA não reconhecido pelo Pagador';
+      76: Result := '76-Liquidação CEE (boleto emitido na modalidade Cooperativa Emite e Expede)';
+      77: Result := '77-Liquidação após Baixa ou Liquidação Título Não Registrado CEE';
+      89: Result := '89-Rejeição cartorária';
+      91: Result := '91-Título em aberto não enviado ao pagador';
       92: Result := '92-Inconsistência Negativação Serasa';
       93: Result := '93-Inclusão Negativação via Serasa';
       94: Result := '94-Exclusão Negativação Serasa';
+      95: Result := '95-Instrução de SMS';
+      96: Result := '96-Cancelamento Instrução SMS';
+      97: Result := '97-Confirmação de instrução automática de anuência';
     end;
   end
   else
@@ -1047,32 +1061,41 @@ begin
   if (ACBrBanco.ACBrBoleto.LayoutRemessa = c240) then
   begin
     case CodOcorrencia of  // 16,2 Dominio
-      02 : Result := toRetornoRegistroConfirmado;
-      03 : Result := toRetornoRegistroRecusado;
-      06 : Result := toRetornoLiquidado;
-      07 : Result := toRetornoRecebimentoInstrucaoConcederDesconto;
-      08 : Result := toRetornoRecebimentoInstrucaoCancelarDesconto;
-      09 : Result := toRetornoBaixado;
-      12 : Result := toRetornoAbatimentoConcedido;
-      13 : Result := toRetornoAbatimentoCancelado;
-      14 : Result := toRetornoVencimentoAlterado;
-      17 : Result := toRetornoLiquidadoAposBaixaOuNaoRegistro;
-      19 : Result := toRetornoRecebimentoInstrucaoProtestar;
-      20 : Result := toRetornoRecebimentoInstrucaoSustarProtesto;
-      23 : Result := toRetornoEncaminhadoACartorio;
-      24 : Result := toRetornoRetiradoDeCartorio;
-      25 : Result := toRetornoBaixaPorProtesto;
-      26 : Result := toRetornoInstrucaoRejeitada;
-      27 : Result := toRetornoAlteracaoUsoCedente;
-      28 : Result := toRetornoDebitoTarifas;
-      42 : Result := toRetornoRecebimentoInstrucaoAlterarNomeSacado;
-      46 : Result := toRetornoProtestoOuSustacaoEstornado;
-    //76 : Result :=
-    //77 : Result :=
-    //91 : Result :=
-      92 : Result := toRetornoEntradaNegativacaoRejeitada;
-      93 : Result := toRetornoInclusaoNegativacao;
-      94 : Result := toRetornoExclusaoNegativacao
+      02 : Result := toRetornoRegistroConfirmado;                          {'02' = Entrada Confirmada}
+      03 : Result := toRetornoRegistroRecusado;                            {'03' = Entrada Rejeitada}
+      06 : Result := toRetornoLiquidado;                                   {'06' = Liquidação}
+      07 : Result := toRetornoRecebimentoInstrucaoConcederDesconto;        {'07' = Confirmação do Recebimento da Instrução de Desconto}
+      08 : Result := toRetornoRecebimentoInstrucaoCancelarDesconto;        {'08' = Confirmação do Recebimento do Cancelamento do Desconto}
+      09 : Result := toRetornoBaixado;                                     {'09' = Baixa}
+      12 : Result := toRetornoAbatimentoConcedido;                         {'12' = Confirmação Recebimento Instrução de Abatimento}
+      13 : Result := toRetornoAbatimentoCancelado;                         {'13' = Confirmação Recebimento Instrução de Cancelamento Abatimento}
+      14 : Result := toRetornoVencimentoAlterado;                          {'14' = Confirmação Recebimento Instrução Alteração de Vencimento}
+      17 : Result := toRetornoLiquidadoAposBaixaOuNaoRegistro;             {'17' = Liquidação Após Baixa ou Liquidação Título Não Registrado}
+      19 : Result := toRetornoRecebimentoInstrucaoProtestar;               {'19' = Confirmação Recebimento Instrução de Protesto}
+      20 : Result := toRetornoRecebimentoInstrucaoSustarProtesto;          {'20' = Confirmação Recebimento Instrução de Sustação/Cancelamento de Protesto}
+      22 : Result := toRetornoEntradaEmCartorio;                           {'22' = Título Enviado ao Cartório}
+      23 : Result := toRetornoEncaminhadoACartorio;                        {'23' = Remessa a Cartório (Aponte em Cartório)}
+      24 : Result := toRetornoRetiradoDeCartorio;                          {'24' = Retirada de Cartório e Manutenção em Carteira}
+      25 : Result := toRetornoBaixaPorProtesto;                            {'25' = Protestado e Baixado (Baixa por Ter Sido Protestado)}
+      26 : Result := toRetornoInstrucaoRejeitada;                          {'26' = Instrução Rejeitada}
+      27 : Result := toRetornoAlteracaoUsoCedente;                         {'27' = Confirmação do Pedido de Alteração de Outros Dados}
+      28 : Result := toRetornoDebitoTarifas;                               {'28' = Débito de Tarifas/Custas}
+      36 : Result := toRetornoConfirmacaoEmailSMS;                         {'36' = Confirmação de envio de e-mail e SMS}
+      37 : Result := toRetornoEmailSMSRejeitado;                           {'37' = Envio de e-mail/SMS rejeitado}
+      42 : Result := toRetornoRecebimentoInstrucaoAlterarNomeSacado;       {'42' = Confirmação da alteração dos dados do Sacado}
+      46 : Result := toRetornoProtestoOuSustacaoEstornado;                 {'46' = Instrução para cancelar protesto confirmada}
+      51 : Result := toRetornoTituloDDAReconhecidoPagador;                 {'51' = Título DDA reconhecido pelo Pagador}
+      52 : Result := toRetornoTituloDDANaoReconhecidoPagador;              {'52' = Título DDA não reconhecido pelo Pagador}
+      76 : Result := toRetornoLiquidado;                                   {'76' = Liquidação CEE (boleto emitido na modalidade Cooperativa Emite e Expede)}
+      77 : Result := toRetornoLiquidadoAposBaixaOuNaoRegistro;             {'77' = Liquidação após Baixa ou Liquidação Título Não Registrado CEE}
+      89 : Result := toRetornoDevolvidoPeloCartorio;                       {'89' = Rejeição cartorária}
+      91 : Result := toRetornoPagadorDDA;                                  {'91' = Título em aberto não enviado ao pagador}
+      92 : Result := toRetornoEntradaNegativacaoRejeitada;                 {'92' = Inconsistência Negativação Serasa}
+      93 : Result := toRetornoInclusaoNegativacao;                         {'93' = Incluir Serasa}
+      94 : Result := toRetornoExclusaoNegativacao;                         {'94' = Excluir Serasa}
+      95 : Result := toRetornoConfirmacaoEmailSMS;                         {'95' = Instrução de SMS}
+      96 : Result := toRetornoEmailSMSRejeitado;                           {'96' = Cancelamento Instrução SMS}
+      97 : Result := toRetornoConfirmacaoInstrucaoAnuencia;                {'97' = Confirmação de instrução automática de anuência}
     else
       Result := toRetornoOutrasOcorrencias;
     end;
@@ -1297,6 +1320,86 @@ begin
          end;
        end;
 
+       case TipoOcorrencia of
+         toRetornoDevolvidoPeloCartorio:
+         case CodMotivo of
+           01: Result := '01-Data da apresentação inferior à data de vencimento';
+           02: Result := '02-Falta de comprovante da prestação de serviço';
+           03: Result := '03-Nome do sacado incompleto/incorreto';
+           04: Result := '04-Nome do cedente incompleto/incorreto';
+           05: Result := '05-Nome do sacador incompleto/incorreto';
+           06: Result := '06-Endereço do sacado insuficiente';
+           07: Result := '07-CNPJ/CPF do sacado inválido/incorreto';
+           08: Result := '08-CNPJ/CPF incompatível c/ o nome do sacado/sacador avalista';
+           09: Result := '09-CNPJ/CPF do sacado incompatível com o tipo de documento';
+           10: Result := '10-CNPJ/CPF do sacador incompatível com a espécie';
+           11: Result := '11-Título aceito sem a assinatura do sacado';
+           12: Result := '12-Título aceito rasurado ou rasgado';
+           13: Result := '13-Título aceito - falta título';
+           14: Result := '14-CEP incorreto';
+           15: Result := '15-Praça de pagamento incompatível com endereço';
+           16: Result := '16-Falta número do título';
+           17: Result := '17-Título sem endosso do cedente ou irregular';
+           18: Result := '18-Falta data de emissão do título';
+           19: Result := '19-Título aceito: valor por extenso diferente do valor numérico';
+           20: Result := '20-Data de emissão posterior ao vencimento';
+           21: Result := '21-Espécie inválida para protesto';
+           22: Result := '22-CEP do sacado incompatível com a praça de protesto';
+           23: Result := '23-Falta espécie do título';
+           24: Result := '24-Saldo maior que o valor do título';
+           25: Result := '25-Tipo de endosso inválido';
+           26: Result := '26-Devolvido por ordem judicial';
+           27: Result := '27-Dados do título não conferem com disquete';
+           28: Result := '28-Sacado e Sacador/Avalista são a mesma pessoa';
+           29: Result := '29-Corrigir a espécie do título';
+           30: Result := '30-Aguardar um dia útil após o vencimento para protestar';
+           31: Result := '31-Data do vencimento rasurada';
+           32: Result := '32-Vencimento por extenso não confere com número';
+           33: Result := '33-Falta data de vencimento no título';
+           34: Result := '34-DM/DMI sem comprovante autenticado ou declaração';
+           35: Result := '35-Comprovante ilegível para conferência e microfilmagem';
+           36: Result := '36-Nome solicitado não confere com emitente ou sacado';
+           37: Result := '37-Confirmar se são 2 emitentes. Se sim, indicar os dados dos 2';
+           38: Result := '38-Endereço do sacado igual ao do sacador ou do portador';
+           39: Result := '39-Endereço do apresentante incompleto ou não informado';
+           40: Result := '40-Rua/Número inexistente no endereço';
+           41: Result := '41-Informar a qualidade do endosso (M ou T)';
+           42: Result := '42-Falta endosso do favorecido para o apresentante';
+           43: Result := '43-Data da emissão rasurada';
+           44: Result := '44-Protesto de cheque proibido - motivo 20/25/28/30 ou 35';
+           45: Result := '45-Falta assinatura do emitente no cheque';
+           46: Result := '46-Endereço do emitente no cheque igual ao do banco sacado';
+           47: Result := '47-Falta o motivo da devolução no cheque ou motivo ilegível';
+           48: Result := '48-Falta assinatura do sacador no título';
+           49: Result := '49-Nome do apresentante não informado/incompleto/incorreto';
+           50: Result := '50-Erro de preenchimento do título';
+           51: Result := '51-Título com direito de regresso vencido';
+           52: Result := '52-Título apresentado em duplicidade';
+           53: Result := '53-Título já protestado';
+           54: Result := '54-Letra de Câmbio vencida - falta aceite do sacado';
+           55: Result := '55-Título - falta tradução por tradutor público';
+           56: Result := '56-Falta declaração de saldo assinada no título';
+           57: Result := '57-Contrato de Câmbio - falta conta gráfica';
+           58: Result := '58-Ausência do documento físico';
+           59: Result := '59-Sacado falecido';
+           60: Result := '60-Sacado apresentou quitação do título';
+           61: Result := '61-Título de outra jurisdição territorial';
+           62: Result := '62-Título com emissão anterior à concordata do sacado';
+           63: Result := '63-Sacado consta na lista de falência';
+           64: Result := '64-Apresentante não aceita publicação de edital';
+           65: Result := '65-Dados do sacador em branco ou inválido';
+           66: Result := '66-Título sem autorização para protesto por edital';
+           67: Result := '67-Valor divergente entre título e comprovante';
+           68: Result := '68-Condomínio não pode ser protestado para fins falimentares';
+           70: Result := '70-Dados do cedente em branco ou inválido';
+           89: Result := '89-Comarca bloqueada';
+           90: Result := '90-Rejeição cartorária';
+           99: Result := '99-Estorno por rejeição cartorária';
+         else
+            Result := 'Devolvido Cartorio, retorno não mapeado';
+         end;
+       end;
+
      end
   else
      begin // c400 Natureza do Recebimento tabela 03 - Posicao 087/088 - Pag 33
@@ -1384,7 +1487,7 @@ begin
    ACBrBanco.ACBrBoleto.NumeroArquivo := StrToIntDef(Copy(ARetorno[0],158,6),0);
 
    rCedente := trim(copy(ARetorno[0], 73, 30));
-   rCNPJCPF := OnlyNumber( copy(ARetorno[0], 19, 14) );
+   rCNPJCPF := OnlyCPFCNPJAlphaNum( copy(ARetorno[0], 19, 14) );
    rConta := OnlyNumber( copy(ARetorno[0], 60, 11) );
 
    ValidarDadosRetorno('', '', rCNPJCPF);

@@ -43,6 +43,21 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+18/06/2026
+-- Diversas units ACBrCTe  --
+[*] Ajuste das chaves chaves e cnpj alfanumérico.
+   ACBr-9369
+   Por: Daniel Morais InfoCotidiano
+
+04/06/2026
+-- ACBrCTe.IniReader/ACBrCTe.EnvEvento --
+[*] Melhorias no código e utilização da função CarregarArquivo para ler um XML do disco.
+   Por: Italo Giurizzato Junior
+
+18/05/2026
+-- ACBrCTe.EnvEvento --
+[*] ACBr-9197: Alterado a forma de carregar o arquivo de TStringList para TMemoryStream.
+   Por: Italo Giurizzato Junior
 
 11/05/2026
 -- ACBrCTe.EnvEvento --

@@ -6,25 +6,40 @@ using ACBrLib.Core.DFe;
 
 namespace ACBrLib.GNRe
 {
-    public sealed partial class ACBrGNRe : ACBrLibHandle
+    /// <summary>
+    /// Implementação dinâmica da ACBrLib GNRe.
+    /// </summary>
+    public sealed partial class ACBrGNRe : ACBrLibHandle, IACBrLibGNRe
     {
         #region Constructors
 
+        /// <summary>
+        /// Inicializa uma nova instância da biblioteca ACBrLib GNRe.
+        /// </summary>
+        /// <param name="eArqConfig">Arquivo de configuração da biblioteca.</param>
+        /// <param name="eChaveCrypt">Chave de criptografia utilizada na configuração.</param>
         public ACBrGNRe(string eArqConfig = "", string eChaveCrypt = "") : base(IsWindows ? "ACBrGNRe64.dll" : "libacbrgnre64.so",
                                                                                 IsWindows ? "ACBrGNRe32.dll" : "libacbrgnre32.so")
         {
-            var inicializar = GetMethod<GNRE_Inicializar>();
-            var ret = ExecuteMethod(() => inicializar(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
-
-            CheckResult(ret);
-
+            Inicializar(eArqConfig, eChaveCrypt);
             Config = new GNReConfig(this);
+        }
+
+        /// <inheritdoc/>
+        public override void Inicializar(string eArqConfig = "", string eChaveCrypt = "")
+        {
+            var inicializarLib = GetMethod<GNRE_Inicializar>();
+            var ret = ExecuteMethod<int>(() => inicializarLib(ToUTF8(eArqConfig), ToUTF8(eChaveCrypt)));
+            CheckResult(ret);
         }
 
         #endregion Constructors
 
         #region Properties
 
+        /// <summary>
+        /// Nome da biblioteca carregada.
+        /// </summary>
         public string Nome
         {
             get
@@ -41,6 +56,9 @@ namespace ACBrLib.GNRe
             }
         }
 
+        /// <summary>
+        /// Versão da biblioteca carregada.
+        /// </summary>
         public string Versao
         {
             get
@@ -57,6 +75,7 @@ namespace ACBrLib.GNRe
             }
         }
 
+        /// <inheritdoc/>
         public GNReConfig Config { get; }
 
         #endregion Properties
@@ -65,6 +84,7 @@ namespace ACBrLib.GNRe
 
         #region Ini
 
+        /// <inheritdoc/>
         public override void ConfigGravar(string eArqConfig = "")
         {
             var gravarIni = GetMethod<GNRE_ConfigGravar>();
@@ -73,6 +93,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override void ConfigLer(string eArqConfig = "")
         {
             var lerIni = GetMethod<GNRE_ConfigLer>();
@@ -81,6 +102,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override T ConfigLerValor<T>(ACBrSessao eSessao, string eChave)
         {
             var method = GetMethod<GNRE_ConfigLerValor>();
@@ -94,6 +116,7 @@ namespace ACBrLib.GNRe
             return ConvertValue<T>(value);
         }
 
+        /// <inheritdoc/>
         public override void ConfigGravarValor(ACBrSessao eSessao, string eChave, object value)
         {
             if (value == null) return;
@@ -105,6 +128,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override void ImportarConfig(string eArqConfig = "")
         {
             var importarConfig = GetMethod<GNRE_ConfigImportar>();
@@ -113,6 +137,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public override string ExportarConfig()
         {
             var bufferLen = BUFFER_LEN;
@@ -128,6 +153,7 @@ namespace ACBrLib.GNRe
 
         #endregion Ini
 
+        /// <inheritdoc/>
         public void CarregarXML(string eArquivoOuXml)
         {
             var method = GetMethod<GNRE_CarregarXML>();
@@ -136,6 +162,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void CarregarINI(string eArquivoOuIni)
         {
             var method = GetMethod<GNRE_CarregarINI>();
@@ -144,6 +171,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public string ObterXml(int aIndex)
         {
             var bufferLen = BUFFER_LEN;
@@ -157,6 +185,7 @@ namespace ACBrLib.GNRe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public void GravarXml(int aIndex, string eNomeArquivo = "", string ePathArquivo = "")
         {
             var method = GetMethod<GNRE_GravarXml>();
@@ -165,6 +194,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void CarregarGuiaRetorno(string eArquivoOuXml)
         {
             var method = GetMethod<GNRE_CarregarGuiaRetorno>();
@@ -173,6 +203,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void LimparLista()
         {
             var method = GetMethod<GNRE_LimparLista>();
@@ -181,6 +212,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void LimparListaGuiaRetorno()
         {
             var method = GetMethod<GNRE_LimparListaGuiaRetorno>();
@@ -189,6 +221,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void Assinar()
         {
             var method = GetMethod<GNRE_Assinar>();
@@ -197,6 +230,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void Validar()
         {
             var method = GetMethod<GNRE_Validar>();
@@ -205,6 +239,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public string VerificarAssinatura()
         {
             var bufferLen = BUFFER_LEN;
@@ -218,6 +253,7 @@ namespace ACBrLib.GNRe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public InfoCertificado[] ObterCertificados()
         {
             var bufferLen = BUFFER_LEN;
@@ -232,6 +268,7 @@ namespace ACBrLib.GNRe
             return certificados.Length == 0 ? new InfoCertificado[0] : certificados.Select(x => new InfoCertificado(x)).ToArray();
         }
 
+        /// <inheritdoc/>
         public string Enviar()
         {
             var bufferLen = BUFFER_LEN;
@@ -245,6 +282,7 @@ namespace ACBrLib.GNRe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public string Consultar(string uf, int receita)
         {
             var bufferLen = BUFFER_LEN;
@@ -258,6 +296,7 @@ namespace ACBrLib.GNRe
             return ProcessResult(buffer, bufferLen);
         }
 
+        /// <inheritdoc/>
         public void EnviarEmail(string ePara, string eChaveNFe, bool aEnviaPDF, string eAssunto, string eMensagem, string[] eCc = null, string[] eAnexos = null)
         {
             var method = GetMethod<GNRE_EnviarEmail>();
@@ -267,6 +306,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void Imprimir(string impressora = "", bool? MostrarPreview = null)
         {
             var mostrarPreview = MostrarPreview.HasValue ? $"{Convert.ToInt32(MostrarPreview.Value)}" : string.Empty;
@@ -277,6 +317,7 @@ namespace ACBrLib.GNRe
             CheckResult(ret);
         }
 
+        /// <inheritdoc/>
         public void ImprimirPDF()
         {
             var method = GetMethod<GNRE_ImprimirPDF>();
@@ -287,13 +328,15 @@ namespace ACBrLib.GNRe
 
         #region Private Methods
 
-        protected override void FinalizeLib()
+        /// <inheritdoc/>
+        public override void Finalizar()
         {
-            var finalizar = GetMethod<GNRE_Finalizar>();
-            var codRet = ExecuteMethod(() => finalizar());
+            var finalizarLib = GetMethod<GNRE_Finalizar>();
+            var codRet = ExecuteMethod(() => finalizarLib());
             CheckResult(codRet);
         }
 
+        /// <inheritdoc/>
         protected override string GetUltimoRetorno(int iniBufferLen = 0)
         {
             var bufferLen = iniBufferLen < 1 ? BUFFER_LEN : iniBufferLen;
@@ -310,6 +353,20 @@ namespace ACBrLib.GNRe
 
             ExecuteMethod(() => ultimoRetorno(buffer, ref bufferLen));
             return FromUTF8(buffer);
+        }
+
+        /// <inheritdoc/>
+        public override string OpenSSLInfo()
+        {
+            var bufferLen = BUFFER_LEN;
+            var buffer = new StringBuilder(bufferLen);
+
+            var method = GetMethod<GNRE_OpenSSLInfo>();
+            var ret = ExecuteMethod(() => method(buffer, ref bufferLen));
+
+            CheckResult(ret);
+
+            return ProcessResult(buffer, bufferLen);
         }
 
         #endregion Private Methods

@@ -60,7 +60,7 @@ Const
 type
 
   TSSLLib = (libNone, libOpenSSL, libCapicom, libCapicomDelphiSoap, libWinCrypt, libCustom);
-  TSSLCryptLib = (cryNone, cryOpenSSL, cryCapicom, cryWinCrypt);
+  TSSLCryptLib = (cryNone, cryOpenSSL, cryCapicom, cryWinCrypt, cryCNGCrypt);
   TSSLHttpLib = (httpNone, httpWinINet, httpWinHttp, httpOpenSSL, httpIndy);
   TSSLXmlSignLib = (xsNone, xsXmlSec, xsMsXml, xsMsXmlCapicom, xsLibXml2);
 
@@ -523,7 +523,8 @@ uses
    ,ACBrDFeHttpIndy
   {$EndIf}
   {$IfDef MSWINDOWS}
-   ,ACBrDFeWinCrypt, ACBrDFeHttpWinApi
+   ,ACBrDFeWinCrypt, ACBrDFeHttpWinApi, ACBrDFeCry.WinUtils
+   ,ACBrDFeWinSecCNG
    {$IfNDef DFE_SEM_MSXML}
     ,ACBrDFeXsMsXml
    {$EndIf}
@@ -652,7 +653,7 @@ begin
     P := PosEx(':', SubjectName, P);
     if P > 0 then
     begin
-      Result := OnlyNumber(copy(SubjectName, P+1, 14));
+      Result := OnlyAlphaNum(copy(SubjectName, P+1, 14));
       // Evita pegar CPF ou outro Documento, do SubjectName (comuns em EPP)
       if (ValidarCNPJ(Result) <> '') and (ValidarCPF(Result) <> '') then
         Result := '';
@@ -1070,7 +1071,7 @@ begin
     // Verifica se o ResultCode é: 200 OK; 201 Created; 202 Accepted
     // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     if (not (FpHTTPResultCode in [200..202])) and AValidateReturnCode then
-      raise EACBrDFeException.Create('');
+      raise EACBrDFeException.Create('Retorno diferente de 200-202');
   except
     on E:Exception do
     begin
@@ -1079,7 +1080,6 @@ begin
                                          + sLineBreak + LastErrorDesc + sLineBreak + Result);
     end;
   end;
-
 end;
 
 procedure TDFeSSLHttpClass.HTTPMethod(const AMethod, AURL: String);
@@ -1675,12 +1675,12 @@ procedure TDFeSSL.ValidarCNPJCertificado(CNPJDocumento: String);
 var
   ErroCNPJ, CNPJCertificado: String;
 begin
-  CNPJDocumento := OnlyNumber(CNPJDocumento);
+  CNPJDocumento := OnlyAlphaNum(CNPJDocumento);
   if (CNPJDocumento = '') or              // Informou vazio
      (Length(CNPJDocumento) <> 14) then   // Não é CNPJ
     exit;
 
-  CNPJCertificado := OnlyNumber(CertCNPJ);  // Lendo CNPJ do Certificado...
+  CNPJCertificado := OnlyAlphaNum(CertCNPJ);  // Lendo CNPJ do Certificado...
   if (CNPJCertificado = '') or              // Não foi capaz de ler CNPJ do Certificado (Senha, NumSerie, Path... há algo errado na configuração)
      (Length(CNPJCertificado) <> 14) then   // Não é CNPJ (estranho.. pode ser um eCPF)
     exit;
@@ -1875,6 +1875,16 @@ begin
       {$IfDef MSWINDOWS}
        FreeSSLCryptLib;
        FSSLCryptClass := TDFeWinCrypt.Create(Self);
+      {$Else}
+       raise EACBrDFeException.Create('Suporte a libWinCrypt disponível apenas em MSWINDOWS');
+      {$EndIf}
+    end;
+
+    cryCNGCrypt:
+    begin
+      {$IfDef MSWINDOWS}
+       FreeSSLCryptLib;
+       FSSLCryptClass := TDFeWinSecCNGCrypt.Create(Self);
       {$Else}
        raise EACBrDFeException.Create('Suporte a libWinCrypt disponível apenas em MSWINDOWS');
       {$EndIf}

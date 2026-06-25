@@ -110,6 +110,7 @@ uses
   GestaoISS.Provider,
   Giss.Provider,
   GovDigital.Provider,
+  HM2.Provider,
   iiBrasil.Provider,
   Isaneto.Provider,
   ISSCamacari.Provider,
@@ -454,9 +455,10 @@ begin
           end;
         end;
 
-      proGoverna:    Result := TACBrNFSeProviderGoverna.Create(ACBrNFSe);
-      proHorus:      Result := TACBrNFSeProviderHorus.Create(ACBrNFSe);
-      proiiBrasil:   Result := TACBrNFSeProvideriiBrasil204.Create(ACBrNFSe);
+      proGoverna:  Result := TACBrNFSeProviderGoverna.Create(ACBrNFSe);
+      proHM2:      Result := TACBrNFSeProviderHM2203.Create(ACBrNFSe);
+      proHorus:    Result := TACBrNFSeProviderHorus.Create(ACBrNFSe);
+      proiiBrasil: Result := TACBrNFSeProvideriiBrasil204.Create(ACBrNFSe);
 
       proInfisc:
         begin
@@ -763,7 +765,14 @@ begin
 
       proSmart4:   Result := TACBrNFSeProviderSmart4.Create(ACBrNFSe);
       proSoftPlan: Result := TACBrNFSeProviderSoftPlan.Create(ACBrNFSe);
-      proSpeedGov: Result := TACBrNFSeProviderSpeedGov.Create(ACBrNFSe);
+
+      proSpeedGov:
+        begin
+          if APIPropria then
+            Result := TACBrNFSeProviderSpeedGovAPIPropria.Create(ACBrNFSe)
+          else
+            Result := TACBrNFSeProviderSpeedGov.Create(ACBrNFSe);
+        end;
 
       proSSInformatica:
         Result := TACBrNFSeProviderSSInformatica203.Create(ACBrNFSe);

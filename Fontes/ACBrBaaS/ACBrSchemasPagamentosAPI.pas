@@ -553,7 +553,7 @@ type
     fcodigoTipoContribuinte: TACBrTipoContribuinte;
     fcodigoTipoContribuinteGuiaPrevidenciaSocial: TACBrTipoContribuinte;
     fcontaCorrenteDebito: Integer;
-    fcpfCnpjContribuinte: Int64;
+    fcpfCnpjContribuinte: String;
     fdata: TDateTime;
     fdataAgendamento: TDateTime;
     fdataApuracao: TDateTime;
@@ -566,8 +566,8 @@ type
     festadoPagamento: TACBrEstadoPagamento;
     ffimCartaoCredito: Integer;
     fid: Int64;
-    fidContribuinte: Int64;
-    fidentificacaoContribuinte: Int64;
+    fidContribuinte: String;
+    fidentificacaoContribuinte: String;
     fidPagamento: Int64;
     findicadorAceite: String;
     findicadorMovimentoAceito: String;
@@ -588,8 +588,8 @@ type
     fnumeroDocumentoDebito: Int64;
     fnumeroCodigoBarras: String;
     fdataPagamento: TDateTime;
-    fnumeroIdentificacaoContribuinte: Integer;
-    fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial: Integer;
+    fnumeroIdentificacaoContribuinte: String;
+    fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial: String;
     fnumeroReferencia: String;
     fseuDocumento: String;
     fseuNumero: String;
@@ -691,7 +691,7 @@ type
     property numeroReferencia: String read fnumeroReferencia write fnumeroReferencia;
     property textoDescricao: String read ftextoDescricao write ftextoDescricao;
     property mesAnoCompetencia: Integer read fmesAnoCompetencia write fmesAnoCompetencia;
-    property idContribuinte: Int64 read fidContribuinte write fidContribuinte;
+    property idContribuinte: String read fidContribuinte write fidContribuinte;
     property valor: Double read fvalor write fvalor;
     property valorPrincipal: Double read fvalorPrincipal write fvalorPrincipal;
     property valorOutraDeducao: Double read fvalorOutraDeducao write fvalorOutraDeducao;
@@ -701,13 +701,13 @@ type
     property valorJuroEncargo: Double read fvalorJuroEncargo write fvalorJuroEncargo;
     property valorOutroAcrescimo: Double read fvalorOutroAcrescimo write fvalorOutroAcrescimo;
     property valorOutrosAcrescimos: Double read fvalorOutrosAcrescimos write fvalorOutrosAcrescimos;
-    property cpfCnpjContribuinte: Int64 read fcpfCnpjContribuinte write fcpfCnpjContribuinte;
+    property cpfCnpjContribuinte: String read fcpfCnpjContribuinte write fcpfCnpjContribuinte;
     property indicadorMovimentoAceito: String read findicadorMovimentoAceito write findicadorMovimentoAceito;
 
     // DARF
     property codigoReceitaTributo: Integer read fcodigoReceitaTributo write fcodigoReceitaTributo;
     property codigoTipoContribuinte: TACBrTipoContribuinte read fcodigoTipoContribuinte write fcodigoTipoContribuinte;
-    property numeroIdentificacaoContribuinte: Integer read fnumeroIdentificacaoContribuinte write fnumeroIdentificacaoContribuinte;
+    property numeroIdentificacaoContribuinte: String read fnumeroIdentificacaoContribuinte write fnumeroIdentificacaoContribuinte;
     property codigoIdentificadorTributo: String read fcodigoIdentificadorTributo write fcodigoIdentificadorTributo;
     property dataApuracao: TDateTime read fdataApuracao write fdataApuracao;
 
@@ -716,7 +716,7 @@ type
     property nomeConvenente: String read fnomeConvenente write fnomeConvenente;
     property codigoReceitaTributoGuiaPrevidenciaSocial: Integer read fcodigoReceitaTributoGuiaPrevidenciaSocial write fcodigoReceitaTributoGuiaPrevidenciaSocial;
     property codigoTipoContribuinteGuiaPrevidenciaSocial: TACBrTipoContribuinte read fcodigoTipoContribuinteGuiaPrevidenciaSocial write fcodigoTipoContribuinteGuiaPrevidenciaSocial;
-    property numeroIdentificacaoContribuinteGuiaPrevidenciaSocial: Integer read fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial write fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial;
+    property numeroIdentificacaoContribuinteGuiaPrevidenciaSocial: String read fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial write fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial;
     property codigoIdentificadorTributoGuiaPrevidenciaSocial: String read fcodigoIdentificadorTributoGuiaPrevidenciaSocial write fcodigoIdentificadorTributoGuiaPrevidenciaSocial;
     property mesAnoCompetenciaGuiaPrevidenciaSocial: Integer read fmesAnoCompetenciaGuiaPrevidenciaSocial write fmesAnoCompetenciaGuiaPrevidenciaSocial;
     property valorPrevistoInstNacSeguridadeSocialGuiaPrevidenciaSocial: Double read fvalorPrevistoInstNacSeguridadeSocialGuiaPrevidenciaSocial write fvalorPrevistoInstNacSeguridadeSocialGuiaPrevidenciaSocial;
@@ -736,7 +736,7 @@ type
     property inicioCartaoCredito: Integer read finicioCartaoCredito write finicioCartaoCredito;
     property fimCartaoCredito: Integer read ffimCartaoCredito write ffimCartaoCredito;
     property codigoAutenticacaoPagamento: String read fcodigoAutenticacaoPagamento write fcodigoAutenticacaoPagamento;
-    property identificacaoContribuinte: Int64 read fidentificacaoContribuinte write fidentificacaoContribuinte;
+    property identificacaoContribuinte: String read fidentificacaoContribuinte write fidentificacaoContribuinte;
     property tipoPessoaBeneficiario: Integer read ftipoPessoaBeneficiario write ftipoPessoaBeneficiario;
     property tipoPessoaPagador: Integer read ftipoPessoaPagador write ftipoPessoaPagador;
     property tipoPessoaAvalista: Integer read ftipoPessoaAvalista write ftipoPessoaAvalista;
@@ -1274,6 +1274,103 @@ type
     property cpfCnpjContribuinte;
     property numeroDocumentoDebito;
     property textoDescricao;
+  end;
+
+  { TACBrPagamentosPagamentoCancelarClass }
+
+  TACBrPagamentosPagamentoCancelarClass = class(TACBrAPISchema)
+  private
+    fcodigoPagamento: Int64;
+    festadoCancelamento: String;
+    festadoPagamento: String;
+    findicadorCancelamento: String;
+  protected
+    procedure AssignSchema(aSource: TACBrAPISchema); override;
+    procedure DoWriteToJSon(aJSon: TACBrJSONObject); override;
+    procedure DoReadFromJSon(aJSon: TACBrJSONObject); override;
+
+    property codigoPagamento: Int64 read fcodigoPagamento write fcodigoPagamento;
+    property indicadorCancelamento: String read findicadorCancelamento write findicadorCancelamento;
+    property estadoPagamento: String read festadoPagamento write festadoPagamento;
+    property estadoCancelamento: String read festadoCancelamento write festadoCancelamento;
+  public
+    procedure Clear; override;
+    function IsEmpty: Boolean; override;
+    procedure Assign(aSource: TACBrPagamentosPagamentoCancelarClass);
+  end;
+
+  { TACBrPagamentosPagamentoCancelar }
+
+  TACBrPagamentosPagamentoCancelar = class(TACBrPagamentosPagamentoCancelarClass)
+  public
+    property codigoPagamento;
+  end;
+
+  { TACBrPagamentosPagamentoCancelarLista }
+
+  TACBrPagamentosPagamentoCancelarLista = class(TACBrAPISchemaArray)
+  private
+    function GetItem(aIndex: Integer): TACBrPagamentosPagamentoCancelar;
+    procedure SetItem(aIndex: Integer; aValue: TACBrPagamentosPagamentoCancelar);
+  protected
+    function NewSchema: TACBrAPISchema; override;
+  public
+    function Add(aItem: TACBrPagamentosPagamentoCancelar): Integer;
+    procedure Insert(aIndex: Integer; aItem: TACBrPagamentosPagamentoCancelar);
+    function New: TACBrPagamentosPagamentoCancelar;
+    property Items[aIndex: Integer]: TACBrPagamentosPagamentoCancelar read GetItem write SetItem; default;
+  end;
+
+  { TACBrPagamentosPagamentoCancelarResposta }
+
+  TACBrPagamentosPagamentoCancelarResposta = class(TACBrPagamentosPagamentoCancelarClass)
+  public
+    property codigoPagamento;
+    property indicadorCancelamento;
+    property estadoPagamento;
+    property estadoCancelamento;
+  end;
+
+  { TACBrPagamentosPagamentoCancelarRespostaLista }
+
+  TACBrPagamentosPagamentoCancelarRespostaLista = class(TACBrAPISchemaArray)
+  private
+    function GetItem(aIndex: Integer): TACBrPagamentosPagamentoCancelarResposta;
+    procedure SetItem(aIndex: Integer; aValue: TACBrPagamentosPagamentoCancelarResposta);
+  protected
+    function NewSchema: TACBrAPISchema; override;
+  public
+    function Add(aItem: TACBrPagamentosPagamentoCancelarResposta): Integer;
+    procedure Insert(aIndex: Integer; aItem: TACBrPagamentosPagamentoCancelarResposta);
+    function New: TACBrPagamentosPagamentoCancelarResposta;
+    property Items[aIndex: Integer]: TACBrPagamentosPagamentoCancelarResposta read GetItem write SetItem; default;
+  end;
+
+  { TACBrPagamentosCancelarLotePagamentos }
+
+  TACBrPagamentosCancelarLotePagamentos = class(TACBrAPISchema)
+  private
+    fagenciaDebito: Int64;
+    fcontaCorrenteDebito: Int64;
+    fdigitoVerificadorContaCorrente: String;
+    flistaPagamentos: TACBrPagamentosPagamentoCancelarLista;
+    fnumeroContratoPagamento: Int64;
+    function GetlistaPagamentos: TACBrPagamentosPagamentoCancelarLista;
+  protected
+    procedure AssignSchema(aSource: TACBrAPISchema); override;
+    procedure DoWriteToJSon(aJSon: TACBrJSONObject); override;
+    procedure DoReadFromJSon(aJSon: TACBrJSONObject); override;
+  public
+    destructor Destroy; override;
+    procedure Clear; override;
+    function IsEmpty: Boolean; override;
+    procedure Assign(aSource: TACBrPagamentosCancelarLotePagamentos);
+
+    property agenciaDebito: Int64 read fagenciaDebito write fagenciaDebito;
+    property contaCorrenteDebito: Int64 read fcontaCorrenteDebito write fcontaCorrenteDebito;
+    property digitoVerificadorContaCorrente: String read fdigitoVerificadorContaCorrente write fdigitoVerificadorContaCorrente;
+    property numeroContratoPagamento: Int64 read fnumeroContratoPagamento write fnumeroContratoPagamento;
+    property listaPagamentos: TACBrPagamentosPagamentoCancelarLista read GetlistaPagamentos write flistaPagamentos;
   end;
 
   { TACBrGPSLancamentoResposta }
@@ -2551,6 +2648,203 @@ function TACBrDARFLancamentosResposta.New: TACBrDARFLancamentoResposta;
 begin
   Result := TACBrDARFLancamentoResposta.Create;
   Self.Add(Result);
+end;
+
+{ TACBrPagamentosPagamentoCancelarClass }
+
+procedure TACBrPagamentosPagamentoCancelarClass.AssignSchema(aSource: TACBrAPISchema);
+begin
+  if (aSource is TACBrPagamentosPagamentoCancelarClass) then
+    Assign(TACBrPagamentosPagamentoCancelarClass(ASource));
+end;
+
+procedure TACBrPagamentosPagamentoCancelarClass.DoWriteToJSon(aJSon: TACBrJSONObject);
+begin
+  aJSon
+    .AddPair('codigoPagamento', fcodigoPagamento)
+    .AddPair('indicadorCancelamento', findicadorCancelamento)
+    .AddPair('estadoPagamento', festadoPagamento)
+    .AddPair('estadoCancelamento', festadoCancelamento);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarClass.DoReadFromJSon(aJSon: TACBrJSONObject);
+begin
+  aJSon
+    .Value('codigoPagamento', fcodigoPagamento)
+    .Value('indicadorCancelamento', findicadorCancelamento)
+    .Value('estadoPagamento', festadoPagamento)
+    .Value('estadoCancelamento', festadoCancelamento);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarClass.Clear;
+begin
+  fcodigoPagamento := 0;
+  findicadorCancelamento := EmptyStr;
+  festadoPagamento := EmptyStr;
+  festadoCancelamento := EmptyStr;
+end;
+
+function TACBrPagamentosPagamentoCancelarClass.IsEmpty: Boolean;
+begin
+  Result :=
+    EstaZerado(fcodigoPagamento) and
+    EstaVazio(findicadorCancelamento) and
+    EstaVazio(festadoPagamento) and
+    EstaVazio(festadoCancelamento);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarClass.Assign(aSource: TACBrPagamentosPagamentoCancelarClass);
+begin
+  fcodigoPagamento := ASource.codigoPagamento;
+  findicadorCancelamento := ASource.indicadorCancelamento;
+  festadoPagamento := ASource.estadoPagamento;
+  festadoCancelamento := ASource.estadoCancelamento;
+end;
+
+{ TACBrPagamentosPagamentoCancelarLista }
+
+function TACBrPagamentosPagamentoCancelarLista.GetItem(aIndex: Integer): TACBrPagamentosPagamentoCancelar;
+begin
+  Result := TACBrPagamentosPagamentoCancelar(inherited Items[aIndex]);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarLista.SetItem(aIndex: Integer; aValue: TACBrPagamentosPagamentoCancelar);
+begin
+  inherited Items[aIndex] := aValue;
+end;
+
+function TACBrPagamentosPagamentoCancelarLista.NewSchema: TACBrAPISchema;
+begin
+  Result := New;
+end;
+
+function TACBrPagamentosPagamentoCancelarLista.Add(aItem: TACBrPagamentosPagamentoCancelar): Integer;
+begin
+  Result := inherited Add(aItem);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarLista.Insert(aIndex: Integer;
+  aItem: TACBrPagamentosPagamentoCancelar);
+begin
+  inherited Insert(aIndex, aItem);
+end;
+
+function TACBrPagamentosPagamentoCancelarLista.New: TACBrPagamentosPagamentoCancelar;
+begin
+  Result := TACBrPagamentosPagamentoCancelar.Create;
+  Self.Add(Result);
+end;
+
+{ TACBrPagamentosPagamentoCancelarRespostaLista }
+
+function TACBrPagamentosPagamentoCancelarRespostaLista.GetItem(aIndex: Integer): TACBrPagamentosPagamentoCancelarResposta;
+begin
+  Result := TACBrPagamentosPagamentoCancelarResposta(inherited Items[aIndex]);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarRespostaLista.SetItem(aIndex: Integer; aValue: TACBrPagamentosPagamentoCancelarResposta);
+begin
+  inherited Items[aIndex] := aValue;
+end;
+
+function TACBrPagamentosPagamentoCancelarRespostaLista.NewSchema: TACBrAPISchema;
+begin
+  Result := New;
+end;
+
+function TACBrPagamentosPagamentoCancelarRespostaLista.Add(aItem: TACBrPagamentosPagamentoCancelarResposta): Integer;
+begin
+  Result := inherited Add(aItem);
+end;
+
+procedure TACBrPagamentosPagamentoCancelarRespostaLista.Insert(aIndex: Integer;
+  aItem: TACBrPagamentosPagamentoCancelarResposta);
+begin
+  inherited Insert(aIndex, aItem);
+end;
+
+function TACBrPagamentosPagamentoCancelarRespostaLista.New: TACBrPagamentosPagamentoCancelarResposta;
+begin
+  Result := TACBrPagamentosPagamentoCancelarResposta.Create;
+  Self.Add(Result);
+end;
+
+{ TACBrPagamentosCancelarLotePagamentos }
+
+function TACBrPagamentosCancelarLotePagamentos.GetlistaPagamentos: TACBrPagamentosPagamentoCancelarLista;
+begin
+  if (not Assigned(flistaPagamentos)) then
+    flistaPagamentos := TACBrPagamentosPagamentoCancelarLista.Create('listaPagamentos');
+  Result := flistaPagamentos;
+end;
+
+procedure TACBrPagamentosCancelarLotePagamentos.AssignSchema(aSource: TACBrAPISchema);
+begin
+  if (aSource is TACBrPagamentosCancelarLotePagamentos) then
+    Assign(TACBrPagamentosCancelarLotePagamentos(ASource));
+end;
+
+procedure TACBrPagamentosCancelarLotePagamentos.DoWriteToJSon(aJSon: TACBrJSONObject);
+begin
+  aJSon
+    .AddPair('agenciaDebito', fagenciaDebito)
+    .AddPair('contaCorrenteDebito', fcontaCorrenteDebito)
+    .AddPair('digitoVerificadorContaCorrente', fdigitoVerificadorContaCorrente)
+    .AddPair('numeroContratoPagamento', fnumeroContratoPagamento);
+
+  if Assigned(flistaPagamentos) then
+    flistaPagamentos.WriteToJSon(aJSon);
+end;
+
+procedure TACBrPagamentosCancelarLotePagamentos.DoReadFromJSon(aJSon: TACBrJSONObject);
+begin
+  aJSon
+    .Value('agenciaDebito', fagenciaDebito)
+    .Value('contaCorrenteDebito', fcontaCorrenteDebito)
+    .Value('digitoVerificadorContaCorrente', fdigitoVerificadorContaCorrente)
+    .Value('numeroContratoPagamento', fnumeroContratoPagamento);
+
+  if Assigned(flistaPagamentos) then
+    flistaPagamentos.ReadFromJSon(aJSon);
+end;
+
+destructor TACBrPagamentosCancelarLotePagamentos.Destroy;
+begin
+  if Assigned(flistaPagamentos) then
+    flistaPagamentos.Free;
+  inherited Destroy;
+end;
+
+procedure TACBrPagamentosCancelarLotePagamentos.Clear;
+begin
+  fagenciaDebito := 0;
+  fcontaCorrenteDebito := 0;
+  fdigitoVerificadorContaCorrente := EmptyStr;
+  fnumeroContratoPagamento := 0;
+
+  if Assigned(flistaPagamentos) then
+    flistaPagamentos.Clear;
+end;
+
+function TACBrPagamentosCancelarLotePagamentos.IsEmpty: Boolean;
+begin
+  Result :=
+    EstaZerado(fagenciaDebito) and
+    EstaZerado(fcontaCorrenteDebito) and
+    EstaVazio(fdigitoVerificadorContaCorrente) and
+    EstaZerado(fnumeroContratoPagamento) and
+    flistaPagamentos.IsEmpty;
+end;
+
+procedure TACBrPagamentosCancelarLotePagamentos.Assign(aSource: TACBrPagamentosCancelarLotePagamentos);
+begin
+  fagenciaDebito := ASource.agenciaDebito;
+  fcontaCorrenteDebito := ASource.contaCorrenteDebito;
+  fdigitoVerificadorContaCorrente := ASource.digitoVerificadorContaCorrente;
+  fnumeroContratoPagamento := ASource.numeroContratoPagamento;
+
+  if Assigned(flistaPagamentos) then
+    flistaPagamentos.Assign(ASource.listaPagamentos);
 end;
 
 { TACBrLoteDARFRespostaConsulta }
@@ -4603,14 +4897,14 @@ begin
   fdataAgendamento := 0;
   fdata := 0;
   fvalor := 0;
-  fcpfCnpjContribuinte := 0;
+  fcpfCnpjContribuinte := EmptyStr;
   fnumeroReferencia := EmptyStr;
   fidPagamento := 0;
   fnomeConvenente := EmptyStr;
   fnomeRecebedor := EmptyStr;
   findicadorMovimentoAceito := EmptyStr;
   fmesAnoCompetencia := 0;
-  fidContribuinte := 0;
+  fidContribuinte := EmptyStr;
   fvalorPrincipal := 0;
   fvalorOutraDeducao := 0;
   fvalorOutroDeducao := 0;
@@ -4622,7 +4916,7 @@ begin
   ftextoDescricaoPagamento := EmptyStr;
   fcodigoReceitaTributoGuiaPrevidenciaSocial := 0;
   fcodigoTipoContribuinteGuiaPrevidenciaSocial := tctNenhum;
-  fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial := 0;
+  fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial := EmptyStr;
   fcodigoIdentificadorTributoGuiaPrevidenciaSocial := EmptyStr;
   fmesAnoCompetenciaGuiaPrevidenciaSocial := 0;
   fvalorPrevistoInstNacSeguridadeSocialGuiaPrevidenciaSocial := 0;
@@ -4640,7 +4934,7 @@ begin
   finicioCartaoCredito := 0;
   ffimCartaoCredito := 0;
   ftipoPessoaAvalista := 0;
-  fidentificacaoContribuinte := 0;
+  fidentificacaoContribuinte := EmptyStr;
   ftipoContribuinte := 0;
   fidentificacaoGPS := EmptyStr;
   fvalorINSS := 0;
@@ -4650,7 +4944,7 @@ begin
   fcodigoAutenticacaoPagamento := EmptyStr;
   fcodigoReceitaTributo := 0;
   fcodigoTipoContribuinte := tctNenhum;
-  fnumeroIdentificacaoContribuinte := 0;
+  fnumeroIdentificacaoContribuinte := EmptyStr;
   fcodigoIdentificadorTributo := EmptyStr;
   fdataApuracao := 0;
 
@@ -4710,7 +5004,7 @@ begin
     EstaZerado(fdataVencimento) and
     EstaVazio(fnumeroReferencia) and
     EstaZerado(fmesAnoCompetencia) and
-    EstaZerado(fidContribuinte) and
+    EstaVazio(fidContribuinte) and
     EstaZerado(fvalorPrincipal) and
     EstaZerado(fvalorOutraDeducao) and
     EstaZerado(fvalorOutroDeducao) and
@@ -4723,18 +5017,18 @@ begin
     EstaZerado(fidPagamento) and
     EstaZerado(fdata) and
     EstaZerado(fvalor) and
-    EstaZerado(fcpfCnpjContribuinte) and
+    EstaVazio(fcpfCnpjContribuinte) and
     EstaVazio(fnomeConvenente) and
     EstaVazio(fnomeRecebedor) and
     EstaZerado(fcodigoReceitaTributo) and
     (fcodigoTipoContribuinte = tctNenhum) and
-    EstaZerado(fnumeroIdentificacaoContribuinte) and
+    EstaVazio(fnumeroIdentificacaoContribuinte) and
     EstaVazio(fcodigoIdentificadorTributo) and
     EstaZerado(fdataApuracao) and
     EstaVazio(findicadorMovimentoAceito) and
     EstaZerado(fcodigoReceitaTributoGuiaPrevidenciaSocial) and
     (fcodigoTipoContribuinteGuiaPrevidenciaSocial = tctNenhum) and
-    EstaZerado(fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial) and
+    EstaVazio(fnumeroIdentificacaoContribuinteGuiaPrevidenciaSocial) and
     EstaVazio(fcodigoIdentificadorTributoGuiaPrevidenciaSocial) and
     EstaZerado(fmesAnoCompetenciaGuiaPrevidenciaSocial) and
     EstaZerado(fvalorPrevistoInstNacSeguridadeSocialGuiaPrevidenciaSocial) and
@@ -4752,7 +5046,7 @@ begin
     EstaZerado(finicioCartaoCredito) and
     EstaZerado(ffimCartaoCredito) and
     EstaZerado(ftipoPessoaAvalista) and
-    EstaZerado(fidentificacaoContribuinte) and
+    EstaVazio(fidentificacaoContribuinte) and
     EstaZerado(ftipoContribuinte) and
     EstaVazio(fidentificacaoGPS) and
     EstaZerado(fvalorINSS) and

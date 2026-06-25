@@ -138,7 +138,7 @@ type
     destructor Destroy; override;
     procedure Assign(DeWebServicesConf: TWebServicesConf); reintroduce; virtual;
     procedure GravarIni( const AIni: TCustomIniFile ); virtual;
-    procedure LerIni( const AIni: TCustomIniFile ); virtual;
+    procedure LerIni( const AIni: TCustomIniFile ; ValidarAmbiente: Boolean = true); virtual;
 
     procedure LerParams; virtual;
 
@@ -371,7 +371,7 @@ type
 
     procedure Assign(DeConfiguracoes: TConfiguracoes); reintroduce; virtual;
     procedure GravarIni( const AIni: TCustomIniFile ); virtual;
-    procedure LerIni( const AIni: TCustomIniFile ); virtual;
+    procedure LerIni( const AIni: TCustomIniFile ; ValidarAmbiente : Boolean = True); virtual;
 
     procedure LerParams(const NomeArqParams: String = '');
 
@@ -514,11 +514,11 @@ begin
   RespTec.GravarIni( AIni );
 end;
 
-procedure TConfiguracoes.LerIni(const AIni: TCustomIniFile);
+procedure TConfiguracoes.LerIni(const AIni: TCustomIniFile; ValidarAmbiente : Boolean = true );
 begin
   Geral.LerIni( AIni );
-  WebServices.LerIni( AIni );
-  Certificados.LerIni( AIni );
+  WebServices.LerIni( AIni,ValidarAmbiente );
+  Certificados.LerIni( AIni);
   Arquivos.LerIni( AIni );
   RespTec.LerIni( AIni );
 end;
@@ -844,7 +844,7 @@ begin
   end;
 end;
 
-procedure TWebServicesConf.LerIni(const AIni: TCustomIniFile);
+procedure TWebServicesConf.LerIni(const AIni: TCustomIniFile; ValidarAmbiente : boolean = True);
 var
   i : integer;
 begin
@@ -860,9 +860,11 @@ begin
   if NaoEstaVazio(fpConfiguracoes.SessaoIni) then
   begin
     i:= AIni.ReadInteger(fpConfiguracoes.SessaoIni, 'Ambiente', Integer(Ambiente));
-    if ( ( i < 0 ) or ( i > 1) ) then
-       raise EACBrConversaoEnumeradoException.Create(IntToStr(i) + 'não é valor válido para Ambiente');
 
+    if ValidarAmbiente then begin
+      if ( ( i < 0 ) or ( i > 1) ) then
+         raise EACBrConversaoEnumeradoException.Create(IntToStr(i) + ' ' +  ACBrStr('não é valor válido para TACBrTipoAmbiente'));
+    end;
 
     Ambiente := TpcnTipoAmbiente( i );
     Salvar := AIni.ReadBool(fpConfiguracoes.SessaoIni, 'SalvarWS', Salvar);
@@ -1325,11 +1327,11 @@ begin
     case FOrdenacaoPath[i].Item of
       opCNPJ:
         begin
-          CNPJ_temp := OnlyNumber(CNPJ);
+          CNPJ_temp := OnlyCPFCNPJAlphaNum(CNPJ);
 
           if EstaVazio(CNPJ_temp) then
             if Assigned(fpConfiguracoes.Owner) then
-              CNPJ_temp := OnlyNumber(TACBrDFe(fpConfiguracoes.Owner).SSL.CertCNPJ);
+              CNPJ_temp := OnlyCPFCNPJAlphaNum(TACBrDFe(fpConfiguracoes.Owner).SSL.CertCNPJ);
 
           if NaoEstaVazio(CNPJ_temp) then
             Dir := PathWithDelim(Dir) + CNPJ_temp;

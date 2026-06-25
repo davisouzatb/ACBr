@@ -601,7 +601,7 @@ begin
   while true do
   begin
     sSecao := 'autXML' + IntToStrZero(I,2) ;
-    sFim   := OnlyNumber(AINIRec.ReadString(sSecao, 'CNPJCPF', 'FIM'));
+    sFim   := OnlyCPFCNPJAlphaNum(AINIRec.ReadString(sSecao, 'CNPJCPF', 'FIM'));
     if (sFim = 'FIM') or (Length(sFim) <= 0) then
       break ;
 
@@ -766,7 +766,6 @@ end;
 procedure TBPeIniReader.Ler_IBSCBS(AINIRec: TMemIniFile; IBSCBS: TIBSCBS; Idx1, Idx2: Integer);
 var
   sSecao: string;
-  ok: Boolean;
 begin
   if Idx1 = -1 then
     sSecao := 'IBSCBS'

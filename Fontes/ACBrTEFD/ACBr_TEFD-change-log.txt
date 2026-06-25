@@ -45,8 +45,56 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+24/06/2026
+-- ACBrTEFAPITXT --
+[*] Adicionada Sobrecarga ao método 'VerificarPresencaPinPad', para chamar 'ATV'
+
+-- ACBrTEFTXTPayGo --
+[*] Aplicado workaround no método 'MNU', para ler a resposta do campo 763 ou 762
+    (por: DSA)
+
+19/06/2026
+-- ACBrTEFAPICliSiTef --
+[*] Ajuste para perguntar Campo 500-Supervior, com informações de Mascara e validação
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=92968
+    (por: DSA)
+
+-- ACBrTEFCliSiTefComum --
+[-] Correção em 'ConteudoToPropertyCliSiTef', para não somar o valor da transação
+    de uso interno, quando ler o valor do retornado pelo Log do TEF (146)
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=92869
+    (por: DSA)
+
+-- ACBrTEFScopeAPI --
+[+] Adicionada a propriedade InterfacePinPad: Integer default 2
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=92903
+    (por: C4Dev)
+
+-- ACBrTEFAPIScope --
+[*] Correçao de Fluxo de Menu em TACBrTEFAPIClassScope.EfetuarAdministrativa quando
+    nada é selecionado
+
+15/06/2026
+-- ACBrTEFAPIComum --
+[+] Adicionada a propriedade "TACBrTEFAPIDadosTerminal.Senha: String"
+[-] Correção de exibição de acentuação em Exibição de Erro em
+    "VerificarIdentificadorVendaInformado"
+
+-- ACBrTEFAPIScope --
+[-] Correção de exibição de acentuação em Exibição de Erro em "EfetuarPagamento"
+
+-- ACBrTEFAPITXT --
+[+] Adicionado suporte ao método "MenuPinPad"
+
+-- ACBrTEFTXTPayGo --
+[+] Adicionado os métodos:
+    function QRP(const ConteudoQRCode: String): Boolean;  // Exibe QRCode
+    function FQR: Boolean;                                // Remove QRCode
+    function MNU(const Titulo: String; Opcoes: TStrings): Integer;  // Exibe Menu
+ (por: DSA)
+
 08/05/2026
--- TACBrTEFScopeAPI --
+-- ACBrTEFScopeAPI --
 [-] Correção para exibir atualização de msgs do Operador e Cliente, no fluxo do TEF
     https://www.projetoacbr.com.br/forum/index.php?showtopic=92002
     (por: juniorguillen)

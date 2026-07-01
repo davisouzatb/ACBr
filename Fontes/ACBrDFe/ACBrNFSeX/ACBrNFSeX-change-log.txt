@@ -42,6 +42,67 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+01/07/2026
+-- ACBrNFSeXClass --
+[-] Ajustes para resolver quebra de compilação.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml/GeisWeb.GravarXml/ISSFortaleza.GravarXml/ISSIntel.LerXml/ISSNet.GravarXml --
+-- ISSSaoPaulo.GravarXml/PadraoNacional.GravarXml/Publica.GravarXml --
+[*] ACBR-9489 - Sobrecarga de algumas procedures para atender o provedor ISSNet, com isso essas
+    procedures tiveram que ser alteradas para virtual e consequentemente afetando outros provedores.
+   Por: Italo Giurizzato Junior
+-- Citta.Provider --
+[*] ACBR-9301 - Possível solução para o Consultar DPS por Chave.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-9449 - O município de Itajaí/SC aderiu ao Padrão Nacional
+	Por: Larissa Santos
+	Veja: https://www.projetoacbr.com.br/forum/topic/92570-mudan%C3%A7a-prefeitura-de-itaja%C3%AD-01072026/
+[*] ACBR-9484 - O município de Guapore/RS aderiu ao Padrão Nacional
+	Por: Larissa Santos
+	Veja: https://discord.com/channels/798697718800318484/800042186783588364/1514605893390569652
+[*] ACBR-9484 - Os municípios de Sao Marcos/RS e Flores da Cunha/RS aderiram ao Padrão Nacional
+	Por: Larissa Santos
+	Veja: https://www.projetoacbr.com.br/forum/topic/92880-acbr-9505-troca-de-provedor-2-cidades-para-provedor-padr%C3%A3o-nacional/
+[*] ACBR-9521 - O município de Capanema/PR aderiu ao Padrão Nacional
+	Por: Larissa Santos
+	Veja: https://www.projetoacbr.com.br/forum/topic/92958-acbr-9521-alteracao-provedor-capanema-pr/
+[*] ACBR-9573 - O município de Saltinho/SP aderiu ao Padrão Nacional
+	Por: Larissa Santos
+	Veja: https://www.projetoacbr.com.br/forum/topic/93158-alterar-provedor-saltinho-sp-e-itaja%C3%ADsc/
+
+30/06/2026
+-- Fiorilli.Provider --
+[*] ACBR-9538 - Possível solução para extrai corretamente o XML da NFS-e do retorno
+    da consulta.
+   Por: Italo Giurizzato Junior
+-- ISSFortaleza.GravarXml/ISSFortaleza.Provider --
+[*] ACBR-9435 - Ajustes para atender os novos Schemas do provedor.
+   Por: Italo Giurizzato Junior
+
+26/06/2026
+-- IPM.GravarXML --
+[*] ACBR-9525 - Adiciona fallback para o valor CodigoNBS pegar priorizar o valor da Lista de Itens.
+   Por: Valter Patrick
+   Veja: https://www.projetoacbr.com.br/forum/topic/92957-acbr-9525-erro-de-nfsex-municipio-de-de-rio-do-sul-provedor-pr%C3%B3prio-ipm/
+-- ACBrNFSeXConversao/IPM.GravarXml --
+[*] ACBr-9303 - Acrescentados novos valores de CST usados pelo provedor IPM.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-9503 - A cidade de Bertioga/SP trocou de provedor, agora é o GISS na versão 2.04
+   Por: Destak
+   Veja: https://www.projetoacbr.com.br/forum/topic/92890-acbr-9503cidade-de-bertiogasp-mudou-de-ginfes-para-giss/
+[*] ACBR-9503 - A cidade de Carmo do Cajuru/MG trocou de provedor, agora é o Padrão Nacional.
+   Por: MS
+[*] Alterado para o WS novo do provedor Fiorilli versão 1.01 a cidade de Motuca/SP
+   Por: Italo Giurizzato Junior
+-- VersaTecnologia.Provider --
+[*] ACBr-9509 - Ajustes para atender a versão 2.04
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] Todas as cidades atendidas pelo provedor VersaTecnologia mudaram para a versão 2.04
+   Por: Italo Giurizzato Junior
+
 25/06/2026
 -- ACBrNFSeXServicos --
 [*] ACBr-9527 - O municipio de Guaraquecaba/PR trocou de provedor para Elotech

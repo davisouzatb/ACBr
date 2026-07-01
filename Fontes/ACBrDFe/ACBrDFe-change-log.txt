@@ -38,6 +38,17 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+
+01/07/2026
+-- ACBrDFeUtil --
+[*] Criado o metodo RemoverLiteralIDChave quando prefixo for ID como das chaves com Reinf e eSocial.
+   Por: Italo Giurizzato Junior, Alexandre de Paula, Daniel de Morais InfoCotidiano 
+
+30/06/2026
+-- ACBrDFe.Conversao/ACBrDFeConsts/ACBrXmlWriter --
+[*] Melhorias para atender a Reforma Tibutária.
+   Por: Italo Giurizzato Junior
+
 25/06/2026
 -- ACBrXmlWriter --
 [*] Ajuste da função AddNodeCNPJ com cnpj alfanumerico.

@@ -55,7 +55,7 @@ type
     function GerarXMLDestinatario(Dest: TDadosdaPessoa): TACBrXmlNode; override;
     function GerarXMLEnderecoDestinatario(ender: Tender): TACBrXmlNode;
     function GerarXMLContatoDestinatario(Dest: TDadosdaPessoa): TACBrXmlNode;
-    function GerarXMLImovel(Imovel: TDadosimovel): TACBrXmlNode;
+    function GerarXMLImovel(Imovel: TDadosimovel): TACBrXmlNode; override;
     function GerarXMLEnderecoNacionalImovel(ender: TenderImovel): TACBrXmlNode;
     function GerarXMLIBSCBSTribValores(valores: Tvalorestrib): TACBrXmlNode; override;
     function GerarXMLgReeRepRes(gReeRepRes: TgReeRepRes): TACBrXmlNode;
@@ -67,7 +67,7 @@ type
 
     function GerarXMLTributos(trib: Ttrib): TACBrXmlNode;
     function GerarXMLgIBSCBS(gIBSCBS: TgIBSCBS): TACBrXmlNode; override;
-    function GerarXMLgTribRegular(gTribRegular: TgTribRegular): TACBrXmlNode;
+    function GerarXMLgTribRegular(gTribRegular: TgTribRegular): TACBrXmlNode; override;
     function GerarXMLgDif(gDif: TgDif): TACBrXmlNode;
 
     function GerarConstrucaoCivil: TACBrXmlNode; override;
@@ -360,10 +360,10 @@ begin
     if NFSe.IBSCBS.valores.gReeRepRes.documentos[i].fornec.xNome <> '' then
       Result[i].AppendChild(GerarXMLfornec(NFSe.IBSCBS.valores.gReeRepRes.documentos[i].fornec));
 
-    Result[i].AppendChild(AddNode(tcDat, '#1', 'DataEmissaoDocumento', 10, 10, 1,
+    Result[i].AppendChild(AddNode(tcDatHor, '#1', 'DataEmissaoDocumento', 10, 20, 1,
                     NFSe.IBSCBS.valores.gReeRepRes.documentos[i].dtEmiDoc, ''));
 
-    Result[i].AppendChild(AddNode(tcDat, '#1', 'DataCompetenciaDocumento', 10, 10, 1,
+    Result[i].AppendChild(AddNode(tcDatHor, '#1', 'DataCompetenciaDocumento', 10, 20, 1,
                    NFSe.IBSCBS.valores.gReeRepRes.documentos[i].dtCompDoc, ''));
 
     Result[i].AppendChild(AddNode(tcStr, '#1', 'TipoReeRepRes', 2, 2, 1,

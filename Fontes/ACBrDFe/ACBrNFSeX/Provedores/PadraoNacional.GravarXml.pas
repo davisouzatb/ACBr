@@ -88,13 +88,13 @@ type
 
     function GerarXMLServico: TACBrXmlNode; virtual;
     function GerarXMLLocalPrestacao: TACBrXmlNode;
-    function GerarXMLCodigoServico: TACBrXmlNode;
+    function GerarXMLCodigoServico: TACBrXmlNode; virtual;
     function GerarXMLComercioExterior: TACBrXmlNode;
     function GerarXMLLocacaoSubLocacao: TACBrXmlNode;
     function GerarXMLObra: TACBrXmlNode; virtual;
     function GerarXMLEnderecoObra: TACBrXmlNode;
     function GerarXMLEnderecoExteriorObra: TACBrXmlNode; virtual;
-    function GerarXMLAtividadeEvento: TACBrXmlNode;
+    function GerarXMLAtividadeEvento: TACBrXmlNode; virtual;
     function GerarXMLEnderecoEvento: TACBrXmlNode;
     function GerarXMLEnderecoExteriorEvento: TACBrXmlNode;
     function GerarXMLExploracaoRodoviaria: TACBrXmlNode;
@@ -1630,6 +1630,7 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'tpRetISSQN', 2, 2, 1,
                  tpRetISSQNToStr(NFSe.Servico.Valores.tribMun.tpRetISSQN), ''));
 
+
   Result.AppendChild(AddNode(tcDe2, '#1', 'pAliq', 1, 3, 0,
                                        NFSe.Servico.Valores.tribMun.pAliq, ''));
 end;
@@ -1849,6 +1850,7 @@ begin
 
   if FormatoDiscriminacao <> fdNenhum then
     ConsolidarVariosItensServicosEmUmSo;
+//    CampoDiscriminacaoFormatado;
 
   xmlNode := GerarXMLInfDps;
   NFSeNode.AppendChild(xmlNode);

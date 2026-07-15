@@ -145,7 +145,7 @@ const
   tiSimplificado = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoImpressao.{$ENDIF}tiSimplificado deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoImpressao da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   tiNFCe = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoImpressao.{$ENDIF}tiNFCe deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoImpressao da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   tiMsgEletronica = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoImpressao.{$ENDIF}tiMsgEletronica deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoImpressao da Unit ACBrDFe.Conversao.pas' {$ENDIF};
-  tiSimplificado2 = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoImpressao.{$ENDIF}tiSimplificado2 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoImpressao da Unit ACBrDFe.Conversao.pas' {$ENDIF};
+  tiSimplificadoTipo2 = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoImpressao.{$ENDIF}tiSimplificadoTipo2 deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoImpressao da Unit ACBrDFe.Conversao.pas' {$ENDIF};
 
   // Enumerados do TACBrTipoEmissao
 const
@@ -261,6 +261,7 @@ const
   tePerecPerdaRouboFurtoTranspContratFornec = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}tePerecPerdaRouboFurtoTranspContratFornec deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   teFornecNaoRealizPagAntec = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teFornecNaoRealizPagAntec deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   teSolicApropCredPres = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teSolicApropCredPres deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
+  teDestItemConsPessoal = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teDestItemConsPessoal deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   tePerecPerdaRouboFurtoTranspContratAqu = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}tePerecPerdaRouboFurtoTranspContratAqu deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   teAceiteDebitoApuracaoNotaCredito = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teAceiteDebitoApuracaoNotaCredito deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
   teImobilizacaoItem = {$IFDEF SUPPORTS_SCOPEDENUMS}TACBrTipoEvento.{$ENDIF}teImobilizacaoItem deprecated {$IfDef SUPPORTS_DEPRECATED_DETAILS} 'Use o tipo TACBrTipoEvento da Unit ACBrDFe.Conversao.pas' {$ENDIF};
@@ -827,14 +828,14 @@ function TpImpToStr(const t: TpcnTipoImpressao): string;
 begin
   result := EnumeradoToStr(t, ['0', '1', '2', '3', '4', '5', '6'],
                               [tiSemGeracao, tiRetrato, tiPaisagem, tiSimplificado,
-                               tiNFCe, tiMsgEletronica, tiSimplificado2]);
+                               tiNFCe, tiMsgEletronica, tiSimplificadoTipo2]);
 end;
 
 function StrToTpImp(out ok: boolean; const s: string): TpcnTipoImpressao;
 begin
   result := StrToEnumerado(ok, s, ['0', '1', '2', '3', '4', '5', '6'],
                                   [tiSemGeracao, tiRetrato, tiPaisagem, tiSimplificado,
-                                   tiNFCe, tiMsgEletronica, tiSimplificado2]);
+                                   tiNFCe, tiMsgEletronica, tiSimplificadoTipo2]);
 end;
 
 // B22 - Forma de Emissão da NF-e **********************************************
@@ -1229,7 +1230,8 @@ begin
               'ConcFinanceira', 'CancConcFinanceira', 'RegistroPassagemMDFe',
               'CancGenerico', 'PagIntegLibCredPresAdq', 'ImporALCZFM',
               'PerecPerdaRouboFurtoTranspContratFornec', 'FornecNaoRealizPagAntec',
-              'SolicApropCredPres', 'PerecPerdaRouboFurtoTranspContratAqu',
+              'SolicApropCredPres', 'DestItemConsPessoal',
+              'PerecPerdaRouboFurtoTranspContratAqu',
               'AceiteDebitoApuracaoNotaCredito', 'ImobilizacaoItem',
               'SolicApropCredCombustivel', 'SolicApropCredBensServicos',
               'ManifPedTransfCredIBSSucessao', 'ManifPedTransfCredCBSSucessao',
@@ -1259,8 +1261,9 @@ begin
               teRegistroPassagemMDFe, teCancGenerico, tePagIntegLibCredPresAdq,
               teImporALCZFM, tePerecPerdaRouboFurtoTranspContratFornec,
               teFornecNaoRealizPagAntec, teSolicApropCredPres,
-              tePerecPerdaRouboFurtoTranspContratAqu, teAceiteDebitoApuracaoNotaCredito,
-              teImobilizacaoItem, teSolicApropCredCombustivel, teSolicApropCredBensServicos,
+              teDestItemConsPessoal, tePerecPerdaRouboFurtoTranspContratAqu,
+              teAceiteDebitoApuracaoNotaCredito, teImobilizacaoItem,
+              teSolicApropCredCombustivel, teSolicApropCredBensServicos,
               teManifPedTransfCredIBSSucessao, teManifPedTransfCredCBSSucessao,
               teAtualizacaoDataPrevisaoEntrega, teVinculoPgto, teCancVinculoPgto]);
 end;

@@ -35,7 +35,6 @@
 package ACBr_NFAg;
 
 {$R *.res}
-{$R *.otares}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -82,6 +81,7 @@ contains
   ACBrNFAg.IniWriter in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\ACBrNFAg.IniWriter.pas',
   ACBrNFAg.XmlReader in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\ACBrNFAg.XmlReader.pas',
   ACBrNFAg.XmlWriter in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\ACBrNFAg.XmlWriter.pas',
+  ACBrNFAg.ValidarRegrasdeNegocio in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\ACBrNFAg.ValidarRegrasdeNegocio.pas',
   ACBrNFAg.ConsSit in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\Servicos\ACBrNFAg.ConsSit.pas',
   ACBrNFAg.RetConsSit in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\Servicos\ACBrNFAg.RetConsSit.pas',
   ACBrNFAg.EventoClass in '..\..\..\..\Fontes\ACBrDFe\ACBrNFAg\Base\Servicos\ACBrNFAg.EventoClass.pas',

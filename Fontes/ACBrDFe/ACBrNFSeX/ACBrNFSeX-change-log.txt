@@ -42,6 +42,99 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+14/07/2026
+-- ACBrNFSeXServicos --
+[*] ACBR-9522 - Municipio de Suzano/SP mudou de Ginfes para Giss
+	Por: Larissa Santos
+	Veja: https://www.projetoacbr.com.br/forum/topic/92952-provedor-de-suzano-sp-mudan%C3%A7a-para-giss/
+-- Tecnos.GravarXml/Tecnos.LerXml/Tecnos.Provider --
+[+] ACBR-9311 - Implementado o ConsultarNFSeServicosTomadosIntermediados.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXGravarXml --
+[*] ACBR-9626 - As tags pRedAliqUF, pRedAliqMun pRedAliqCBS, estavam como obrigatórias
+    sendo que são opcionais.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXConversao --
+[*] ACBR-9486 - Alteração visando utilizar as funções StrToEnumerado e EnumeradoToStr
+    definidas na unit ACBrDFe.Conversao
+   Por: Italo Giurizzato Junior
+
+13/07/2026
+-- ACBrNFSeXServicos --
+[*] ACBR-9532 - Incluída a cidade Varjota/CE, o provedor é SSInformatica.
+   Por: fpereirasilv
+[*] ACBR-9626 - A cidade Rodeio Bonito/RS esta configurado errado o provedor correto é Digifred.
+   Por: Quality Automação
+[*] ACBR-9362 - A cidade Ituverava/SP passou a usar a versão 1.01 do provedor Primax.
+   Por: C4Dev
+-- Giap.Provider --
+[*] ACBR-9364 - O webservice do provedor não trabalha em UTF-8 e sim Windows 1252
+    Ajustes para contornar esse problema.
+   Por: Store Brasil
+
+10/07/2026
+-- ACBrNFSeXProviderManager/DSF.GravarXml/DSF.LerXml/DSF.Provider --
+[*] ACBR-9622/9621 - Alterações visando consumir a nova API Rest do provedor DSF.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[*] ACBR-9622/9621 - O Provedor DSF implementou uma API Rest para recepcionar o XML 
+    segundo o layout do padrão Nacional e vai usar essa API para as cidades de 
+    João Pessoa/PB e Campinas/SP é bem provável que vai usar nas demais cidades que 
+    usam o provedor DSF e ISSDSF.
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXDANFSeRLPadraoNacional --
+[*] Incluído o numerador de páginas e agora o Canhoto só é impresso se a propriedade
+    de configuração: ImprimeCanhoto receber o valor True.
+   Por: Italo Giurizzato Junior
+
+09/07/2026
+-- ACBrNFSeXServicos --
+[*] A cidade de Registro/SP mudou de provedor, agora é o Giss na versão 2.04
+   Por: EasySoft Sistemas
+   Veja: https://www.projetoacbr.com.br/forum/topic/93256-nfs-e-problema-ao-emitir-nfse-cidade-de-registro/?&_rid=124795#findComment-610343
+
+08/07/2026
+-- Diversos --
+[+] Implementado o provedor Agape que no momento atende a cidade Boquim/SE
+   Por: Italo Giurizzato Junior
+-- ACBrNFSeXServicos --
+[+] ACBR-9502 - Incluída a cidade Gentil/RS, o provedor é Citta
+   Por: C4Dev
+-- Citta.Provider --
+[*] ACBR-9502 - Alteração visando setar com o valor True no campo SucessoCanc quanto a nota
+    for cancelada com sucesso.
+   Por: C4Dev
+
+07/07/2026
+-- ACBrNFSeXLerXml/GovDigital.GravarXml --
+[*] ACBR-9469 - Ajustes para gerar corretamente os campos CST e TpRetPisCofins.
+   Por: Advance/Italo Giurizzato Junior
+-- ACBrNFSeXProviderBase --
+[-] ACBR-9534 - Ajustes visando a correta definição e leitura das URLS e do parâmetro API Própria.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/93047-acbr-9534acbr-9541-nfse-juazeiro-do-norte-ce-speedgov-parou-de-funcionar/?&_rid=124795#findComment-608247
+-- Diversos --
+[+] Implementado o provedor TaxTecnologia que no momento atende a cidade Santa Izabel do Para/PA
+   Por: Italo Giurizzato Junior
+
+06/07/2026
+-- ACBrNFSeXServicos --
+[*] ACBR-9505 - O municipio de Sao Marcos/SP continua usando o provedor Tecnos e não aderiu ao Padrão Nacional
+	Por: dna.automacao
+	Veja: https://www.projetoacbr.com.br/forum/topic/92880-acbr-9505-troca-de-provedor-2-cidades-para-provedor-padr%C3%A3o-nacional/?&_rid=153416#findComment-609272
+[*] ACBr-9587 - Mudança de URL de produção para o municipio de Cubatão/SP
+	Por: Calmeida79
+	Veja: https://www.projetoacbr.com.br/forum/topic/93252-acbr-9587-nfs-e-altera%C3%A7%C3%A3o-no-ws-cubat%C3%A3o-sp/#comment-609684
+[*] ACBR-9507 - O municipio de Hortolandia/SP mudou de Provedor Ginfes para GissOnline
+	Por: Destak
+	Veja: https://www.projetoacbr.com.br/forum/topic/92902-cidade-de-hortolandiasp-mudou-de-ginfes-para-giss/
+[*] ACBR-9583 - O município de Laranjal Paulista/SP aderiu ao Padrão Nacional
+	Por: VEXCOM Sistemas - Valtair
+	Veja: https://www.projetoacbr.com.br/forum/topic/93266-acbr-9583-alterar-provedor-laranjal-paulista/
+[*] ACBR-9482 - O municipio de Assis/SP aderiu ao Padrão Nacional
+	Por: Innovae Brasil Engenharia
+	Veja: https://www.projetoacbr.com.br/forum/topic/92800-acbr-9482-nfs-e-assissp-migra%C3%A7%C3%A3o-para-padr%C3%A3o-nacional-a-partir-de-01072026/
+
 01/07/2026
 -- ACBrNFSeXClass --
 [-] Ajustes para resolver quebra de compilação.

@@ -39,6 +39,43 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+14/07/2026
+-- ACBrNF3e --
+[*] ACBR-9369 - Implementação CNPJ Alfanumérico para a NF3e
+   Por: Larissa Santos / Rev.: Alexandre de Paula
+   
+10/07/2026
+-- ACBrDFe.Conversao --
+[-] ACBR-9625 - Correção nos valores do tipo TtpALCZFMCBS, o correto é 1 e 2 em vez de 0 e 1.
+   Por: Maxuel Santana
+-- ACBrDFe.RTC.Classes/ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter --
+-- ACBrDFe.RTC.XmlReader/ACBrDFe.RTC.XmlWriter --
+[*] Alterações visando deixar as units prontas para a NT 2025/002 versão 1.50 da NF-e.
+   Por: Italo Giurizzato Junior
+
+09/07/2026
+-- ACBrDFeConversao --
+[*] ACBR-9624 - Revert da alteração que remove o enumerado do evento 211120
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/93444-acbr-9624evento-211110-da-nfe-grupo-gcredpresoper/#comment-610686
+
+07/07/2026
+-- ACBrDFeSSL --
+[*] Ajustado para o padrão OnlyCPFCNPJAlphaNum definido em topico interno 
+   Por: Daniel de Morais InfoCotidiano
+
+07/07/2026
+-- ACBrDFe.Conversao --
+[*] Renomeado o enumerado tiSimplificado2 para tiSimplificadoTipo2 visando deixar mais claro a sua utilidade.
+   Por: Italo Giurizzato Junior
+
+02/07/2026
+-- ACBrDFe.RTC.Classes/ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter/ACBrDFe.RTC.XmlReader/ACBrDFe.RTC.XmlWriter --
+[*] Implementado as units: de classes, leitura e escrita do arquivo INI e leitura e escrita do XML.
+    Units estas especificas para a Reforma Tributária que futuramente serão utilizadas por todos os DF-e com 
+    exceção da NFS-e.
+   Por: Italo Giurizzato Junior
+
 01/07/2026
 -- ACBrDFeUtil --
 [*] Criado o metodo RemoverLiteralIDChave quando prefixo for ID como das chaves com Reinf e eSocial.

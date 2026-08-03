@@ -44,6 +44,10 @@ uses
 
 resourcestring
   sMsgComunicacaoCTF = 'Comunicação com %s, %s';
+  sMsgInformeNSU = 'Informe o NSU da Transação';
+  sMsgDataTransacao = 'Data da Transação';
+  sMsgValorTransacao = 'Valor da Transação';
+  sErrDataInvalida = 'Data Inválida';
 
 type
 
@@ -52,6 +56,7 @@ type
   TACBrTEFRespAuttar = class( TACBrTEFResp )
   public
     procedure ConteudoToProperty; override;
+    procedure ProcessarTipoInterno(ALinha: TACBrTEFLinha); override;
   end;
 
 
@@ -72,8 +77,11 @@ type
   protected
     procedure InterpretarRespostaAPI; override;
     function TestarComunicacaoAuttar: Boolean;
+    function ConsultarPIXAuttar: Boolean;
+    function DevolverPIXAuttar: Boolean;
     procedure DadosAdicionaisToStringList(const DadosAdicionais: String; SL: TStringList);
     procedure ExibirQRCodeCTF(const APathQRCodePNG: String);
+    procedure GravarLog(const ALogLine: AnsiString);
   public
     constructor Create(AACBrTEFAPI: TACBrTEFAPIComum);
     destructor Destroy; override;
@@ -90,8 +98,8 @@ type
       DataPreDatado: TDateTime = 0;
       DadosAdicionais: String = ''): Boolean; override;
 
-    function ConsultarPIXAutorizado(const NsuCTF: String): Boolean;
-    function DevolverPIX(const NsuCTF: String; AData: TDateTime): Boolean;
+    function ConsultarPIXAutorizado(const NsuCTF: String; ValorTransacao: Double): Boolean;
+    function DevolverPIX(const NsuCTF: String; ValorTransacao: Double; AData: TDateTime): Boolean;
 
     function EfetuarAdministrativa(
       CodOperacaoAdm: TACBrTEFOperacao = tefopAdministrativo): Boolean; overload; override;
@@ -196,7 +204,7 @@ begin
       end;
 
       SC_S_CODIGO_RESPOSTA:
-        Finalizacao := LinStr;
+        StatusTransacao := LinStr;
 
       SC_E_NUMERO_DOCTO_FISCAL:
         DocumentoVinculado := LinStr;
@@ -217,10 +225,10 @@ begin
         DocumentoPessoa := LinStr;
 
       SC_S_DADOS_RETORNADOS:
-        StatusTransacao := LinStr;
+        Trailer := LinStr;
 
       SC_S_NSU_TEF:
-        NSU_TEF := LinStr;
+        NSU := LinStr;
 
       SC_E_TAXA_SERVICO:
         TaxaServico := Info.AsFloat;
@@ -236,8 +244,8 @@ begin
 
       SC_S_NSU_AUTORIZADORA:
       begin
-        if (NSU = '') then
-          NSU := LinStr;
+        if (NSU_TEF = '') then
+          NSU_TEF := LinStr;
       end;
 
       SC_ES_DATA_AGENDAMENTO_PREDATADO:
@@ -268,10 +276,13 @@ begin
         ValorOriginal := Info.AsFloat;
 
       SC_S_ERRO_AUTORIZADORA:
-        Autenticacao := LinStr;
+      begin
+        if (Autenticacao = '') then
+          Autenticacao := LinStr;
+      end;
 
       SC_S_CODIGO_ERRO:
-        Trailer := LinStr;
+        Autenticacao := LinStr;
 
       SC_S_DESCRICAO_TRANSACAO:
         ModalidadePagtoDescrita := LinStr;
@@ -323,7 +334,7 @@ begin
       SC_S_TAXA_JUROS_PLANO:;
 
       SC_S_NSU_AUTORIZADORA_ALFA:
-        NSU := LinStr;
+        NSU_TEF := LinStr;
 
       SC_S_CUPOM_REDUZIDO:
       begin
@@ -344,7 +355,11 @@ begin
         CodigoBandeiraPadrao := LinStr;
 
       SC_S_CODIGO_AUTORIZACAO:
+      begin
         CodigoAutorizacaoTransacao := LinStr;
+        if (EndToEndID = '') then
+          EndToEndID := LinStr;
+      end;
 
       SC_S_METODO_VERIFICACAO:
       begin
@@ -352,7 +367,10 @@ begin
       end;
 
       SC_S_NOME_REDE_ADQUIRENTE:
+      begin
         NomeAdministradora := LinStr;
+        Rede := LinStr;
+      end;
 
       SC_S_CODIGO_VAN:
       begin
@@ -385,7 +403,17 @@ begin
   end;
 
   QtdLinhasComprovante := max(ImagemComprovante1aVia.Count, ImagemComprovante2aVia.Count);
-  Confirmar := (CodigoAutorizacaoTransacao <> '') or (QtdLinhasComprovante > 0);
+  Confirmar := (CodigoAutorizacaoTransacao <> '') or (NSU <> '') or (NSU_TEF <> '');
+  if (DataHoraTransacaoHost = 0) then
+    DataHoraTransacaoHost := DataHoraTransacaoLocal;
+end;
+
+procedure TACBrTEFRespAuttar.ProcessarTipoInterno(ALinha: TACBrTEFLinha);
+begin
+  inherited ProcessarTipoInterno(ALinha);
+
+  if (ALinha.Identificacao = 899) and (ALinha.Sequencia = CTEF_RESP_ORDEM_PAGTO) then
+    Finalizacao := ALinha.Informacao.AsString;
 end;
 
 
@@ -489,6 +517,9 @@ begin
     end;
   end;
 
+  if (OperacaoEmAndamento = tefmtdPagamento) then
+    fpACBrTEFAPI.UltimaRespostaTEF.Conteudo.GravaInformacao(899, CTEF_RESP_ORDEM_PAGTO, IntToStr(fpACBrTEFAPI.RespostasTEF.Count+1));
+
   fpACBrTEFAPI.UltimaRespostaTEF.ConteudoToProperty;
 end;
 
@@ -505,6 +536,67 @@ begin
     s := 'Erro';
 
   QuandoExibirMensagemAPI(Format(ACBrStr(sMsgComunicacaoCTF), [CTFClientFolderName, s]), 1, 0, Cancelar);
+end;
+
+function TACBrTEFAPIClassAuttar.ConsultarPIXAuttar: Boolean;
+var
+  NsuTEF, ValorStr: String;
+  Cancelar: Boolean;
+  vl: Double;
+begin
+  Result := False;
+  QuandoPerguntarCampoAPI(ACBrStr(sMsgInformeNSU), SC_E_NSU_CTF_ORIGINAL, 6, True, NsuTEF, Cancelar);
+  if Cancelar then
+    Exit;
+
+  QuandoPerguntarCampoAPI(ACBrStr(sMsgValorTransacao), SC_ES_VALOR_TRANSACAO, 12, False, ValorStr, Cancelar);
+  if Cancelar then
+    Exit;
+
+  vl := StrToFloat(ValorStr)/100;
+
+  with GetTEFAuttar do
+  begin
+    SubCampos.Clear;
+    Result := ConsultarPIXAutorizado(NsuTEF, vl);
+  end;
+end;
+
+function TACBrTEFAPIClassAuttar.DevolverPIXAuttar: Boolean;
+var
+  NsuTEF, DataStr, AnoStr, ValorStr: String;
+  dt: TDateTime;
+  Cancelar: Boolean;
+  vl: Double;
+begin
+  Result := False;
+  QuandoPerguntarCampoAPI(ACBrStr(sMsgInformeNSU), SC_E_NSU_CTF_ORIGINAL, 6, True, NsuTEF, Cancelar);
+  if Cancelar then
+    Exit;
+
+  QuandoPerguntarCampoAPI(ACBrStr(sMsgValorTransacao), SC_ES_VALOR_TRANSACAO, 12, False, ValorStr, Cancelar);
+  if Cancelar then
+    Exit;
+
+  QuandoPerguntarCampoAPI(ACBrStr(sMsgDataTransacao), SC_ES_DATA_TRANSACAO_ORIGINAL, 6, False, DataStr, Cancelar);
+  if Cancelar then
+    Exit;
+
+  AnoStr := IntToStr(YearOf(Today));
+  DataStr := copy(DataStr,1,4) + copy(AnoStr,1,2) + copy(DataStr,5,2);
+  if not TryEncodeDate( StrToIntDef(copy(DataStr,5,4), 0),
+                        StrToIntDef(copy(DataStr,3,2), 0),
+                        StrToIntDef(copy(DataStr,1,2), 0),
+                        dt ) then
+    raise EACBrTEFAuttarAPI.Create( ACBrStr(sErrDataInvalida) );
+
+  vl := StrToFloat(ValorStr)/100;
+
+  with GetTEFAuttar do
+  begin
+    SubCampos.Clear;
+    Result := DevolverPIX(NsuTEF, vl, dt);
+  end;
 end;
 
 procedure TACBrTEFAPIClassAuttar.DadosAdicionaisToStringList(
@@ -531,6 +623,11 @@ begin
   end;
 end;
 
+procedure TACBrTEFAPIClassAuttar.GravarLog(const ALogLine: AnsiString);
+begin
+  fpACBrTEFAPI.GravarLog(ALogLine);
+end;
+
 function TACBrTEFAPIClassAuttar.GetTEFAuttar: TACBrTEFAuttarAPI;
 begin
   Result := ACBrTEFAuttarAPI.GetTEFAuttarAPI;
@@ -549,6 +646,7 @@ procedure TACBrTEFAPIClassAuttar.QuandoExibirMensagemAPI(
 var
   telaAPI: TACBrTEFAPITela;
 begin
+  GravarLog('QuandoExibirMensagemAPI( '+Mensagem+', '+IntToStr(Tela)+', '+IntToStr(MilissegundosExibicao)+' )' );
   if (Tela = 1) then
     telaAPI := telaOperador
   else if (Tela = 2) then
@@ -571,9 +669,11 @@ procedure TACBrTEFAPIClassAuttar.QuandoPerguntarMenuAPI(const Titulo: String;
 var
   i: Integer;
 begin
+  GravarLog('QuandoPerguntarMenuAPI( '+Titulo+', '+StringReplace(Opcoes.Text, sLineBreak, '|', [rfReplaceAll])+' )' );
   i := 0;
   TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarMenu( Titulo, Opcoes, i);
   ItemSelecionado := i;
+  GravarLog('  Ret:'+IntToStr(ItemSelecionado));
 end;
 
 procedure TACBrTEFAPIClassAuttar.QuandoPerguntarCampoAPI(const Titulo: String;
@@ -583,6 +683,7 @@ var
   def: TACBrTEFAPIDefinicaoCampo;
   Validado: Boolean;
 begin
+  GravarLog('QuandoPerguntarCampoAPI( '+Titulo+', '+IntToStr(TipoCampo)+', '+BoolToStr(ZerosAEsquerda, True)+' )' );
   def.TituloPergunta := Titulo;
   def.TipoCampo := TipoCampo;
   def.TamanhoMaximo := TamMaximo;
@@ -679,10 +780,48 @@ begin
       def.TipoDeEntrada := tedNumerico;
   end;
 
+  case TipoCampo of
+    SC_ES_VALOR_TRANSACAO,
+    SC_E_VALOR_CANCELAMENTO,
+    SC_E_VALOR_PARCELA,
+    SC_ES_VALOR_ACRESCIMO,
+    SC_E_VALOR_DESCONTO,
+    SC_ES_VALOR_DEVIDO_DOCUMENTO,
+    SC_ES_VALOR_PARCELA_PLANO,
+    SC_E_TAXA_SERVICO,
+    SC_E_TAXA_EMBARQUE,
+    SC_E_VALOR_ENTRADA,
+    SC_E_VALOR_SAQUE,
+    SC_E_VALOR_RECARGA_FONE:
+      def.MascaraDeCaptura := '@@@@@@,@@';
+
+    SC_ES_DATA_VENCTO_CARTAO_MMAA,
+    SC_E_DATA_EMISSAO_CARTAO_MMAA:
+    begin
+      def.ValidacaoDado := valdMesAno;
+      def.MascaraDeCaptura := '@@/@@';
+    end;
+
+    SC_ES_DATA_TRANSACAO_ORIGINAL,
+    SC_E_DATA_CHEQUE_DDMMAA,
+    SC_ES_DATA_AGENDAMENTO_PREDATADO,
+    SC_E_DATA_VENCTO_CORBAN_DDMMAA,
+    SC_E_DATA_NASCIMENTO_CLIENTE:
+    begin
+      def.ValidacaoDado := valdDiaMesAno;
+      def.MascaraDeCaptura := '@@/@@/@@';
+    end;
+  end;
+
   Validado := True;
   Cancelar := False;
   Resposta := '';
   TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarCampo(def, Resposta, Validado, Cancelar);
+
+  if (def.TipoDeEntrada = tedNumerico) and (pos(',', def.MascaraDeCaptura) > 0) then
+    Resposta := OnlyNumber(Resposta);
+
+  GravarLog('  Ret:'+Resposta+', Validado: '+BoolToStr(Validado, True)+', Cancelar:'+BoolToStr(Cancelar, True));
 end;
 
 procedure TACBrTEFAPIClassAuttar.QuandoTransacaoEmAndamentoAPI(out Cancelar: Boolean);
@@ -717,9 +856,10 @@ begin
       OpcoesMenu.Add(ACBrStr('6  Pré-autorização Crédito'));
       OpcoesMenu.Add(ACBrStr('7  Consulta Saldo Crédito'));
       OpcoesMenu.Add(ACBrStr('8  Pagamento de Título'));
-      OpcoesMenu.Add(ACBrStr('9  Devolução Pix'));
-      OpcoesMenu.Add(ACBrStr('10 Carga de Tabelas'));
-      OpcoesMenu.Add(ACBrStr('11 Teste de Comunicação'));
+      OpcoesMenu.Add(ACBrStr('9  Consultar Pix'));
+      OpcoesMenu.Add(ACBrStr('10 Devolução Pix'));
+      OpcoesMenu.Add(ACBrStr('11 Carga de Tabelas'));
+      OpcoesMenu.Add(ACBrStr('12 Teste de Comunicação'));
 
       ItemSelecionado := -1;
       QuandoPerguntarMenuAPI(ACBrStr('Selecione uma opção:'), OpcoesMenu, ItemSelecionado);
@@ -734,9 +874,10 @@ begin
         5: Op := OP_PRE_AUTORIZACAO_CREDITO;
         6: Op := OP_CONSULTA_SALDO_CREDITO;
         7: Op := OP_PAGAMENTO_TITULO;
-        8: Op := OP_DEVOLUCAO_PIX;
-        9: Op := OP_CARGA_TABELAS;
-        10: Op := OP_CONSULTA_CONFIGURACAO;
+        8: Op := OP_CONSULTA_PIX;
+        9: Op := OP_DEVOLUCAO_PIX;
+        10: Op := OP_CARGA_TABELAS;
+        11: Op := OP_CONSULTA_CONFIGURACAO;
       else
         Exit;
       end;
@@ -774,15 +915,24 @@ begin
     end;
   end;
 
-  if (OP = OP_CONSULTA_CONFIGURACAO) then
-    Result := TestarComunicacaoAuttar
+  case OP of
+    OP_CONSULTA_CONFIGURACAO:
+      Result := TestarComunicacaoAuttar;
+
+    OP_CONSULTA_PIX:
+      Result := ConsultarPIXAuttar;
+
+    OP_DEVOLUCAO_PIX:
+      Result := DevolverPIXAuttar;
   else
     Result := EfetuarAdministrativa(IntToStr(Op));
+  end;
 end;
 
 function TACBrTEFAPIClassAuttar.EfetuarAdministrativa(const CodOperacaoAdm: string): Boolean;
 var
   Op: Integer;
+  CodRetorno: Integer;
 begin
   Result := False;
   Op := StrToIntDef(CodOperacaoAdm, -1);
@@ -793,15 +943,29 @@ begin
   with GetTEFAuttar do
   begin
     SubCampos.Clear;
+
     ExecutarTransacaoCTF(Op);
-    Result := True;
+    CodRetorno := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_RETORNO]), -1);
+    Result := (CodRetorno = 0);
   end;
 end;
 
 function TACBrTEFAPIClassAuttar.CancelarTransacao(const NSU,
   CodigoAutorizacaoTransacao: string; DataHoraTransacao: TDateTime;
   Valor: Double; const CodigoFinalizacao: string; const Rede: string): Boolean;
+var
+  CodRetorno: Integer;
 begin
+  with GetTEFAuttar do
+  begin
+    SubCampos.Clear;
+    SubCampos.ValueInfo[SC_E_NSU_CTF_ORIGINAL] := PadLeft(Trim(NSU), 6, '0');
+    SubCampos.ValueInfo[SC_ES_DATA_TRANSACAO_ORIGINAL] := FormatDateTime('DDMMYYYY', DataHoraTransacao);
+
+    ExecutarTransacaoCTF(OP_CANCELAMENTO, Valor, CodigoAutorizacaoTransacao);
+    CodRetorno := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_RETORNO]), -1);
+    Result := (CodRetorno = 0);
+  end;
 end;
 
 function TACBrTEFAPIClassAuttar.EfetuarPagamento(ValorPagto: Currency;
@@ -809,10 +973,12 @@ function TACBrTEFAPIClassAuttar.EfetuarPagamento(ValorPagto: Currency;
   Financiamento: TACBrTEFModalidadeFinanciamento; Parcelas: Byte;
   DataPreDatado: TDateTime; DadosAdicionais: String): Boolean;
 var
-  Operacao, NumTransacao: Integer;
+  Operacao, NumTransacao, CodRetorno: Integer;
   NumDocto, PathQrCodePNG, NsuCTF: String;
   DataFiscal: TDateTime;
+  ContinuaTransacaoPIX: Boolean;
 begin
+  ContinuaTransacaoPIX := False;
   VerificarIdentificadorVendaInformado;
   if (ValorPagto <= 0) then
     fpACBrTEFAPI.DoException(ACBrStr(sACBrTEFAPIValorPagamentoInvalidoException));
@@ -821,12 +987,14 @@ begin
   begin
     SubCampos.Clear;
     DadosAdicionaisToStringList(DadosAdicionais, SubCampos);
-    DadosAdicionais := '';
 
     Operacao := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_TRANSACAO_CTF]), OP_TRANSACAO_GENERICA);
     NumDocto := Trim(fpACBrTEFAPI.RespostasTEF.IdentificadorTransacao);
     DataFiscal := fpACBrTEFAPI.RespostasTEF.DataHoraIdentificador;
-    NumTransacao := fpACBrTEFAPI.RespostasTEF.Count+1;
+    if fpACBrTEFAPI.ConfirmarTransacaoAutomaticamente then
+      NumTransacao := 1
+    else
+      NumTransacao := fpACBrTEFAPI.RespostasTEF.Count+1;
 
     case Modalidade of
       tefmpCartao:
@@ -865,7 +1033,8 @@ begin
       tefmpCarteiraVirtual:
       begin
         Operacao := OP_PAGAMENTO_PIX;
-        if (TACBrTEFAPI(fpACBrTEFAPI).ExibicaoQRCode = qrapiExibirAplicacao) then
+        ContinuaTransacaoPIX := (TACBrTEFAPI(fpACBrTEFAPI).ExibicaoQRCode = qrapiExibirAplicacao);
+        if ContinuaTransacaoPIX  then
           SubCampos.ValueInfo[SC_E_FLAG_CONSULTA_INTEGRACAO] := '1';
       end
     end;
@@ -876,26 +1045,32 @@ begin
     if (DataPreDatado <> 0) then
       SubCampos.ValueInfo[SC_E_DATA_PRE_DATADA] := FormatDateTime('DDMMYYYY', DataPreDatado);
 
-    ExecutarTransacaoCTF(Operacao, ValorPagto,  NumDocto, DataFiscal, NumTransacao, DadosAdicionais);
-    Result := True;
+    ExecutarTransacaoCTF(Operacao, ValorPagto,  NumDocto, DataFiscal, NumTransacao);
+    CodRetorno := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_RETORNO]), -1);
 
-    if (TACBrTEFAPI(fpACBrTEFAPI).ExibicaoQRCode = qrapiExibirAplicacao) then
+    if ContinuaTransacaoPIX then
     begin
       PathQrCodePNG := Trim(SubCampos.ValueInfo[SC_S_DADOS_RETORNADOS]);
       NsuCTF := Trim(SubCampos.ValueInfo[SC_ES_IDENTIFICADOR_CONSULTA]);
-      if (PathQrCodePNG <> '') and (NsuCTF <> '') and (SubCampos.ValueInfo[SC_S_CODIGO_RETORNO] = '00') then
+      if (PathQrCodePNG <> '') and (NsuCTF <> '') and (CodRetorno = 0) then
       begin
         ExibirQRCodeCTF(PathQrCodePNG);
 
         SubCampos.Clear;
         SubCampos.ValueInfo[SC_ES_IDENTIFICADOR_CONSULTA] := NsuCTF;
-        ExecutarTransacaoCTF(Operacao, ValorPagto,  NumDocto, DataFiscal, NumTransacao, DadosAdicionais);
+        ExecutarTransacaoCTF(Operacao, ValorPagto,  NumDocto, DataFiscal, NumTransacao);
+        CodRetorno := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_RETORNO]), -1);
+
+        ExibirQRCodeCTF('');  // Limpa o QRCode
       end;
     end;
+
+    Result := (CodRetorno = 0);
   end;
 end;
 
-function TACBrTEFAPIClassAuttar.ConsultarPIXAutorizado(const NsuCTF: String): Boolean;
+function TACBrTEFAPIClassAuttar.ConsultarPIXAutorizado(const NsuCTF: String;
+  ValorTransacao: Double): Boolean;
 var
   CodResposta: Integer;
   MsgDisplay: String;
@@ -905,7 +1080,7 @@ begin
   begin
     SubCampos.Clear;
     SubCampos.ValueInfo[SC_E_NSU_CTF_ORIGINAL] := PadLeft(Trim(NsuCTF), 6, '0');
-    ExecutarTransacaoCTF(OP_CONSULTA_PIX);
+    ExecutarTransacaoCTF(OP_CONSULTA_PIX, ValorTransacao);
 
     CodResposta := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_RESPOSTA]), -1);
     MsgDisplay := SubCampos.ValueInfo[SC_S_MSG_DISPLAY_TRANSACAO];
@@ -917,7 +1092,7 @@ begin
 end;
 
 function TACBrTEFAPIClassAuttar.DevolverPIX(const NsuCTF: String;
-  AData: TDateTime): Boolean;
+  ValorTransacao: Double; AData: TDateTime): Boolean;
 var
   CodResposta: Integer;
   MsgDisplay: String;
@@ -928,7 +1103,7 @@ begin
     SubCampos.Clear;
     SubCampos.ValueInfo[SC_E_NSU_CTF_ORIGINAL] := PadLeft(Trim(NsuCTF), 6, '0');
     SubCampos.ValueInfo[SC_ES_DATA_TRANSACAO_ORIGINAL] := FormatDateTime('DDMMYYYY', AData);
-    ExecutarTransacaoCTF(OP_DEVOLUCAO_PIX);
+    ExecutarTransacaoCTF(OP_DEVOLUCAO_PIX, ValorTransacao);
 
     CodResposta := StrToIntDef(Trim(SubCampos.ValueInfo[SC_S_CODIGO_RESPOSTA]), -1);
     MsgDisplay := SubCampos.ValueInfo[SC_S_MSG_DISPLAY_TRANSACAO];
@@ -941,7 +1116,27 @@ end;
 
 procedure TACBrTEFAPIClassAuttar.FinalizarTransacao(const Rede, NSU,
   CodigoFinalizacao: String; AStatus: TACBrTEFStatusTransacao);
+var
+  Confirma: Boolean;
+  NumTransacao: Integer;
+  DataFiscal: TDateTime;
 begin
+  Confirma := (AStatus in [tefstsSucessoAutomatico, tefstsSucessoManual]);
+  NumTransacao := 0;
+  if not fpACBrTEFAPI.ConfirmarTransacaoAutomaticamente then
+  begin
+    NumTransacao := fpACBrTEFAPI.RespostasTEF.AcharTransacao(Rede, NSU, CodigoFinalizacao);
+    if (NumTransacao < 0) then
+      NumTransacao := 0;
+  end;
+
+  if (NumTransacao < fpACBrTEFAPI.RespostasTEF.Count) then
+    DataFiscal := fpACBrTEFAPI.RespostasTEF[NumTransacao].DataHoraTransacaoLocal;
+
+  with GetTEFAuttar do
+  begin
+    FinalizarTransacaoCTF(Confirma, NumTransacao+1, DataFiscal);
+  end;
 end;
 
 procedure TACBrTEFAPIClassAuttar.ResolverTransacaoPendente(AStatus: TACBrTEFStatusTransacao);

@@ -1556,6 +1556,15 @@ object FormPrincipal: TFormPrincipal
                   TabOrder = 5
                   OnClick = btVersaoTEFClick
                 end
+                object btExibirImagemPinPad1: TButton
+                  Left = 408
+                  Height = 28
+                  Top = 48
+                  Width = 113
+                  Caption = 'Enviar QRCode'
+                  TabOrder = 6
+                  OnClick = btExibirImagemPinPad1Click
+                end
               end
               object gbAdmOutrasFuncoes: TGroupBox
                 Left = 0
@@ -1904,8 +1913,6 @@ object FormPrincipal: TFormPrincipal
     ConfigQRCode.Tipo = 2
     ConfigQRCode.LarguraModulo = 4
     ConfigQRCode.ErrorLevel = 0
-    ConfigImagem.ModoLegado = True
-    ConfigImagem.AddLF = True
     LinhasEntreCupons = 0
     Left = 968
     Top = 272

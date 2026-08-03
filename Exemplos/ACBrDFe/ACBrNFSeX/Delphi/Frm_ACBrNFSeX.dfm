@@ -2,8 +2,8 @@ object frmACBrNFSe: TfrmACBrNFSe
   Left = 282
   Top = 118
   Caption = 'ACBrNFSeX - Programa Exemplo - Vers'#227'o Delphi'
-  ClientHeight = 643
-  ClientWidth = 866
+  ClientHeight = 635
+  ClientWidth = 858
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,11 +12,12 @@ object frmACBrNFSe: TfrmACBrNFSe
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
+  TextHeight = 13
   object pnlMenus: TPanel
     Left = 0
     Top = 0
     Width = 297
-    Height = 643
+    Height = 635
     Align = alLeft
     TabOrder = 0
     object lblColaborador: TLabel
@@ -1706,15 +1707,15 @@ object frmACBrNFSe: TfrmACBrNFSe
   object pnlCentral: TPanel
     Left = 297
     Top = 0
-    Width = 569
-    Height = 643
+    Width = 561
+    Height = 635
     Align = alClient
     TabOrder = 1
     object pgRespostas: TPageControl
       Left = 1
       Top = 246
-      Width = 567
-      Height = 396
+      Width = 559
+      Height = 388
       ActivePage = TabSheet8
       Align = alClient
       TabOrder = 0
@@ -1724,8 +1725,8 @@ object frmACBrNFSe: TfrmACBrNFSe
         object memoLog: TMemo
           Left = 0
           Top = 0
-          Width = 559
-          Height = 368
+          Width = 551
+          Height = 360
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -1743,12 +1744,12 @@ object frmACBrNFSe: TfrmACBrNFSe
         object WBXmlEnvio: TWebBrowser
           Left = 0
           Top = 0
-          Width = 559
-          Height = 368
+          Width = 551
+          Height = 360
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000842600005B1900000000000000000000000000000000000000000000
+            4C0000008F2D0000C41D00000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1761,12 +1762,12 @@ object frmACBrNFSe: TfrmACBrNFSe
         object WBXmlRetorno: TWebBrowser
           Left = 0
           Top = 0
-          Width = 559
-          Height = 368
+          Width = 551
+          Height = 360
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000842600005B1900000000000000000000000000000000000000000000
+            4C0000008F2D0000C41D00000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1778,12 +1779,12 @@ object frmACBrNFSe: TfrmACBrNFSe
         object WBXmlNotas: TWebBrowser
           Left = 0
           Top = 0
-          Width = 559
-          Height = 368
+          Width = 551
+          Height = 360
           Align = alClient
           TabOrder = 0
           ControlData = {
-            4C000000842600005B1900000000000000000000000000000000000000000000
+            4C0000008F2D0000C41D00000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126200000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1794,7 +1795,7 @@ object frmACBrNFSe: TfrmACBrNFSe
     object pgcProvedores: TPageControl
       Left = 1
       Top = 41
-      Width = 567
+      Width = 559
       Height = 205
       ActivePage = tsDemais
       Align = alTop
@@ -1804,7 +1805,7 @@ object frmACBrNFSe: TfrmACBrNFSe
         object pgcBotoes: TPageControl
           Left = 0
           Top = 0
-          Width = 559
+          Width = 551
           Height = 177
           ActivePage = tsEnvios
           Align = alClient
@@ -2181,7 +2182,7 @@ object frmACBrNFSe: TfrmACBrNFSe
         object pgcBotoes1: TPageControl
           Left = 0
           Top = 0
-          Width = 559
+          Width = 551
           Height = 150
           ActivePage = tsEnvios1
           Align = alTop
@@ -2570,7 +2571,7 @@ object frmACBrNFSe: TfrmACBrNFSe
     object rgReformaTributaria: TRadioGroup
       Left = 1
       Top = 1
-      Width = 567
+      Width = 559
       Height = 40
       Align = alTop
       Caption = 'Gera os campos da ReformaTributaria (somente Padr'#227'o Nacional)'

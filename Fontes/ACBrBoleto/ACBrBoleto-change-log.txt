@@ -48,6 +48,24 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+30/07/2026
+-- ACBrBoletoW_Bradesco --
+[*] ACBR-9661 - Implementado o indice de continuidade
+   Por: Valter Patrick
+   Veja: https://www.projetoacbr.com.br/forum/topic/93562-acbr-9661-pagina%C3%A7%C3%A3o-consulta-titulos-api-bradesco/
+
+22/07/2026
+-- ACBrBancoSicredi --
+[*] ACBR-9585 - Atualizações visando compatibilização com a versão 3.1 do manual do CNAB400
+   Por: Valter Patrick
+   Veja: https://www.projetoacbr.com.br/forum/topic/93240-acbr-9585-boleto-sicredi-informar-juros-mensais/#comment-609566
+
+21/07/2026
+-- ACBrBoleto --
+[*] Adiciona Instrucao4 e Instrucao5 na rotina de leitura do arquivo INI.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/93633-boleto-sicoob-via-api-mensagem-de-instru%C3%A7%C3%A3o/
+
 01/07/2026
 -- ACBrBoletoW_Cresol --
 [*] Ajuste na quantidade de registros para retorno da consulta em lista

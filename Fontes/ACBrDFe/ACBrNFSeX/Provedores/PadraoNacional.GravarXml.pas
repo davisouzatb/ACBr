@@ -57,6 +57,7 @@ type
     function GerarChaveDPS(const AcMun, ACNPJCPF, ASerie, ANumero: string): string;
     function GerarChaveNFSe(const AcMun, AAmbGer, ACNPJCPF,
       ANumero, AUF: string; ADataEmis: TDateTime; ACodNum: Int64): string;
+    function CodigoLocalEmissao: Integer;
 
     function GerarXMLNFSe: TACBrXmlNode;
     function GerarXMLInfNFSe: TACBrXmlNode;
@@ -156,7 +157,7 @@ type
     procedure GerarIniNfse(AINIRec: TMemIniFile);
   public
     function GerarXml: Boolean; override;
-//    function GerarIni: string; override;
+    function GerarIni: string; override;
   end;
 
 implementation
@@ -177,6 +178,23 @@ uses
 //==============================================================================
 
 { TNFSeW_PadraoNacional }
+
+function TNFSeW_PadraoNacional.CodigoLocalEmissao: Integer;
+begin
+  Result := StrToIntDef(NFSe.cLocEmi, 0);
+
+  if Result = 0 then
+  begin
+    case NFSe.tpEmit of
+      teTomador:
+        Result := StrToIntDef(NFSe.Tomador.Endereco.CodigoMunicipio, 0);
+      teIntermediario:
+        Result := StrToIntDef(NFSe.Intermediario.Endereco.CodigoMunicipio, 0);
+    else
+      Result := StrToIntDef(NFSe.Prestador.Endereco.CodigoMunicipio, 0);
+    end;
+  end;
+end;
 
 function TNFSeW_PadraoNacional.DevoGerarXMLObra: Boolean;
 begin
@@ -437,11 +455,15 @@ var
   chave, CodigoMun, CNPJ: string;
   xmlNode: TACBrXmlNode;
 begin
-  CodigoMun := IntToStr(CodMunEmit);
-  CNPJ := CNPJEmitente;
+  if CodMunEmit <> 0 then
+    CodigoMun := IntToStr(CodMunEmit)
+  else
+    CodigoMun := IntToStr(CodigoLocalEmissao);
+
+  CNPJ := Trim(CNPJEmitente);
 
   if CNPJ = '' then
-    CNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
+    CNPJ := Trim(NFSe.Prestador.IdentificacaoPrestador.CpfCnpj);
 
   chave := GerarChaveDPS(CodigoMun,
                          CNPJ,
@@ -468,11 +490,15 @@ var
   cLocIncid: Integer;
   xmlNode: TACBrXmlNode;
 begin
-  CodigoMun := IntToStr(CodMunEmit);
-  CNPJ := CNPJEmitente;
+  if CodMunEmit <> 0 then
+    CodigoMun := IntToStr(CodMunEmit)
+  else
+    CodigoMun := IntToStr(CodigoLocalEmissao);
+
+  CNPJ := Trim(CNPJEmitente);
 
   if CNPJ = '' then
-    CNPJ := NFSe.Prestador.IdentificacaoPrestador.CpfCnpj;
+    CNPJ := Trim(NFSe.Prestador.IdentificacaoPrestador.CpfCnpj);
 
   if NFSe.infNFSe.nDFSe <> '' then
     lnDFSe := NFSe.infNFSe.nDFSe
@@ -495,20 +521,7 @@ begin
   Result := CreateElement('infNFSe');
   Result.SetAttribute(FpAOwner.ConfigGeral.Identificador, chave);
 
-  if NFSe.cLocEmi <> '' then
-    xLocEmi := ObterNomeMunicipioUF(StrToIntDef(NFSe.cLocEmi, 0), xUF)
-  else
-  begin
-    case NFSe.tpEmit of
-      teTomador:
-        xLocEmi := ObterNomeMunicipioUF(StrToIntDef(NFSe.Tomador.Endereco.CodigoMunicipio, 0), xUF);
-
-      teIntermediario:
-        xLocEmi := ObterNomeMunicipioUF(StrToIntDef(NFSe.Intermediario.Endereco.CodigoMunicipio, 0), xUF);
-    else
-      xLocEmi := ObterNomeMunicipioUF(StrToIntDef(NFSe.Prestador.Endereco.CodigoMunicipio, 0), xUF);
-    end;
-  end;
+  xLocEmi := ObterNomeMunicipioUF(CodigoLocalEmissao, xUF);
 
   Result.AppendChild(AddNode(tcStr, '#1', 'xLocEmi', 1, 150, 1, xLocEmi, ''));
 
@@ -662,23 +675,8 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'cMotivoEmisTI', 1, 1, 0,
                                    cMotivoEmisTIToStr(NFSe.cMotivoEmisTI), ''));
 
-  if NFSe.cLocEmi <> '' then
-    Result.AppendChild(AddNode(tcStr, '#1', 'cLocEmi', 7, 7, 1,
-                                                              NFSe.cLocEmi, ''))
-  else
-  begin
-    case NFSe.tpEmit of
-      teTomador:
-        Result.AppendChild(AddNode(tcStr, '#1', 'cLocEmi', 7, 7, 1,
-                                    NFSe.Tomador.Endereco.CodigoMunicipio, ''));
-      teIntermediario:
-        Result.AppendChild(AddNode(tcStr, '#1', 'cLocEmi', 7, 7, 1,
-                              NFSe.Intermediario.Endereco.CodigoMunicipio, ''));
-    else
-      Result.AppendChild(AddNode(tcStr, '#1', 'cLocEmi', 7, 7, 1,
-                                  NFSe.Prestador.Endereco.CodigoMunicipio, ''));
-    end;
-  end;
+  Result.AppendChild(AddNode(tcInt, '#1', 'cLocEmi', 7, 7, 1,
+                                                       CodigoLocalEmissao, ''));
 
   Result.AppendChild(GerarXMLSubstituicao);
   Result.AppendChild(GerarXMLPrestador);
@@ -1726,10 +1724,10 @@ begin
 
     Result.AppendChild(AddNode(tcDe2, '#1', 'vCofins', 1, 15, 1,
                                      NFSe.Servico.Valores.tribFed.vCofins, ''));
-
-    Result.AppendChild(AddNode(tcStr, '#1', 'tpRetPisCofins', 1, 1, 1,
-         tpRetPisCofinsToStr(NFSe.Servico.Valores.tribFed.tpRetPisCofins), ''));
   end;
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'tpRetPisCofins', 1, 1, 0,
+         tpRetPisCofinsToStr(NFSe.Servico.Valores.tribFed.tpRetPisCofins), ''));
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLTotalTributos: TACBrXmlNode;
@@ -1848,10 +1846,11 @@ begin
 
   FDocument.Root := NFSeNode;
 
+{ Comentado para finalizar os ajustes que estão sendo realizados nas classes
   if FormatoDiscriminacao <> fdNenhum then
-    ConsolidarVariosItensServicosEmUmSo;
-//    CampoDiscriminacaoFormatado;
-
+//    ConsolidarVariosItensServicosEmUmSo;
+    CampoDiscriminacaoFormatado;
+}
   xmlNode := GerarXMLInfDps;
   NFSeNode.AppendChild(xmlNode);
 
@@ -1859,7 +1858,7 @@ begin
 end;
 
 //====== Gerar o Arquivo INI=========================================
-(*
+
 function TNFSeW_PadraoNacional.GerarIni: string;
 var
   INIRec: TMemIniFile;
@@ -1886,7 +1885,7 @@ begin
     end;
   end;
 end;
-*)
+
 procedure TNFSeW_PadraoNacional.GerarIniNfse(AINIRec: TMemIniFile);
 begin
   GerarINIIdentificacaoNFSe(AINIRec);

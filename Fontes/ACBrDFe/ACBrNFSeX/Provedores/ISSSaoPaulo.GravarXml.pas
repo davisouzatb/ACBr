@@ -193,7 +193,7 @@ end;
 
 function TNFSeW_ISSSaoPaulo.GerarXml: Boolean;
 var
-  Aliquota: Double;
+  Aliquota, lValorFinalCobrado: Double;
   LNFSeNode, LNode: TACBrXmlNode;
   LTipoRPS, LSituacao, LAliquota, LISSRetido, LISSRetidoInter: String;
 begin
@@ -335,7 +335,8 @@ begin
 
   if (NFSe.TipoTributacaoRPS <> ttTribnoMun) and
      (NFSe.TipoTributacaoRPS <> ttTribnoMunIsento) and
-     (NFSe.TipoTributacaoRPS <> ttTribnoMunImune) then
+     (NFSe.TipoTributacaoRPS <> ttTribnoMunImune) and
+     (NFSe.TipoTributacaoRPS <> ttTribnoMunSuspensa) then
     LNFSeNode.AppendChild(AddNode(tcStr, '#1', 'MunicipioPrestacao', 1, 7, 0,
                                              NFSe.Servico.CodigoMunicipio, ''));
 
@@ -350,11 +351,14 @@ begin
 
   if VersaoNFSe = ve200 then
   begin
-    if (NFSe.Servico.Valores.ValorInicialCobrado > 0) and (NFSe.Servico.Valores.ValorFinalCobrado = 0) then
-      NFSe.Servico.Valores.ValorFinalCobrado := NFSe.Servico.Valores.ValorInicialCobrado;
+    lValorFinalCobrado := NFSe.Servico.Valores.ValorFinalCobrado;
+    if (NFSe.Servico.Valores.ValorInicialCobrado > 0) and (lValorFinalCobrado = 0) then
+      lValorFinalCobrado := NFSe.Servico.Valores.ValorInicialCobrado;
+    if (NFSe.Servico.Valores.ValorServicos > 0) and (lValorFinalCobrado = 0) then
+      lValorFinalCobrado := NFSe.Servico.Valores.ValorServicos;
 
     LNFSeNode.AppendChild(AddNode(tcDe2, '#1', 'ValorFinalCobrado', 1, 15, 1,
-                                 NFSe.Servico.Valores.ValorFinalCobrado, ''));
+                                 lValorFinalCobrado, ''));
   end;
 
   LNFSeNode.AppendChild(AddNode(tcDe2, '#1', 'ValorMulta', 1, 15, 0,
@@ -376,7 +380,7 @@ begin
                                                                       '0', ''));
 
     LNFSeNode.AppendChild(AddNode(tcStr, '#1', 'PagamentoParceladoAntecipado', 1, 1, 0,
-                                                                      '', ''));
+                                                                      '0', ''));
   end;
 
   LNFSeNode.AppendChild(AddNode(tcStr, '#1', 'NCM', 1, 15, 0,

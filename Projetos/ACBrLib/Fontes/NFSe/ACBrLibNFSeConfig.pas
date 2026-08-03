@@ -196,6 +196,7 @@ begin
   FAtividade := AIni.ReadString(CSessaoDANFSE, CChaveAtividade, FAtividade);
   FFormatarNumeroDocumentoNFSe := AIni.ReadBool(CSessaoDANFSE, CChaveFmtNroNFSe, FFormatarNumeroDocumentoNFSe);
   FNFSeCancelada := AIni.ReadBool(CSessaoDANFSE, CChaveNFSeCancelada, FNFSeCancelada);
+  FImprimeCanhoto := AIni.ReadBool(CSessaoDANFSE, CChaveImprimeCanhoto, FImprimeCanhoto);
   FDetalharServico := AIni.ReadBool(CSessaoDANFSE, CChaveDetalharServico, FDetalharServico);
   FProducao := StrToSimNao(ok, AIni.ReadString(CSessaoDANFSE, CChaveProducao, SimNaoToStr(FProducao)));
   FDataCompetenciaCompleta:=AIni.ReadBool(CSessaoDANFSe, CChaveDataCompetenciaCompleta,FDataCompetenciaCompleta);
@@ -227,6 +228,7 @@ begin
   AIni.WriteString(CSessaoDANFSE, CChaveAtividade, FAtividade);
   AIni.WriteBool(CSessaoDANFSE, CChaveFmtNroNFSe, FFormatarNumeroDocumentoNFSe);
   AIni.WriteBool(CSessaoDANFSE, CChaveNFSeCancelada, FNFSeCancelada);
+  AIni.WriteBool(CSessaoDANFSE, CChaveImprimeCanhoto, FImprimeCanhoto);
   AIni.WriteBool(CSessaoDANFSE, CChaveDetalharServico, FDetalharServico);
   AIni.WriteString(CSessaoDANFSE, CChaveProducao, SimNaoToStr(FProducao));
   AIni.WriteBool(CSessaoDANFSE,CChaveDataCompetenciaCompleta,FDataCompetenciaCompleta);
@@ -271,6 +273,7 @@ begin
     Atividade := FAtividade;
     FormatarNumeroDocumentoNFSe := FFormatarNumeroDocumentoNFSe;
     Cancelada := FNFSeCancelada;
+    ImprimeCanhoto := FImprimeCanhoto;
     DetalharServico := FDetalharServico;
     Producao := FProducao;
     DataCompetenciaCompleta:= FDataCompetenciaCompleta;
@@ -301,6 +304,7 @@ begin
   FTomadorEmail := EmptyStr;
   FFormatarNumeroDocumentoNFSe := True;
   FNFSeCancelada := False;
+  FImprimeCanhoto := False;
   FDetalharServico := False;
   FDataCompetenciaCompleta:= False;
 end;

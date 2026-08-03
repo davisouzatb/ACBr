@@ -45,6 +45,49 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+29/07/2026
+-- ACBrTEFAPICliSiTef --
+[-] Correção na forma de montagem dos parâmatros na Inicialização da Biblioteca
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=93761
+    (por: William F.L. e DSA)
+
+27/07/2026
+-- ACBrTEFAPIAuttar --
+[*] Melhorias nos Logs
+
+-- ACBrTEFAPITPag, ACBrTEFTPagAPI --
+[*] Compatibilização com versão 0.0.3 do SDK
+    (por: DSA)
+
+22/07/2026
+-- ACBrTEFAPICliSiTef --
+[-] Correção para confirmação de Cancelamento PIX
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=93651
+    (por: William F.L.)
+
+21/07/2026
+-- ACBrTEFAPIAuttar --
+[-] Correção em Administrativo Consultar e Devoluçao PIX
+[*] Melhorias nos Logs
+[*] Melhorias de mascaras em 'QuandoPerguntarCampoAPI'
+(por: DSA)
+
+16/07/2026
+-- ACBrTEFAPIAuttar, ACBrTEFAuttarAPI --
+[+] Adicionado suporte a novo TEF Auttar
+    (por: Antonio e DSA)
+
+-- ACBrTEFAPICliSiTef --
+[-] Correção para confirmação Pendente de Transação com Backup Temporário (999)
+    (por: DSA)
+[-] Correção na exibição do Num.Cupom, na Msg de Resolução de Pendencia
+    (por: Antonio)
+
+-- ACBrTEFCliSiTefComum --
+[-] Correção para não tentar confirmar Transação administrativa de Reimpressão
+    https://www.projetoacbr.com.br/forum/index.php?showtopic=93526
+    (por: DSA)
+
 26/06/2026
 -- ACBrTEFAPIPayKit --
 [-] Ajuste em 'TACBrTEFRespPayKit.ConteudoToProperty', para considerar que imagem

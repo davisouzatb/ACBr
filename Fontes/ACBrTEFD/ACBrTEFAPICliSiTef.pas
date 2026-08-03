@@ -366,7 +366,7 @@ begin
         TEFParam.Text := StringReplace(ParamComunicacao, ';', sLineBreak, [rfReplaceAll]);
 
       if not ParamTemChave(TEFParam, CPARAM_TipoComunicacaoExterna) then
-        TEFParam.Values[CPARAM_TipoComunicacaoExterna] := 'TLSGWP';
+        TEFParam.Insert(0, CPARAM_TipoComunicacaoExterna + '=TLSGWP');
 
       // acertar quebras de linhas e abertura e fechamento da lista de parametros
       ParamComunicacao := StringReplace(Trim(TEFParam.Text), sLineBreak, ';', [rfReplaceAll]);
@@ -378,9 +378,6 @@ begin
   // acertar quebras de linhas e abertura e fechamento da lista de parametros
   ParamAdic := StringReplace(Trim(ParamAdicConfig.Text), sLineBreak, ';', [rfReplaceAll]);
 
-  if NaoEstaVazio(ParamComunicacao) then
-    ParamAdic := ParamAdic + ';' + ParamComunicacao;
-
   if NaoEstaVazio(ParamAdic) then
   begin
     if (ParamAdic[1] = ';') then
@@ -389,11 +386,20 @@ begin
     ParamAdic := '['+ ParamAdic + ']';
   end;
 
+  if NaoEstaVazio(ParamComunicacao) then
+  begin
+    if NaoEstaVazio(ParamAdic) then
+      ParamAdic := ParamAdic + ';';
+      
+    ParamAdic := ParamAdic + '[' + ParamComunicacao + ']';
+  end;
+
   if NaoEstaVazio(ParmsClient) then
   begin
-    ParamAdic := ParamAdic + ';[' +CPARAM_ParmsClient + '=' + ParmsClient + ']';
-    if (ParamAdic[1] = ';') then
-      System.Delete(ParamAdic, 1, 1);   // remove ; inicial
+    if NaoEstaVazio(ParamAdic) then
+      ParamAdic := ParamAdic + ';';
+      
+    ParamAdic := ParamAdic + '[' + CPARAM_ParmsClient + '=' + ParmsClient + ']';
   end;
 
   Sts := fTEFCliSiTefAPI.ConfiguraIntSiTefInterativo(
@@ -1036,6 +1042,7 @@ end;
 procedure TACBrTEFAPIClassCliSiTef.GravarArquivoBackupTemporario;
 var
   Salvar: Boolean;
+  s: string;
 begin
   InterpretarRespostaAPI;  // Mapeia valores da resposta
   Salvar := (fpMetodoOperacao in [tefmtdPagamento, tefmtdCancelamento]) or
@@ -1047,6 +1054,12 @@ begin
     fpACBrTEFAPI.UltimaRespostaTEF.ArqBackup := NomeArquivoBackupTemporario;
     fpACBrTEFAPI.UltimaRespostaTEF.CNFEnviado := False;
     fpACBrTEFAPI.UltimaRespostaTEF.Conteudo.GravaInformacao(899, CTEF_RESP_FUNCAO, '999');
+
+    s := Trim(fpACBrTEFAPI.UltimaRespostaTEF.Conteudo.LeInformacao(899, CTEF_RESP_CONFIRMAR).AsString);
+    if (s = '') then
+      fpACBrTEFAPI.UltimaRespostaTEF.Conteudo.GravaInformacao(899, CTEF_RESP_CONFIRMAR,
+        IfThen(OperacaoEmAndamento in [tefmtdPagamento, tefmtdCancelamento], 'True', 'False') );
+
     AtualizarHeader;  // Atualiza Header e Grava o Backup temporário
   end;
 end;
@@ -1429,6 +1442,7 @@ procedure TACBrTEFAPIClassCliSiTef.ResolverTransacaoPendente(
   AStatus: TACBrTEFStatusTransacao);
 var
   AMsg: String;
+  NumCupomExibir: String;
 begin
   FinalizarTransacao( fpACBrTEFAPI.UltimaRespostaTEF.Rede,
                       fpACBrTEFAPI.UltimaRespostaTEF.NSU,
@@ -1436,8 +1450,13 @@ begin
                       AStatus );
 
   if (AStatus in [tefstsSucessoAutomatico, tefstsSucessoManual]) then
-    AMsg := Format( CACBrTEFCliSiTef_TransacaoEfetuadaReImprimir,
-                    [fpACBrTEFAPI.UltimaRespostaTEF.Finalizacao] )
+  begin
+    NumCupomExibir := Trim(fpACBrTEFAPI.UltimaRespostaTEF.DocumentoVinculado);
+    if (NumCupomExibir = '') then
+      NumCupomExibir := fpACBrTEFAPI.UltimaRespostaTEF.Finalizacao;
+
+    AMsg := Format( CACBrTEFCliSiTef_TransacaoEfetuadaReImprimir, [NumCupomExibir] )
+  end
   else
     AMsg := CACBrTEFCliSiTef_TransacaoNaoEfetuada;
 

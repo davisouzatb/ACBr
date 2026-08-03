@@ -286,7 +286,6 @@ type
     RLLabel107: TRLLabel;
     rllRegimeEspecial: TRLLabel;
     rlbCanhoto: TRLBand;
-    RLDraw7: TRLDraw;
     rllNumChave: TRLLabel;
     RLLabel50: TRLLabel;
     RLLabel54: TRLLabel;
@@ -298,6 +297,7 @@ type
     RLSystemInfo1: TRLSystemInfo;
     RLLabel62: TRLLabel;
     RLSystemInfo2: TRLSystemInfo;
+    imgQRCode: TRLImage;
 
     procedure RLNFSeBeforePrint(Sender: TObject; var PrintIt: Boolean);
 
@@ -349,7 +349,7 @@ var
 implementation
 
 uses
-  StrUtils, DateUtils,
+  StrUtils, DateUtils, Types,
   ACBrUtil.Base,
   ACBrUtil.Strings,
   ACBrUtil.DateTime,
@@ -359,6 +359,7 @@ uses
   ACBrNFSeXInterface,
   ACBrNFSeXLerXml,
   ACBrValidador,
+  ACBrImage,
   ACBrDFeReportFortes;
 
 {$IFNDEF FPC}
@@ -380,7 +381,9 @@ end;
 procedure TfrlXDANFSeRLPadraoNacional.rlbBanda01_LogosBeforePrint(
   Sender: TObject; var PrintIt: Boolean);
 var
-  Ambiente: string;
+  Ambiente, Logo, TipoLogo: string;
+  Res: TResourceStream;
+  LogoStream: TStringStream;
 begin
   inherited;
 
@@ -394,10 +397,10 @@ begin
     Ambiente := 'Produção';
 
   rlmPrefeitura.Lines.Clear;
-  rlmPrefeitura.Lines.Add('Município: ' + fpNFSe.infNFSe.xLocEmi + '/' +
-                                          fpNFSe.infNFSe.UFLocEmi);
-  rlmPrefeitura.Lines.Add('Ambiente Gerador: ' + ambGerToStrText(fpNFSe.infNFSe.ambGer));
-  rlmPrefeitura.Lines.Add('Tipo Ambiente: ' + Ambiente);
+  rlmPrefeitura.Lines.Add(ACBrStr('Município: ' + fpNFSe.infNFSe.xLocEmi + '/' +
+                                          fpNFSe.infNFSe.UFLocEmi));
+  rlmPrefeitura.Lines.Add(ACBrStr('Ambiente Gerador: ' + ambGerToStrText(fpNFSe.infNFSe.ambGer)));
+  rlmPrefeitura.Lines.Add(ACBrStr('Tipo Ambiente: ' + Ambiente));
 end;
 
 procedure TfrlXDANFSeRLPadraoNacional.rlbBanda02_Ide_NFSeBeforePrint(
@@ -414,9 +417,6 @@ begin
   rllChaveAcesso.Caption := ACBrStr(fpNFSe.CodigoVerificacao);
   rllNumNF0.Caption := fpNFSe.Numero;
   rllNumeroDPS.Caption := fpNFSe.IdentificacaoRps.Numero;
-
-  // Exibe canhoto
-  rlbCanhoto.Visible := fpDANFSe.ImprimeCanhoto;
 
   case fpNFSe.tpEmit of
     tePrestador: rllEmitente.Caption := ACBrStr('Prestador do Serviço');
@@ -435,43 +435,7 @@ begin
   rllFinalidade.Caption := finNFSeToStrText(fpNFSe.IBSCBS.finNFSe);
 
   if fpNFSe.Link <> '' then
-  begin
-    rlImgQrCode := TRLImage.Create(rlbBanda02_Ide_NFSe);
-    rlImgQrCode.Parent := rlbBanda02_Ide_NFSe;
-    rlImgQrCode.Stretch := True;
-    rlImgQrCode.AutoSize := False;
-    rlImgQrCode.Center := True;
-    rlImgQrCode.SetBounds(720, 3, 77, 77);
-    rlImgQrCode.BringToFront;
-
-    QRCodeData := fpNFSe.Link;
-    QrCode := TDelphiZXingQRCode.Create;
-    QrCodeBitmap := TBitmap.Create;
-    try
-      QrCode.Encoding := qrUTF8NoBOM;
-      QrCode.QuietZone := 1;
-      QrCode.Data := WideString(QRCodeData);
-
-      QrCodeBitmap.Width := QrCode.Columns;
-      QrCodeBitmap.Height := QrCode.Rows;
-
-      for Row := 0 to QrCode.Rows - 1 do
-      begin
-        for Column := 0 to QrCode.Columns - 1 do
-        begin
-          if (QrCode.IsBlack[Row, Column]) then
-            QrCodeBitmap.Canvas.Pixels[Column, Row] := clBlack
-          else
-            QrCodeBitmap.Canvas.Pixels[Column, Row] := clWhite;
-        end;
-      end;
-
-      rlImgQrCode.Picture.Bitmap.Assign(QrCodeBitmap);
-    finally
-      QrCode.Free;
-      QrCodeBitmap.Free;
-    end;
-  end;
+    PintarQRCode(fpNFSe.Link, imgQRCode.Picture.Bitmap, qrUTF8NoBOM);
 end;
 
 procedure TfrlXDANFSeRLPadraoNacional.rlbBanda03_EmitenteBeforePrint(
@@ -849,6 +813,8 @@ end;
 
 procedure TfrlXDANFSeRLPadraoNacional.rlbBanda11_TributacaoFederalBeforePrint(
   Sender: TObject; var PrintIt: Boolean);
+var
+  lValor: Double;
 begin
   inherited;
 
@@ -857,23 +823,47 @@ begin
   else
     rllValorIRRF.Caption := '-';
 
-  if fpNFSe.Servico.Valores.tribFed.vPis > 0 then
-    rllValorPIS.Caption := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.tribFed.vPis)
-  else
-    rllValorPIS.Caption := '-';
-
   if fpNFSe.Servico.Valores.tribFed.vRetCP > 0 then
     rllValorCP.Caption := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.tribFed.vRetCP)
   else
     rllValorCP.Caption := '-';
 
-  if fpNFSe.Servico.Valores.tribFed.vCofins > 0 then
-    rllValorCOFINS.Caption := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.tribFed.vCofins)
+  { Quando tpRetPisCofins = 1 (PIS/COFINS Retido), este campo retornará 0,00 (zero).
+    Nos demais casos, o campo retornará o valor informado em vPis. }
+  if fpNFSe.Servico.Valores.tribFed.tpRetPisCofins = trpcRetido then
+    lValor := 0
+  else
+    lValor := fpNFSe.Servico.Valores.tribFed.vPis;
+
+  if lValor > 0 then
+    rllValorPIS.Caption := 'R$ ' + FormatFloatBr(lValor)
+  else
+    rllValorPIS.Caption := '-';
+
+  { Quando tpRetPisCofins = 1 (PIS/COFINS Retido), este campo retornará 0,00 (zero).
+    Nos demais casos, o campo retornará o valor informado em vCofins. }
+  if fpNFSe.Servico.Valores.tribFed.tpRetPisCofins = trpcRetido then
+    lValor := 0
+  else
+    lValor := fpNFSe.Servico.Valores.tribFed.vCofins;
+
+  if lValor > 0 then
+    rllValorCOFINS.Caption := 'R$ ' + FormatFloatBr(lValor)
   else
     rllValorCOFINS.Caption := '-';
 
-  if fpNFSe.Servico.Valores.tribFed.vRetCSLL > 0 then
-    rllValorCSLL.Caption := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.tribFed.vRetCSLL)
+  { Quando tpRetPisCofins = 1 (PIS/COFINS Retido), este campo retornará o somatório dos valores
+    informados nos campos vRetCSLL, vPis e vCofins. Nos demais casos, o campo retornará o
+    valor informado em vRetCSLL. }
+  if fpNFSe.Servico.Valores.tribFed.tpRetPisCofins = trpcRetido then
+    lValor := fpNFSe.Servico.Valores.tribFed.vRetCSLL +
+              fpNFSe.Servico.Valores.tribFed.vPis +
+              fpNFSe.Servico.Valores.tribFed.vCofins
+  else
+    lValor := fpNFSe.Servico.Valores.tribFed.vRetCSLL;
+
+  if lValor > 0 then
+    rllValorCSLL.Caption := 'R$ ' + FormatFloatBr(lValor)
   else
     rllValorCSLL.Caption := '-';
 
@@ -979,7 +969,7 @@ begin
   aValor := fpNFSe.infNFSe.IBSCBS.valores.fed.pCBS;
 
   if aValor > 0 then
-    rllAliquotaCBS.Caption := FormatFloatBr(fpNFSe.infNFSe.IBSCBS.valores.uf.pIBSUF) + '%'
+    rllAliquotaCBS.Caption := FormatFloatBr(aValor) + '%'
   else
     rllAliquotaCBS.Caption := '-';
 
@@ -1042,9 +1032,10 @@ begin
   else
     rllValorTotalIBSCBS.Caption := '-';
 
-  LValor := fpNFSe.Servico.Valores.ValorServicos +
-            fpNFSe.infNFSe.IBSCBS.totCIBS.gIBS.vIBSTot +
-            fpNFSe.infNFSe.IBSCBS.totCIBS.gCBS.vCBS;
+  LValor := fpNFSe.infNFSe.IBSCBS.totCIBS.vTotNF;
+
+  if LValor = 0 then
+    LValor := fpNFSe.Servico.Valores.ValorLiquidoNfse;
 
   rllValorLiqIBSCBS.Caption := 'R$ ' + FormatFloatBr(LValor);
 end;
@@ -1052,66 +1043,98 @@ end;
 procedure TfrlXDANFSeRLPadraoNacional.rlbBanda14_InformacoesComplementaresBeforePrint(
   Sender: TObject; var PrintIt: Boolean);
 var
-  LTributosFederais, LTributosEstaduais, LTributosMunicipais: string;
+  LInform, LTributosFederais, LTributosEstaduais, LTributosMunicipais: string;
 begin
   inherited;
 
   rlmDadosAdicionais.Lines.BeginUpdate;
   rlmDadosAdicionais.Lines.Clear;
 
+  // ********** NBS
   if fpNFSe.Servico.CodigoNBS <> '' then
     rlmDadosAdicionais.Lines.Add(ACBrStr('NBS: ') + fpNFSe.Servico.CodigoNBS);
 
-  if fpDANFSe.OutrasInformacaoesImp <> '' then
-    rlmDadosAdicionais.Lines.Add(StringReplace(fpDANFSe.OutrasInformacaoesImp,
-                                       FQuebradeLinha, #13#10, [rfReplaceAll]));
-
-  if fpNFSe.OutrasInformacoes <> '' then
-    rlmDadosAdicionais.Lines.Add(StringReplace(fpNFSe.OutrasInformacoes,
-                                       FQuebradeLinha, #13#10, [rfReplaceAll]));
-
-  if fpNFSe.InformacoesComplementares <> '' then
-    rlmDadosAdicionais.Lines.Add(StringReplace(fpNFSe.InformacoesComplementares,
-                                       FQuebradeLinha, #13#10, [rfReplaceAll]));
-
-  if (fpNFSe.Servico.Valores.totTrib.vTotTribFed > 0) or
-     (fpNFSe.Servico.Valores.totTrib.vTotTribEst > 0) or
-     (fpNFSe.Servico.Valores.totTrib.vTotTribMun > 0) or
-     (fpNFSe.Servico.Valores.totTrib.pTotTribFed > 0) or
-     (fpNFSe.Servico.Valores.totTrib.pTotTribEst > 0) or
-     (fpNFSe.Servico.Valores.totTrib.pTotTribMun > 0) then
+  // ********** Imovel
+  if (fpNFSe.IBSCBS.imovel.cCIB <> '') or (fpNFSe.IBSCBS.imovel.inscImobFisc <> '') then
   begin
-    if fpNFSe.Servico.Valores.totTrib.vTotTribFed > 0 then
-      LTributosFederais := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.totTrib.vTotTribFed)
-    else if fpNFSe.Servico.Valores.totTrib.pTotTribFed > 0 then
-      LTributosFederais := FormatFloatBr(fpNFSe.Servico.Valores.totTrib.pTotTribFed) + ' %'
-    else
-      LTributosFederais := 'R$ ' + FormatFloatBr(0);
-
-    if fpNFSe.Servico.Valores.totTrib.vTotTribEst > 0 then
-      LTributosEstaduais := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.totTrib.vTotTribEst)
-    else if fpNFSe.Servico.Valores.totTrib.pTotTribEst > 0 then
-      LTributosEstaduais := FormatFloatBr(fpNFSe.Servico.Valores.totTrib.pTotTribEst) + ' %'
-    else
-      LTributosEstaduais := 'R$ ' + FormatFloatBr(0);
-
-    if fpNFSe.Servico.Valores.totTrib.vTotTribMun > 0 then
-      LTributosMunicipais := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.totTrib.vTotTribMun)
-    else if fpNFSe.Servico.Valores.totTrib.pTotTribMun > 0 then
-      LTributosMunicipais := FormatFloatBr(fpNFSe.Servico.Valores.totTrib.pTotTribMun) + ' %'
-    else
-      LTributosMunicipais := 'R$ ' + FormatFloatBr(0);
-
-    rlmDadosAdicionais.Lines.Add(ACBrStr('Totais Aproximados dos Tributos cfe. Lei n. 12.741/2012:') +
-      ' Federais: ' + LTributosFederais +
-      ' Estaduais: ' + LTributosEstaduais +
-      ' Municipais: ' + LTributosMunicipais);
+    LInform := 'Cod. CIB: ' + fpNFSe.IBSCBS.imovel.cCIB + FQuebradeLinha +
+               'Insc. Imob.: ' + fpNFSe.IBSCBS.imovel.inscImobFisc;
+    rlmDadosAdicionais.Lines.Add(StringReplace(LInform,
+                                       FQuebradeLinha, #13#10, [rfReplaceAll]));
   end;
 
-//  if fpNFSe.Servico.Valores.RetencoesFederais > 0 then
-//    rllValorTotalTribFed.Caption := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.RetencoesFederais)
-//  else
-//    rllValorTotalTribFed.Caption := '-';
+  // ********** Obra
+  if (fpNFSe.ConstrucaoCivil.CodigoObra <> '') or (fpNFSe.ConstrucaoCivil.inscImobFisc <> '') then
+  begin
+    LInform := 'Cod. Obra: ' + fpNFSe.ConstrucaoCivil.CodigoObra + FQuebradeLinha +
+               'Insc. Imob.: ' + fpNFSe.ConstrucaoCivil.inscImobFisc;
+    rlmDadosAdicionais.Lines.Add(StringReplace(LInform,
+                                       FQuebradeLinha, #13#10, [rfReplaceAll]));
+  end;
+
+  // ********** Atividade de Evento
+  if fpNFSe.Servico.Evento.idAtvEvt <> '' then
+  begin
+    LInform := 'Cod. Evt.: ' + fpNFSe.Servico.Evento.idAtvEvt;
+    rlmDadosAdicionais.Lines.Add(LInform);
+  end;
+
+  // ********** Informações Complementares
+
+  if (fpDANFSe.OutrasInformacaoesImp <> '') or (fpNFSe.OutrasInformacoes <> '') or
+     (fpNFSe.InformacoesComplementares <> '') then
+  begin
+    LInform := '';
+
+    if fpDANFSe.OutrasInformacaoesImp <> '' then
+      LInform := fpDANFSe.OutrasInformacaoesImp;
+
+    if fpNFSe.OutrasInformacoes <> '' then
+    begin
+      if LInform <> '' then
+        LInform := LInform + FQuebradeLinha;
+      LInform := LInform + fpNFSe.OutrasInformacoes;
+    end;
+
+    if fpNFSe.InformacoesComplementares <> '' then
+    begin
+      if LInform <> '' then
+        LInform := LInform + FQuebradeLinha;
+      LInform := LInform + fpNFSe.InformacoesComplementares;
+    end;
+
+    LInform := 'Inf. Compl.: ' + ACBrStr(LInform);
+    rlmDadosAdicionais.Lines.Add(StringReplace(LInform,
+                                       FQuebradeLinha, #13#10, [rfReplaceAll]));
+  end;
+
+
+  // ********** Totais Aproximados dos Tributos (Obrigatório)
+  if fpNFSe.Servico.Valores.totTrib.vTotTribFed > 0 then
+    LTributosFederais := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.totTrib.vTotTribFed)
+  else if fpNFSe.Servico.Valores.totTrib.pTotTribFed > 0 then
+    LTributosFederais := FormatFloatBr(fpNFSe.Servico.Valores.totTrib.pTotTribFed) + ' %'
+  else
+    LTributosFederais := 'R$ ' + FormatFloatBr(0);
+
+  if fpNFSe.Servico.Valores.totTrib.vTotTribEst > 0 then
+    LTributosEstaduais := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.totTrib.vTotTribEst)
+  else if fpNFSe.Servico.Valores.totTrib.pTotTribEst > 0 then
+    LTributosEstaduais := FormatFloatBr(fpNFSe.Servico.Valores.totTrib.pTotTribEst) + ' %'
+  else
+    LTributosEstaduais := 'R$ ' + FormatFloatBr(0);
+
+  if fpNFSe.Servico.Valores.totTrib.vTotTribMun > 0 then
+    LTributosMunicipais := 'R$ ' + FormatFloatBr(fpNFSe.Servico.Valores.totTrib.vTotTribMun)
+  else if fpNFSe.Servico.Valores.totTrib.pTotTribMun > 0 then
+    LTributosMunicipais := FormatFloatBr(fpNFSe.Servico.Valores.totTrib.pTotTribMun) + ' %'
+  else
+    LTributosMunicipais := 'R$ ' + FormatFloatBr(0);
+
+  rlmDadosAdicionais.Lines.Add(ACBrStr('Totais Aproximados dos Tributos cfe. Lei n. 12.741/2012:') +
+    ' Federais: ' + LTributosFederais +
+    ' Estaduais: ' + LTributosEstaduais +
+    ' Municipais: ' + LTributosMunicipais);
 
   rlmDadosAdicionais.Lines.EndUpdate;
 
@@ -1126,10 +1149,14 @@ begin
     rllMsgTeste.Enabled := True;
   end;
 
-  rllMsgTeste.Repaint;
+  if fpNFSe.subst.chSubstda <> '' then
+  begin
+    rllMsgTeste.Caption := ACBrStr('NFS-e SUBSTITUÍDA');
+    rllMsgTeste.Visible := True;
+    rllMsgTeste.Enabled := True;
+  end;
 
-  // Exibe canhoto
-//  rlbCanhoto.Visible := fpDANFSe.ImprimeCanhoto;
+  rllMsgTeste.Repaint;
 end;
 
 procedure TfrlXDANFSeRLPadraoNacional.rlbBanda16_SistemaBeforePrint(
@@ -1150,6 +1177,7 @@ procedure TfrlXDANFSeRLPadraoNacional.rlbCanhotoBeforePrint(Sender: TObject;
 begin
   inherited;
 
+  PrintIt := fpDANFSe.ImprimeCanhoto;
   rllNumNFSe.Caption := fpNFSe.Numero;
   rllNumChave.Caption := fpNFSe.CodigoVerificacao;
 end;

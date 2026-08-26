@@ -392,7 +392,7 @@ begin
                                                  qrCode, DSC_INFQRCODE, False));
 
     if NFe.infNFe.Versao >= 4 then
-      xmlNode.AppendChild(AddNode(tcStr, 'ZX03', 'urlChave', 21, 85, 1,
+      xmlNode.AppendChild(AddNode(tcStr, 'ZX03', 'urlChave', 21, 100, 1,
                                  NFe.infNFeSupl.urlChave, DSC_URLCHAVE, False));
   end;
 
@@ -1901,6 +1901,7 @@ begin
       tpNFCredito = 03-Retorno por Recusa Total/Não Localização do Destinatário
       tpNFCredito = 04-Redução de valores
       tpNFCredito = 06-Retorno por recusa parcial na entrega
+      tpNFDebito  = 06-Pagamento Antecipado - Incluido pela versão 1.51 da NT.
       tpNFDebito  = 07-Perda em estoque
     A versão anterior desta condição só tratava tpNFCredito=03 (tcRetorno)
     e não considerava tpNFDebito nenhuma exceção, causando XML inconsistente
@@ -1909,7 +1910,7 @@ begin
   if ((not (nfe.Ide.finNFe in [fnCredito, fnDebito]) and
        (nfe.Ide.gCompraGov.tpOperGov <> togRecebimentoPag))
       or (nfe.Ide.tpNFCredito in [tcRetorno, tcReducaoValores, tcRetornoRecusaParcial])
-      or (nfe.Ide.tpNFDebito = tdPerdaEmEstoque)) then
+      or (nfe.Ide.tpNFDebito in [tdPagamentoAntecipado, tdPerdaEmEstoque])) then
   begin
     if ((NFe.Det[i].Imposto.ISSQN.cSitTrib <> ISSQNcSitTribVazio) or
       ((NFe.infNFe.Versao > 3) and (NFe.Det[i].Imposto.ISSQN.cListServ <> ''))) then
@@ -1920,14 +1921,28 @@ begin
     end
     else
     begin
-      Result.AppendChild(GerarDetImpostoICMS(i));
+      if nfe.Ide.tpNFDebito <> tdPagamentoAntecipado then
+        Result.AppendChild(GerarDetImpostoICMS(i));
+
       Result.AppendChild(GerarDetImpostoIPI(i));
-      Result.AppendChild(GerarDetImpostoII(i));
+
+      if nfe.Ide.tpNFDebito <> tdPagamentoAntecipado then
+        Result.AppendChild(GerarDetImpostoII(i));
     end;
-    Result.AppendChild(GerarDetImpostoPIS(i));
-    Result.AppendChild(GerarDetImpostoPISST(i));
-    Result.AppendChild(GerarDetImpostoCOFINS(i));
-    Result.AppendChild(GerarDetImpostoCOFINSST(i));
+
+    {
+     Regra B25-80 NT 2025/002 versão 1.51 - A exceção abaixo ativada em
+              homologação: 01/09/2026 - produção: 05/10/2026
+     Exceção 2: tpNFDebito=”06-Pagamento Antecipado” permite a informação do PIS,
+                PISST, COFINS e COFINSST em NF-e com data de emissão em 2026.
+    }
+    if (nfe.Ide.tpNFDebito = tdPagamentoAntecipado) and (YearOf(NFe.Ide.dEmi) = 2026) then
+    begin
+      Result.AppendChild(GerarDetImpostoPIS(i));
+      Result.AppendChild(GerarDetImpostoPISST(i));
+      Result.AppendChild(GerarDetImpostoCOFINS(i));
+      Result.AppendChild(GerarDetImpostoCOFINSST(i));
+    end;
 
     if NFe.Det[i].Imposto.ICMSUFDest.pICMSInterPart > 0 then
       Result.AppendChild(GerarDetImpostoICMSUFDest(i));
@@ -2059,6 +2074,11 @@ begin
             01, 07, 0, NFe.Det[i].Imposto.ICMS.adRemICMS, DSC_ADREMICMS));
           xmlNode.AppendChild(AddNode(tcDe2, 'N15', 'vICMSMonoOp',
             01, 15, 0, NFe.Det[i].Imposto.ICMS.vICMSMonoOp, DSC_VICMSMONOOP));
+
+          xmlNode.AppendChild(AddNode(tcDe4, 'N15', 'qBCMonoDif',
+            01, 15, 0, NFe.Det[i].Imposto.ICMS.qBCMonoDif, DSC_QBCMONODIF));
+          xmlNode.AppendChild(AddNode(tcDe4, 'N15', 'adRemICMSDif',
+            01, 07, 0, NFe.Det[i].Imposto.ICMS.adRemICMSDif, DSC_ADREMICMSDIF));
 
           if NFe.Det[i].Imposto.ICMS.pDif = 100 then
             FormatoAliq4ou2 := tcDe2
@@ -4464,7 +4484,7 @@ function TNFeXmlWriter.Gerar_IBSCBS_gIBSCBS_gDevTrib(
 begin
   Result := FDocument.CreateElement('gDevTrib'); 
 
-  Result.AppendChild(AddNode(tcDe4, '#1', 'pDevTrib', 1, 7, 1,
+  Result.AppendChild(AddNode(tcDe4, '#1', 'pDevTrib', 1, 7, 0,
                                              DevTrib.pDevTrib, DSC_PDEVTRIB));
 
   Result.AppendChild(AddNode(tcDe2, '#2', 'vDevTrib', 1, 15, 1,

@@ -936,13 +936,13 @@ begin
   if EstaVazio(Response.NumeroLote) then
   begin
     AErro := Response.Erros.New;
-    AErro.Codigo := Cod126;
-    AErro.Descricao := ACBrStr(Desc126);
+    AErro.Codigo := Cod111;
+    AErro.Descricao := ACBrStr(Desc111);
     Exit;
   end;
 
 
-  CNPJ := OnlyAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
+  CNPJ := OnlyCPFCNPJAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
   IM := OnlyAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.InscMun);
   IdAttrib := Response.NumeroLote;
 
@@ -1022,12 +1022,12 @@ begin
   if EstaVazio(Response.NumeroLote) then
   begin
     AErro := Response.Erros.New;
-    AErro.Codigo := Cod126;
-    AErro.Descricao := ACBrStr(Desc126);
+    AErro.Codigo := Cod111;
+    AErro.Descricao := ACBrStr(Desc111);
     Exit;
   end;
 
-  CNPJ := OnlyAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
+  CNPJ := OnlyCPFCNPJAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
   IM := OnlyAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.InscMun);
   IdAttrib := Response.NumeroLote;
 

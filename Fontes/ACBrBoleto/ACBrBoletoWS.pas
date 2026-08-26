@@ -254,7 +254,12 @@ uses
   ACBrBoletoW_BTGPactual,
   ACBrBoletoRet_BTGPactual,
   ACBrBoletoW_Asaas,
-  ACBrBoletoRet_Asaas;
+  ACBrBoletoRet_Asaas,
+  ACBrBoletoRet_Sisprime_API,
+  ACBrBoletoW_Sisprime_API,
+  ACBrBoletoW_C6_V2,
+  ACBrBoletoRet_C6_V2;
+
 
   { TRetornoEnvioClass }
 
@@ -475,8 +480,16 @@ begin
       end;
      cobBancoC6:
       begin
-        FBoletoWSClass := TBoletoW_C6.Create(Self);
-        FRetornoBanco  := TRetornoEnvio_C6.Create(FBoleto);
+        if (LVersaoDF = 'V2') or (LVersaoDFInt = 2) then
+        begin
+          FBoletoWSClass := TBoletoW_C6_V2.Create(Self);
+          FRetornoBanco  := TRetornoEnvio_C6_V2.Create(FBoleto);
+        end
+        else
+        begin
+          FBoletoWSClass := TBoletoW_C6.Create(Self);
+          FRetornoBanco  := TRetornoEnvio_C6.Create(FBoleto);
+        end
       end;
     cobBancoCresol :
       begin
@@ -507,6 +520,11 @@ begin
       begin
         FBoletoWSClass := TBoletoW_Asaas.Create(Self);
         FRetornoBanco  := TRetornoEnvio_Asaas.Create(FBoleto);
+      end;
+    cobBancoSisprimeAPI:
+      begin
+        FBoletoWSClass := TBoletoW_Sisprime_API.Create(Self);
+        FRetornoBanco  := TRetornoEnvio_Sisprime_API.Create(FBoleto);
       end;
     else
       FBoletoWSClass := TBoletoWSClass.Create(Self);

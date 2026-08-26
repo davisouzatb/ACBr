@@ -380,7 +380,7 @@ begin
                                                                       '0', ''));
 
     LNFSeNode.AppendChild(AddNode(tcStr, '#1', 'PagamentoParceladoAntecipado', 1, 1, 0,
-                                                                      '0', ''));
+                                                                      '', ''));
   end;
 
   LNFSeNode.AppendChild(AddNode(tcStr, '#1', 'NCM', 1, 15, 0,
@@ -489,8 +489,7 @@ function TNFSeW_ISSSaoPaulo.GerarXMLIBSCBS(IBSCBS: TIBSCBSDPS): TACBrXmlNode;
 begin
   Result := inherited GerarXMLIBSCBS(IBSCBS);
 
-  if ((IBSCBS.imovel.cCIB <> '') or (IBSCBS.imovel.ender.xLgr <> '')) then
-    Result.AppendChild(GerarXMLImovel(IBSCBS.imovel));
+  Result.AppendChild(GerarXMLImovel(IBSCBS.imovel));
 end;
 
 function TNFSeW_ISSSaoPaulo.GerarXMLImovel(Imovel: TDadosimovel): TACBrXmlNode;

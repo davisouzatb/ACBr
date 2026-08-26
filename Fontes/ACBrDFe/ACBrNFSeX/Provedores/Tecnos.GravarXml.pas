@@ -54,6 +54,9 @@ type
 
     function GerarInfDeclaracaoPrestacaoServico: TACBrXmlNode; override;
     function GerarInfDeclaracaoPrestacaoServ: TACBrXmlNode;
+    function GerarRPSSubstituido: TACBrXmlNode; override;
+    function GerarIdentificacaoIntermediarioServico: TACBrXmlNode; override;
+    function GerarIntermediarioServico: TACBrXmlNode; override;
     function GerarValores: TACBrXmlNode; override;
     function GerarConstrucaoCivil: TACBrXmlNode; override;
     function GerarXMLComercioExterior: TACBrXmlNode;
@@ -98,7 +101,7 @@ begin
 
   FormatoEmissao := tcDatHor;
   FormatoCompetencia := tcDatHor;
-  FormatoItemListaServico := filsComFormatacaoSemZeroEsquerda;
+  FormatoItemListaServico := filsSemFormatacaoSemZeroEsquerda;
 
   FormatoAliq := tcDe2;
 
@@ -146,7 +149,7 @@ begin
   NrOcorrInscEstTomador_1 := 0;
 
   NrOcorrRespRetencao := 1;
-  
+
   GerarTagServicos := False;
 end;
 
@@ -381,6 +384,16 @@ begin
 
 end;
 
+function TNFSeW_Tecnos201.GerarIdentificacaoIntermediarioServico: TACBrXmlNode;
+begin
+  Result := CreateElement('IdentificacaoIntermediario');
+
+  Result.AppendChild(GerarCPFCNPJ(NFSe.Intermediario.Identificacao.CpfCnpj));
+
+  Result.AppendChild(AddNode(tcStr, '#50', 'InscricaoMunicipal', 1, 15, NrOcorrInscEstInter,
+                NFSe.Intermediario.Identificacao.InscricaoMunicipal, DSC_IM));
+end;
+
 function TNFSeW_Tecnos201.GerarImovel(Imovel: TDadosimovel): TACBrXmlNode;
 begin
   Result := nil;
@@ -448,7 +461,7 @@ begin
     Result.AppendChild(GerarEnderNacDest(dest));
     Result.AppendChild(GerarCPFCNPJ(dest.CNPJCPF));
 
-    Result.AppendChild(AddNode(tcInt, '#1', 'exterior', 5, 5, 1, 'false', ''));
+    Result.AppendChild(AddNode(tcBoolStr, '#1', 'exterior', 5, 5, 1, 'false', ''));
 
     Result.AppendChild(AddNode(tcStr, '#1', 'motivoNaoNif', 1, 1, 1,
                                                 NaoNIFToStr(Dest.cNaoNIF), ''));
@@ -508,7 +521,7 @@ var
 begin
   aDoc := OnlyAlphaNum(CPFCNPJ);
 
-  Result := CreateElement('cpf_cnpj');
+  Result := CreateElement('CpfCnpj');
 
   if length(aDoc) <= 11 then
     Result.AppendChild(AddNode(tcStr, '#34', 'Cpf ', 11, 11, 1, aDoc, DSC_CPF))
@@ -668,6 +681,33 @@ begin
   AINIRec.WriteString(lSecao, 'CodigoServicoNacional', NFSe.Servico.CodigoServicoNacional);
 end;
 
+function TNFSeW_Tecnos201.GerarIntermediarioServico: TACBrXmlNode;
+begin
+  Result := CreateElement(TagIntermediario);
+
+  Result.AppendChild(GerarIdentificacaoIntermediarioServico);
+
+  Result.AppendChild(AddNode(tcStr, '#48', 'RazaoSocial', 1, 115, NrOcorrRazaoSocialInterm,
+                                  NFSe.Intermediario.RazaoSocial, DSC_XNOME));
+
+  Result.AppendChild(AddNode(tcStr, '#49', 'CodigoMunicipio', 7, 7,
+     NrOcorrCodigoMunicInterm, NFSe.Intermediario.CodigoMunicipio, DSC_CMUN));
+end;
+
+function TNFSeW_Tecnos201.GerarRPSSubstituido: TACBrXmlNode;
+begin
+  Result := CreateElement('RpsSubstituido');
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'Numero', 1, 15, 1,
+                      OnlyNumber(NFSe.RpsSubstituido.Numero), DSC_NUMRPSSUB));
+
+  Result.AppendChild(AddNode(tcStr, '#2', 'Serie', 1, 5, 1,
+                                 NFSe.RpsSubstituido.Serie, DSC_SERIERPSSUB));
+
+  Result.AppendChild(AddNode(tcStr, '#3', 'Tipo', 1, 1, 1,
+            FpAOwner.TipoRPSToStr(NFSe.RpsSubstituido.Tipo), DSC_TIPORPSSUB));
+end;
+
 function TNFSeW_Tecnos201.GerarValores: TACBrXmlNode;
 var
   item: string;
@@ -677,22 +717,22 @@ begin
 
   Valores := inherited GerarValores;
 
-  Valores.AppendChild(AddNode(tcDe2, '#29', 'IbsMunicipal', 1, 5, 0,
+  Valores.AppendChild(AddNode(tcDe2, '#29', 'IbsMunicipal', 1, 5, 1,
                                          NFSe.IBSCBS.valores.IbsMunicipal, ''));
 
-  Valores.AppendChild(AddNode(tcDe2, '#29', 'ValorIbsMunicipal', 1, 15, 0,
+  Valores.AppendChild(AddNode(tcDe2, '#29', 'ValorIbsMunicipal', 1, 15, 1,
                                     NFSe.IBSCBS.valores.ValorIbsMunicipal, ''));
 
-  Valores.AppendChild(AddNode(tcDe2, '#29', 'IbsEstadual', 1, 5, 0,
+  Valores.AppendChild(AddNode(tcDe2, '#29', 'IbsEstadual', 1, 5, 1,
                                           NFSe.IBSCBS.valores.IbsEstadual, ''));
 
-  Valores.AppendChild(AddNode(tcDe2, '#29', 'ValorIbsEstadual', 1, 15, 0,
+  Valores.AppendChild(AddNode(tcDe2, '#29', 'ValorIbsEstadual', 1, 15, 1,
                                      NFSe.IBSCBS.valores.ValorIbsEstadual, ''));
 
-  Valores.AppendChild(AddNode(tcDe2, '#29', 'Cbs', 1, 5, 0,
+  Valores.AppendChild(AddNode(tcDe2, '#29', 'Cbs', 1, 5, 1,
                                                   NFSe.IBSCBS.valores.Cbs, ''));
 
-  Valores.AppendChild(AddNode(tcDe2, '#29', 'ValorCbs', 1, 15, 0,
+  Valores.AppendChild(AddNode(tcDe2, '#29', 'ValorCbs', 1, 15, 1,
                                              NFSe.IBSCBS.valores.ValorCbs, ''));
 
   Result.AppendChild(Valores);

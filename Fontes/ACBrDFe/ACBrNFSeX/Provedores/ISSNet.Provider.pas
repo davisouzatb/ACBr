@@ -184,7 +184,7 @@ type
 
     procedure ProcessarMensagemErros(RootNode: TACBrXmlNode;
                                      Response: TNFSeWebserviceResponse;
-                                     const AListTag: string = 'ListaMensagemRetorno';
+                                     const AListTag: string = 'ListaMensagemRetornoLote';
                                      const AMessageTag: string = 'MensagemRetorno'); override;
 
     function PrepararArquivoEnvio(const aXml: string; aMetodo: TMetodo): string; override;
@@ -363,7 +363,7 @@ begin
                                  InfoCanc.NumeroNFSe +
                                '</' + Prefixo2 + 'Numero>' +
                                '<' + Prefixo2 + 'Cnpj>' +
-                                 OnlyNumber(Emitente.CNPJ) +
+                                 OnlyCPFCNPJAlphaNum(Emitente.CNPJ) +
                                '</' + Prefixo2 + 'Cnpj>' +
                                GetInscMunic(Emitente.InscMun, Prefixo2) +
                                '<' + Prefixo2 + 'CodigoMunicipio>' +
@@ -1265,12 +1265,12 @@ begin
   begin
     Result := inherited TratarXmlRetornado(Result);
 
-    Result := RemoverCaracteresDesnecessarios(Result);
-    Result := ParseText(Result);
+//    Result := RemoverCaracteresDesnecessarios(Result);
+    Result := DecodeHTMLEntities(Result);
     Result := RemoverDeclaracaoXML(Result);
     Result := RemoverIdentacao(Result);
     Result := RemoverPrefixosDesnecessarios(Result);
-    Result := StringReplace(Result, '<br>', ' ', [rfReplaceAll, rfIgnoreCase]);
+//    Result := StringReplace(Result, '<br>', ' ', [rfReplaceAll, rfIgnoreCase]);
   end;
 end;
 
@@ -1516,6 +1516,7 @@ begin
 
     ServicosDisponibilizados.EnviarUnitario := True;
     ServicosDisponibilizados.EnviarLoteSincrono := True;
+    ServicosDisponibilizados.EnviarLoteAssincrono := True;
     {
     ServicosDisponibilizados.ConsultarNfseChave := True;
     ServicosDisponibilizados.ConsultarRps := True;
@@ -1545,7 +1546,10 @@ begin
     DadosCabecalho := GetCabecalho('');
 
     LoteRpsSincrono.DocElemento := 'EnviarLoteDpsSincronoEnvio';
+    LoteRpsSincrono.InfElemento := 'LoteDps';
+
     LoteRps.DocElemento := 'EnviarLoteDpsEnvio';
+    LoteRps.InfElemento := 'LoteDps';
 
     ConsultarLote.DocElemento := 'ConsultarLoteDpsEnvio';
     ConsultarNFSeRps.DocElemento := 'ConsultarNfseDpsEnvio';
@@ -1560,6 +1564,7 @@ begin
   with ConfigAssinar do
   begin
     Rps := True;
+    LoteRps := True;
     RpsGerarNFSe := True;
     EnviarEvento := True;
   end;
@@ -1573,7 +1578,7 @@ var
   xCpfCnpj: string;
 begin
   Result := '';
-  xCpfCnpj := OnlyNumber(CpfCnpj);
+  xCpfCnpj := OnlyCPFCNPJAlphaNum(CpfCnpj);
 
   if xCpfCnpj <> '' then
   begin
@@ -1683,11 +1688,13 @@ var
   DataAut: TDateTime;
   ANota: TNotaFiscal;
   AResumo: TNFSeResumoCollectionItem;
+  NFSeNode: TACBrXmlNode;
 begin
   Result := False;
 
   if Node <> nil then
   begin
+    NFSeNode := Node;
     Node := Node.Childrens.FindAnyNs('infNFSe');
 
     if not Assigned(Node) then Exit;
@@ -1733,7 +1740,7 @@ begin
     Response.NumeroRps := NumRps;
     Response.SerieRps := SerieRps;
 
-    ANota := CarregarXmlNfse(ANota, Node.OuterXml);
+    ANota := CarregarXmlNfse(ANota, NFSeNode.OuterXml);
     SalvarXmlNfse(ANota);
 
     AResumo.NomeArq := ANota.NomeArq;
@@ -1850,9 +1857,14 @@ end;
 begin
   ANode := RootNode.Childrens.FindAnyNs(AListTag);
 
+  if not Assigned(ANode) then
+  begin
+    ANode := RootNode.Childrens.FindAnyNs('ListaMensagemRetorno');
+  end;
+
   ProcessarErros;
 
-  ANode := RootNode.Childrens.FindAnyNs('ListaMensagemAlertaRetorno');
+  ANode := RootNode.Childrens.FindAnyNs('ListaMensagemAlertaRetornoLote');
 
   if Assigned(ANode) then
   begin
@@ -2657,7 +2669,8 @@ begin
         AResumo.NumeroRps := NumRps;
         AResumo.SerieRps := SerieRps;
 
-        ANota := CarregarXmlNfse(ANota, ANode.OuterXml);
+        AuxNode := ANode.Childrens.FindAnyNs('NFSe');
+        ANota := CarregarXmlNfse(ANota, AuxNode.OuterXml);
         SalvarXmlNfse(ANota);
 
         AResumo.NomeArq := ANota.NomeArq;
@@ -3534,7 +3547,7 @@ begin
 
     xUF := TACBrNFSeX(FAOwner).Configuracoes.WebServices.UF;
 
-    CnpjCpf := OnlyAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
+    CnpjCpf := OnlyCPFCNPJAlphaNum(TACBrNFSeX(FAOwner).Configuracoes.Geral.Emitente.CNPJ);
     if Length(CnpjCpf) < 14 then
     begin
       xAutorEvento := '<CPFAutor>' +
@@ -3609,7 +3622,7 @@ begin
     Chave := chNFSe;
 
     nomeArq := '';
-    SalvarXmlEvento(ID + '-pedRegEvento', Response.ArquivoEnvio, nomeArq);
+    SalvarXmlEvento(ID + '-pedRegEvento', Response.ArquivoEnvio, nomeArq, dhEvento);
     Response.PathNome := nomeArq;
   end;
 end;

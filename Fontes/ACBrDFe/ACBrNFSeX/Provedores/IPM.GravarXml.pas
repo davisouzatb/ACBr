@@ -719,6 +719,9 @@ begin
   Result.AppendChild(AddNode(tcDe2, '#1', 'pRedutor', 1, 2, 1,
                                                  NFSe.infNFSe.IBSCBS.pRedutor));
 
+  Result.AppendChild(AddNode(tcInt, '#2', 'cLocalidadeIncid', 7, 7, 1,
+                                     NFSe.infNFSe.IBSCBS.cLocalidadeIncid, ''));
+
   Result.AppendChild(GerarValoresBrutosIbsCbs);
   Result.AppendChild(GerarTotalizadores);
 end;
@@ -863,7 +866,8 @@ begin
 
   // Reforma Tributária
   if (NFSe.infNFSe.IBSCBS.pRedutor > 0) or
-     (NFSe.infNFSe.IBSCBS.valores.vBC > 0) then
+     (NFSe.infNFSe.IBSCBS.valores.vBC > 0) or
+     (NFSe.infNFSe.IBSCBS.cLocalidadeIncid <> 0) then
     Result.AppendChild(GerarXMLIBSCBSServico);
 end;
 
@@ -889,13 +893,13 @@ begin
 
         NrOcorrCodigoMunicInterm := 1;
 
-        NrOcorrCodTribMun_1 := -1;
-        NrOcorrDiscriminacao_1 := -1;
-        NrOcorrCodigoMunic_1 := -1;
+        NrOcorrCodTribMun_1 := 0;
+        NrOcorrDiscriminacao_1 := 0;
+        NrOcorrCodigoMunic_1 := 0;
 
-        NrOcorrCodTribMun_2 := 0;
-        NrOcorrDiscriminacao_2 := 0;
-        NrOcorrCodigoMunic_2 := 0;
+        NrOcorrCodTribMun_2 := -1;
+        NrOcorrDiscriminacao_2 := -1;
+        NrOcorrCodigoMunic_2 := -1;
       end;
   else
     begin
@@ -942,6 +946,9 @@ begin
 
     Result.AppendChild(AddNode(tcDe2, '#1', 'pRedutor', 1, 2, 1,
                                                  NFSe.infNFSe.IBSCBS.pRedutor));
+
+    Result.AppendChild(AddNode(tcInt, '#2', 'cLocalidadeIncid', 7, 7, 1,
+                                     NFSe.infNFSe.IBSCBS.cLocalidadeIncid, ''));
 
     Result.AppendChild(GerarValoresBrutosIbsCbs);
     Result.AppendChild(GerarTotalizadores);

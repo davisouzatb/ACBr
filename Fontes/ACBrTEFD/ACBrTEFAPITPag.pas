@@ -3,7 +3,7 @@
 {  Biblioteca multiplataforma de componentes Delphi para interação com equipa- }
 { mentos de Automação Comercial utilizados no Brasil                           }
 {                                                                              }
-{ Direitos Autorais Reservados (c) 2024 Daniel Simoes de Almeida               }
+{ Direitos Autorais Reservados (c) 2026 Daniel Simoes de Almeida               }
 {                                                                              }
 { Colaboradores nesse arquivo:                                                 }
 {                                                                              }
@@ -43,6 +43,8 @@ uses
 
 resourcestring
   sMsgInformeNSU = 'Informe o NSU da Transação';
+  sMsgInfoParcelas = 'Número de Parcelas';
+  sMsgErroMinMax = 'Valor Mínimo: %d, Máximo: %d';
 
 type
 
@@ -60,8 +62,8 @@ type
   TACBrTEFAPIClassTPag = class(TACBrTEFAPIClass)
   private
     function GetTEFTPagAPI: TPagAPI;
-    procedure QuandoGravarLogAPI(const ALogLine: String; var Tratado: Boolean);
-    //procedure QuandoTransacaoEmAndamentoAPI( EstadoOperacao: TPagEstadoOperacao; out Cancelar: Boolean);
+    procedure QuandoGravarLogAPI(const ALogLine: String);
+    procedure QuandoTransacaoEmAndamentoAPI(out Cancelar: Boolean);
     procedure QuandoExibirMensagemAPI(const Mensagem: String);
     procedure QuandoPerguntarMenuAPI(const Titulo: String; Opcoes: TStringList;
       var ItemSelecionado: LongInt);
@@ -75,7 +77,13 @@ type
 
   protected
     procedure InterpretarRespostaAPI; override;
-    procedure GravarLog(const ALogLine: AnsiString);
+    function PerguntarParcelas: Byte;
+    function PerguntarMenuAdmTPAG: TACBrTEFOperacao;
+    function PerguntarSimNao(const Titulo: String; out Cancelar: Boolean): Boolean;
+    function ObterCupomReimpressao: Boolean;
+    function ReiniciarTerminal: Boolean;
+    function ExibirVersaoTPAG: Boolean;
+    function TestarComunicacaoTPAG: Boolean;
 
   public
     constructor Create(AACBrTEFAPI: TACBrTEFAPIComum);
@@ -114,6 +122,8 @@ type
     procedure ResolverTransacaoPendente(AStatus: TACBrTEFStatusTransacao = tefstsSucessoManual); override;
 
     procedure AbortarTransacaoEmAndamento; override;
+    function VersaoAPI: String; override;
+    procedure ExibirMensagemPinPad(const MsgPinPad: String); override;
 
     procedure ObterListaDeTransacoes(ListaTransacoes: TACBrTEFRespostas;
       Inicio: TDateTime = 0; Fim: TDateTime = 0;
@@ -256,7 +266,7 @@ begin
   begin
     OnGravarLog := QuandoGravarLogAPI;
     OnExibeMensagem := QuandoExibirMensagemAPI;
-    //OnTransacaoEmAndamento := QuandoTransacaoEmAndamentoAPI;
+    OnTransacaoEmAndamento := QuandoTransacaoEmAndamentoAPI;
     QuandoPerguntarMenu := QuandoPerguntarMenuAPI;
     QuandoPerguntarCampo := QuandoPerguntarCampoAPI;
   end;
@@ -282,6 +292,7 @@ begin
   begin
     PathLib := PathDLL;
     Identification := fpACBrTEFAPI.DadosEstabelecimento.CNPJ;
+    posMessageDisplay := fpACBrTEFAPI.DadosAutomacao.MensagemPinPad;
     Inicializar;
   end;
 
@@ -299,22 +310,17 @@ begin
   GetTEFTPagAPI.Conectar;
 end;
 
-procedure TACBrTEFAPIClassTPag.QuandoGravarLogAPI(const ALogLine: String;
-  var Tratado: Boolean);
+procedure TACBrTEFAPIClassTPag.QuandoGravarLogAPI(const ALogLine: String);
 begin
   fpACBrTEFAPI.GravarLog(ALogLine);
-  Tratado := True;
 end;
 
-//procedure TACBrTEFAPIClassTPag.QuandoTransacaoEmAndamentoAPI(
-//  EstadoOperacao: TPagEstadoOperacao; out Cancelar: Boolean);
-//var
-//  i: Integer;
-//begin
-//  i := Integer(EstadoOperacao);
-//  Cancelar := False;
-//  TACBrTEFAPI(fpACBrTEFAPI).QuandoEsperarOperacao(TACBrTEFAPIOperacaoAPI(i), Cancelar);
-//end;
+procedure TACBrTEFAPIClassTPag.QuandoTransacaoEmAndamentoAPI(out
+  Cancelar: Boolean);
+begin
+  Cancelar := False;
+  TACBrTEFAPI(fpACBrTEFAPI).QuandoEsperarOperacao(opapiPinPad, Cancelar);
+end;
 
 procedure TACBrTEFAPIClassTPag.QuandoExibirMensagemAPI(const Mensagem: String);
 begin
@@ -338,6 +344,7 @@ procedure TACBrTEFAPIClassTPag.QuandoPerguntarCampoAPI(const Titulo: String;
 var
   def: TACBrTEFAPIDefinicaoCampo;
   Validado: Boolean;
+  i: Integer;
 begin
   if (Mensagem <> '') then
     def.TituloPergunta := Titulo + sLineBreak + Mensagem
@@ -372,10 +379,26 @@ begin
   else
     def.ValidacaoDado := valdNenhuma;
 
-  Validado := True;
-  Cancelar := False;
-  Resposta := '';
-  TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarCampo(def, Resposta, Validado, Cancelar);
+  repeat
+    Validado := False;
+    Cancelar := False;
+    Resposta := '';
+    TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarCampo(def, Resposta, Validado, Cancelar);
+
+    if (not Validado) and (not Cancelar) then
+    begin
+      if (InputMode = INPUT_MODE_NUMERIC) then
+      begin
+        i := StrToIntDef(Resposta, -1);
+        Validado := (i >= def.ValorMinimo) and ((def.ValorMaximo = 0) or (i <= def.ValorMaximo));
+        if not Validado then
+           TACBrTEFAPI(fpACBrTEFAPI).QuandoExibirMensagem(Format(ACBrStr(sMsgErroMinMax), [def.ValorMinimo, def.ValorMaximo]), telaTodas, 5000);
+      end
+      else
+        Validado := True;
+    end;
+  until Validado or Cancelar;
+
 end;
 
 procedure TACBrTEFAPIClassTPag.DoException(const AErrorMsg: String);
@@ -388,9 +411,126 @@ begin
   TACBrTEFRespTPag( fpACBrTEFAPI.UltimaRespostaTEF ).SetStrings(GetTEFTPagAPI.DadosDaTransacao);
 end;
 
-procedure TACBrTEFAPIClassTPag.GravarLog(const ALogLine: AnsiString);
+function TACBrTEFAPIClassTPag.PerguntarParcelas: Byte;
+var
+  Resp: String;
+  Cancelar: Boolean;
+  ic: TPagInputModeConfig;
 begin
-  fpACBrTEFAPI.GravarLog(ALogLine);
+  Resp := '';
+  Cancelar := False;
+  ic.minLength := 1; ic.maxLength := 2;
+  ic.minValue := 2; ic.maxValue := 99;
+  ic.allowZero := False; ic.maskInput := False;
+
+  QuandoPerguntarCampoAPI(ACBrStr(sMsgInfoParcelas), '',
+    TPagRequestOptions(-1),
+    INPUT_MODE_NUMERIC,
+    ic, Resp, Cancelar);
+
+  if Cancelar then
+    Result := 0
+  else
+    Result := StrToIntDef(Resp, 0);
+end;
+
+function TACBrTEFAPIClassTPag.PerguntarMenuAdmTPAG: TACBrTEFOperacao;
+var
+  slMenu: TStringList;
+  ItemSel: Integer;
+begin
+  Result := tefopNenhuma;
+  slMenu := TStringList.Create;
+  try
+    slMenu.Add(ACBrStr('1-Reimpressão'));
+    slMenu.Add(ACBrStr('2-Cancelar Transação'));
+    slMenu.Add(ACBrStr('3-Atualizar Tabelas'));
+    slMenu.Add(ACBrStr('4-Versão'));
+    slMenu.Add(ACBrStr('5-Teste Comunicação'));
+    slMenu.Add(ACBrStr('6-Manutenção (Reset)'));
+    ItemSel := -1;
+    TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarMenu( 'Menu Administrativo', slMenu, ItemSel );
+    case ItemSel of
+      0: Result := tefopReimpressao;
+      1: Result := tefopCancelamento;
+      2: Result := tefopCargaTabelas;
+      3: Result := tefopVersao;
+      4: Result := tefopTesteComunicacao;
+      5: Result := tefopManutencao;
+    end;
+  finally
+    slMenu.Free;
+  end;
+end;
+
+function TACBrTEFAPIClassTPag.PerguntarSimNao(const Titulo: String; out
+  Cancelar: Boolean): Boolean;
+var
+  slMenu: TStringList;
+  ItemSel: Integer;
+begin
+  Result := False;
+  slMenu := TStringList.Create;
+  try
+    slMenu.Add(ACBrStr('1-SIM'));
+    slMenu.Add(ACBrStr('2-NÃO'));
+    ItemSel := -1;
+    TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarMenu( Titulo, slMenu, ItemSel );
+    Cancelar := (ItemSel < 0);
+    if not Cancelar then
+      Result := (ItemSel = 0);
+  finally
+    slMenu.Free;
+  end;
+end;
+
+function TACBrTEFAPIClassTPag.ObterCupomReimpressao: Boolean;
+var
+  s: String;
+  ret: Integer;
+begin
+  with GetTEFTPagAPI do
+  begin
+    DadosDaTransacao.Clear;
+    ret := -1;
+    s := UltimoRecibo(True, False, True, ret);
+    Result := (ret = 0);
+    if Result then
+      DadosDaTransacao.Values['transactionReceipt'] := s;
+  end;
+end;
+
+function TACBrTEFAPIClassTPag.ReiniciarTerminal: Boolean;
+var
+  ret: LongInt;
+  Cancelar, sim: Boolean;
+begin
+  Cancelar := False;
+  sim := PerguntarSimNao('Reiniciar o Terminal ?', Cancelar);
+  if (Cancelar or (not sim)) then
+    Exit;
+
+  ret := GetTEFTPagAPI.ReiniciarTerminal;
+  Result := (ret = 0);
+  if Result then
+    Autenticar;
+end;
+
+function TACBrTEFAPIClassTPag.ExibirVersaoTPAG: Boolean;
+var
+  s: String;
+begin
+  s := Trim(GetTEFTPagAPI.GetlibDM_SDKVersion);
+  Result := (s <> '');
+  if Result then
+    TACBrTEFAPI(fpACBrTEFAPI).QuandoExibirMensagem(s, telaOperador, 0);
+end;
+
+function TACBrTEFAPIClassTPag.TestarComunicacaoTPAG: Boolean;
+begin
+  Autenticar;
+  TACBrTEFAPI(fpACBrTEFAPI).QuandoExibirMensagem('initialization executado com sucesso', telaOperador, 0);
+  Result := True;
 end;
 
 function TACBrTEFAPIClassTPag.EfetuarPagamento(ValorPagto: Currency;
@@ -423,7 +563,16 @@ begin
   end;
 
   if (Financiamento > tefmfAVista) then
-    Params.creditType := Cardinal(CREDIT_TYPE_INSTALLMENT)
+  begin
+    Params.creditType := Cardinal(CREDIT_TYPE_INSTALLMENT);
+
+    if (Parcelas <= 1) then
+    begin
+      Parcelas := PerguntarParcelas;
+      if (Parcelas = 0) then
+        Exit;
+    end;
+  end
   else
     Params.creditType := Cardinal(CREDIT_TYPE_NO_INSTALLMENT);
 
@@ -437,71 +586,32 @@ begin
   Result := (ret = 0);
 end;
 
-function TACBrTEFAPIClassTPag.EfetuarAdministrativa(
-  CodOperacaoAdm: TACBrTEFOperacao): Boolean;
-var
-  sl: TStringList;
-  ItemSel: Integer;
-  ret: LongInt;
-  s: String;
+function TACBrTEFAPIClassTPag.EfetuarAdministrativa(CodOperacaoAdm: TACBrTEFOperacao): Boolean;
 begin
   GetTEFTPagAPI.DadosDaTransacao.Clear;
   Result := False;
-  ItemSel := -1;
+  if (CodOperacaoAdm = tefopAdministrativo) then
+    CodOperacaoAdm := PerguntarMenuAdmTPAG;
 
   case CodOperacaoAdm of
+    tefopNenhuma:
+      Result := False;
     tefopReimpressao:
-      ItemSel := 0;
+      Result := ObterCupomReimpressao;
     tefopCancelamento:
-      ItemSel := 2;
-    tefopAdministrativo:
-      begin
-        sl := TStringList.Create;
-        try
-          sl.Add(ACBrStr('Reimpressão'));
-          sl.Add(ACBrStr('Cancelar última Transação'));
-          sl.Add(ACBrStr('Atualizar Tabelas'));
-          sl.Add(ACBrStr('Manutenção (Reset)'));
-          TACBrTEFAPI(fpACBrTEFAPI).QuandoPerguntarMenu( 'Menu Administrativo', sl, ItemSel );
-        finally
-          sl.Free;
-        end;
-      end;
-    else
-      DoException(ACBrStr(Format(sACBrTEFAPIAdministrativaNaoSuportada,
+      Result := CancelarTransacaoTPag;
+    tefopCargaTabelas:
+      Result := (GetTEFTPagAPI.AtualizarTabelas = 0);
+    tefopManutencao:
+      Result := ReiniciarTerminal;
+    tefopVersao:
+      Result := ExibirVersaoTPAG;
+    tefopTesteComunicacao:
+      Result := TestarComunicacaoTPAG;
+  else
+    DoException(ACBrStr(Format(sACBrTEFAPIAdministrativaNaoSuportada,
         ['EfetuarAdministrativa( '+GetEnumName(TypeInfo(TACBrTEFOperacao),
         integer(CodOperacaoAdm) )+' )', ClassName])));
-  end;
-
-  case ItemSel of
-    0:  // Reimpressão
-      begin
-        with GetTEFTPagAPI do
-        begin
-          ret := -1;
-          s := UltimoRecibo(True, False, True, ret);
-          Result := (ret = 0);
-          if Result then
-            DadosDaTransacao.Values['transactionReceipt'] := s;
-        end;
-      end;
-
-    1:
-      Result := CancelarTransacaoTPag();
-
-    2:  // Atualizar Tabelas
-      begin
-        ret := GetTEFTPagAPI.AtualizarTabelas;
-        Result := (ret = 0);
-      end;
-
-    3:  // Manutenção
-      begin
-        ret := GetTEFTPagAPI.ReiniciarTerminal;
-        Result := (ret = 0);
-        if Result then
-          Autenticar;
-      end;
   end;
 end;
 
@@ -574,6 +684,7 @@ begin
 
   with GetTEFTPagAPI do
   begin
+    DadosDaTransacao.Clear;
     Result := CancelarTransacao(NsuTEF, '', 0, 0);
   end;
 end;
@@ -593,6 +704,16 @@ end;
 procedure TACBrTEFAPIClassTPag.AbortarTransacaoEmAndamento;
 begin
   GetTEFTPagAPI.AbortarTransacao;
+end;
+
+function TACBrTEFAPIClassTPag.VersaoAPI: String;
+begin
+  Result := GetTEFTPagAPI.GetlibDM_SDKVersion;
+end;
+
+procedure TACBrTEFAPIClassTPag.ExibirMensagemPinPad(const MsgPinPad: String);
+begin
+  GetTEFTPagAPI.ExibirMensagemPinPad(MsgPinPad);
 end;
 
 procedure TACBrTEFAPIClassTPag.ObterListaDeTransacoes(

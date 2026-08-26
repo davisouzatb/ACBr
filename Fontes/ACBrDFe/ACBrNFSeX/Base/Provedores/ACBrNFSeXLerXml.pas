@@ -281,12 +281,7 @@ end;
 
 function TNFSeRClass.NormatizarXml(const aXml: string): string;
 begin
-{$IfDef FPC}
   Result := aXml;
-{$Else}
-  Result := ParseText(aXml);
-  Result := FastStringReplace(Result, '&', '&amp;', [rfReplaceAll]);
-{$EndIf}
 end;
 
 function TNFSeRClass.ObterNomeMunicipioUF(ACodigoMunicipio: Integer; var xUF: string): string;
@@ -960,7 +955,7 @@ begin
       OptanteSimplesNacional := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(sSecao, 'OptanteSN', '1'));
       OptanteSN := StrToOptanteSN(Ok, AINIRec.ReadString(sSecao, 'opSimpNac', '2'));
       OptanteMEISimei := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(sSecao, 'OptanteMEISimei', ''));
-      DataOptanteSimplesNacional := AINIRec.ReadDateTime(sSecao, 'DataOptanteSimplesNacional', 0);
+      DataOptanteSimplesNacional := StringToDateTimeDef(AINIRec.ReadString(sSecao, 'DataOptanteSimplesNacional', ''), 0);
 
       IncentivadorCultural := FpAOwner.StrToSimNao(Ok, AINIRec.ReadString(sSecao, 'IncentivadorCultural', '1'));
 
@@ -2182,10 +2177,12 @@ begin
     Imovel.ender.nro := AINIRec.ReadString(sSecao, 'Numero', '');
     Imovel.ender.xCpl := AINIRec.ReadString(sSecao, 'Complemento', '');
     Imovel.ender.xBairro := AINIRec.ReadString(sSecao, 'Bairro', '');
+    Imovel.ender.CodigoMunicipio := StrToIntDef(AINIRec.ReadString(sSecao, 'CodigoMunicipio', ''), 0);
 
     Imovel.ender.endExt.cEndPost := AINIRec.ReadString(sSecao, 'cEndPost', '');
     Imovel.ender.endExt.xCidade := AINIRec.ReadString(sSecao, 'xCidade', '');
     Imovel.ender.endExt.xEstProvReg := AINIRec.ReadString(sSecao, 'xEstProvReg', '');
+    Imovel.ender.endExt.cPais := AINIRec.ReadInteger(sSecao, 'cPais', 0);
   end;
 end;
 

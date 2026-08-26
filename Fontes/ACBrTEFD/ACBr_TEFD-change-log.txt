@@ -45,6 +45,39 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+10/08/2026
+-- ACBrTEFAPITPag, ACBrTEFTPagAPI --
+[*] Refaforação de código em EfetuarAdministrativa
+[+] Implementado o método: function VersaoAPI: String;
+[+] Adicionado suporte a propriedade: DadosAutomacao.MensagemPinPad
+[+] Implementado suporte ao método ExibirMensagemPinPad
+
+-- ACBrTEFAPI --
+[+] Adicionado o método FormatarMensagemPinPad, para formatar previamente
+    a mensagem que a Automação envia ao PinPad e considerar quebras de linhas com  '|'
+
+-- ACBrTEFComum --
+[*] Adicionado enumerados  tefopCargaTabelas, tefopManutencao em TACBrTEFOperacao
+
+-- ACBrTEFPayGoComum --
+[*] Adicionado suporte aos enumerados tefopCargaTabelas e tefopManutencao no
+    método: EfetuarAdministrativa
+    (por: DSA)
+
+05/08/2026
+-- ACBrTEFAPITPag --
+[*] Correção para Perguntar a Parcela, quando não for informado, em transação Parcelada
+    (por: DSA)
+
+04/08/2026
+-- ACBrTEFAPI --
+[-] Correção de A.V. em algumas situações onde o Modelo do TEF ainda não estava
+    instanciado
+
+-- ACBrTEFTPagAPI, ACBrTEFAPITPag --
+[*] Compatibilização com versão 0.0.3 do SDK
+    (por: DSA)
+
 29/07/2026
 -- ACBrTEFAPICliSiTef --
 [-] Correção na forma de montagem dos parâmatros na Inicialização da Biblioteca

@@ -72,9 +72,19 @@ type
   TNFSeW_ISSNetAPIPropria = class(TNFSeW_PadraoNacional)
   protected
     function GerarXMLPrestador: TACBrXmlNode; override;
+
     function GerarXMLObra: TACBrXmlNode; override;
+    function GerarXMLEnderecoObra: TACBrXmlNode;
+    function GerarXMLEnderecoNacionalObra: TACBrXmlNode;
+    function GerarXMLEnderecoExteriorObra: TACBrXmlNode; override;
+
     function GerarXMLAtividadeEvento: TACBrXmlNode; override;
+
     function GerarXMLImovel(Imovel: TDadosimovel): TACBrXmlNode; override;
+    function GerarXMLEnderecoImovel(ender: TenderImovel): TACBrXmlNode;
+    function GerarXMLEnderecoNacionalImovel(ender: TenderImovel): TACBrXmlNode; override;
+    function GerarXMLEnderecoExteriorImovel(endExt: TendExt): TACBrXmlNode; override;
+
     function GerarXMLCodigoServico: TACBrXmlNode; override;
 
   public
@@ -278,6 +288,53 @@ begin
                                             NFSe.Servico.CodigoInterContr, ''));
 end;
 
+function TNFSeW_ISSNetAPIPropria.GerarXMLEnderecoExteriorImovel(
+  endExt: TendExt): TACBrXmlNode;
+begin
+  Result := CreateElement('endExt');
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'cPais', 2, 2, 1, CodIBGEPaisToSiglaISO2(endExt.cPais), ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'cEndPost', 1, 11, 1,
+                                                          endExt.cEndPost, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xCidade', 1, 60, 1,
+                                                           endExt.xCidade, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xEstProvReg', 1, 60, 1,
+                                                       endExt.xEstProvReg, ''));
+end;
+
+function TNFSeW_ISSNetAPIPropria.GerarXMLEnderecoImovel(
+  ender: TenderImovel): TACBrXmlNode;
+begin
+  Result := CreateElement('end');
+
+  if ender.endExt.cPais > 0 then
+    Result.AppendChild(GerarXMLEnderecoExteriorImovel(ender.endExt))
+  else
+    Result.AppendChild(GerarXMLEnderecoNacionalImovel(ender));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xLgr', 1, 255, 1, ender.xLgr, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'nro', 1, 60, 1, ender.nro, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xCpl', 1, 156, 0, ender.xCpl, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xBairro', 1, 60, 1,
+                                                          ender.xBairro, ''));
+end;
+
+function TNFSeW_ISSNetAPIPropria.GerarXMLEnderecoNacionalImovel(
+  ender: TenderImovel): TACBrXmlNode;
+begin
+  Result := CreateElement('endNac');
+
+  Result.AppendChild(AddNode(tcInt, '#1', 'cMun', 7, 7, 1, ender.CodigoMunicipio, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'CEP', 8, 8, 1, ender.CEP, ''));
+end;
+
 function TNFSeW_ISSNetAPIPropria.GerarXMLImovel(
   Imovel: TDadosimovel): TACBrXmlNode;
 begin
@@ -290,8 +347,58 @@ begin
     Result.AppendChild(AddNode(tcStr, '#1', 'inscImobFisc', 1, 30, 0,
                                                       Imovel.inscImobFisc, ''));
 
-    Result.AppendChild(GerarXMLEnderecoNacionalImovel(Imovel.ender));
+    Result.AppendChild(GerarXMLEnderecoImovel(Imovel.ender));
   end;
+end;
+
+function TNFSeW_ISSNetAPIPropria.GerarXMLEnderecoExteriorObra: TACBrXmlNode;
+begin
+  Result := CreateElement('endExt');
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'cPais', 2, 2, 1,
+         CodIBGEPaisToSiglaISO2(NFSe.ConstrucaoCivil.Endereco.CodigoPais), ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'cEndPost', 1, 11, 1,
+                                        NFSe.ConstrucaoCivil.Endereco.CEP, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xCidade', 1, 60, 1,
+                                 NFSe.ConstrucaoCivil.Endereco.xMunicipio, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xEstProvReg', 1, 60, 1,
+                                         NFSe.ConstrucaoCivil.Endereco.UF, ''));
+end;
+
+function TNFSeW_ISSNetAPIPropria.GerarXMLEnderecoNacionalObra: TACBrXmlNode;
+begin
+  Result := CreateElement('endNac');
+
+  Result.AppendChild(AddNode(tcInt, '#1', 'cMun', 7, 7, 1,
+                            NFSe.ConstrucaoCivil.Endereco.CodigoMunicipio, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'CEP', 8, 8, 1,
+                                        NFSe.ConstrucaoCivil.Endereco.CEP, ''));
+end;
+
+function TNFSeW_ISSNetAPIPropria.GerarXMLEnderecoObra: TACBrXmlNode;
+begin
+  Result := CreateElement('end');
+
+  if NFSe.ConstrucaoCivil.Endereco.CodigoPais > 0 then
+    Result.AppendChild(GerarXMLEnderecoExteriorObra)
+  else
+    Result.AppendChild(GerarXMLEnderecoNacionalObra);
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xLgr', 1, 255, 1,
+                                   NFSe.ConstrucaoCivil.Endereco.Endereco, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'nro', 1, 60, 1,
+                                     NFSe.ConstrucaoCivil.Endereco.Numero, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xCpl', 1, 156, 0,
+                                NFSe.ConstrucaoCivil.Endereco.Complemento, ''));
+
+  Result.AppendChild(AddNode(tcStr, '#1', 'xBairro', 1, 60, 1,
+                                     NFSe.ConstrucaoCivil.Endereco.Bairro, ''));
 end;
 
 function TNFSeW_ISSNetAPIPropria.GerarXMLObra: TACBrXmlNode;

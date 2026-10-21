@@ -43,6 +43,21 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+29/09/2026
+-- ACBrCTe.XmlReader.pas --
+[-] Ajuste visando a correta leitura do campo tpALCZFMCBS
+   Por: Daniel de Morais
+
+
+04/09/2026
+-- ACBrCTeWebServices --
+[-] Substitui chamada de pcnRetConsReciDFe para ACBrDFeComum.RetConsReciDFe
+   Por: Diego Folieni
+
+01/09/2026
+-- ACBrCTeWebServices --
+[-] Ajuste para que o nome do arquivo seja gerado corretamente na DistribuicaoDFe quando definido caminho em DownloadDFe.PathDownload
+   Por: Ewerton Lauredo
 
 06/08/2026
 -- ACBrCTe.XmlReader --

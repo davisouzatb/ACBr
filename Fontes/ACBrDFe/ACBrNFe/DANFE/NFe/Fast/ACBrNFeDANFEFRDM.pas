@@ -41,7 +41,7 @@ interface
 uses
   SysUtils, Classes, Forms, DB, DBClient, Graphics,
   ACBrNFe.EnvEvento,
-  ACBrNFe.RetInut, ACBrNFe.Classes, pcnConversao,
+  ACBrNFe.RetInut, ACBrNFe.Classes, ACBrDFe.Conversao,
   ACBrDFeReport, ACBrDFeDANFeReport, ACBrNFeDANFEClass,
   frxClass, frxExportPDF, frxDBSet, frxBarcode,
   ACBrUtil.FR;
@@ -190,6 +190,7 @@ uses
   ACBrUtil.Strings,
   ACBrUtil.Math, ACBrUtil.FilesIO, ACBrUtil.Base, ACBrUtil.DateTime, ACBrUtil.XMLHTML,
   ACBrValidador, ACBrImage, ACBrDelphiZXingQRCode,
+  ACBrDFe.RTC.Classes,
   pcnConversaoNFe;
 
 { TACBrNFeFRClass }
@@ -318,6 +319,8 @@ begin
         FieldDefs.Add('CRT', ftString, 1);
         FieldDefs.Add('DESCR_CST', ftString, 30);
         FieldDefs.Add('DADOS_ENDERECO', ftString, 1000);
+        // NT 2026.010 - DANFE Reforma Tributária
+        FieldDefs.Add('CRT_Descricao', ftString, 60);
         CreateDataSet;
      end;
    end;
@@ -421,7 +424,21 @@ begin
         FieldDefs.Add('VTribFed'   , ftFloat);
         FieldDefs.Add('VTribEst'   , ftFloat);
         FieldDefs.Add('VTribMun'   , ftFloat);
-        
+
+        // NT 2026.010 - DANFE Reforma Tributária
+        FieldDefs.Add('vBCIPI'     , ftString, 18);
+        FieldDefs.Add('cClassTrib' , ftString, 6);
+        FieldDefs.Add('vBCIBSCBS'  , ftString, 18);
+        FieldDefs.Add('pIBSUF'     , ftString, 18);
+        FieldDefs.Add('vIBSUF'     , ftString, 18);
+        FieldDefs.Add('pIBSMun'    , ftString, 18);
+        FieldDefs.Add('vIBSMun'    , ftString, 18);
+        FieldDefs.Add('pCBS'       , ftString, 18);
+        FieldDefs.Add('vCBS'       , ftString, 18);
+        FieldDefs.Add('vBCIS'      , ftString, 18);
+        FieldDefs.Add('pIS'        , ftString, 18);
+        FieldDefs.Add('vIS'        , ftString, 18);
+
         CreateDataSet;
      end;
    end;
@@ -478,6 +495,8 @@ begin
         FieldDefs.Add('dhRecbto', ftDateTime);
         FieldDefs.Add('poscanhotolayout', ftString, 1);
         FieldDefs.Add('ExibeICMSDesoneradoComoDesconto', ftBoolean);
+        // NT 2026.010 - QR Code no DANFE modelo 55 (somente quando informado no XML)
+        FieldDefs.Add('ExibeQrCodeNFe', ftString, 1);
         CreateDataSet;
      end;
    end;
@@ -539,6 +558,10 @@ begin
         FieldDefs.Add('VTribPerc'   , ftFloat);
         FieldDefs.Add('VTribFonte'  , ftString, 100);
         FieldDefs.Add('vTotPago'    , ftFloat);
+        FieldDefs.Add('vNFTot'      , ftFloat);
+        FieldDefs.Add('vCBS'        , ftFloat);
+        FieldDefs.Add('vIBS'        , ftFloat);
+        FieldDefs.Add('vIS'         , ftFloat);
         FieldDefs.Add('vTroco'      , ftFloat);
         FieldDefs.Add('ValorApagar' , ftFloat);
         FieldDefs.Add('VFCP'        , ftFloat);
@@ -550,6 +573,20 @@ begin
         FieldDefs.Add('VTribFed'   , ftFloat);
         FieldDefs.Add('VTribEst'   , ftFloat);
         FieldDefs.Add('VTribMun'   , ftFloat);
+
+        // NT 2026.010 - DANFE Reforma Tributária
+        FieldDefs.Add('vICMSUFDest'    , ftFloat);
+        FieldDefs.Add('vFCPUFDest'     , ftFloat);
+        FieldDefs.Add('qBCMono'        , ftFloat);
+        FieldDefs.Add('vICMSMono'      , ftFloat);
+        FieldDefs.Add('qBCMonoReten'   , ftFloat);
+        FieldDefs.Add('vICMSMonoReten' , ftFloat);
+        FieldDefs.Add('vIBSUF'         , ftFloat);
+        FieldDefs.Add('vIBSMun'        , ftFloat);
+        FieldDefs.Add('vIBSMono'       , ftFloat);
+        FieldDefs.Add('vCBSMono'       , ftFloat);
+        FieldDefs.Add('vIBSMonoReten'  , ftFloat);
+        FieldDefs.Add('vCBSMonoReten'  , ftFloat);
 
         CreateDataSet;
      end;
@@ -952,7 +989,7 @@ begin
       FieldByName('VOutro').AsFloat       := VOutro;
       FieldByName('VNF').AsFloat          := VNF;
 
-      if (FDANFEClassOwner.ImprimeTributos = trbNormal) or (FNFe.Ide.Modelo = 65)  then
+      if (FDANFEClassOwner.ImprimeTributos = trbNormal) or (FNFe.Ide.Modelo = 65) or ((FNFe.Ide.Modelo = 55) and (FNFe.Ide.tpImp = tiSimplificadoTipo2)) then
         FieldByName('VTotTrib').AsFloat     := VTotTrib;
 
       FieldByName('ValorApagar').AsFloat  := VNF;
@@ -978,6 +1015,25 @@ begin
         lvTroco := TACBrNFeDANFCEClass(FDANFEClassOwner).vTroco;
       FieldByName('vTroco').AsCurrency    := lvTroco;
       FieldByName('vTotPago').AsCurrency  := lvTroco + vNF;
+
+      FieldByName('vNFTot').AsCurrency  := FNFe.Total.vNFTot;
+      FieldByName('vCBS').AsCurrency    := FNFe.Total.IBSCBSTot.gCBS.vCBS;
+      FieldByName('vIBS').AsCurrency    := FNFe.Total.IBSCBSTot.gIBS.vIBS;
+      FieldByName('vIS').AsCurrency     := FNFe.Total.ISTot.vIS;
+
+      // NT 2026.010 - DANFE Reforma Tributária
+      FieldByName('vICMSUFDest').AsFloat    := vICMSUFDest;
+      FieldByName('vFCPUFDest').AsFloat     := vFCPUFDest;
+      FieldByName('qBCMono').AsFloat        := qBCMono;
+      FieldByName('vICMSMono').AsFloat      := vICMSMono;
+      FieldByName('qBCMonoReten').AsFloat   := qBCMonoReten;
+      FieldByName('vICMSMonoReten').AsFloat := vICMSMonoReten;
+      FieldByName('vIBSUF').AsFloat         := FNFe.Total.IBSCBSTot.gIBS.gIBSUFTot.vIBSUF;
+      FieldByName('vIBSMun').AsFloat        := FNFe.Total.IBSCBSTot.gIBS.gIBSMunTot.vIBSMun;
+      FieldByName('vIBSMono').AsFloat       := FNFe.Total.IBSCBSTot.gMono.vIBSMono;
+      FieldByName('vCBSMono').AsFloat       := FNFe.Total.IBSCBSTot.gMono.vCBSMono;
+      FieldByName('vIBSMonoReten').AsFloat  := FNFe.Total.IBSCBSTot.gMono.vIBSMonoReten;
+      FieldByName('vCBSMonoReten').AsFloat  := FNFe.Total.IBSCBSTot.gMono.vCBSMonoReten;
     end;
 
     Post;
@@ -1007,6 +1063,17 @@ end;
 procedure TACBrNFeFRClass.CarregaDadosProdutos;
 var
   inItem : Integer;
+
+  // NT 2026.010 - item 4.3: quando o grupo gRed for informado (redução de alíquota
+  // ou compra governamental), imprime a alíquota efetiva (pAliqEfet)
+  function AliquotaIBSCBS(const AAliq: Double; AgRed: TgRed): String;
+  begin
+    if (AgRed.pRedAliq > 0) or (AgRed.pAliqEfet > 0) or (FNFe.Ide.gCompraGov.pRedutor > 0) then
+      Result := FormatFloatBr(AgRed.pAliqEfet, ',0.00##')
+    else
+      Result := FormatFloatBr(AAliq, ',0.00##');
+  end;
+
 begin
   if not cdsParametros.Active then
     CarregaParametros;
@@ -1127,6 +1194,23 @@ begin
         FieldByName('ValorAcrescimos').AsString   := FormatFloatBr( Prod.vOutro + Prod.vFrete + Prod.vSeg, ',0.00');
         FieldByName('xPed').AsString              := Prod.xPed;
         FieldByName('nItemPed').AsString          := Prod.nItemPed;
+
+        // NT 2026.010 - DANFE Reforma Tributária
+        FieldByName('vBCIPI').AsString     := FormatFloatBr( Imposto.IPI.vBC, ',0.00');
+        FieldByName('cClassTrib').AsString := Imposto.IBSCBS.cClassTrib;
+        with Imposto.IBSCBS.gIBSCBS do
+        begin
+          FieldByName('vBCIBSCBS').AsString := FormatFloatBr( vBC, ',0.00');
+          FieldByName('pIBSUF').AsString    := AliquotaIBSCBS( gIBSUF.pIBSUF, gIBSUF.gRed );
+          FieldByName('vIBSUF').AsString    := FormatFloatBr( gIBSUF.vIBSUF, ',0.00');
+          FieldByName('pIBSMun').AsString   := AliquotaIBSCBS( gIBSMun.pIBSMun, gIBSMun.gRed );
+          FieldByName('vIBSMun').AsString   := FormatFloatBr( gIBSMun.vIBSMun, ',0.00');
+          FieldByName('pCBS').AsString      := AliquotaIBSCBS( gCBS.pCBS, gCBS.gRed );
+          FieldByName('vCBS').AsString      := FormatFloatBr( gCBS.vCBS, ',0.00');
+        end;
+        FieldByName('vBCIS').AsString := FormatFloatBr( Imposto.ISel.vBCIS, ',0.00');
+        FieldByName('pIS').AsString   := FormatFloatBr( Imposto.ISel.pIS, ',0.00##');
+        FieldByName('vIS').AsString   := FormatFloatBr( Imposto.ISel.vIS, ',0.00');
         Post;
       end;
     end;
@@ -1168,7 +1252,7 @@ begin
 
       FieldByName('Consumidor').AsString := '';
 
-      if (cdsIdentificacao.FieldByName('Mod_').AsString = '65') then
+      if ((FNFe.Ide.Modelo = 65) or ((FNFe.Ide.Modelo = 55) and (FNFe.Ide.tpImp = tiSimplificadoTipo2))) then
       begin
         if NaoEstaVazio(idEstrangeiro) then
           FieldByName('Consumidor').AsString := 'ESTRANGEIRO: ' + Trim(FieldByName('CNPJCPF').AsString) + ' ' + trim(FieldByName('XNome').AsString)
@@ -1262,6 +1346,14 @@ begin
       case CRT of
         crtSimplesNacional, crtMEI: FieldByName('DESCR_CST').AsString := 'CSOSN / CST';
         crtRegimeNormal, crtSimplesExcessoReceita: FieldByName('DESCR_CST').AsString := 'CST';
+      end;
+
+      // NT 2026.010 - item 4.2
+      case CRT of
+        crtSimplesNacional:       FieldByName('CRT_Descricao').AsString := '1 - SIMPLES NACIONAL';
+        crtSimplesExcessoReceita: FieldByName('CRT_Descricao').AsString := '2 - SIMPLES NACIONAL - EXCESSO DE SUBLIMITE';
+        crtRegimeNormal:          FieldByName('CRT_Descricao').AsString := '3 - REGIME NORMAL';
+        crtMEI:                   FieldByName('CRT_Descricao').AsString := '4 - MEI';
       end;
 
       cdsEmitente.FieldByName('DADOS_ENDERECO').AsString    := Trim(FieldByName('XLgr').AsString) + ', ' +
@@ -1407,9 +1499,9 @@ begin
     FieldByName('TpNF').AsString    := tpNFToStr( FNFe.Ide.TpNF );
     FieldByName('CMunFG').AsString  := IntToStr(FNFe.Ide.CMunFG);
     FieldByName('TpImp').AsString   := TpImpToStr( FNFe.Ide.TpImp );
-    FieldByName('TpEmis').AsString  := TpEmisToStr( FNFe.Ide.TpEmis );
+    FieldByName('TpEmis').AsString  := TipoEmissaoToStr( FNFe.Ide.TpEmis );
     FieldByName('CDV').AsString     := IntToStr(FNFe.Ide.CDV);
-    FieldByName('TpAmb').AsString   := TpAmbToStr( FNFe.Ide.TpAmb );
+    FieldByName('TpAmb').AsString   := TipoAmbienteToStr( FNFe.Ide.TpAmb );
     FieldByName('FinNFe').AsString  := FinNFeToStr( FNFe.Ide.FinNFe );
     FieldByName('ProcEmi').AsString := procEmiToStr( FNFe.Ide.ProcEmi );
     FieldByName('VerProc').AsString := FNFe.Ide.VerProc;
@@ -1419,15 +1511,15 @@ begin
     else
       FieldByName('HoraSaida').AsString := ifthen(TimeOf(FNFe.ide.dSaiEnt)=0, '', TimeToStr(FNFe.ide.dSaiEnt));
 
-    if (FNFe.Ide.Modelo = 65) then
+    if ((FNFe.Ide.Modelo = 65) or ((FNFe.Ide.Modelo = 55) and (FNFe.Ide.tpImp = tiSimplificadoTipo2))) then
     begin
       FieldByName('DEmi').AsString := FormatDateTimeBr(FNFe.Ide.DEmi);
 
       if (FNFe.Ide.tpEmis <> teNormal) and EstaVazio(FNFe.procNFe.nProt) then
-        FieldByName('MensagemFiscal').AsString := ACBrStr('EMITIDA EM CONTINGÊNCIA'+LineBreak+'Pendente de autorização');
+        FieldByName('MensagemFiscal').AsString := ACBrStr('EMITIDA EM CONTINGÊNCIA'+sLineBreak+'Pendente de autorização');
 
       if FNFe.Ide.TpAmb = taHomologacao then
-        FieldByName('MensagemFiscal').AsString := FieldByName('MensagemFiscal').AsString+LineBreak+LineBreak+ACBrStr('EMITIDA EM AMBIENTE DE HOMOLOGAÇÃO - SEM VALOR FISCAL');
+        FieldByName('MensagemFiscal').AsString := FieldByName('MensagemFiscal').AsString+sLineBreak+sLineBreak+ACBrStr('EMITIDA EM AMBIENTE DE HOMOLOGAÇÃO - SEM VALOR FISCAL');
 
       //if EstaVazio(FieldByName('MensagemFiscal').AsString) then
       //  FieldByName('MensagemFiscal').AsString := ACBrStr('ÁREA DE MENSAGEM FISCAL');
@@ -1648,6 +1740,11 @@ begin
                                                      'www.nfe.fazenda.gov.br/portal ou no site da Sefaz autorizadora';
 
     FieldByName('ExibeICMSDesoneradoComoDesconto').AsBoolean := DANFEClassOwner.ExibeICMSDesoneradoComoDesconto;
+
+    // NT 2026.010 - item 4.5: QR Code no DANFE modelo 55 somente quando informado no XML
+    FieldByName('ExibeQrCodeNFe').AsString := 'N';
+    if Assigned(FNFe) and (FNFe.Ide.modelo = 55) and NaoEstaVazio(Trim(FNFe.infNFeSupl.qrCode)) then
+      FieldByName('ExibeQrCodeNFe').AsString := 'S';
 
     if DANFEClassOwner is TACBrNFeDANFEClass then
     begin
@@ -2051,7 +2148,7 @@ begin
          FieldByName('cStat').AsInteger     := cStat;
          FieldByName('xMotivo').AsString    := xMotivo;
          FieldByName('dhRecbto').AsDateTime := dhRecbto;
-         FieldByName('cUF').AsString        := CUFtoUF(cUF);
+         FieldByName('cUF').AsString        := CodigoUFParaUF(cUF);
 
          case tpAmb of
             taProducao:    FieldByName('tpAmb').AsString := ACBrStr('PRODUÇÃO');
@@ -2314,6 +2411,41 @@ procedure TACBrNFeFRClass.frxReportBeforePrint(Sender: TfrxReportComponent);
 var
   qrcode: String;
   CpTituloReport, CpLogomarca, CpDescrProtocolo, CpTotTrib, CpContingencia1, CpContingencia2 : TfrxComponent;
+  procedure MontarDanfce;
+  begin
+    CpTituloReport := frxReport.FindObject('ReportTitle1');
+    if Assigned(CpTituloReport) then
+      CpTituloReport.Visible := cdsParametros.FieldByName('Imagem').AsString <> '';
+
+    CpLogomarca := frxReport.FindObject('ImgLogo');
+    if Assigned(CpLogomarca) and Assigned(CpTituloReport) then
+      CpLogomarca.Visible := CpTituloReport.Visible;
+
+    if EstaVazio(Trim(NFe.infNFeSupl.qrCode)) then
+      qrcode := TACBrNFe(DANFEClassOwner.ACBrNFe).GetURLQRCode(NFe)
+    else
+      qrcode := NFe.infNFeSupl.qrCode;
+
+    if Assigned(Sender) and (LeftStr(Sender.Name, 9) = 'ImgQrCode') then
+      PintarQRCode(qrcode, TfrxPictureView(Sender).Picture{$IFNDEF FMX}.Bitmap{$ENDIF}, qrUTF8NoBOM);
+
+    CpDescrProtocolo := frxReport.FindObject('Memo25');
+    if Assigned(CpDescrProtocolo) then
+      CpDescrProtocolo.Visible := cdsParametros.FieldByName('Contingencia_Valor').AsString <> '';
+
+    CpTotTrib := frxReport.FindObject('ValorTributos');
+    if Assigned(CpTotTrib) then
+      CpTotTrib.Visible := cdsCalculoImposto.FieldByName('VTotTrib').AsFloat > 0;
+
+    // ajusta Informação de contingência no NFCe
+    CpContingencia1 := frxReport.FindObject('ChildContingenciaCabecalho');
+    if Assigned(CpContingencia1) then
+      CpContingencia1.Visible := FNFe.Ide.tpEmis <> teNormal;
+
+    CpContingencia2 := frxReport.FindObject('ChildContingenciaIdentificacao');
+    if Assigned(CpContingencia2) then
+      CpContingencia2.Visible := FNFe.Ide.tpEmis <> teNormal;
+  end;
 begin
 
   qrCode := '';
@@ -2331,42 +2463,17 @@ begin
                   if Assigned(CpLogomarca) and Assigned(CpTituloReport) then
                     CpLogomarca.Visible := CpTituloReport.Visible;
                 end;
+              tiSimplificadoTipo2 : MontarDanfce;
+              tiRetrato, tiPaisagem :
+                begin
+                  // NT 2026.010 - item 4.5: QR Code no DANFE modelo 55
+                  if Assigned(Sender) and (LeftStr(Sender.Name, 9) = 'ImgQrCode') and
+                     NaoEstaVazio(Trim(NFe.infNFeSupl.qrCode)) then
+                    PintarQRCode(NFe.infNFeSupl.qrCode, TfrxPictureView(Sender).Picture{$IFNDEF FMX}.Bitmap{$ENDIF}, qrUTF8NoBOM);
+                end;
             end;
 
-      65 :  begin
-              CpTituloReport := frxReport.FindObject('ReportTitle1');
-              if Assigned(CpTituloReport) then
-                CpTituloReport.Visible := cdsParametros.FieldByName('Imagem').AsString <> '';
-
-              CpLogomarca := frxReport.FindObject('ImgLogo');
-              if Assigned(CpLogomarca) and Assigned(CpTituloReport) then
-                CpLogomarca.Visible := CpTituloReport.Visible;
-
-              if EstaVazio(Trim(NFe.infNFeSupl.qrCode)) then
-                qrcode := TACBrNFe(DANFEClassOwner.ACBrNFe).GetURLQRCode(NFe)
-              else
-                qrcode := NFe.infNFeSupl.qrCode;
-
-              if Assigned(Sender) and (LeftStr(Sender.Name, 9) = 'ImgQrCode') then
-                PintarQRCode(qrcode, TfrxPictureView(Sender).Picture{$IFNDEF FMX}.Bitmap{$ENDIF}, qrUTF8NoBOM);
-
-              CpDescrProtocolo := frxReport.FindObject('Memo25');
-              if Assigned(CpDescrProtocolo) then
-                CpDescrProtocolo.Visible := cdsParametros.FieldByName('Contingencia_Valor').AsString <> '';
-
-              CpTotTrib := frxReport.FindObject('ValorTributos');
-              if Assigned(CpTotTrib) then
-                CpTotTrib.Visible := cdsCalculoImposto.FieldByName('VTotTrib').AsFloat > 0;
-
-              // ajusta Informação de contingência no NFCe
-              CpContingencia1 := frxReport.FindObject('ChildContingenciaCabecalho');
-              if Assigned(CpContingencia1) then
-                CpContingencia1.Visible := FNFe.Ide.tpEmis <> teNormal;
-
-              CpContingencia2 := frxReport.FindObject('ChildContingenciaIdentificacao');
-              if Assigned(CpContingencia2) then
-                CpContingencia2.Visible := FNFe.Ide.tpEmis <> teNormal;
-            end;
+      65 :  MontarDanfce;
     end;
   end;
 end;

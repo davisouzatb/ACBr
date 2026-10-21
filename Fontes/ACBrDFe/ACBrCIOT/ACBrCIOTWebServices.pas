@@ -58,7 +58,6 @@ type
     FPStatus: TStatusACBrCIOT;
     FPLayout: TLayOutCIOT;
     FPConfiguracoesCIOT: TConfiguracoesCIOT;
-
   protected
     procedure InicializarServico; override;
     procedure DefinirEnvelopeSoap; override;
@@ -86,6 +85,7 @@ type
   protected
     procedure DefinirServicoEAction; override;
     procedure DefinirDadosMsg; override;
+    procedure DefinirEnvelopeSoap; override;
     procedure DefinirURL; override;
     function TratarResposta: Boolean; override;
 
@@ -197,13 +197,21 @@ procedure TCIOTWebService.DefinirEnvelopeSoap;
 var
   Texto: String;
 begin
+  FPDadosMsg := RemoverDeclaracaoXML(FPDadosMsg);
+
+  // A integradora ANTT utiliza REST com JSON, portanto a mensagem é enviada
+  // sem envelope SOAP.
+  if FPConfiguracoesCIOT.Geral.Integradora = iANTT then
+  begin
+    FPEnvelopeSoap := FPDadosMsg;
+    Exit;
+  end;
+
   {$IFDEF FPC}
    Texto := '<' + ENCODING_UTF8 + '>';    // Envelope já está sendo montado em UTF8
   {$ELSE}
    Texto := '';  // Isso forçará a conversão para UTF8, antes do envio
   {$ENDIF}
-
-  FPDadosMsg := RemoverDeclaracaoXML(FPDadosMsg);
 
   Texto := Texto + '<' + FPSoapVersion + ':Envelope ' + FPSoapEnvelopeAtributtes + '>';
   Texto := Texto + '<' + FPSoapVersion + ':Header/>';
@@ -258,7 +266,7 @@ end;
 
 procedure TCIOTWebService.EnviarDados;
 Var
-  Tentar, Tratado: Boolean;
+  Tentar, Tratado, IsANTT: Boolean;
 begin
   { sobrescrever apenas se necessário.
     Você também pode mudar apenas o valor de "FLayoutServico" na classe
@@ -267,8 +275,11 @@ begin
   FPRetWS := '';
   FPRetornoWS := '';
   Tentar := True;
+  IsANTT := (FPConfiguracoesCIOT.Geral.Integradora = iANTT);
 
-  FPEnvelopeSoap := UTF8ToNativeString(FPEnvelopeSoap);
+  // O JSON da ANTT ja esta em UTF8 e deve ser enviado sem conversao.
+  if not IsANTT then
+    FPEnvelopeSoap := UTF8ToNativeString(FPEnvelopeSoap);
 
   while Tentar do
   begin
@@ -284,7 +295,10 @@ begin
                                  FormatDateBr(FPDFeOwner.SSL.CertDataVenc)));
 
     try
-      FPRetornoWS := FPDFeOwner.SSL.Enviar(FPEnvelopeSoap, FPURL, FPSoapAction, FPMimeType);
+      // Na ANTT as rejeicoes podem retornar HTTP 4xx com o JSON de erro no
+      // corpo, que sera tratado em TratarResposta. Envelope vazio = GET.
+      FPRetornoWS := FPDFeOwner.SSL.Enviar(FPEnvelopeSoap, FPURL, FPSoapAction,
+        FPMimeType, '', not IsANTT);
     except
       if Assigned(FPDFeOwner.OnTransmitError) then
         FPDFeOwner.OnTransmitError(FPDFeOwner.SSL.HTTPResultCode,
@@ -399,6 +413,38 @@ end;
 
 { TCIOTEnviar }
 
+function ServicoANTT(const AOperacao: TpOperacao): String;
+begin
+  case AOperacao of
+    opConsultarSituacaoTransportador:
+      Result := 'ConsultarSituacaoTransportador';
+
+    opConsultarFrota:
+      Result := 'ConsultarFrotaTransportador';
+
+    opAdicionar:
+      Result := 'DeclaracaoOperacaoTransporte';
+
+    opCancelar:
+      Result := 'CancelamentoOperacaoTransporte';
+
+    opRetificar:
+      Result := 'RetificacaoOperacaoTransporte';
+
+    opEncerrar:
+      Result := 'EncerramentoOperacaoTransporte';
+
+    opConsultarExcecao:
+      Result := 'ConsultarExcecao';
+
+    opObterCodigoIOT,
+    opConsultarCIOTGerado:
+      Result := 'ConsultarCIOTGerado';
+  else
+    Result := '';
+  end;
+end;
+
 procedure TCIOTEnviar.Clear;
 begin
   inherited Clear;
@@ -430,6 +476,22 @@ var
   URL_WSDL, Servico, Acao: String;
 begin
   case TACBrCIOT( FContratos.ACBrCIOT ).Configuracoes.Geral.Integradora of
+    iANTT:
+      begin
+        Acao := ServicoANTT(FContratos.Items[0].CIOT.Integradora.Operacao);
+
+        FPMimeType := 'application/json; charset=utf-8';
+
+        FPArqEnv  := 'ped-' + Acao;
+        FPArqResp := 'res-' + Acao;
+
+        FPServico := Acao;
+        // Servico REST: nao deve ser enviado o header SOAPAction.
+        FPSoapAction := '';
+
+        Exit;
+      end;
+
     iPamcard:
       begin
         URL_WSDL := 'http://webservice.pamcard.jee.pamcary.com.br/WSTransacional/';
@@ -807,9 +869,42 @@ begin
   FPSoapAction := Servico + Acao;
 end;
 
+procedure TCIOTEnviar.DefinirEnvelopeSoap;
+begin
+  inherited DefinirEnvelopeSoap;
+
+  // ConsultarExcecao da ANTT e consumido via GET (parametro na URL); com o
+  // envelope vazio o TDFeSSL.Enviar utiliza o verbo GET.
+  if (FPConfiguracoesCIOT.Geral.Integradora = iANTT) and
+     (FContratos.Items[0].CIOT.Integradora.Operacao = opConsultarExcecao) then
+    FPEnvelopeSoap := '';
+end;
+
 procedure TCIOTEnviar.DefinirURL;
+var
+  Operacao: TpOperacao;
 begin
   case TACBrCIOT( FContratos.ACBrCIOT ).Configuracoes.Geral.Integradora of
+    iANTT:
+      begin
+        FPLayout := LayANTT;
+
+        inherited DefinirURL;
+
+        Operacao := FContratos.Items[0].CIOT.Integradora.Operacao;
+
+        if (FPURL <> '') and (FPURL[Length(FPURL)] <> '/') then
+          FPURL := FPURL + '/';
+
+        FPURL := FPURL + ServicoANTT(Operacao);
+
+        if Operacao = opConsultarExcecao then
+          FPURL := FPURL + '?CPFCNPJTransportador=' +
+            OnlyCPFCNPJAlphaNum(FContratos.Items[0].CIOT.ConsultarTransportador.CpfCnpjTransportador);
+
+        Exit;
+      end;
+
     iPamcard:
       FPLayout := LayPamcard;
   else //ieFrete
@@ -873,6 +968,17 @@ var
   NomeArq: string;
 begin
   case FPConfiguracoesCIOT.Geral.Integradora of
+    iANTT:
+      begin
+        FPRetWS := FPRetornoWS;
+
+        // Resposta de erro HTTP sem JSON no corpo nao pode ser interpretada.
+        if ((FPDFeOwner.SSL.HTTPResultCode < 200) or
+            (FPDFeOwner.SSL.HTTPResultCode > 299)) and
+           (Copy(Trim(FPRetWS), 1, 1) <> '{') then
+          GerarException(ACBrStr(Format('Erro HTTP %d ao acessar: %s',
+            [FPDFeOwner.SSL.HTTPResultCode, FPURL])) + CRLF + FPRetWS);
+      end;
     iPamcard:
       FPRetWS := SeparaDados(FPRetornoWS, 'env:Body');
   else
@@ -884,7 +990,11 @@ begin
   if( FContratos.Count > 0 )then
     FRetornoEnvio.Operacao := FContratos.Items[0].CIOT.Integradora.Operacao;
 
-  FRetornoEnvio.Leitor.Arquivo := UTF8ToNativeString(ParseText(FPRetWS));
+  if FPConfiguracoesCIOT.Geral.Integradora = iANTT then
+    FRetornoEnvio.Leitor.Arquivo := UTF8ToNativeString(FPRetWS)
+  else
+    FRetornoEnvio.Leitor.Arquivo := UTF8ToNativeString(ParseText(FPRetWS));
+
   FRetornoEnvio.LerXml;
 
   if FRetornoEnvio.RetEnvio.PDF <> '' then
@@ -902,6 +1012,7 @@ begin
   FPMsg := '';
 
   case FPConfiguracoesCIOT.Geral.Integradora of
+    iANTT,
     iPamcard:
       FPMsg := FRetornoEnvio.RetEnvio.Codigo + ' - ' +
                FRetornoEnvio.RetEnvio.Mensagem;

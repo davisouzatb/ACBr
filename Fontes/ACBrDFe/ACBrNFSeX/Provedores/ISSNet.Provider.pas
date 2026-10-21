@@ -514,6 +514,7 @@ begin
   Result := RemoverIdentacao(Result);
   Result := RemoverPrefixosDesnecessarios(Result);
   Result := RemoverCaracteresDesnecessarios(Result);
+  Result := StringReplace(Result, '&', '&amp;', [rfReplaceAll]);
 end;
 
 { TACBrNFSeXWebserviceISSNet204 }
@@ -1265,12 +1266,12 @@ begin
   begin
     Result := inherited TratarXmlRetornado(Result);
 
-//    Result := RemoverCaracteresDesnecessarios(Result);
-    Result := DecodeHTMLEntities(Result);
+    Result := RemoverCaracteresDesnecessarios(Result);
+    //Result := DecodeHTMLEntities(Result); // Removido por erro de parser de respostas do WS : Panda
     Result := RemoverDeclaracaoXML(Result);
     Result := RemoverIdentacao(Result);
     Result := RemoverPrefixosDesnecessarios(Result);
-//    Result := StringReplace(Result, '<br>', ' ', [rfReplaceAll, rfIgnoreCase]);
+    Result := StringReplace(Result, '<br>', ' ', [rfReplaceAll, rfIgnoreCase]);
   end;
 end;
 
@@ -1648,7 +1649,8 @@ begin
     if AuxNode <> nil then
     begin
       AuxNode := AuxNode.Childrens.FindAnyNs('infDPS');
-      if not Assigned(AuxNode) then
+
+      if AuxNode <> nil then
       begin
         NumRps := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('nDPS'), tcStr);
         SerieRps := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('serie'), tcStr);
@@ -1857,10 +1859,17 @@ end;
 begin
   ANode := RootNode.Childrens.FindAnyNs(AListTag);
 
+  //Procura dentro de ValidarXML primeiro
   if not Assigned(ANode) then
   begin
-    ANode := RootNode.Childrens.FindAnyNs('ListaMensagemRetorno');
+    ANode := RootNode.Childrens.FindAnyNs('ValidarXmlResposta');
+    if Assigned(ANode) then
+      ANode := ANode.Childrens.FindAnyNs('ListaMensagemRetorno');
   end;
+
+  //Se não achar ValidarXML procura elemento solto
+  if not Assigned(ANode) then
+    ANode := RootNode.Childrens.FindAnyNs('ListaMensagemRetorno');
 
   ProcessarErros;
 
@@ -3632,7 +3641,7 @@ procedure TACBrNFSeProviderISSNetAPIPropria.TratarRetornoEnviarEvento(
 var
   Document: TACBrXmlDocument;
   ANode, AuxNode: TACBrXmlNode;
-  IdAttr, nomeArq: string;
+  nomeArq: string;
   AErro: TNFSeEventoCollectionItem;
 begin
   Document := TACBrXmlDocument.Create;
@@ -3651,7 +3660,15 @@ begin
 
       ProcessarMensagemErros(Document.Root, Response);
 
-      ANode := Document.Root.Childrens.FindAnyNs('Evento');
+      ANode := Document.Root.Childrens.FindAnyNs('ListaEvento');
+
+      if Assigned(ANode) then
+        ANode := ANode.Childrens.FindAnyNs('evento')
+      else
+        ANode := Document.Root.Childrens.FindAnyNs('evento');
+
+      if not Assigned(ANode) then
+        ANode := Document.Root.Childrens.FindAnyNs('Evento');
 
       if not Assigned(ANode) then
       begin
@@ -3665,9 +3682,9 @@ begin
 
       if not Assigned(AuxNode) then Exit;
 
-      Response.idEvento := ObterConteudoTag(ANode.Attributes.Items[IdAttr]);
-      Response.DataCanc := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
-      Response.NumeroNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('nDFe'), tcStr);
+      Response.idEvento := ObterConteudoTag(AuxNode.Attributes.Items['Id']);
+      Response.DataCanc := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('dhProc'), tcDatHor);
+      Response.NumeroNota := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('nDFSe'), tcStr);
 
       if Response.DataCanc > 0 then
       begin

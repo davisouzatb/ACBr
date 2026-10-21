@@ -43,6 +43,52 @@ Símbolo : Significado
 [+]     : Novo recurso
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
+
+19/10/2026
+-- DoACBrMDFeUnit --
+[-] ACBR-10070 - MDFe - Corrigido tratamento de erro nos comandos SetFormaEmissao e SetTipoImpressao 
+   Por: Renato Rubinho
+   Veja: https://www.projetoacbr.com.br/forum/topic/95417-acbr-10070-mdfesetformaemissao-forma-de-emiss%C3%A3o-inv%C3%A1lida-1/
+
+16/10/2026
+-- DoBoletoUnit --
+[-] Corrigido a sintaxe de resposta dos metodos: ConsultarTitulosPorPeriodo e EnviarBoleto
+   Por: Daniel de Morais
+   Veja: https://www.projetoacbr.com.br/forum/topic/95387-arquivo-saitxt-retorno-bancodobrasilapi-com-ok-na-primeira-linha/#comment-624187
+
+09/10/2026
+-- ACBrMonitor1 --
+[-] Corrige seleção do componente de impressão quando DANFe Simplificado Tipo 2 para considerar ESCPOS também.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/95129-impress%C3%A3o-de-danfe-simplificada-tipo-2-na-bobina/?&_rid=124795#findComment-623343 
+
+07/10/2026
+--- Diversos ---
+[+] ACBR-9220 - Implementação do CIOT no Monitor
+    Por: Renato Rubinho
+
+02/10/2026
+-- ACBrMonitor1/DoACBrNFeUnit --
+[+] ACBR-9942 - Adiciona a impressão do DANFe Simplificado Tipo 2
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/94858-danfe-simplificado-tipo-2-sendo-disponibilizado-nos-motores-de-relat%C3%B3rio-do-acbr/
+
+17/09/2026
+-- ACBrMonitor1/DoACBrMDFeUnit/DoACBrNFeUnit --
+[*] Substituição das units pcnConversao por ACBrDFe.Conversao, pmdfMDFeConversao por ACBrMDFe.Conversao, remoção da unit pcnAuxiliar das rotinas do MDFe e melhoria das rotinas LerINI para os objetos MDFe e NFe.
+   Por: Diego Folieni / Italo Giurizzato Junior
+   Veja: https://www.projetoacbr.com.br/forum/topic/94539-fim-do-uso-da-unit-pcnconversao-nos-dfe-e-uso-das-units-exclusivas-para-a-rtc/
+
+09/09/2026
+-- ACBrMonitor1 --
+[-] [ACBR-9638] Mitigação de Access Violation no Windows quando não há impressora padrão
+    Por: doszapro
+
+04/09/22026
+-- ACBrMonitor1 --
+[*] Altera nomenclatura de chNFe para chDFe
+   Por: Diego Folieni
+
 18/06/2026
 -- Diversas units  --
 [*] Ajuste das chaves chaves e cnpj alfanumérico.

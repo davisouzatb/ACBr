@@ -57,7 +57,7 @@ type
     FValidarInscricoes: boolean;
     FValidarListaServicos: boolean;
 
-  published
+  public
     property AjustarTagNro: boolean read FAjustarTagNro write FAjustarTagNro;
     property GerarTagIPIparaNaoTributado: boolean read FGerarTagIPIparaNaoTributado write FGerarTagIPIparaNaoTributado;
     property NormatizarMunicipios: boolean read FNormatizarMunicipios write FNormatizarMunicipios;
@@ -225,7 +225,7 @@ begin
 
   vUF          := Poem_Zeros(AUF, 2);
   vDataEmissao := FormatDateTime('YYMM', ADataEmissao);
-  vCNPJ        := PadLeft(OnlyAlphaNum(ACNPJ), 14, '0');
+  vCNPJ        := PadLeft(OnlyCPFCNPJAlphaNum(ACNPJ), 14, '0');
   vModelo      := Poem_Zeros(AModelo, 2);
   vSerie       := Poem_Zeros(ASerie, 3);
   vNumero      := Poem_Zeros(ANumero, 9);
@@ -532,7 +532,7 @@ begin
                                 OnlyNumber(DCe.dest.enderDest.fone), DSC_FONE));
 
   Result.AppendChild(AddNode(tcStr, 'E19', 'email', 1, 60, 0,
-                              OnlyNumber(DCe.dest.enderDest.email), DSC_EMAIL));
+                                          DCe.dest.enderDest.email, DSC_EMAIL));
 end;
 
 function TDCeXmlWriter.Gerar_autXML: TACBrXmlNodeArray;
@@ -875,6 +875,9 @@ begin
 
     teEmissorProprio:
       xCNPJCPF := DCe.emit.CNPJCPF;
+
+    teECT:
+      xCNPJCPF := DCe.ECT.CNPJ;
 
   else
     xCNPJCPF := DCe.Transportadora.CNPJ;

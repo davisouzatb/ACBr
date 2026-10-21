@@ -285,6 +285,7 @@ type
     VersaoeSocial     : String;
     VersaoReinf       : String;
     VersaoGNRe        : String;
+    VersaoCIOT        : String;
     VersaoQRCode      : String;
     CamposFatObrig    : Boolean;
     FormaEmissaoNFe   : Integer;
@@ -437,6 +438,15 @@ type
     TipoContribuinte : String;
   end;
 
+  TCIOT = record
+    Integradora: Integer;
+    HashIntegrador: String;
+    Usuario: String;
+    Senha: String;
+    CNPJEmitente: String;
+    Token: String;
+  end;
+
   TDFe = record
     IgnorarComandoModoEmissao: Boolean;
     ModoXML           : Boolean;
@@ -462,6 +472,7 @@ type
     Diretorios         : TDFeDiretorios;
     ESocial            : TeSocial;
     Reinf              : TReinf;
+    CIOT: TCIOT;
     RespTecnico        : TDFeRespTecnico;
     QuebraDeLinha      : String;
   end;
@@ -1164,6 +1175,7 @@ begin
       Ini.WriteString( CSecWebService, CKeyVersaoQRCode, VersaoQRCode );
       Ini.WriteString( CSecWebService, CKeyVersaoBPe, VersaoBPe );
       Ini.WriteString( CSecWebService, CKeyVersaoGNRe, VersaoGNRe );
+      Ini.WriteString( CSecWebService, CKeyVersaoCIOT, VersaoCIOT );
       Ini.WriteInteger( CSecWebService, CKeyFormaEmissaoNFe, FormaEmissaoNFe );
       Ini.WriteInteger( CSecWebService, CKeyFormaEmissaoCTe, FormaEmissaoCTe );
       Ini.WriteInteger( CSecWebService, CKeyFormaEmissaoMDFe, FormaEmissaoMDFe );
@@ -1199,6 +1211,16 @@ begin
       Ini.WriteString( CSecReinf, CKeyIdContribuinte, IdContribuinte );
       Ini.WriteString( CSecReinf, CKeyIdTransmissor, IdTransmissor );
       Ini.WriteString( CSecReinf, CKeyTipoContribuinte, TipoContribuinte );
+    end;
+
+    with DFe.CIOT do
+    begin
+      Ini.WriteInteger( CSecCIOT, CKeyIntegradora, Integradora );
+      GravaINICrypt(Ini, CSecCIOT, CKeyHashIntegrador, HashIntegrador, _C);
+      Ini.WriteString( CSecCIOT, CKeyCIOTUsuario, Usuario );
+      GravaINICrypt(Ini, CSecCIOT, CKeySenha, Senha, _C);
+      Ini.WriteString( CSecCIOT, CKeyCNPJEmitente, CNPJEmitente );
+      GravaINICrypt(Ini, CSecCIOT, CKeyToken, Token, _C);
     end;
 
     with DFe.WebService.Proxy do
@@ -2000,6 +2022,7 @@ begin
       VersaoQRCode              := Ini.ReadString( CSecWebService, CKeyVersaoQRCode, CvalueVersaoQRCode );
       VersaoBPe                 := Ini.ReadString( CSecWebService, CKeyVersaoBPe, VersaoBPe );
       VersaoGNRe                := Ini.ReadString( CSecWebService, CKeyVersaoGNRe, VersaoGNRe );
+      VersaoCIOT                := Ini.ReadString( CSecWebService, CKeyVersaoCIOT, VersaoCIOT );
       FormaEmissaoNFe           := Ini.ReadInteger( CSecWebService, CKeyFormaEmissaoNFe, DFe.Impressao.Geral.FormaEmissao );
       FormaEmissaoCTe           := Ini.ReadInteger( CSecWebService, CKeyFormaEmissaoCTe, DFe.Impressao.Geral.FormaEmissao );
       FormaEmissaoGNRe          := Ini.ReadInteger( CSecWebService, CKeyFormaEmissaoGNRe, DFe.Impressao.Geral.FormaEmissao );
@@ -2207,6 +2230,16 @@ begin
       IdContribuinte             := Ini.ReadString( CSecReinf,    CKeyIdContribuinte,  IdContribuinte  );
       IdTransmissor              := Ini.ReadString( CSecReinf,    CKeyIdTransmissor,  IdTransmissor  );
       TipoContribuinte           := Ini.ReadString( CSecReinf,    CKeyTipoContribuinte,  CValueTipoContribuinte  );
+    end;
+
+    with DFe.CIOT do
+    begin
+      Integradora := Ini.ReadInteger( CSecCIOT, CKeyIntegradora, Integradora );
+      HashIntegrador := LeINICrypt(Ini, CSecCIOT, CKeyHashIntegrador, _C);
+      Usuario := Ini.ReadString( CSecCIOT, CKeyCIOTUsuario, Usuario );
+      Senha := LeINICrypt(Ini, CSecCIOT, CKeySenha, _C);
+      CNPJEmitente := Ini.ReadString( CSecCIOT, CKeyCNPJEmitente, CNPJEmitente );
+      Token := LeINICrypt(Ini, CSecCIOT, CKeyToken, _C);
     end;
 
     with SAT do
@@ -2814,6 +2847,7 @@ begin
     VersaoQRCode              := '0';
     VersaoBPe                 := '1.00';
     VersaoGNRe                := '1.00';
+    VersaoCIOT                := '5.00';
     FormaEmissaoNFe           := 0;
     FormaEmissaoCTe           := 0;
     FormaEmissaoGNRe          := 0;
@@ -3010,6 +3044,16 @@ begin
     IdContribuinte             := '';
     IdTransmissor              := '';
     TipoContribuinte           := 'tcPessoaJuridica';
+  end;
+
+  with DFe.CIOT do
+  begin
+    Integradora := 0;
+    HashIntegrador := '';
+    Usuario := '';
+    Senha := '';
+    CNPJEmitente := '';
+    Token := '';
   end;
 
   with SAT do

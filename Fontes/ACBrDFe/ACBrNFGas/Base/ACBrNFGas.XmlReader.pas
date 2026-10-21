@@ -76,7 +76,6 @@ type
     procedure Ler_Prod(const ANode: TACBrXmlNode; Prod: TProd);
     procedure Ler_gMedicao(const ANode: TACBrXmlNode; gMedicao: TgMedicao);
     procedure Ler_gMedida(const ANode: TACBrXmlNode; gMedida: TgMedida);
-    procedure Ler_gPagAntecipado(const ANode: TACBrXmlNode; gPagAntecipado: TgPagAntecipadoNFGas);
 
     procedure Ler_Imposto(const ANode: TACBrXmlNode; Imposto: TImposto);
     procedure Ler_ICMS(const ANode: TACBrXmlNode; ICMS: TICMS);
@@ -284,6 +283,7 @@ begin
   NFGas.Ide.verProc := ObterConteudo(ANode.Childrens.FindAnyNs('verProc'), tcStr);
   NFGas.Ide.dhCont := ObterConteudo(ANode.Childrens.FindAnyNs('dhCont'), tcDatHor);
   NFGas.Ide.xJust := ObterConteudo(ANode.Childrens.FindAnyNs('xJust'), tcStr);
+  NFGas.Ide.tpPagAnt := StrTotpPagAnt(ObterConteudo(ANode.Childrens.FindAnyNs('tpPagAnt'), tcStr));
 
   Ler_gCompraGovReduzido(ANode.Childrens.FindAnyNs('gCompraGov'), NFGas.Ide.gCompraGov);
 end;
@@ -539,13 +539,15 @@ begin
   Prod.fatorP := ObterConteudo(ANode.Childrens.FindAnyNs('fatorP'), tcDe4);
   Prod.fatorT := ObterConteudo(ANode.Childrens.FindAnyNs('fatorT'), tcDe4);
   Prod.vProd := ObterConteudo(ANode.Childrens.FindAnyNs('vProd'), tcDe10);
+  Prod.vItemLiq := ObterConteudo(ANode.Childrens.FindAnyNs('vItemLiq'), tcDe10);
+  Prod.vProdLiq := ObterConteudo(ANode.Childrens.FindAnyNs('vProdLiq'), tcDe10);
 
   Lvalor := ObterConteudo(ANode.Childrens.FindAnyNs('indDevolucao'), tcStr);
 
   if Lvalor <> '' then
     Prod.indDevolucao := StrToTIndicador(lValor);
 
-  Ler_gPagAntecipado(ANode.Childrens.FindAnyNs('gPagAntecipado'), Prod.gPagAntecipado);
+  Ler_gPagAntecipadoProd(ANode.Childrens.FindAnyNs('gPagAntecipado'), Prod.gPagAntecipado);
 end;
 
 procedure TNFGasXmlReader.Ler_gMedicao(const ANode: TACBrXmlNode; gMedicao: TgMedicao);
@@ -569,16 +571,6 @@ begin
 
   gMedida.uMed := StrTouMed(ObterConteudo(ANode.Childrens.FindAnyNs('uMed'), tcStr));
   gMedida.vMed := ObterConteudo(ANode.Childrens.FindAnyNs('vMed'), tcDe4);
-end;
-
-procedure TNFGasXmlReader.Ler_gPagAntecipado(const ANode: TACBrXmlNode;
-  gPagAntecipado: TgPagAntecipadoNFGas);
-begin
-  if not Assigned(ANode) then
-    Exit;
-
-  gPagAntecipado.chDFePagAnt := ObterConteudo(ANode.Childrens.FindAnyNs('chDFePagAnt'), tcStr);
-  gPagAntecipado.nItemPagAnt := ObterConteudo(ANode.Childrens.FindAnyNs('nItemPagAnt'), tcInt);
 end;
 
 procedure TNFGasXmlReader.Ler_DetgAgregadora(const ANode: TACBrXmlNode;
@@ -730,6 +722,8 @@ begin
   if Lvalor <> '' then
     gProcRef.indDevolucao := StrToTIndicador(lValor);
 
+  Ler_gIBSCBSSemProcJur(ANode.Childrens.FindAnyNs('gIBSCBS'), gProcRef.gIBSCBS);
+
   ANodes := ANode.Childrens.FindAllAnyNs('gProc');
   for Index := 0 to Length(ANodes) - 1 do
   begin
@@ -756,6 +750,7 @@ begin
     Exit;
 
   Total.vProd := ObterConteudo(ANode.Childrens.FindAnyNs('vProd'), tcDe2);
+  Total.vProdLiq := ObterConteudo(ANode.Childrens.FindAnyNs('vProdLiq'), tcDe2);
 
   Ler_ICMSTot(ANode.Childrens.FindAnyNs('ICMSTot'), Total);
   Ler_vRetTribTot(ANode.Childrens.FindAnyNs('vRetTribTot'), Total);

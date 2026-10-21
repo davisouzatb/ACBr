@@ -1369,7 +1369,7 @@ inherited frmNF3eDAEventoRLRetrato: TfrmNF3eDAEventoRLRetrato
       object RLDraw81: TRLDraw
         Left = 1
         Top = 44
-        Width = 368
+        Width = 330
         Height = 1
         HelpContext = 1
         Brush.Style = bsClear
@@ -1492,14 +1492,14 @@ inherited frmNF3eDAEventoRLRetrato: TfrmNF3eDAEventoRLRetrato
         Brush.Style = bsClear
       end
       object rlsLinhaV08: TRLDraw
-        Left = 236
+        Left = 220
         Top = 15
         Width = 1
         Height = 30
         Brush.Style = bsClear
       end
       object rlLabel33: TRLLabel
-        Left = 246
+        Left = 223
         Top = 19
         Width = 95
         Height = 9
@@ -1516,7 +1516,7 @@ inherited frmNF3eDAEventoRLRetrato: TfrmNF3eDAEventoRLRetrato
         Transparent = False
       end
       object rllEmissao: TRLLabel
-        Left = 246
+        Left = 223
         Top = 27
         Width = 58
         Height = 13
@@ -1531,7 +1531,7 @@ inherited frmNF3eDAEventoRLRetrato: TfrmNF3eDAEventoRLRetrato
         Transparent = False
       end
       object rlsLinhaV07: TRLDraw
-        Left = 368
+        Left = 330
         Top = 15
         Width = 1
         Height = 66
@@ -1556,7 +1556,7 @@ inherited frmNF3eDAEventoRLRetrato: TfrmNF3eDAEventoRLRetrato
       object rllChave: TRLLabel
         Left = 6
         Top = 60
-        Width = 356
+        Width = 314
         Height = 14
         Alignment = taCenter
         AutoSize = False
@@ -1579,15 +1579,15 @@ inherited frmNF3eDAEventoRLRetrato: TfrmNF3eDAEventoRLRetrato
         Brush.Style = bsClear
       end
       object rliBarCode: TRLBarcode
-        Left = 376
-        Top = 24
-        Width = 357
+        Left = 337
+        Top = 22
+        Width = 402
         Height = 48
         Margins.LeftMargin = 1.000000000000000000
         Margins.RightMargin = 1.000000000000000000
         Alignment = taCenter
         AutoSize = False
-        BarcodeType = bcCode128C
+        BarcodeType = bcCode128
       end
     end
   end

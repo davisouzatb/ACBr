@@ -119,6 +119,8 @@ resourcestring
   DSC_VDESC = 'Valor do Desconto';
   DSC_VOUTRO = 'Outras despesas acessórias ';
   DSC_VPROD = 'Valor total do item';
+  DSC_VITEMLIQ = 'Valor unitário do item sem tributos';
+  DSC_VPRODLIQ = 'Valor líquido total do item sem tributos';
   DSC_CST = 'Classificação Tributária';
   DSC_VBC = 'Valor da Base de Calculo';
   DSC_PICMS = 'Alíquota do ICMS';
@@ -193,8 +195,6 @@ resourcestring
   DSC_DREFSALDOPTS= 'Data de aferição do saldo de pontos';
   DSC_QTDPTSRESG = 'Qtd de pontos resgatados na data de referência';
   DSC_DREFRESGPTS = 'Data de resgate dos pontos';
-  DSC_CHDFEPAGANT = 'Chave de acesso do DF-e de antecipação de pagamento';
-  DSC_NITEMPAGANT = 'Número do item do DF-e de antecipação para refência direta a um item';
 
 implementation
 

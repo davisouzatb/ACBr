@@ -416,6 +416,7 @@ const
   TtpGuiaArrayStrings: array[TtpGuia] of string = ('', '1', '2', '3', '4', '5', '6', '7');
 
 // Reforma Tributária
+{
 type
   TtpNFDebito = (tdNenhum, tdTransferenciaCreditoCooperativa, tdAnulacao,
                  tdDebitosNaoProcessadas, tdMultaJuros,
@@ -425,7 +426,7 @@ type
 const
   TtpNFDebitoArrayStrings: array[TtpNFDebito] of string = ('', '01', '02', '03',
     '04', '05', '06', '07', '08');
-
+}
 type
   TtpNFCredito = (tcNenhum, tcMultaJuros, tcApropriacaoCreditoPresumido, tcRetorno,
                   tcReducaoValores, tcTransferenciaCreditoSucessao,
@@ -442,14 +443,6 @@ type
 const
   TCSTISArrayStrings: array[TCSTIS] of string = ('',
     '000', '100', '200', '300', '400','500', '600');
-
-type
-  TTpCredPresIBSZFM = (tcpNenhum, tcpSemCredito, tcpBensConsumoFinal, tcpBensCapital,
-                       tcpBensIntermediarios, tcpBensInformaticaOutros);
-
-const
-  TTpCredPresIBSZFMArrayStrings: array[TTpCredPresIBSZFM] of string = ('', '0',
-    '1', '2', '3', '4');
 
 {
   Declaração das funções de conversão
@@ -533,18 +526,16 @@ function TtpGuiaToStr(const t: TtpGuia): string;
 function StrToTtpGuia(const s: String): TtpGuia;
 
 // Reforma Tributária
+{
 function tpNFDebitoToStr(const t: TtpNFDebito): string;
 function StrTotpNFDebito(const s: string): TtpNFDebito;
-
+}
 function tpNFCreditoToStr(const t: TtpNFCredito): string;
 function StrTotpNFCredito(const s: string): TtpNFCredito;
 
 function CSTISToStr(const t: TCSTIS): string;
 function TryStrToCSTIS(const s: string; out Value: TCSTIS): Boolean;
 function StrToCSTIS(const s: string): TCSTIS;
-
-function TpCredPresIBSZFMToStr(const t: TTpCredPresIBSZFM): string;
-function StrToTpCredPresIBSZFM(const s: string): TTpCredPresIBSZFM;
 
 implementation
 
@@ -1752,6 +1743,7 @@ begin
 end;
 
 // Reforma Tributária
+{
 function tpNFDebitoToStr(const t: TtpNFDebito): string;
 begin
   Result := TtpNFDebitoArrayStrings[t];
@@ -1771,7 +1763,7 @@ begin
   end;
   raise EACBrException.CreateFmt('Valor string inválido para TtpNFDebito: %s', [s]);
 end;
-
+}
 function tpNFCreditoToStr(const t: TtpNFCredito): string;
 begin
   Result := TtpNFCreditoArrayStrings[t];
@@ -1817,26 +1809,6 @@ function StrToCSTIS(const s: string): TCSTIS;
 begin
   if not TryStrToCSTIS(s, Result) then
     raise EACBrException.CreateFmt('Valor string inválido para TCSTIS: %s', [s]);
-end;
-
-function TpCredPresIBSZFMToStr(const t: TTpCredPresIBSZFM): string;
-begin
-  Result := TTpCredPresIBSZFMArrayStrings[t];
-end;
-
-function StrToTpCredPresIBSZFM(const s: string): TTpCredPresIBSZFM;
-var
-  idx: TTpCredPresIBSZFM;
-begin
-  for idx:= Low(TTpCredPresIBSZFMArrayStrings) to High(TTpCredPresIBSZFMArrayStrings) do
-  begin
-    if(TTpCredPresIBSZFMArrayStrings[idx] = s)then
-    begin
-      Result := idx;
-      exit;
-    end;
-  end;
-  raise EACBrException.CreateFmt('Valor string inválido para TTpCredPresIBSZFM: %s', [s]);
 end;
 
 initialization

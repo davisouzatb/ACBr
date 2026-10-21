@@ -138,6 +138,7 @@ type
     procedure LerINISecaoOrgaoGerador(const AINIRec: TMemIniFile); virtual;
     procedure LerINISecaoParcelas(const AINIRec: TMemIniFile); virtual;
     procedure LerINIValoresTribFederal(AINIRec: TMemIniFile);
+    procedure LerINIValoresTribMunicipal(AINIRec: TMemIniFile);
 
   public
     function LerXml: Boolean; override;
@@ -589,6 +590,9 @@ begin
     LerTomadorServico(AuxNode);
 
     NFSe.DataFatoGerador := ObterConteudo(AuxNode.Childrens.FindAnyNs('DataFatoGerador'), tcDat);
+	
+	if NFSe.DataFatoGerador < EncodeDate(2000, 1, 1) then
+      NFSe.DataFatoGerador := 0;
 
     LerIntermediarioServico(AuxNode);
     LerConstrucaoCivil(AuxNode);
@@ -678,6 +682,12 @@ begin
     LerDeclaracaoPrestacaoServico(AuxNode);
 
     NFSe.ChaveAcesso := ObterConteudo(AuxNode.Childrens.FindAnyNs('ChaveAcesso'), tcStr);
+
+    if (NFSe.ChaveAcesso = '') then
+        NFSe.ChaveAcesso := ObterConteudo(AuxNode.Childrens.FindAnyNs('ChaveADN'), tcStr);
+
+    if (NFSe.ChaveAcesso = '') then
+        NFSe.ChaveAcesso := ObterConteudo(AuxNode.Childrens.FindAnyNs('chaveAcessoNacional'), tcStr);
 
     if NFSe.ChaveAcesso = '' then
       NFSe.ChaveAcesso := NFSe.infNFSe.ID;
@@ -1398,6 +1408,7 @@ begin
     LerINISecaoOrgaoGerador(LINIRec);
     LerINISecaoParcelas(LINIRec);
     LerINIValoresTribFederal(LINIRec);
+    LerINIValoresTribMunicipal(LINIRec);
 
     // Ler os campos do arquivo INI referente a Reforma Tributária
     LerINIIBSCBS(LINIRec, NFSe.IBSCBS);
@@ -1843,8 +1854,20 @@ begin
   if AINIRec.SectionExists(sSecao) then
   begin
     NFSe.Servico.Valores.tribFed.CST := StrToCST(Ok, AINIRec.ReadString(sSecao, 'CST', ''));
+    NFSe.Servico.Valores.tribFed.tpRetPisCofins := StrTotpRetPisCofins(Ok, AINIRec.ReadString(sSecao, 'tpRetPisCofins', ''));
+    NFSe.Servico.Valores.tpRetPisCofins := NFSe.Servico.Valores.tribFed.tpRetPisCofins;
   end;
 end;
 
+
+procedure TNFSeR_ABRASFv2.LerINIValoresTribMunicipal(AINIRec: TMemIniFile);
+var
+  sSecao: string;
+  Ok: Boolean;
+begin
+  sSecao := 'tribMun';
+  if AINIRec.SectionExists(sSecao) then
+    NFSe.Servico.Valores.tribMun.tpImunidade := StrToTpImunidade(Ok, AINIRec.ReadString(sSecao, 'tpImunidade', ''));
+end;
 
 end.

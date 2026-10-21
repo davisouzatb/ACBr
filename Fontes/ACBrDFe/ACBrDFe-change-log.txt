@@ -39,6 +39,63 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+06/10/2026
+-- ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter --
+[*] Condicionado a geração da seção gIBSCBSSemProcJur, sem nenhum índice, com apenas
+    um ou com dois índices.
+   Por: Italo Giurizzato Junior
+-- ACBrDFe.Conversao/ACBrDFe.RTC.Classes/ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter --
+-- ACBrDFe.RTC.XmlReader/ACBrDFe.RTC.XmlWriter --
+[+] Alterações visando a NT 2026/004 e para o ACBrNFeABI.
+   Por: Italo Giurizzato Junior
+
+24/09/2026
+-- ACBrDFe.RTC.XmlWriter --
+[-] As tags vCredPres e vCredPresCondSus dos grupos gIBS e gCBS só devem ser geradas se o DF-e
+    for NF-e ou NFC-e.
+   Por: Italo Giurizzato Junior
+
+23/09/2026
+-- ACBrBPeXmlWriter, ACBrDFe.RTC.XmlWriter --
+[-] ACBR-9791 - Bpe - Implementado controle de número de ocorrências para geração dos totais de IBSCBS
+   Por: Paulo Alves N. Júnior/Renato Rubinho
+   Veja: https://www.projetoacbr.com.br/forum/topic/94325-acbr-9791erro-de-schema-no-grupo-ibscbstot-para-cst-400-bpe-tm/
+
+16/09/2026
+-- ACBrDFe.RTC.XmlWriter.pas, ACBrDFe.RTC.XmlReader.pas --
+[-] ACBR-9873 - Ajustado a escrita e a leitura da propriedade pAliqEfet para 4 casas decimais.
+   Por: Daniel de Morais InfoCotidiano
+   Veja: https://www.projetoacbr.com.br/forum/topic/94789-tag-do-grupo-n%C3%A3o-est%C3%A1-aceitando-mais-de-2-casas-decimais/?_rid=1706
+
+11/09/2026
+-- ACBrDFe.RTC.XmlWriter --
+[-] ACBR-9844 - Ajuste para que o grupo gIBSCBSMono seja gerado apenas caso tenha valor atribuído.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/94675-acbr-9844rejei%C3%A7%C3%A3o-n%C3%A3o-informada-tributa%C3%A7%C3%A3o-monof%C3%A1sica-ad-valorem-do-ibs-cst-620/
+
+10/09/2026
+-- ACBrDFe.RTC.XmlReader.pas --
+[*] Ajustes para CNPJBasePSP alfanumerico.
+   Por: Daniel de Morais
+
+09/09/2026
+-- ACBrDFe.RTC.IniWriter --
+[*] Corrige a geração do índice das seções de IBSCBS
+   Por: Diego Folieni
+
+04/09/2026
+-- ACBrDFe.RTC.Classes/ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter --
+-- ACBrDFe.RTC.XmlReader/ACBrDFe.RTC.XmlWriter --
+[*] Alterado o nome da tag de pISEspec para adRemIS conforme consta nos Schemas.
+   Por: Italo Giurizzato Junior
+
+01/09/2026
+-- ACBrDFe.RTC.Classes/ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter --
+-- ACBrDFe.RTC.XmlReader/ACBrDFe.RTC.XmlWriter --
+[*] Ajustes referente ao novo layout da Tributação Monofásica e ajuste
+    na nomenclatura do percentual e valor do IBS Estadual e Municipal.
+   Por: Italo Giurizzato Junior
+
 05/08/2026
 -- ACBrDFe.RTC.Classes/ACBrDFe.RTC.IniReader/ACBrDFe.RTC.IniWriter --
 -- ACBrDFe.RTC.XmlReader/ACBrDFe.RTC.XmlWriter/ACBrDFeConsts --

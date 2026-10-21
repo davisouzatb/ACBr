@@ -64,6 +64,7 @@ uses
   Aspec.Provider,
   AssessorPublico.Provider,
   Asten.Provider,
+  Balker.Provider,
   Bauhaus.Provider,
   Betha.Provider,
   BHISS.Provider,
@@ -247,6 +248,7 @@ begin
         Result := TACBrNFSeProviderAssessorPublico.Create(ACBrNFSe);
 
       proAsten:   Result := TACBrNFSeProviderAsten202.Create(ACBrNFSe);
+      proBalker : Result := TACBrNFSeProviderBalker.Create(ACBrNFSe);
       proBauhaus: Result := TACBrNFSeProviderBauhaus.Create(ACBrNFSe);
 
       proBetha:
@@ -690,11 +692,16 @@ begin
 
       proSigCorp:
         begin
-          case Versao of
-            ve203: Result := TACBrNFSeProviderSigCorp203.Create(ACBrNFSe);
-            ve204: Result := TACBrNFSeProviderSigCorp204.Create(ACBrNFSe);
+          if APIPropria then
+            Result := TACBrNFSeProviderSigCorpAPIPropria.Create(ACBrNFSe)
           else
-            Result := nil;
+          begin
+            case Versao of
+              ve203: Result := TACBrNFSeProviderSigCorp203.Create(ACBrNFSe);
+              ve204: Result := TACBrNFSeProviderSigCorp204.Create(ACBrNFSe);
+            else
+              Result := nil;
+            end;
           end;
         end;
 

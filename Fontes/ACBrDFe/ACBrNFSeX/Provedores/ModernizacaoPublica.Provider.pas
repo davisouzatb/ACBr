@@ -127,6 +127,7 @@ implementation
 
 uses
   ACBrDFe.Conversao,
+  ACBrDFeUtil,
   ACBrUtil.Base,
   ACBrUtil.XMLHTML,
   ACBrUtil.Strings,
@@ -589,7 +590,7 @@ begin
 
             ANode := DocumentXml.Root.Childrens.FindAnyNs('infNFSe');
 
-            CodVerif := OnlyNumber(ObterConteudoTag(ANode.Attributes.Items['Id']));
+            CodVerif := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
             NumNFSe := ObterConteudoTag(ANode.Childrens.FindAnyNs('nNFSe'), tcStr);
             DataAut := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
 
@@ -1012,6 +1013,8 @@ begin
       AnsiString(WSSenha))));
 
   aHeaderReq.AddHeader('Authorization', Auth);
+
+  ReqHeaders := aHeaderReq.Text;
 end;
 
 function TACBrNFSeXWebserviceModernizacaoPublicaAPIPropria.ConsultarNFSePorRps(

@@ -38,7 +38,8 @@ interface
 
 uses
   SysUtils, Classes, Variants,
-  ACBrJSON, ACBrDFeSSL,
+  ACBrJSON,
+  ACBrDFeSSL,
   ACBrBase,
   ACBrXmlBase,
   ACBrXmlDocument,
@@ -46,9 +47,11 @@ uses
   ACBrNFSeXClass,
   ACBrDFe.Conversao,
   ACBrNFSeXConversao,
-  ACBrNFSeXGravarXml, ACBrNFSeXLerXml,
+  ACBrNFSeXGravarXml,
+  ACBrNFSeXLerXml,
   ACBrNFSeXProviderProprio,
-  ACBrNFSeXWebserviceBase, ACBrNFSeXWebservicesResponse;
+  ACBrNFSeXWebserviceBase,
+  ACBrNFSeXWebservicesResponse;
 
 type
   TACBrNFSeXWebservicePadraoNacional = class(TACBrNFSeXWebserviceRest)
@@ -127,11 +130,19 @@ implementation
 
 uses
   synacode,
-  ACBrDFeException, ACBrCompress,
+  ACBrDFeException,
+  ACBrCompress,
   ACBrUtil.DateTime,
-  ACBrUtil.Base, ACBrUtil.XMLHTML, ACBrUtil.Strings, ACBrUtil.FilesIO,
-  ACBrNFSeX, ACBrNFSeXConsts, ACBrNFSeXConfiguracoes,
-  PadraoNacional.GravarXml, PadraoNacional.LerXml;
+  ACBrUtil.Base,
+  ACBrUtil.XMLHTML,
+  ACBrUtil.Strings,
+  ACBrUtil.FilesIO,
+  ACBrDFeUtil,
+  ACBrNFSeX,
+  ACBrNFSeXConsts,
+  ACBrNFSeXConfiguracoes,
+  PadraoNacional.GravarXml,
+  PadraoNacional.LerXml;
 
 { TACBrNFSeProviderPadraoNacional }
 
@@ -412,7 +423,7 @@ var
 
         ANode := DocumentXml.Root.Childrens.FindAnyNs('infNFSe');
 
-        CodVerif := OnlyNumber(ObterConteudoTag(ANode.Attributes.Items['Id']));
+        CodVerif := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
         NumNFSe := ObterConteudoTag(ANode.Childrens.FindAnyNs('nNFSe'), tcStr);
         DataAut := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
 
@@ -420,6 +431,7 @@ var
         ANode := ANode.Childrens.FindAnyNs('infDPS');
         NumDps := ObterConteudoTag(ANode.Childrens.FindAnyNs('nDPS'), tcStr);
 
+        Response.CodigoVerificacao := CodVerif;
         Response.NumeroNota := NumNFSe;
         Response.Data := DataAut;
         Response.XmlRetorno := NFSeXml;
@@ -804,16 +816,27 @@ begin
 
             ANode := DocumentXml.Root.Childrens.FindAnyNs('infEvento');
 
-            IDEvento := OnlyNumber(ObterConteudoTag(ANode.Attributes.Items['Id']));
+            IDEvento := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
 
             Response.nSeqEvento := ObterConteudoTag(ANode.Childrens.FindAnyNs('nSeqEvento'), tcInt);
             Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
+
+            ANode := ANode.Childrens.FindAnyNs('pedRegEvento');
+            ANode := ANode.Childrens.FindAnyNs('infPedReg');
+
+            if IDEvento = '' then
+              IDEvento := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
+
+            Response.idNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('chNFSe'), tcStr);
             Response.idEvento := IDEvento;
             Response.tpEvento := StrTotpEvento(Ok, Copy(IDEvento, 51, 6));
             Response.XmlRetorno := EventoXml;
 
             case Response.tpEvento of
-              teCancelamento:
+              teCancelamento,
+              teCancelamentoSubstituicao,
+              teCancelamentoDeferido,
+              teCancelamentoPorOficio:
                 begin
                   Response.SucessoCanc := True;
                   Response.DescSituacao := 'Nota Cancelada';
@@ -824,12 +847,6 @@ begin
                 Response.DescSituacao := '';
               end;
             end;
-
-            ANode := ANode.Childrens.FindAnyNs('pedRegEvento');
-            ANode := ANode.Childrens.FindAnyNs('infPedReg');
-
-            Response.idNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('chNFSe'), tcStr);
-
             nomeArq := '';
             SalvarXmlEvento(IDEvento + '-procEveNFSe', EventoXml, nomeArq, Response.Data);
             Response.PathNome := nomeArq;
@@ -935,7 +952,7 @@ begin
 
         AResumo := Response.Resumos.New;
         AResumo.ChaveDFe := JSon.AsString['chaveAcesso'];
-        AResumo.TipoEvento := 'e' + JSon.AsString['tipoEvento'];
+        AResumo.TipoEvento := JSon.AsString['tipoEvento'];
         AResumo.TipoDoc := 'Evento de ' +
                            tpEventoToDesc(StrTotpEvento(Ok, AResumo.TipoEvento));
 
@@ -964,20 +981,37 @@ begin
 
             ANode := DocumentXml.Root.Childrens.FindAnyNs('infEvento');
 
-            IDEvento := OnlyNumber(ObterConteudoTag(ANode.Attributes.Items['Id']));
+            IDEvento := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
 
             Response.nSeqEvento := ObterConteudoTag(ANode.Childrens.FindAnyNs('nSeqEvento'), tcInt);
             Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
-            Response.idEvento := IDEvento;
-            Response.tpEvento := StrTotpEvento(Ok, Copy(IDEvento, 51, 6));
-            Response.XmlRetorno := ArquivoXml;
-
-            Response.SucessoCanc := (Response.tpEvento = teCancelamento);
 
             ANode := ANode.Childrens.FindAnyNs('pedRegEvento');
             ANode := ANode.Childrens.FindAnyNs('infPedReg');
 
+            if IDEvento = '' then
+              IDEvento := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
+
             Response.idNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('chNFSe'), tcStr);
+            Response.idEvento := IDEvento;
+            Response.tpEvento := StrTotpEvento(Ok, Copy(IDEvento, 51, 6));
+            Response.XmlRetorno := ArquivoXml;
+
+            case Response.tpEvento of
+              teCancelamento,
+              teCancelamentoSubstituicao,
+              teCancelamentoDeferido,
+              teCancelamentoPorOficio:
+                begin
+                  Response.SucessoCanc := True;
+                  Response.DescSituacao := 'Nota Cancelada';
+                end
+            else
+              begin
+                Response.SucessoCanc := False;
+                Response.DescSituacao := '';
+              end;
+            end;
 
             nomeArq := '';
             SalvarXmlEvento(IDEvento + '-procEveNFSe', ArquivoXml, nomeArq, Response.Data);
@@ -1110,6 +1144,8 @@ begin
 
                 ANota := CarregarXmlNfse(ANota, DocumentXml.Root.OuterXml);
                 SalvarXmlNfse(ANota);
+                AResumo.NomeArq := ANota.NomeArq;
+                AResumo.XmlRetorno := ANota.XMLNFSe;
               except
                 on E:Exception do
                 begin
@@ -1132,17 +1168,20 @@ begin
 
                 ANode := DocumentXml.Root.Childrens.FindAnyNs('infEvento');
 
-                IDEvento := OnlyNumber(ObterConteudoTag(ANode.Attributes.Items['Id']));
+                IDEvento := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
 
                 Response.nSeqEvento := ObterConteudoTag(ANode.Childrens.FindAnyNs('nSeqEvento'), tcInt);
                 Response.Data := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhProc'), tcDatHor);
-                Response.idEvento := IDEvento;
-                Response.tpEvento := StrTotpEvento(Ok, 'e' + Copy(IDEvento, 51, 6));
 
                 ANode := ANode.Childrens.FindAnyNs('pedRegEvento');
                 ANode := ANode.Childrens.FindAnyNs('infPedReg');
 
+                if IDEvento = '' then
+                  IDEvento := RemoverLiteralChave(ObterConteudoTag(ANode.Attributes.Items['Id']));
+
                 Response.idNota := ObterConteudoTag(ANode.Childrens.FindAnyNs('chNFSe'), tcStr);
+                Response.idEvento := IDEvento;
+                Response.tpEvento := StrTotpEvento(Ok, Copy(IDEvento, 51, 6));
 
                 nomeArq := '';
                 SalvarXmlEvento(IDEvento + '-procEveNFSe', ArquivoXml, nomeArq, Response.Data);
@@ -1154,6 +1193,8 @@ begin
                 AResumo.idEvento := Response.idEvento;
                 AResumo.tpEvento := Response.tpEvento;
                 AResumo.idNota := Response.idNota;
+                AResumo.NomeArq := nomeArq;
+                AResumo.XmlRetorno := ArquivoXml;
               except
                 on E:Exception do
                 begin

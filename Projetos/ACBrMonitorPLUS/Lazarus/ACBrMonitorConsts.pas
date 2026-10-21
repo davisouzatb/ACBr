@@ -998,6 +998,7 @@ const
   CKeyVersaoQRCode =                 'VersaoQRCode';
   CKeyVersaoBPe =                    'VersaoBPe';
   CKeyVersaoGNRe =                   'VersaoGNRe';
+  CKeyVersaoCIOT =                   'VersaoCIOT';
   CKeyFormaEmissaoCTe =              'FormaEmissaoCTe';
   CKeyFormaEmissaoNFe =              'FormaEmissaoNFe';
   CKeyFormaEmissaoMDFe =             'FormaEmissaoMDFe';
@@ -1190,6 +1191,13 @@ const
   CSeceSocial =                             'eSocial';
   CSecReinf =                               'Reinf';
   CKey =                                    'Host';
+
+  CSecCIOT =                                'CIOT';
+  CKeyIntegradora =                         'Integradora';
+  CKeyHashIntegrador =                      'HashIntegrador';
+  CKeyCIOTUsuario =                         'Usuario';
+  CKeyCNPJEmitente =                        'CNPJEmitente';
+  CKeyToken =                               'Token';
 
   CSecSAT =                                 'SAT';
   CKeySATModelo =                           'Modelo';

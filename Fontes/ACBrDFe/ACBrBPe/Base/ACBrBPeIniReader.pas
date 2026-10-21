@@ -178,15 +178,7 @@ begin
   Ide.dhCont  := StringToDateTime(AINIRec.ReadString('ide', 'dhCont', '0'));
   Ide.xJust   := AINIRec.ReadString('ide', 'xJust', '');
 
-  Ide.gCompraGov.pRedutor := StringToFloatDef(AINIRec.ReadString('ide', 'pRedutor', ''), 0);
-
-  if Ide.gCompraGov.pRedutor > 0 then
-  begin
-    Ide.gCompraGov.tpEnteGov := StrTotpEnteGov(AINIRec.ReadString('ide', 'tpEnteGov', ''));
-    Ide.gCompraGov.tpOperGov := StrTotpOperGov(AINIRec.ReadString('ide', 'tpOperGov', ''));
-
-    Ler_refDFe(AINIRec, Ide.gCompraGov.refDFe);
-  end;
+  Ler_gCompraGovReduzido(AINIRec, Ide.gCompraGov);
 end;
 
 procedure TBPeIniReader.Ler_Emitente(AINIRec: TMemIniFile; Emit: TEmit);
@@ -368,6 +360,7 @@ begin
   // Seção [infValorBPe] Informações dos Valores do BP-e
   //
   infValorBPe.vBP        := StringToFloatDef(AINIRec.ReadString('infValorBPe', 'vBP', ''), 0);
+  infValorBPe.vBPLiq     := StringToFloatDef(AINIRec.ReadString('infValorBPe', 'vBPLiq', ''), 0);
   infValorBPe.vDesconto  := StringToFloatDef(AINIRec.ReadString('infValorBPe', 'vDesconto', ''), 0);
   infValorBPe.vPgto      := StringToFloatDef(AINIRec.ReadString('infValorBPe', 'vPgto', ''), 0);
   infValorBPe.vTroco     := StringToFloatDef(AINIRec.ReadString('infValorBPe', 'vTroco', ''), 0);
@@ -616,6 +609,7 @@ begin
     Item.nContFim := AINIRec.ReadString(sSecao, 'nContFim', '');
     Item.qPass := AINIRec.ReadString(sSecao, 'qPass', '');
     Item.vBP := StringToFloatDef(AINIRec.ReadString(sSecao,'vBP','') ,0);
+    Item.vBPLiq := StringToFloatDef(AINIRec.ReadString(sSecao,'vBPLiq','') ,0);
 
     Ler_DetImposto(AINIRec, Item.imp, Idx, I);
 
@@ -676,6 +670,7 @@ begin
   begin
     Total.qPass := AINIRec.ReadInteger(sSecao, 'qPass', 0);
     Total.vBP := StringToFloatDef(AINIRec.ReadString(sSecao,'vBP','') ,0);
+    Total.vBPLiq := StringToFloatDef(AINIRec.ReadString(sSecao,'vBPLiq','') ,0);
     Total.vBC := StringToFloatDef(AINIRec.ReadString(sSecao,'vBC','') ,0);
     Total.vICMS := StringToFloatDef(AINIRec.ReadString(sSecao,'vICMS','') ,0);
     // Reforma Tributária

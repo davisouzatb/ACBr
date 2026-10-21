@@ -6,7 +6,7 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
   Font.Height = -18
   TextHeight = 24
   inherited RLNFe: TRLReport
-    Top = 10
+    Top = 5
     Margins.LeftMargin = 7.000000000000000000
     Margins.TopMargin = 7.000000000000000000
     Margins.RightMargin = 7.000000000000000000
@@ -806,18 +806,31 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         ParentFont = False
       end
       object rliTipoEntrada: TRLDraw
-        Left = 329
-        Top = 55
-        Width = 25
-        Height = 25
+        Left = 322
+        Top = 53
+        Width = 20
+        Height = 19
       end
       object rllEntradaSaida: TRLLabel
-        Left = 332
-        Top = 58
-        Width = 20
-        Height = 20
+        Left = 324
+        Top = 55
+        Width = 16
+        Height = 14
         Alignment = taCenter
         AutoSize = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
+      object rllNumNF1: TRLLabel
+        Left = 262
+        Top = 78
+        Width = 85
+        Height = 16
+        Caption = 'N'#186' 999999999'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -13
@@ -825,29 +838,16 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object rllNumNF1: TRLLabel
-        Left = 263
-        Top = 75
-        Width = 61
-        Height = 11
-        Caption = 'N'#186' 999999999'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -9
-        Font.Name = 'Arial'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
       object rllSERIE1: TRLLabel
-        Left = 263
-        Top = 87
-        Width = 40
-        Height = 10
+        Left = 260
+        Top = 97
+        Width = 50
+        Height = 12
         Alignment = taCenter
         Caption = 'S'#201'RIE 000'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -8
+        Font.Height = -9
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
@@ -869,14 +869,15 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         HoldStyle = hsHorizontally
       end
       object rlbCodigoBarras: TRLBarcode
-        Left = 420
-        Top = 6
-        Width = 254
+        Left = 364
+        Top = 7
+        Width = 367
         Height = 40
         Margins.LeftMargin = 1.000000000000000000
         Margins.RightMargin = 1.000000000000000000
         Alignment = taCenter
         Anchors = [fkLeft, fkTop]
+        AutoSize = False
         BarcodeType = bcCode128
       end
       object rllChaveAcesso: TRLLabel
@@ -1185,9 +1186,9 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         BarcodeType = bcCode128
       end
       object rllPageNumber: TRLSystemInfo
-        Left = 263
+        Left = 317
         Top = 97
-        Width = 37
+        Width = 19
         Height = 13
         AutoSize = False
         Font.Charset = DEFAULT_CHARSET
@@ -1200,9 +1201,9 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         Text = 'fl. '
       end
       object rllLastPage: TRLSystemInfo
-        Left = 309
+        Left = 337
         Top = 97
-        Width = 24
+        Width = 17
         Height = 13
         AutoSize = False
         Font.Charset = DEFAULT_CHARSET
@@ -6136,9 +6137,9 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         ParentFont = False
       end
       object rlBarramDadosAdicionaisAuxiliar: TRLMemo
-        Left = 116
+        Left = 110
         Top = 45
-        Width = 301
+        Width = 234
         Height = 12
         Behavior = [beSiteExpander]
         Font.Charset = DEFAULT_CHARSET
@@ -6151,16 +6152,17 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         Visible = False
       end
       object RLBarraBarcode: TRLBarcode
-        Left = 540
-        Top = 31
-        Width = 122
+        Left = 364
+        Top = 32
+        Width = 367
         Height = 38
         Margins.LeftMargin = 1.000000000000000000
         Margins.RightMargin = 1.000000000000000000
-        BarcodeType = bcCode128C
+        Alignment = taCenter
+        BarcodeType = bcCode128
       end
       object rllBarraNFe: TRLLabel
-        Left = 458
+        Left = 466
         Top = 3
         Width = 45
         Height = 16
@@ -6204,7 +6206,7 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
       object rlBarraiCanhoto1: TRLDraw
         Left = 0
         Top = 25
-        Width = 451
+        Width = 741
         Height = 1
         Borders.Sides = sdCustom
         Borders.DrawLeft = False
@@ -6223,15 +6225,27 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
         Angle = 90.000000000000000000
         DrawKind = dkLine
         HoldStyle = hsVertically
+        Transparent = False
       end
       object rlBarraiCanhoto3: TRLDraw
         Left = 451
         Top = 0
         Width = 1
-        Height = 70
+        Height = 25
         Angle = 90.000000000000000000
         DrawKind = dkLine
         HoldStyle = hsVertically
+        Transparent = False
+      end
+      object rlBarraiCanhoto4: TRLDraw
+        Left = 357
+        Top = 25
+        Width = 1
+        Height = 45
+        Angle = 90.000000000000000000
+        DrawKind = dkLine
+        HoldStyle = hsVertically
+        Transparent = False
       end
     end
     object rlbFaturaReal: TRLBand
@@ -6950,7 +6964,7 @@ inherited frlDANFeRLRetrato: TfrlDANFeRLRetrato
           Tag = 705
           Left = 4
           Top = 1
-          Width = 736
+          Width = 655
           Height = 10
           Behavior = [beSiteExpander]
           Font.Charset = DEFAULT_CHARSET

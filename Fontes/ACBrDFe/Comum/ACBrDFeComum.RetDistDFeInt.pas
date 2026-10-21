@@ -39,14 +39,14 @@ interface
 uses
   SysUtils, Classes,
   {$IF DEFINED(HAS_SYSTEM_GENERICS)}
-   System.Generics.Collections, System.Generics.Defaults,
+   System.Generics.Collections, 
+   System.Generics.Defaults,
   {$ELSEIF DEFINED(DELPHICOMPILER16_UP)}
    System.Contnrs,
   {$IfEnd}
   ACBrBase,
   ACBrDFe,
   ACBrDFe.Conversao,
-  pcnConversao,
   ACBrXmlBase,
   ACBrXmlDocument;
 
@@ -54,13 +54,13 @@ type
   TDetEventoCTe = class(TObject)
   private
     FchCTe: string;
-    Fmodal: TpcteModal;
+    Fmodal: TModal;
     FdhEmi: TDateTime;
     FnProt: string;
     FdhRecbto: TDateTime;
   public
     property chCTe: string       read FchCTe    write FchCTe;
-    property modal: TpcteModal   read Fmodal    write Fmodal;
+    property modal: TModal       read Fmodal    write Fmodal;
     property dhEmi: TDateTime    read FdhEmi    write FdhEmi;
     property nProt: string       read FnProt    write FnProt;
     property dhRecbto: TDateTime read FdhRecbto write FdhRecbto;
@@ -141,13 +141,13 @@ type
   TprocEvento_RetInfEvento = class(TObject)
   private
     FId: string;
-    FtpAmb: TpcnTipoAmbiente;
+    FtpAmb: TACBrTipoAmbiente;
     FverAplic: string;
     FcOrgao: Integer;
     FcStat: Integer;
     FxMotivo: string;
     FchDFe: string;
-    FtpEvento: TpcnTpEvento;
+    FtpEvento: TACBrTipoEvento;
     FxEvento: string;
     FnSeqEvento: Integer;
     FCNPJDest: string;
@@ -157,13 +157,13 @@ type
     FnProt: string;
   public
     property Id: string              read FId          write FId;
-    property tpAmb: TpcnTipoAmbiente read FtpAmb       write FtpAmb;
+    property tpAmb: TACBrTipoAmbiente read FtpAmb       write FtpAmb;
     property verAplic: string        read FverAplic    write FverAplic;
     property cOrgao: Integer         read FcOrgao      write FcOrgao;
     property cStat: Integer          read FcStat       write FcStat;
     property xMotivo: string         read FxMotivo     write FxMotivo;
     property chDFe: string           read FchDFe       write FchDFe;
-    property tpEvento: TpcnTpEvento  read FtpEvento    write FtpEvento;
+    property tpEvento: TACBrTipoEvento read FtpEvento    write FtpEvento;
     property xEvento: string         read FxEvento     write FxEvento;
     property nSeqEvento: Integer     read FnSeqEvento  write FnSeqEvento;
     property CNPJDest: string        read FCNPJDest    write FCNPJDest;
@@ -180,7 +180,7 @@ type
     FxNome: string;
     FIE: string;
     FdhEmi: TDateTime;
-    FtpNF: TpcnTipoNFe;
+    FtpNF: TTipoNFe;
     FvNF: Currency;
     FdigVal: string;
     FdhRecbto: TDateTime;
@@ -192,7 +192,7 @@ type
     property xNome: string         read FxNome    write FxNome;
     property IE: string            read FIE       write FIE;
     property dhEmi: TDateTime      read FdhEmi    write FdhEmi;
-    property tpNF: TpcnTipoNFe     read FtpNF     write FtpNF;
+    property tpNF: TTipoNFe        read FtpNF     write FtpNF;
     property vNF: Currency         read FvNF      write FvNF;
     property digVal: string        read FdigVal   write FdigVal;
     property dhRecbto: TDateTime   read FdhRecbto write FdhRecbto;
@@ -206,7 +206,7 @@ type
     FCNPJCPF: string;
     FchDFe: string;
     FdhEvento: TDateTime;
-    FtpEvento: TpcnTpEvento;
+    FtpEvento: TACBrTipoEvento;
     FnSeqEvento: ShortInt;
     FxEvento: string;
     FdhRecbto: TDateTime;
@@ -216,7 +216,7 @@ type
     property CNPJCPF: string        read FCNPJCPF    write FCNPJCPF;
     property chDFe: string          read FchDFe      write FchDFe;
     property dhEvento: TDateTime    read FdhEvento   write FdhEvento;
-    property tpEvento: TpcnTpEvento read FtpEvento   write FtpEvento;
+    property tpEvento: TACBrTipoEvento read FtpEvento   write FtpEvento;
     property nSeqEvento: ShortInt   read FnSeqEvento write FnSeqEvento;
     property xEvento: string        read FxEvento    write FxEvento;
     property dhRecbto: TDateTime    read FdhRecbto   write FdhRecbto;
@@ -227,11 +227,11 @@ type
   private
     FId: string;
     FcOrgao: Integer;
-    FtpAmb: TpcnTipoAmbiente;
+    FtpAmb: TACBrTipoAmbiente;
     FCNPJ: string;
     FchDFe: string;
     FdhEvento: TDateTime;
-    FtpEvento: TpcnTpEvento;
+    FtpEvento: TACBrTipoEvento;
     FnSeqEvento: Integer;
     FverEvento: string;
 
@@ -243,11 +243,11 @@ type
 
     property Id: string              read FId             write FId;
     property cOrgao: Integer         read FcOrgao         write FcOrgao;
-    property tpAmb: TpcnTipoAmbiente read FtpAmb          write FtpAmb;
+    property tpAmb: TACBrTipoAmbiente read FtpAmb          write FtpAmb;
     property CNPJ: string            read FCNPJ           write FCNPJ;
     property chDFe: string           read FchDFe          write FchDFe;
     property dhEvento: TDateTime     read FdhEvento       write FdhEvento;
-    property tpEvento: TpcnTpEvento  read FtpEvento       write FtpEvento;
+    property tpEvento: TACBrTipoEvento read FtpEvento       write FtpEvento;
     property nSeqEvento: Integer     read FnSeqEvento     write FnSeqEvento;
     property verEvento: string       read FverEvento      write FverEvento;
 
@@ -302,7 +302,7 @@ type
     FOwner: TACBrDFe;
 
     Fversao: string;
-    FtpAmb: TpcnTipoAmbiente;
+    FtpAmb: TACBrTipoAmbiente;
     FverAplic: string;
     FcStat: Integer;
     FxMotivo: string;
@@ -350,7 +350,7 @@ type
     procedure CarregarArquivo(Const CaminhoArquivo: string);
 
     property versao: string            read Fversao   write Fversao;
-    property tpAmb: TpcnTipoAmbiente   read FtpAmb    write FtpAmb;
+    property tpAmb: TACBrTipoAmbiente  read FtpAmb    write FtpAmb;
     property verAplic: string          read FverAplic write FverAplic;
     property cStat: Integer            read FcStat    write FcStat;
     property xMotivo: string           read FxMotivo  write FxMotivo;
@@ -505,8 +505,6 @@ begin
 end;
 
 procedure TRetDistDFeInt.LerResumo(const ANode: TACBrXmlNode; Indice: Integer);
-var
-  Ok: Boolean;
 begin
   if not Assigned(ANode) then Exit;
 
@@ -520,12 +518,12 @@ begin
   docZip[Indice].resDFe.xNome := ObterConteudoTag(ANode.Childrens.FindAnyNs('xNome'), tcStr);
   docZip[Indice].resDFe.IE := ObterConteudoTag(ANode.Childrens.FindAnyNs('IE'), tcStr);
   docZip[Indice].resDFe.dhEmi := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhEmi'), tcDatHor);
-  docZip[Indice].resDFe.tpNF := StrToTpNF(Ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('tpNF'), tcStr));
+  docZip[Indice].resDFe.tpNF := StrToTpNF(ObterConteudoTag(ANode.Childrens.FindAnyNs('tpNF'), tcStr));
   docZip[Indice].resDFe.vNF := ObterConteudoTag(ANode.Childrens.FindAnyNs('vNF'), tcDe2);
   docZip[Indice].resDFe.digVal := ObterConteudoTag(ANode.Childrens.FindAnyNs('digVal'), tcStr);
   docZip[Indice].resDFe.dhRecbto := ObterConteudoTag(ANode.Childrens.FindAnyNs('dhRecbto'), tcDatHor);
   docZip[Indice].resDFe.nProt := ObterConteudoTag(ANode.Childrens.FindAnyNs('nProt'), tcStr);
-  docZip[Indice].resDFe.cSitDFe := StrToSituacaoDFe(Ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('cSitNFe'), tcStr));
+  docZip[Indice].resDFe.cSitDFe := StrToSituacaoDFe(ObterConteudoTag(ANode.Childrens.FindAnyNs('cSitNFe'), tcStr));
 end;
 
 procedure TRetDistDFeInt.LerResumoEvento(const ANode: TACBrXmlNode; Indice: Integer);
@@ -554,7 +552,7 @@ end;
 procedure TRetDistDFeInt.LerGrupo_ide(const ANode: TACBrXmlNode;
   Indice: Integer);
 var
-  Ok: Boolean;
+  NodeTpNF: TACBrXmlNode;
 begin
   if not Assigned(ANode) then Exit;
 
@@ -564,7 +562,10 @@ begin
   if docZip[Indice].resDFe.dhEmi  = 0 then
     docZip[Indice].resDFe.dhEmi := ObterConteudoTag(ANode.Childrens.FindAnyNs('dEmi'), tcDat);
 
-  docZip[Indice].resDFe.tpNF := StrToTpNF(Ok, ObterConteudoTag(ANode.Childrens.FindAnyNs('tpNF'), tcStr));
+  // tpNF só existe na NF-e; CT-e/MDF-e não possuem a tag
+  NodeTpNF := ANode.Childrens.FindAnyNs('tpNF');
+  if Assigned(NodeTpNF) then
+    docZip[Indice].resDFe.tpNF:= StrToTpNF(ObterConteudoTag(NodeTpNF, tcStr));
 end;
 
 procedure TRetDistDFeInt.LerGrupo_emit(const ANode: TACBrXmlNode;
@@ -674,7 +675,6 @@ end;
 procedure TRetDistDFeInt.LerGrupo_detEvento_CTe(const ANode: TACBrXmlNode;
   Indice: Integer);
 var
-  Ok: Boolean;
   AuxNode: TACBrXmlNode;
 begin
   if not Assigned(ANode) then Exit;
@@ -684,7 +684,7 @@ begin
   if Assigned(AuxNode) then
   begin
     docZip[Indice].procEvento.detEvento.CTe.chCTe := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('chCTe'), tcStr);
-    docZip[Indice].procEvento.detEvento.CTe.modal := StrToTpModal(Ok, ObterConteudoTag(AuxNode.Childrens.FindAnyNs('modal'), tcStr));
+    docZip[Indice].procEvento.detEvento.CTe.modal := StrToTpModal(ObterConteudoTag(AuxNode.Childrens.FindAnyNs('modal'), tcStr));
     docZip[Indice].procEvento.detEvento.CTe.dhEmi := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('dhEmi'), tcDatHor);
     docZip[Indice].procEvento.detEvento.CTe.nProt := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('nProt'), tcStr);
     docZip[Indice].procEvento.detEvento.CTe.dhRecbto := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('dhRecbto'), tcDatHor);
@@ -762,7 +762,7 @@ begin
   if Assigned(AuxNode) then
   begin
     docZip[Indice].procEvento.RetinfEvento.Id := ObterConteudoTag(AuxNode.Attributes.Items['Id']);
-    docZip[Indice].procEvento.RetinfEvento.tpAmb := StrToTpAmb(Ok, ObterConteudoTag(AuxNode.Childrens.FindAnyNs('tpAmb'), tcStr));
+    docZip[Indice].procEvento.RetinfEvento.tpAmb := StrToTipoAmbiente(ObterConteudoTag(AuxNode.Childrens.FindAnyNs('tpAmb'), tcStr));
     docZip[Indice].procEvento.RetinfEvento.verAplic := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('verAplic'), tcStr);
     docZip[Indice].procEvento.RetinfEvento.cOrgao := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('cOrgao'), tcInt);
     docZip[Indice].procEvento.RetinfEvento.cStat := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('cStat'), tcInt);
@@ -795,7 +795,7 @@ begin
   if Assigned(AuxNode) then
   begin
     docZip[Indice].procEvento.Id := ObterConteudoTag(AuxNode.Attributes.Items['Id']);
-    docZip[Indice].procEvento.tpAmb := StrToTpAmb(Ok, ObterConteudoTag(AuxNode.Childrens.FindAnyNs('tpAmb'), tcStr));
+    docZip[Indice].procEvento.tpAmb := StrToTipoAmbiente(ObterConteudoTag(AuxNode.Childrens.FindAnyNs('tpAmb'), tcStr));
     docZip[Indice].procEvento.CNPJ := ObterConteudoTag(AuxNode.Childrens.FindAnyNs('CNPJ'), tcStr);
 
     if docZip[Indice].procEvento.CNPJ = '' then
@@ -898,41 +898,36 @@ end;
 
 function TRetDistDFeInt.LerXml: boolean;
 var
-  Ok: boolean;
   Document: TACBrXmlDocument;
   ANode: TACBrXmlNode;
 begin
   Document := TACBrXmlDocument.Create;
 
-  try
-    try
-      Result := False;
+  try    
+    Result := False;
 
-      if XmlRetorno = '' then Exit;
+    if XmlRetorno = '' then Exit;
 
-      XML := XmlRetorno;
-      Document.LoadFromXml(XmlRetorno);
+    XML := XmlRetorno;
+    Document.LoadFromXml(XmlRetorno);
 
-      ANode := Document.Root;
+    ANode := Document.Root;
 
-      if Assigned(ANode) then
-      begin
-        versao := ObterConteudoTag(ANode.Attributes.Items['versao']);
-        tpAmb := StrToTpAmb(Ok, ObterConteudoTag(Anode.Childrens.FindAnyNs('tpAmb'), tcStr));
-        verAplic := ObterConteudoTag(ANode.Childrens.FindAnyNs('verAplic'), tcStr);
-        cStat := ObterConteudoTag(ANode.Childrens.FindAnyNs('cStat'), tcInt);
-        xMotivo := ACBrStr(ObterConteudoTag(ANode.Childrens.FindAnyNs('xMotivo'), tcStr));
-        dhResp := ObterConteudoTag(Anode.Childrens.FindAnyNs('dhResp'), tcDatHor);
-        ultNSU := ACBrStr(ObterConteudoTag(ANode.Childrens.FindAnyNs('ultNSU'), tcStr));
-        maxNSU := ACBrStr(ObterConteudoTag(ANode.Childrens.FindAnyNs('maxNSU'), tcStr));
+    if Assigned(ANode) then
+    begin
+      versao := ObterConteudoTag(ANode.Attributes.Items['versao']);
+      tpAmb := StrToTipoAmbiente(ObterConteudoTag(Anode.Childrens.FindAnyNs('tpAmb'), tcStr));
+      verAplic := ObterConteudoTag(ANode.Childrens.FindAnyNs('verAplic'), tcStr);
+      cStat := ObterConteudoTag(ANode.Childrens.FindAnyNs('cStat'), tcInt);
+      xMotivo := ACBrStr(ObterConteudoTag(ANode.Childrens.FindAnyNs('xMotivo'), tcStr));
+      dhResp := ObterConteudoTag(Anode.Childrens.FindAnyNs('dhResp'), tcDatHor);
+      ultNSU := ACBrStr(ObterConteudoTag(ANode.Childrens.FindAnyNs('ultNSU'), tcStr));
+      maxNSU := ACBrStr(ObterConteudoTag(ANode.Childrens.FindAnyNs('maxNSU'), tcStr));
 
-        LerLoteDistDFeInt(ANode);
-      end;
-
-      Result := True;
-    except
-      Result := False;
+      LerLoteDistDFeInt(ANode);
     end;
+
+    Result := True;
   finally
     FreeAndNil(Document);
   end;

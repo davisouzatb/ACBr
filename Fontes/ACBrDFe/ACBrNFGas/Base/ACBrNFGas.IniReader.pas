@@ -71,7 +71,6 @@ type
     procedure Ler_gTarif(AINIRec: TMemIniFile; gTarif: TgTarifCollection; DetIndex: Integer);
     procedure Ler_gAgregadora(AINIRec: TMemIniFile; gAgregadora: TgAgregadora; DetIndex: Integer);
     procedure Ler_gMedicao(AINIRec: TMemIniFile; gMedicao: TgMedicao; DetIndex: Integer);
-    procedure Ler_gPagAntecipado(AINIRec: TMemIniFile; gPagAntecipado: TgPagAntecipadoNFGas; DetIndex: Integer);
 
     procedure Ler_gProcRef(AINIRec: TMemIniFile; gProcRef: TgProcRef; DetIndex: Integer);
     procedure Ler_gProc(AINIRec: TMemIniFile; gProc: TgProcCollection; DetIndex: Integer);
@@ -187,6 +186,7 @@ begin
   Ide.tpFat := StrTotpFat(AINIRec.ReadString(Secao, 'tpFat', '1'));
   Ide.dhCont := StringToDateTime(AINIRec.ReadString(Secao, 'dhCont', '0'));
   Ide.xJust := AINIRec.ReadString(Secao, 'xJust', '');
+  Ide.tpPagAnt := StrTotpPagAnt(AINIRec.ReadString(Secao, 'tpPagAnt', ''));
 
   Ler_gCompraGovReduzido(AINIRec, Ide.gCompraGov);
 end;
@@ -385,11 +385,13 @@ begin
     Item.gNormal.Prod.fatorP := StringToFloatDef(AINIRec.ReadString(Secao, 'fatorP', ''), 0);
     Item.gNormal.Prod.fatorT := StringToFloatDef(AINIRec.ReadString(Secao, 'fatorT', ''), 0);
     Item.gNormal.Prod.vProd := StringToFloatDef(AINIRec.ReadString(Secao, 'vProd', ''), 0);
+    Item.gNormal.Prod.vItemLiq := StringToFloatDef(AINIRec.ReadString(Secao, 'vItemLiq', ''), 0);
+    Item.gNormal.Prod.vProdLiq := StringToFloatDef(AINIRec.ReadString(Secao, 'vProdLiq', ''), 0);
     Item.gNormal.Prod.indDevolucao := StrToTIndicador(AINIRec.ReadString(Secao, 'indDevolucao', ''));
     Item.gNormal.infAdProd := AINIRec.ReadString(Secao, 'infAdProd', '');
 
     Ler_gMedicao(AINIRec, Item.gNormal.Prod.gMedicao, Index);
-    Ler_gPagAntecipado(AINIRec, Item.gNormal.Prod.gPagAntecipado, Index);
+    Ler_gPagAntecipadoProd(AINIRec, Item.gNormal.Prod.gPagAntecipado, Index, -1);
 
     Ler_gTarif(AINIRec, Item.gNormal.gTarif, Index);
     Ler_gAgregadora(AINIRec, Item.gAgregadora, Index);
@@ -424,20 +426,6 @@ begin
   gMedicao.xMotNaoLeitura := AINIRec.ReadString(Secao, 'xMotNaoLeitura', '');
 end;
 
-procedure TNFGasIniReader.Ler_gPagAntecipado(AINIRec: TMemIniFile;
-  gPagAntecipado: TgPagAntecipadoNFGas; DetIndex: Integer);
-var
-  Secao: string;
-begin
-  Secao := 'gPagAntecipado' + IntToStrZero(DetIndex, 3);
-
-  if not AINIRec.SectionExists(Secao) then
-    Exit;
-
-  gPagAntecipado.chDFePagAnt := AINIRec.ReadString(Secao, 'nMed', '');
-  gPagAntecipado.nItemPagAnt := AINIRec.ReadInteger(Secao, 'nContrat', 0);
-end;
-
 procedure TNFGasIniReader.Ler_gTarif(AINIRec: TMemIniFile; gTarif: TgTarifCollection; DetIndex: Integer);
 var
   TarifIndex: Integer;
@@ -450,7 +438,7 @@ begin
 
   while True do
   begin
-    Secao := 'gTarif' + IntToStrZero(DetIndex, 3) + IntToStrZero(TarifIndex, 1);
+    Secao := 'gTarif' + IntToStrZero(DetIndex, 3) + IntToStrZero(TarifIndex, 2);
     Valor := AINIRec.ReadString(Secao, 'dIniTarif', 'FIM');
 
     if (Valor = 'FIM') or (Length(Valor) <= 0) then
@@ -497,6 +485,7 @@ begin
   gProcRef.vProd := StringToFloatDef(AINIRec.ReadString(Secao, 'vProd', ''), 0);
   gProcRef.indDevolucao := StrToTIndicador(AINIRec.ReadString(Secao, 'indDevolucao', ''));
 
+  Ler_gIBSCBSSemProcJur(AINIRec, gProcRef.gIBSCBS, DetIndex, -1);
   Ler_gProc(AINIRec, gProcRef.gProc, DetIndex);
 end;
 
@@ -642,6 +631,7 @@ begin
   Secao := 'total';
 
   Total.vProd := StringToFloatDef(AINIRec.ReadString(Secao, 'vProd', ''), 0);
+  Total.vProdLiq := StringToFloatDef(AINIRec.ReadString(Secao, 'vProdLiq', ''), 0);
   Total.vBC := StringToFloatDef(AINIRec.ReadString(Secao, 'vBC', ''), 0);
   Total.vICMS := StringToFloatDef(AINIRec.ReadString(Secao, 'vICMS', ''), 0);
   Total.vBCST := StringToFloatDef(AINIRec.ReadString(Secao, 'vBCST', ''), 0);

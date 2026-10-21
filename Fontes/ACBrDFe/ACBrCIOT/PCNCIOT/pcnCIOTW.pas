@@ -117,7 +117,8 @@ uses
   ACBrDFeException,
   pcnCIOTW_eFrete,
   pcnCIOTW_REPOM,
-  pcnCIOTW_Pamcard;
+  pcnCIOTW_Pamcard,
+  pcnCIOTW_ANTT;
 
 
 { TCIOTWClass }
@@ -144,7 +145,6 @@ end;
 
 function TCIOTWClass.GerarXml: Boolean;
 begin
-  Result := False;
   raise EACBrDFeException.Create(ClassName + '.GerarXml, não implementado');
 end;
 
@@ -200,6 +200,7 @@ begin
     ieFrete:  FCIOTWClass := TCIOTW_eFrete.Create(Self);
     iREPOM:   FCIOTWClass := TCIOTW_REPOM.Create(Self);
     iPamcard: FCIOTWClass := TCIOTW_Pamcard.Create(Self);
+    iANTT:    FCIOTWClass := TCIOTW_ANTT.Create(Self);
   else
     FCIOTWClass := TCIOTWClass.Create(Self);
   end;

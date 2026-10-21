@@ -865,6 +865,7 @@ procedure TNFSeR_PadraoNacional.LerXMLinfNFSe(const ANode: TACBrXmlNode);
 var
   AuxNode: TACBrXmlNode;
   Ok: Boolean;
+  lUF: String;
 begin
   AuxNode := ANode.Childrens.FindAnyNs('Nfse');
 
@@ -1004,6 +1005,12 @@ begin
 
     if NFSe.infNFSe.xLocEmi = NFSe.Intermediario.Endereco.xMunicipio then
       NFSe.infNFSe.UFLocEmi := NFSe.Intermediario.Endereco.UF;
+
+    if NFSe.infNFSe.UFLocEmi = EmptyStr then
+    begin
+      ObterNomeMunicipioUF(StrToIntDef(NFSe.cLocEmi, 0), lUF);
+      NFSe.infNFSe.UFLocEmi := lUF;
+    end;
   end;
 end;
 
@@ -2069,6 +2076,7 @@ begin
 
     NFSe.ConstrucaoCivil.Endereco.CEP := AINIRec.ReadString(sSecao, 'CEP', '');
     NFSe.ConstrucaoCivil.Endereco.xMunicipio := AINIRec.ReadString(sSecao, 'xMunicipio', '');
+    NFSe.ConstrucaoCivil.Endereco.CodigoMunicipio := AINIRec.ReadString(sSecao, 'CodigoMunicipio', '');
     NFSe.ConstrucaoCivil.Endereco.UF := AINIRec.ReadString(sSecao, 'UF', '');
     NFSe.ConstrucaoCivil.Endereco.Endereco := AINIRec.ReadString(sSecao, 'Logradouro', '');
     NFSe.ConstrucaoCivil.Endereco.Numero := AINIRec.ReadString(sSecao, 'Numero', '');

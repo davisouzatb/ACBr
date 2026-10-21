@@ -43,7 +43,7 @@ interface
 uses
   SysUtils, StrUtils, Classes,
   ACBrBase,
-  pcnConversao;
+  ACBrDFe.Conversao;
 
 type
 
@@ -101,7 +101,7 @@ type
 
 function CRTToStr(const t: TpcnCRT): string;
 function StrToCRT(out ok: boolean; const s: string): TpcnCRT;
-function CRTTocRegTrib(const t: TpcnCRT): TpcnRegTrib;
+function CRTTocRegTrib(const t: TpcnCRT): TRegTrib;
 
 type
   TpcnIndicadorTotal = (itSomaTotalNFe, itNaoSomaTotalNFe );
@@ -288,11 +288,12 @@ const
     'URL-ConsultaNFCe');
 
 type
-  TpcnFinalidadeNFe = (fnNormal, fnComplementar, fnAjuste, fnDevolucao);
+  TpcnFinalidadeNFe = (fnNormal, fnComplementar, fnAjuste, fnDevolucao,
+    fnCredito, fnDebito);
 
 const
   TFinalidadeNFeArrayStrings: array[TpcnFinalidadeNFe] of string = ('1', '2', '3',
-    '4');
+    '4', '5', '6');
 
 type
   TpcnModeloDF = (moNFe, moNFCe);
@@ -404,6 +405,7 @@ const
   TtpGuiaArrayStrings: array[TtpGuia] of string = ('', '1', '2', '3', '4', '5', '6', '7');
 
 // Reforma Tributária
+{
 type
   TtpNFDebito = (tdNenhum, tdTransferenciaCreditoCooperativa, tdAnulacao,
                  tdDebitosNaoProcessadas, tdMultaJuros,
@@ -413,7 +415,7 @@ type
 const
   TtpNFDebitoArrayStrings: array[TtpNFDebito] of string = ('', '01', '02', '03',
     '04', '05', '06', '07', '08');
-
+}
 type
   TtpNFCredito = (tcNenhum, tcMultaJuros, tcApropriacaoCreditoPresumido, tcRetorno,
                   tcReducaoValores, tcTransferenciaCreditoSucessao, tcRetornoRecusaParcial);
@@ -430,18 +432,10 @@ const
   TCSTISArrayStrings: array[TCSTIS] of string = ('',
     '000', '100', '200', '300', '400','500', '600');
 
-type
-  TTpCredPresIBSZFM = (tcpNenhum, tcpSemCredito, tcpBensConsumoFinal, tcpBensCapital,
-                       tcpBensIntermediarios, tcpBensInformaticaOutros);
-
-const
-  TTpCredPresIBSZFMArrayStrings: array[TTpCredPresIBSZFM] of string = ('', '0',
-    '1', '2', '3', '4');
-
 {
   Declaração das funções de conversão
 }
-function StrToTpEventoNFe(out ok: boolean; const s: string): TpcnTpEvento;
+function StrToTpEventoNFe(out ok: boolean; const s: string): TACBrTipoEvento;
 
 function LayOutToServico(const t: TLayOut): String;
 function ServicoToLayOut(out ok: Boolean; const s: String): TLayOut;
@@ -520,18 +514,16 @@ function TtpGuiaToStr(const t: TtpGuia): string;
 function StrToTtpGuia(const s: string): TtpGuia;
 
 // Reforma Tributária
+{
 function tpNFDebitoToStr(const t: TtpNFDebito): string;
 function StrTotpNFDebito(const s: string): TtpNFDebito;
-
+}
 function tpNFCreditoToStr(const t: TtpNFCredito): string;
 function StrTotpNFCredito(const s: string): TtpNFCredito;
 
 function CSTISToStr(const t: TCSTIS): string;
 function TryStrToCSTIS(const s: string; out Value: TCSTIS): Boolean;
 function StrToCSTIS(const s: string): TCSTIS;
-
-function TpCredPresIBSZFMToStr(const t: TTpCredPresIBSZFM): string;
-function StrToTpCredPresIBSZFM(const s: string): TTpCredPresIBSZFM;
 
 implementation
 
@@ -783,7 +775,7 @@ begin
      crtRegimeNormal, crtMEI]);
 end;
 
-function CRTTocRegTrib(const t: TpcnCRT): TpcnRegTrib;
+function CRTTocRegTrib(const t: TpcnCRT): TRegTrib;
 begin
   if T = crtSimplesNacional then
     Result := RTSimplesNacional
@@ -1136,7 +1128,7 @@ begin
                           [iscNenhum, iscCOFINSSTNaoCompoe, iscCOFINSSTCompoe]);
 end;
 
-function StrToTpEventoNFe(out ok: boolean; const s: string): TpcnTpEvento;
+function StrToTpEventoNFe(out ok: boolean; const s: string): TACBrTipoEvento;
 begin
   Result := StrToEnumerado(ok, s,
             ['-99999', '110110', '110111', '110112', '110140', '111500',
@@ -1260,14 +1252,14 @@ end;
 // B25 - Finalidade de emissão da NF-e *****************************************
 function FinNFeToStr(const t: TpcnFinalidadeNFe): String;
 begin
-  Result := EnumeradoToStr(t, ['1', '2', '3', '4'],
-    [fnNormal, fnComplementar, fnAjuste, fnDevolucao]);
+  Result := EnumeradoToStr(t, ['1', '2', '3', '4', '5', '6'],
+    [fnNormal, fnComplementar, fnAjuste, fnDevolucao, fnCredito, fnDebito]);
 end;
 
 function StrToFinNFe(out ok: Boolean; const s: String): TpcnFinalidadeNFe;
 begin
-  Result := StrToEnumerado(ok, s, ['1', '2', '3', '4'],
-    [fnNormal, fnComplementar, fnAjuste, fnDevolucao]);
+  Result := StrToEnumerado(ok, s, ['1', '2', '3', '4', '5', '6'],
+    [fnNormal, fnComplementar, fnAjuste, fnDevolucao, fnCredito, fnDebito]);
 end;
 
 function IndicadorNFeToStr(const t: TpcnIndicadorNFe): String;
@@ -1734,6 +1726,7 @@ begin
 end;
 
 // Reforma Tributária
+{
 function tpNFDebitoToStr(const t: TtpNFDebito): string;
 begin
   Result := TtpNFDebitoArrayStrings[t];
@@ -1753,7 +1746,7 @@ begin
   end;
   raise EACBrException.CreateFmt('Valor string inválido para TtpNFDebito: %s', [s]);
 end;
-
+}
 function tpNFCreditoToStr(const t: TtpNFCredito): string;
 begin
   Result := TtpNFCreditoArrayStrings[t];
@@ -1799,26 +1792,6 @@ function StrToCSTIS(const s: string): TCSTIS;
 begin
   if not TryStrToCSTIS(s, Result) then
     raise EACBrException.CreateFmt('Valor string inválido para TCSTIS: %s', [s]);
-end;
-
-function TpCredPresIBSZFMToStr(const t: TTpCredPresIBSZFM): string;
-begin
-  Result := TTpCredPresIBSZFMArrayStrings[t];
-end;
-
-function StrToTpCredPresIBSZFM(const s: string): TTpCredPresIBSZFM;
-var
-  idx: TTpCredPresIBSZFM;
-begin
-  for idx:= Low(TTpCredPresIBSZFMArrayStrings) to High(TTpCredPresIBSZFMArrayStrings) do
-  begin
-    if(TTpCredPresIBSZFMArrayStrings[idx] = s)then
-    begin
-      Result := idx;
-      exit;
-    end;
-  end;
-  raise EACBrException.CreateFmt('Valor string inválido para TTpCredPresIBSZFM: %s', [s]);
 end;
 
 initialization

@@ -44,7 +44,7 @@ uses
   ACBrDFeConsts,
   ACBrDFeUtil,
   ACBrCTe.Classes,
-  pcnRetConsReciDFe,
+  ACBrDFeComum.RetConsReciDFe,
   ACBrDFeComum.RetConsCad,
   ACBrDFeComum.RetEnvio,
   pcteConversaoCTe, pcteProcCTe,
@@ -1701,7 +1701,7 @@ begin
   FPRetWS := SeparaDados(FPRetornoWS, 'cteRetRecepcaoResult');
 
   //A função UTF8ToNativeString deve ser removida quando for refatorado para usar ACBrXmlDocument
-  FCTeRetorno.Leitor.Arquivo := UTF8ToNativeString(ParseText(FPRetWS));
+  FCTeRetorno.XmlRetorno := UTF8ToNativeString(ParseText(FPRetWS));
   FCTeRetorno.LerXML;
 
   Fversao := FCTeRetorno.versao;
@@ -2016,7 +2016,7 @@ begin
   FPRetWS := SeparaDados(FPRetornoWS, 'cteRetRecepcaoResult');
 
   //A função UTF8ToNativeString deve ser removida quando for refatorado para usar ACBrXmlDocument
-  FCTeRetorno.Leitor.Arquivo := UTF8ToNativeString(ParseText(FPRetWS));
+  FCTeRetorno.XmlRetorno := UTF8ToNativeString(ParseText(FPRetWS));
   FCTeRetorno.LerXML;
 
   Fversao := FCTeRetorno.versao;
@@ -3776,7 +3776,7 @@ begin
         FlistaArqs.Add( FNomeArq );
 
       aPath := GerarPathDistribuicao(FretDistDFeInt.docZip.Items[I]);
-      FretDistDFeInt.docZip.Items[I].NomeArq := aPath + FNomeArq;
+      FretDistDFeInt.docZip.Items[I].NomeArq := PathWithDelim(aPath) + FNomeArq;
 
       if (FPConfiguracoesCTe.Arquivos.Salvar) and NaoEstaVazio(FNomeArq) then
       begin

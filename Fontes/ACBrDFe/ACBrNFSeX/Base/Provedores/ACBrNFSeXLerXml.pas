@@ -375,6 +375,9 @@ begin
      (Pos('{', LDiscriminacao) > 0) and (Pos('}', LDiscriminacao) > 0) then
   begin
     FpAOwner.ConfigGeral.DetalharServico := True;
+    // Limpa a lista para evitar duplicidade ao fazer a leitura do XML com o
+    // componente já carregado.
+    NFSe.Servico.ItemServico.Clear;
 
     if Pos('":', LDiscriminacao) > 0 then
       LerListaJson(LDiscriminacao)
@@ -1165,6 +1168,7 @@ begin
       Servico.Endereco.Numero := AINIRec.ReadString(sSecao, 'Numero', '');
       Servico.Endereco.xPais := AINIRec.ReadString(sSecao, 'xPais', '');
       Servico.Endereco.UF := AINIRec.ReadString(sSecao, 'UF', '');
+      Servico.Endereco.CodigoMunicipio := Servico.CodigoMunicipio;
 
       // Provedor ISSBarueri
       Servico.LocalPrestacao := StrToLocalPrestacao(Ok, AINIRec.ReadString(sSecao, 'LocalPrestacao', '1'));
@@ -1718,6 +1722,8 @@ end;
 
 procedure TNFSeRClass.LerXMLEnderecoDestinatario(
   const ANode: TACBrXmlNode; ender: Tender);
+var
+  xUF: String;
 begin
   if not Assigned(ANode) then Exit;
 
@@ -1728,6 +1734,14 @@ begin
   ender.nro := ObterConteudo(ANode.Childrens.FindAnyNs('nro'), tcStr);
   ender.xCpl := ObterConteudo(ANode.Childrens.FindAnyNs('xCpl'), tcStr);
   ender.xBairro := ObterConteudo(ANode.Childrens.FindAnyNs('xBairro'), tcStr);
+
+  ender.DescricaoMunicipio := ObterNomeMunicipioUF(ender.endNac.cMun, xUF);
+
+  if ender.UF = '' then
+  begin
+    ender.UF := xUF;
+    ender.endNac.UF := xUF;
+  end;
 end;
 
 procedure TNFSeRClass.LerXMLEnderecoNacionalDestinatario(
@@ -2079,12 +2093,12 @@ begin
   sSecao := 'IBSCBSDPS';
   if AINIRec.SectionExists(sSecao) then
   begin
-    IBSCBS.finNFSe := StrTofinNFSe(AINIRec.ReadString(sSecao, 'finNFSe', ''));
-    IBSCBS.indFinal := StrToindFinal(AINIRec.ReadString(sSecao, 'indFinal', ''));
+    IBSCBS.finNFSe := StrTofinNFSe(AINIRec.ReadString(sSecao, 'finNFSe', '0'));
+    IBSCBS.indFinal := StrToindFinal(AINIRec.ReadString(sSecao, 'indFinal', '1'));
     IBSCBS.cIndOp := AINIRec.ReadString(sSecao, 'cIndOp', '');
     IBSCBS.tpOper := StrTotpOperGovNFSe(AINIRec.ReadString(sSecao, 'tpOper', ''));
     IBSCBS.tpEnteGov := StrTotpEnteGov(AINIRec.ReadString(sSecao, 'tpEnteGov', ''));
-    IBSCBS.indDest := StrToindDest(AINIRec.ReadString(sSecao, 'indDest', ''));
+    IBSCBS.indDest := StrToindDest(AINIRec.ReadString(sSecao, 'indDest', '0'));
 
     // Incluido para atender o provedor SigISSWeb
     IBSCBS.OperExterior := StrToTIndicador(AINIRec.ReadString(sSecao, 'OperExterior', '0'));

@@ -113,7 +113,6 @@ type
     function Gerar_det_prod(prod: Tprod): TACBrXmlNode;
     function Gerar_det_prod_gMedicao(gMedicao: TgMedicao): TACBrXmlNode;
     function Gerar_det_prod_gMedida(gMedida: TgMedida): TACBrXmlNode;
-    function Gerar_gPagAntecipado(gPagAntecipado: TgPagAntecipadoNFGas): TACBrXmlNode;
 
     function Gerar_det_imposto(imposto: Timposto): TACBrXmlNode;
     function Gerar_det_imposto_PIS(PIS: TPIS): TACBrXmlNode;
@@ -406,6 +405,10 @@ begin
   begin
     Result.AppendChild(NodeCompraGov);
   end;
+
+  if NFGas.Ide.tpPagAnt <> tpaNenhum then
+    Result.AppendChild(AddNode(tcStr, '#20a', 'tpPagAnt', 1, 1, 1,
+                              tpPagAntToStr(NFGas.Ide.tpPagAnt), DSC_TPPAGANT));
 end;
 
 function TNFGasXmlWriter.Gerar_Emit: TACBrXmlNode;
@@ -671,15 +674,16 @@ begin
       gTarif[I].vTarifAplic, 'Valor da tarifa aplicada'));
   end;
 
-  if gTarif.Count > 6 then
-    wAlerta('#102', 'gTarif', '', ERR_MSG_MAIOR_MAXIMO + '6');
+  if gTarif.Count > 20 then
+    wAlerta('#102', 'gTarif', '', ERR_MSG_MAIOR_MAXIMO + '20');
 end;
 
 function TNFGasXmlWriter.Gerar_det_prod(prod: Tprod): TACBrXmlNode;
 begin
   Result := FDocument.CreateElement('prod');
 
-  Result.AppendChild(AddNode(tcStr, '#110', 'indOrigemQtd', 1, 1, 1, prod.indOrigemQtd, 'Indicador da origem da quantidade faturada'));
+  Result.AppendChild(AddNode(tcStr, '#110', 'indOrigemQtd', 1, 1, 1,
+    indOrigemQtdToStr(prod.indOrigemQtd), 'Indicador da origem da quantidade faturada'));
 
   if (prod.gMedicao.nMed > 0) and (prod.gMedicao.gMedida.vMed > 0) then
     Result.AppendChild(Gerar_det_prod_gMedicao(prod.gMedicao));
@@ -697,11 +701,17 @@ begin
   Result.AppendChild(AddNode(tcDe4, '#129', 'fatorT', 1, 15, 0, prod.fatorT, 'Fator de correção de temperatura'));
   Result.AppendChild(AddNode(tcDe8, '#130', 'vProd', 1, 15, 1, prod.vProd, 'Valor do produto'));
 
+  Result.AppendChild(AddNode(tcDe8, '#130', 'vItemLiq', 1, 15, 0,
+                                                  prod.vItemLiq, DSC_VITEMLIQ));
+
+  Result.AppendChild(AddNode(tcDe8, '#130', 'vProdLiq', 1, 15, 0,
+                                                  prod.vProdLiq, DSC_VPRODLIQ));
+
   if prod.indDevolucao = tiSim then
     Result.AppendChild(AddNode(tcStr, '#131', 'indDevolucao', 1, 1, 1, '1', 'Indicador de devolução do valor do item'));
 
   if prod.gPagAntecipado.chDFePagAnt <> '' then
-    Result.AppendChild(Gerar_gPagAntecipado(prod.gPagAntecipado));
+    Result.AppendChild(Gerar_gPagAntecipadoProd(prod.gPagAntecipado));
 end;
 
 function TNFGasXmlWriter.Gerar_det_prod_gMedicao(gMedicao: TgMedicao): TACBrXmlNode;
@@ -736,18 +746,6 @@ begin
                           uMedToStr(gMedida.uMed), 'Unidade básica de medida'));
   Result.AppendChild(AddNode(tcDe4, '#116', 'vMed', 1, 15, 1,
                                              gMedida.vMed, 'Valor da medição'));
-end;
-
-function TNFGasXmlWriter.Gerar_gPagAntecipado(
-  gPagAntecipado: TgPagAntecipadoNFGas): TACBrXmlNode;
-begin
-  Result := FDocument.CreateElement('gPagAntecipado');
-
-  Result.AppendChild(AddNode(tcStr, '#115', 'chDFePagAnt', 44, 44, 1,
-                                        gPagAntecipado.chDFePagAnt, DSC_CHAVE));
-
-  Result.AppendChild(AddNode(tcInt, '#116', 'nItemPagAnt', 3, 3, 0,
-                                        gPagAntecipado.nItemPagAnt, DSC_NITEM));
 end;
 
 function TNFGasXmlWriter.Gerar_det_imposto(imposto: Timposto): TACBrXmlNode;
@@ -1092,6 +1090,8 @@ begin
       'Indicador de devolucao do valor do item'));
   end;
 
+  Result.AppendChild(Gerar_gIBSCBSSemProcJur(gProcRef.gIBSCBS));
+
   ProcNodes := Gerar_det_gProcRef_gProc(gProcRef.gProc);
   for I := 0 to Length(ProcNodes) - 1 do
   begin
@@ -1138,6 +1138,9 @@ begin
 
   Result.AppendChild(AddNode(tcDe2, '#254', 'vProd', 1, 15, 1,
                                                        Total.vProd, DSC_VPROD));
+
+  Result.AppendChild(AddNode(tcDe2, '#254', 'vProdLiq', 1, 15, 0,
+                                                 Total.vProdLiq, DSC_VPRODLIQ));
 
   Result.AppendChild(Gerar_ICMSTot(Total));
   Result.AppendChild(Gerar_vRetTribTot(Total));

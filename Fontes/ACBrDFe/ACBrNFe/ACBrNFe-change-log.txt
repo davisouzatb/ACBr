@@ -44,6 +44,101 @@ Símbolo : Significado
 [*]     : Recurso modificado/melhorado
 [-]     : Correção de Bug (assim esperamos)
 
+15/10/2026
+-- ACBrNFeServicos --
+[-] A URL do QrCode da NF-e com DANFe Simplificado Tipo 2 para o ambiente de homologação de SP foi atualizada.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/95378-danfe-simplificado-tipo-2-erro-valida%C3%A7%C3%A3o-e-url-qrcode/ 
+-- ACBrNFeDANFeESCPOS --
+[-] Ajuste para impressao qrCode Lateral DANFe Simplificado Tipo2
+   Por: Daniel de Morais
+
+14/10/2026
+-- ACBrNFeDANFeRLRetrato --
+[-] Ajuste para a quebra de linha da propriedade RLMemoInfAd (infAdProd )
+   Por: Daniel de Morais
+   Veja: https://www.projetoacbr.com.br/forum/topic/95345-campo-do-infadprod-n%C3%A3o-respeitando-as-margens/
+
+30/09/2026
+-- ACBrNFeWebServices --
+[-] Ajuste visando evitar erro de UTF-8 ao consultar recibo.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/94963-erro-ao-executar-o-comando-acbrnfewebservicesreciboexecutar/ 
+-- ACBrNFe.XmlWriter --
+[-] Ajuste para que sejam gerados os grupos de PIS e COFINS quando nota de pagamento antecipado.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/94786-nfe-finalidade-6nota-de-d%C3%A9bito-tipo-de-d%C3%A9bito-06-pagamento-antecipado/ 
+
+29/09/2026
+-- ACBrNFeServicos --
+[-] ACBR-9846 - Corrige a URL de Consulta para o ambiente de produção de NFe.
+   Por: umclic
+   Veja: https://www.projetoacbr.com.br/forum/topic/94714-acbr-9846-endereco-do-site-da-uf-da-consulta-por-chave-de-acesso-diverge-do-previsto/
+
+24/09/2026
+-- ACBrDANFCeFortesFr (pas/dfm/lfm) --
+[+] ACBR-9424 - Disponibiliza o DANFe Simplificado Tipo 2 no motor de impressão Fortes Report.
+   Por: Alexandre de Paula
+   Veja: https://www.projetoacbr.com.br/forum/topic/94858-danfe-simplificado-tipo-2-sendo-disponibilizado-nos-motores-de-relat%C3%B3rio-do-acbr/ 
+   
+23/09/2026
+-- ACBrNFe.Consts --
+[-] Adiciona as constantes DSC_PESOB_TON e DSC_PESOL_TON.
+   Por: Diego Folieni
+
+22/09/2026
+-- ACBrNFe.Conversao/ACBrNFe.XmlWriter/pcnConversaoNFe --
+[-] ACBR-9863 - Ajuste para informar corretamente o tipo de Nota de Débito, pois não estava gerando
+    corretamente o grupo gEstornoCred.
+   Por: Italo Giurizzato Junior/Paulo Hildebrand Neto
+
+18/09/2026
+-- ACBrNFeServicos.ini --
+[-] ACBR-9424 - Altera a URL de consulta e a URL de QR Code para correta emissão de NF-e Varejo em homologação para SP.
+   Por: Diego Folieni
+-- ACBrNFe/ACBrNFCeDANFeFPDF --
+[+] ACBR-9424 - Disponibiliza o DANFe Simplificado Tipo 2 no motor de impressão FPDF.
+   Por: Diego Folieni
+   Veja: https://www.projetoacbr.com.br/forum/topic/94858-danfe-simplificado-tipo-2-sendo-disponibilizado-nos-motores-de-relat%C3%B3rio-do-acbr/ 
+
+04/09/2026
+-- ACBrNFeDANFEFRDM --
+[-] Correções visando utilizar as novas funções da unit ACBrDFe.Conversao
+   Por: Italo Giurizzato Junior
+-- Diversos --
+[+] Diversas implementações e ajustes no componente para que o mesmo passe a utilizar
+    as units padrões para a RTC.
+   Por: Italo Giurizzato Junior
+-- ACBrNFe.XmlWriter --
+[-] Corrigido a posição onde se deve gerar as tags: qBCMonoDif e adRemICMSDif para
+    o CST=53 do ICMS.
+   Por Italo Giurizzato Junior
+
+03/09/2026
+-- ACBrNFe.XmlWriter --
+[*] Alterado as condições para gerar o XML corretamente quando o tipo de débito for
+    Pagamento Antecipado.
+   Por Italo Giurizzato Junior
+
+02/09/2026
+-- ACBrNFeServicos --
+[+] Incluído as URLs deo QR-Code e de consulta para a NF-e quando emitida com o tipo de impressão
+    DANFE Simplificado Tipo 2.
+   Por Italo Giurizzato Junior
+
+31/08/2026
+-- ACBrNFe --
+[*] Incluído uma condição para pesquisar a seção da NFe ou NFCe ao procurar as URLs do QR-Code
+    dependendo do modelo de documento.
+   Por Italo Giurizzato Junior
+-- ACBrNFeServicos --
+[+] Incluído as URLs de QR-Code e de Consulta (Homologação e Produção) a serem utilizadas
+    em uma NF-e com DANFSE Simplificado Tipo 2.
+   Por Italo Giurizzato Junior
+-- ACBrNFe.XmlReader/ACBrNFe.XmlWriter --
+[*] Alterado o tipo de conversão de tcInt por tcStr, pois o campo nGuia é do tipo string.
+   Por Italo Giurizzato Junior
+
 27/08/2026
 -- ACBrNFe.XmlWriter --
 [*] Removido as condições nas chamadas para gerar II, PIS, PISST, COFINS e COFINSST.

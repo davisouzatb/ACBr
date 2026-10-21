@@ -347,8 +347,8 @@ implementation
 uses IniFiles, DateUtils, Forms, strutils,
   ACBrDFeConfiguracoes, ACBrLibConfig,
   ACBrLibConsReciDFe, ACBrLibDistribuicaoDFe,
-  pcnConversao, pmdfeConversaoMDFe,
-  pcnAuxiliar, pmdfeMDFeR, DoACBrUnit, ACBrMDFe.Classes;
+  ACBrDFe.Conversao, ACBrMDFe.Conversao,
+  ACBrMDFe.XmlReader, DoACBrUnit, ACBrMDFe.Classes;
 
 { TMetodoGetPathEvento }
 
@@ -911,42 +911,14 @@ begin
 end;
 
 function TACBrObjetoMDFe.GerarMDFeIni(XML: string): string;
-var
-  INIRec: TMemIniFile;
-  IniMDFe: TStringList;
-  LocMDFeR: TMDFeR;
 begin
-  INIRec := TMemIniFile.Create('MDFe.ini');
-
-  try
-    fACBrMDFe.Manifestos.Clear;
-
-    if FilesExists(XML) then
-      fACBrMDFe.Manifestos.LoadFromFile(XML)
-    else
-    begin
-      LocMDFeR := TMDFeR.Create(fACBrMDFe.Manifestos.Add.MDFe);
-      try
-        LocMDFeR.Leitor.Arquivo := ConvertStrRecived(XML);
-        LocMDFeR.LerXml;
-        fACBrMDFe.Manifestos.Items[0].XML := LocMDFeR.Leitor.Arquivo;
-        fACBrMDFe.Manifestos.GerarMDFe;
-      finally
-        LocMDFeR.Free;
-      end;
-    end;
-
-    IniMDFe := TStringList.Create;
-    try
-      IniMDFe.Text := fACBrMDFe.Manifestos.GerarIni();
-      INIRec.SetStrings(IniMDFe);
-      Result := IniMDFe.Text;
-    finally
-      IniMDFe.Free;
-    end;
-  finally
-    INIRec.Free;
-  end;
+  fACBrMDFe.Manifestos.Clear;
+  if FilesExists(XML) then
+    fACBrMDFe.Manifestos.LoadFromFile(XML, True)
+  else
+    fACBrMDFe.Manifestos.LoadFromString(ConvertStrRecived(XML), True);
+  Result := fACBrMDFe.Manifestos.GerarIni();
+  WriteToTxt('MDFe.ini', Result);
 end;
 
 { TACBrCarregarMDFe }
@@ -1116,7 +1088,7 @@ begin
   with TACBrObjetoMDFe(fpObjetoDono) do
   begin
     try
-      fpCmd.Resposta := GerarMDFeIni(AXML);
+      fpCmd.Resposta := fpCmd.Resposta + sLineBreak + GerarMDFeIni(AXML);
     except
       on E: Exception do
         raise Exception.Create('Erro ao gerar INI do MDFe.' + sLineBreak + E.Message);
@@ -1156,22 +1128,17 @@ end;
 }
 procedure TMetodoSetformaEmissao.Executar;
 var
-  OK: boolean;
-  FormaEmissao: TpcnTipoEmissao;
+  FormaEmissao: TACBrTipoEmissao;
   NFormaEmissao: Integer;
 begin
   NFormaEmissao := StrToIntDef(fpCmd.Params(0), 1);
 
   with TACBrObjetoMDFe(fpObjetoDono) do
   begin
-    OK := False;
-    FormaEmissao := StrToTpEmis(OK, IntToStr(NFormaEmissao));
-
-    if not OK then
-      raise Exception.Create('Forma de Emissão Inválida: ' + TpEmisToStr(FormaEmissao));
+    FormaEmissao := StrToTipoEmissao(IntToStr(NFormaEmissao));
 
     with MonitorConfig.DFE.WebService do
-      FormaEmissaoMDFe := StrToInt(TpEmisToStr(FormaEmissao)) -1;
+      FormaEmissaoMDFe := StrToInt(TipoEmissaoToStr(FormaEmissao)) -1;
 
     MonitorConfig.SalvarArquivo;
   end;
@@ -1183,19 +1150,14 @@ end;
 }
 procedure TMetodoSetTipoImpressao.Executar;
 var
-  OK: boolean;
-  TipoDAMDFe: TpcnTipoImpressao;
+  TipoDAMDFe: TACBrTipoImpressao;
   NTipoImpressao: Integer;
 begin
   NTipoImpressao := StrToIntDef(fpCmd.Params(0), 1);
 
   with TACBrObjetoMDFe(fpObjetoDono) do
   begin
-    OK := False;
-    TipoDAMDFe := StrToTpImp(OK, IntToStr(NTipoImpressao));
-
-    if not OK then
-      raise Exception.Create('Tipo Impressão Inválido: ' + TpImpToStr(TipoDAMDFe));
+    TipoDAMDFe := StrToTpImp(IntToStr(NTipoImpressao));
 
     with MonitorConfig.DFE.Impressao.Geral do
       DANFE := StrToInt(TpImpToStr(TipoDAMDFe)) -1;
@@ -1395,7 +1357,7 @@ var
   CargaDFeEvento: TACBrCarregarMDFeEvento;
   CargaDFe: TACBrCarregarMDFe;
   AEnviaPDF: Boolean;
-  TipoEvento: TpcnTpEvento;
+  TipoEvento: TACBrTipoEvento;
 begin
   ADestinatario := fpCmd.Params(0);
   APathXMLEvento := fpCmd.Params(1);

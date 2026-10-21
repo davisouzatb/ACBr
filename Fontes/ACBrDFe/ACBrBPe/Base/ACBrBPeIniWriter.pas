@@ -199,14 +199,7 @@ begin
   AINIRec.WriteString('ide', 'xJust', Ide.xJust);
 
   // Reforma Tritutária
-  if Ide.gCompraGov.pRedutor > 0 then
-  begin
-    AINIRec.WriteString('ide', 'tpEnteGov', tpEnteGovToStr(Ide.gCompraGov.tpEnteGov));
-    AINIRec.WriteFloat('ide', 'pRedutor', Ide.gCompraGov.pRedutor);
-    AINIRec.WriteString('ide', 'tpOperGov', tpOperGovToStr(Ide.gCompraGov.tpOperGov));
-
-    Gerar_refDFe(AINIRec, Ide.gCompraGov.refDFe);
-  end;
+  Gerar_gCompraGovReduzido(AINIRec, Ide.gCompraGov);
 end;
 
 procedure TBPeIniWriter.Gerar_Emitente(AINIRec: TMemIniFile; Emit: TEmit);
@@ -365,6 +358,7 @@ begin
   // Informações sobre os Valores do BPe
 
   AINIRec.WriteFloat('infValorBPe', 'vBP', infValorBPe.vBP);
+  AINIRec.WriteFloat('infValorBPe', 'vBPLiq', infValorBPe.vBPLiq);
   AINIRec.WriteFloat('infValorBPe', 'vDesconto', infValorBPe.vDesconto);
   AINIRec.WriteFloat('infValorBPe', 'vPgto', infValorBPe.vPgto);
   AINIRec.WriteFloat('infValorBPe', 'vTroco', infValorBPe.vTroco);
@@ -503,6 +497,7 @@ begin
 
     AINIRec.WriteString(sSecao, 'qPass', det[i].qPass);
     AINIRec.WriteFloat(sSecao, 'vBP', det[i].vBP);
+    AINIRec.WriteFloat(sSecao, 'vBPLiq', det[i].vBPLiq);
 
     Gerar_ImpTM(AINIRec, Det[i].imp, Idx + 1, i + 1);
     Gerar_CompValorTM(AINIRec, det[i].Comp, Idx + 1, i + 1);
@@ -556,6 +551,7 @@ begin
 
   AINIRec.WriteInteger(sSecao, 'qPass', Total.qPass);
   AINIRec.WriteFloat(sSecao, 'vBP', Total.vBP);
+  AINIRec.WriteFloat(sSecao, 'vBPLiq', Total.vBPLiq);
   AINIRec.WriteFloat(sSecao, 'vBC', Total.vBC);
   AINIRec.WriteFloat(sSecao, 'vICMS', Total.vICMS);
 

@@ -55,7 +55,7 @@
 // Descomente a linha abaixo, se você não utiliza a obsoleta Capicom para Criptografia (RECOMENDADO)
 {$DEFINE DFE_SEM_CAPICOM}
 // Descomente a linha abaixo, se você não utiliza a obsoleta MSXML para Assinatura de XML (RECOMENDADO)
-{$DEFINE DFE_SEM_MSXML}
+{.$DEFINE DFE_SEM_MSXML}
 // Descomente a linha abaixo, se você está numa versão antiga do Windows como XP ou CE (NAO RECOMENDADO)
 {.$DEFINE DFE_SEM_WINSECCNG}
 // Descomente a linha abaixo, se você não deseja adicionar a Dependência da INDY nos seus Projetos

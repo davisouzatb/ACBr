@@ -1591,7 +1591,7 @@ var
     "DPS" + Cód.Mun (7) + Tipo de Inscrição Federal (1) +
     Inscrição Federal (14 - CPF completar com 000 à esquerda) + Série DPS (5)+ Núm. DPS (15)
     }
-    cMun := Poem_Zeros(Emitente.DadosEmitente.CodigoMunicipio, 7);
+    cMun := Poem_Zeros(TACBrNFSeX(FAOwner).Configuracoes.Geral.CodigoMunicipio, 7);
     vCNPJ := OnlyCPFCNPJAlphaNum(Emitente.CNPJ);
 
     if Length(vCNPJ) = 11 then

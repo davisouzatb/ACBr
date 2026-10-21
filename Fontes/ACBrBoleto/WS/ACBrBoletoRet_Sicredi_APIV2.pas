@@ -430,6 +430,7 @@ begin
 
               LListaRetorno.DadosRet.TituloRet.DataBaixa                  := DateSicreditoDateTime(LItemObject.AsString['dataPagamento']);
               LListaRetorno.DadosRet.TituloRet.HoraBaixa                  := TimeSicreditoDateTime(LItemObject.AsString['dataPagamento']);
+              LListaRetorno.DadosRet.TituloRet.DataMovimento              := LListaRetorno.DadosRet.TituloRet.DataBaixa;
               LListaRetorno.DadosRet.TituloRet.SeuNumero                  := LItemObject.AsString['seuNumero'];
               LListaRetorno.DadosRet.TituloRet.valorAtual                 := LItemObject.AsFloat['valor'];
               LListaRetorno.DadosRet.TituloRet.ValorDocumento             := LItemObject.AsFloat['valor'];

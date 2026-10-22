@@ -75,6 +75,7 @@ uses
   ACBrBoletoConversao,
   ACBrUtil.Strings,
   ACBrUtil.Base,
+  ACBrUtil.Compatibilidade,
   ACBrJSON;
 
 resourcestring
@@ -130,7 +131,8 @@ var
   i :Integer;
   LcodStatus: Integer;
   LdtPagto, LdtBaixa: Integer;
-  LvalorPago : Double;
+  LvalorPago: Currency;
+  LFormatoValor: TFormatSettings;
 begin
   Result := True;
   LTipoOperacao := ACBrBoleto.Configuracoes.WebService.Operacao;
@@ -226,18 +228,33 @@ begin
               ARetornoWS.DadosRet.TituloRet.DataBaixa                   := DateBradescoToDateTime(LJsonObject.AsString['dtPagto']);
               ARetornoWS.DadosRet.TituloRet.DataCredito	                := DateBradescoToDateTime(LJsonObject.AsString['dtPagto']);
 
-              ARetornoWS.DadosRet.TituloRet.ValorDocumento              := ValorInteiroParaDouble(LJsonObject.AsInteger['valorMoedaBol']);
+              if LJsonObject.AsCurrency['valorMoedaBol'] > 0 then
+                ARetornoWS.DadosRet.TituloRet.ValorDocumento := LJsonObject.AsCurrency['valorMoedaBol'] / 100
+              else
+                ARetornoWS.DadosRet.TituloRet.ValorDocumento := LJsonObject.AsCurrency['valMoeda'] / 100;
 
               LcodStatus := LJsonObject.AsInteger['codStatus'];
               LdtPagto   := LJsonObject.AsInteger['dtPagto'];
               LdtBaixa   := LJsonObject.AsInteger['dtBaixa'];
 
               if LcodStatus = 61 then
-                LvalorPago := StrToFloatDef(StringReplace(LJsonObject.AsString['vlrPagto'], ',', '.', [rfReplaceAll]), 0)
+              begin
+                LFormatoValor := CreateFormatSettings;
+                LFormatoValor.DecimalSeparator := '.';
+                if not TryStrToCurr(StringReplace(LJsonObject.AsString['vlrPagto'], ',', '.', [rfReplaceAll]),
+                  LvalorPago, LFormatoValor) then
+                begin
+                  LMensagemRejeicao := ARetornoWS.CriarRejeicaoLista;
+                  LMensagemRejeicao.Codigo := 'VALOR_PAGO_INVALIDO';
+                  LMensagemRejeicao.Mensagem := 'Valor pago invalido na resposta do Bradesco.';
+                  Result := False;
+                  Exit;
+                end;
+              end
               else if LDtPagto > 0 then
-                LValorPago := ValorInteiroParaDouble(LJsonObject.AsInteger['valMoeda'])
+                LValorPago := LJsonObject.AsCurrency['valMoeda'] / 100
               else if (LCodStatus = 51) and (LDtBaixa > 0) then
-                LvalorPago := ValorInteiroParaDouble(LJsonObject.AsInteger['valMoeda'])
+                LvalorPago := LJsonObject.AsCurrency['valMoeda'] / 100
               else
                 LValorPago := 0;
 

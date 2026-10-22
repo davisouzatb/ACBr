@@ -167,7 +167,7 @@ function OnlyAlphaNum(const AValue: String): String;
 function OnlyCPFCNPJAlphaNum(const AValue: String): String;
 function OnlyCharsInSet(const AValue: String; SetOfChars: TSetOfChars): String;
 
-function TiraAcentos( const AString : String ) : String ;
+function TiraAcentos( const AString : String; const ACaracteresPermitidos: String = '' ) : String ;
 function TiraAcento( const AChar : AnsiChar ) : AnsiChar ;
 
 function AjustaLinhas(const Texto: AnsiString; Colunas: Integer ;
@@ -1263,7 +1263,7 @@ end ;
 {-----------------------------------------------------------------------------
   Substitui todos os caracteres acentuados por compativeis.
  ---------------------------------------------------------------------------- }
-function TiraAcentos( const AString : String ) : String ;
+function TiraAcentos( const AString : String; const ACaracteresPermitidos: String ) : String ;
 Var A : Integer ;
     Letra : AnsiChar ;
     AnsiStr, Ret : AnsiString ;
@@ -1274,7 +1274,7 @@ begin
   For A := 1 to Length( AnsiStr ) do
   begin
      Letra := TiraAcento( AnsiStr[A] ) ;
-     if not (Byte(Letra) in [32..126,13,10,8]) then    {Letras / numeros / pontos / sinais}
+     if not (Byte(Letra) in [32..126,13,10,8]) and (Pos(String(Letra), ACaracteresPermitidos) = 0) then    {Letras / numeros / pontos / sinais}
         Letra := ' ' ;
      Ret := Ret + Letra ;
   end ;

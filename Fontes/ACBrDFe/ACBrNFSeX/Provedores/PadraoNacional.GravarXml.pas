@@ -1044,6 +1044,8 @@ begin
 end;
 
 function TNFSeW_PadraoNacional.GerarXMLCodigoServico: TACBrXmlNode;
+var
+  LQuebraLinhaAnterior: string;
 begin
   Result := CreateElement('cServ');
 
@@ -1053,9 +1055,24 @@ begin
   Result.AppendChild(AddNode(tcStr, '#1', 'cTribMun', 3, 3, 0,
                                    NFSe.Servico.CodigoTributacaoMunicipio, ''));
 
-  Result.AppendChild(AddNode(tcStr, '#1', 'xDescServ', 1, 2000, 1,
-    StringReplace(NFSe.Servico.Discriminacao, Opcoes.QuebraLinha,
-                          FpAOwner.ConfigGeral.QuebradeLinha, [rfReplaceAll])));
+  if FpAOwner.ConfigGeral.Provedor = proPadraoNacional then
+  begin
+    LQuebraLinhaAnterior := Opcoes.QuebraLinha;
+    try
+      // Apenas o emissor nacional recebe LF real em xDescServ.
+      Opcoes.QuebraLinha := #10;
+      Result.AppendChild(AddNode(tcStr, '#1', 'xDescServ', 1, 2000, 1,
+        StringReplace(StringReplace(NFSe.Servico.Discriminacao,
+          LQuebraLinhaAnterior, #10, [rfReplaceAll]),
+          FpAOwner.ConfigGeral.QuebradeLinha, #10, [rfReplaceAll])));
+    finally
+      Opcoes.QuebraLinha := LQuebraLinhaAnterior;
+    end;
+  end
+  else
+    Result.AppendChild(AddNode(tcStr, '#1', 'xDescServ', 1, 2000, 1,
+      StringReplace(NFSe.Servico.Discriminacao, Opcoes.QuebraLinha,
+                            FpAOwner.ConfigGeral.QuebradeLinha, [rfReplaceAll])));
 
   Result.AppendChild(AddNode(tcStr, '#1', 'cNBS', 9, 9, 0,
                                                    NFSe.Servico.CodigoNBS, ''));

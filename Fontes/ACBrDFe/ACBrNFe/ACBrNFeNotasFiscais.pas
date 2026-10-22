@@ -681,7 +681,7 @@ begin
   //WriteToTXT('c:\temp\Notafiscal.xml', FNFeW.Gerador.ArquivoFormatoXML, False, False);
 
 {$IfDef USE_ACBr_XMLDOCUMENT}
-  XMLOriginal := FNFeW.Document.Xml;  // SetXMLOriginal() irá converter para UTF8
+  XMLOriginal := InserirDeclaracaoXMLSeNecessario(FNFeW.Document.Xml);
 {$Else}
   XMLOriginal := FNFeW.Gerador.ArquivoFormatoXML;  // SetXMLOriginal() irá converter para UTF8
 {$EndIf}

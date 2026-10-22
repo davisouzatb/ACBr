@@ -70,7 +70,7 @@ type
 
 function FiltrarTextoXML(const RetirarEspacos: boolean; aTexto: String;
   RetirarAcentos: boolean = True; SubstituirQuebrasLinha: Boolean = True;
-  const QuebraLinha: String = ';'): String;
+  const QuebraLinha: String = ';'; const ACaracteresPermitidos: String = ''): String;
 
 function RemoverIdentacao(const AXML: string): string;
 function XmlToStr(const AXML: string): string;
@@ -160,10 +160,10 @@ end;
 
 function FiltrarTextoXML(const RetirarEspacos: boolean; aTexto: String;
   RetirarAcentos: boolean; SubstituirQuebrasLinha: Boolean;
-  const QuebraLinha: String): String;
+  const QuebraLinha: String; const ACaracteresPermitidos: String): String;
 begin
   if RetirarAcentos then
-     aTexto := TiraAcentos(aTexto);
+     aTexto := TiraAcentos(aTexto, ACaracteresPermitidos);
 
 //  aTexto := ParseText(AnsiString(aTexto), False );
 

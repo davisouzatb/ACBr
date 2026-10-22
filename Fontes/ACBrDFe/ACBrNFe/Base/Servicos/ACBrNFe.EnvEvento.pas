@@ -565,7 +565,7 @@ begin
                                             Evento[Idx].FInfEvento.DescEvento));
 
   Result.AppendChild(AddNode(tcStr, 'HP20', 'xCorrecao', 15, 1000, 1,
-                                   Evento[Idx].FInfEvento.detEvento.xCorrecao));
+                                   Evento[Idx].FInfEvento.detEvento.xCorrecao, '', True, '', #170#176#178#179#185#186));
 
   Result.AppendChild(AddNode(tcStr, 'HP20a', 'xCondUso', 1, 5000, 1,
                                     Evento[Idx].FInfEvento.detEvento.xCondUso));

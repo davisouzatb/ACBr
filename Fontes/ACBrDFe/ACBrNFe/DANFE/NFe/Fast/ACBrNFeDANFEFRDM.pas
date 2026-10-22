@@ -964,7 +964,19 @@ end;
 procedure TACBrNFeFRClass.CarregaCalculoImposto;
 var
   lvTroco: Currency;
+  LTemIBSCBS, LTemIS: Boolean;
+  I: Integer;
 begin
+  // Distingue grupo ausente de imposto informado com valor zero.
+  LTemIBSCBS := False;
+  LTemIS := False;
+  for I := 0 to FNFe.Det.Count - 1 do
+  begin
+    LTemIBSCBS := LTemIBSCBS or (FNFe.Det[I].Imposto.IBSCBS.cClassTrib <> '');
+    LTemIS := LTemIS or (FNFe.Det[I].Imposto.ISel.CSTIS <> '');
+    if LTemIBSCBS and LTemIS then
+      Break;
+  end;
   with cdsCalculoImposto do
   begin
     Close;
@@ -1017,9 +1029,13 @@ begin
       FieldByName('vTotPago').AsCurrency  := lvTroco + vNF;
 
       FieldByName('vNFTot').AsCurrency  := FNFe.Total.vNFTot;
-      FieldByName('vCBS').AsCurrency    := FNFe.Total.IBSCBSTot.gCBS.vCBS;
-      FieldByName('vIBS').AsCurrency    := FNFe.Total.IBSCBSTot.gIBS.vIBS;
-      FieldByName('vIS').AsCurrency     := FNFe.Total.ISTot.vIS;
+      if LTemIBSCBS then
+      begin
+        FieldByName('vCBS').AsCurrency := FNFe.Total.IBSCBSTot.gCBS.vCBS;
+        FieldByName('vIBS').AsCurrency := FNFe.Total.IBSCBSTot.gIBS.vIBS;
+      end;
+      if LTemIS then
+        FieldByName('vIS').AsCurrency := FNFe.Total.ISTot.vIS;
 
       // NT 2026.010 - DANFE Reforma Tributária
       FieldByName('vICMSUFDest').AsFloat    := vICMSUFDest;
@@ -1028,12 +1044,15 @@ begin
       FieldByName('vICMSMono').AsFloat      := vICMSMono;
       FieldByName('qBCMonoReten').AsFloat   := qBCMonoReten;
       FieldByName('vICMSMonoReten').AsFloat := vICMSMonoReten;
-      FieldByName('vIBSUF').AsFloat         := FNFe.Total.IBSCBSTot.gIBS.gIBSUFTot.vIBSUF;
-      FieldByName('vIBSMun').AsFloat        := FNFe.Total.IBSCBSTot.gIBS.gIBSMunTot.vIBSMun;
-      FieldByName('vIBSMono').AsFloat       := FNFe.Total.IBSCBSTot.gMono.vIBSMono;
-      FieldByName('vCBSMono').AsFloat       := FNFe.Total.IBSCBSTot.gMono.vCBSMono;
-      FieldByName('vIBSMonoReten').AsFloat  := FNFe.Total.IBSCBSTot.gMono.vIBSMonoReten;
-      FieldByName('vCBSMonoReten').AsFloat  := FNFe.Total.IBSCBSTot.gMono.vCBSMonoReten;
+      if LTemIBSCBS then
+      begin
+        FieldByName('vIBSUF').AsCurrency         := FNFe.Total.IBSCBSTot.gIBS.gIBSUFTot.vIBSUF;
+        FieldByName('vIBSMun').AsCurrency        := FNFe.Total.IBSCBSTot.gIBS.gIBSMunTot.vIBSMun;
+        FieldByName('vIBSMono').AsCurrency       := FNFe.Total.IBSCBSTot.gMono.vIBSMono;
+        FieldByName('vCBSMono').AsCurrency       := FNFe.Total.IBSCBSTot.gMono.vCBSMono;
+        FieldByName('vIBSMonoReten').AsCurrency  := FNFe.Total.IBSCBSTot.gMono.vIBSMonoReten;
+        FieldByName('vCBSMonoReten').AsCurrency  := FNFe.Total.IBSCBSTot.gMono.vCBSMonoReten;
+      end;
     end;
 
     Post;
@@ -1198,19 +1217,25 @@ begin
         // NT 2026.010 - DANFE Reforma Tributária
         FieldByName('vBCIPI').AsString     := FormatFloatBr( Imposto.IPI.vBC, ',0.00');
         FieldByName('cClassTrib').AsString := Imposto.IBSCBS.cClassTrib;
-        with Imposto.IBSCBS.gIBSCBS do
+        if Imposto.IBSCBS.cClassTrib <> '' then
         begin
-          FieldByName('vBCIBSCBS').AsString := FormatFloatBr( vBC, ',0.00');
-          FieldByName('pIBSUF').AsString    := AliquotaIBSCBS( gIBSUF.pIBSUF, gIBSUF.gRed );
-          FieldByName('vIBSUF').AsString    := FormatFloatBr( gIBSUF.vIBSUF, ',0.00');
-          FieldByName('pIBSMun').AsString   := AliquotaIBSCBS( gIBSMun.pIBSMun, gIBSMun.gRed );
-          FieldByName('vIBSMun').AsString   := FormatFloatBr( gIBSMun.vIBSMun, ',0.00');
-          FieldByName('pCBS').AsString      := AliquotaIBSCBS( gCBS.pCBS, gCBS.gRed );
-          FieldByName('vCBS').AsString      := FormatFloatBr( gCBS.vCBS, ',0.00');
+          with Imposto.IBSCBS.gIBSCBS do
+          begin
+            FieldByName('vBCIBSCBS').AsString := FormatFloatBr( vBC, ',0.00');
+            FieldByName('pIBSUF').AsString    := AliquotaIBSCBS( gIBSUF.pIBSUF, gIBSUF.gRed );
+            FieldByName('vIBSUF').AsString    := FormatFloatBr( gIBSUF.vIBSUF, ',0.00');
+            FieldByName('pIBSMun').AsString   := AliquotaIBSCBS( gIBSMun.pIBSMun, gIBSMun.gRed );
+            FieldByName('vIBSMun').AsString   := FormatFloatBr( gIBSMun.vIBSMun, ',0.00');
+            FieldByName('pCBS').AsString      := AliquotaIBSCBS( gCBS.pCBS, gCBS.gRed );
+            FieldByName('vCBS').AsString      := FormatFloatBr( gCBS.vCBS, ',0.00');
+          end;
         end;
-        FieldByName('vBCIS').AsString := FormatFloatBr( Imposto.ISel.vBCIS, ',0.00');
-        FieldByName('pIS').AsString   := FormatFloatBr( Imposto.ISel.pIS, ',0.00##');
-        FieldByName('vIS').AsString   := FormatFloatBr( Imposto.ISel.vIS, ',0.00');
+        if Imposto.ISel.CSTIS <> '' then
+        begin
+          FieldByName('vBCIS').AsString := FormatFloatBr( Imposto.ISel.vBCIS, ',0.00');
+          FieldByName('pIS').AsString   := FormatFloatBr( Imposto.ISel.pIS, ',0.00##');
+          FieldByName('vIS').AsString   := FormatFloatBr( Imposto.ISel.vIS, ',0.00');
+        end;
         Post;
       end;
     end;

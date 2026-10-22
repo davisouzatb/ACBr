@@ -751,7 +751,7 @@ begin
   FCTeW.GerarXml;
 
 {$IfDef USE_ACBr_XMLDOCUMENT}
-  XMLOriginal := FCTeW.Document.Xml;
+  XMLOriginal := InserirDeclaracaoXMLSeNecessario(FCTeW.Document.Xml);
 {$Else}
   XMLOriginal := FCTeW.Gerador.ArquivoFormatoXML;
 {$EndIf}

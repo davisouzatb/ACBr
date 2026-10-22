@@ -3630,7 +3630,7 @@ begin
     Lote := Copy(EventoNFe.XmlEnvio, 1, I - 1);
     Eventos := SeparaDados(EventoNFe.XmlEnvio, 'envEvento');
     I := Pos('<evento ', Eventos);
-    Eventos := NativeStringToUTF8( Copy(Eventos, I, length(Eventos)) );
+    Eventos := Copy(Eventos, I, length(Eventos));
 
     EventosAssinados := '';
 
@@ -3679,7 +3679,7 @@ begin
     // Realiza a validação de cada evento
     Eventos := SeparaDados(EventoNFe.XmlEnvio, 'envEvento');
     I := Pos('<evento ', Eventos);
-    Eventos := NativeStringToUTF8( Copy(Eventos, I, length(Eventos)) );
+    Eventos := Copy(Eventos, I, length(Eventos));
 
     while Eventos <> '' do
     begin

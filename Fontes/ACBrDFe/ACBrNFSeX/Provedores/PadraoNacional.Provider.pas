@@ -339,6 +339,7 @@ var
   Nota: TNotaFiscal;
   IdAttr, ListaDps: string;
   I: Integer;
+  LPreservarQuebrasLinhaAnterior: Boolean;
 begin
   if TACBrNFSeX(FAOwner).NotasFiscais.Count <= 0 then
   begin
@@ -373,14 +374,21 @@ begin
     Nota.GerarXML;
 
     Nota.XmlRps := ConverteXMLtoUTF8(Nota.XmlRps);
-    Nota.XmlRps := ChangeLineBreak(Nota.XmlRps, '');
+    if ConfigGeral.Provedor <> proPadraoNacional then
+      Nota.XmlRps := ChangeLineBreak(Nota.XmlRps, '');
 
     if (ConfigAssinar.Rps and (Response.ModoEnvio in [meLoteAssincrono, meLoteSincrono])) or
        (ConfigAssinar.RpsGerarNFSe and (Response.ModoEnvio in [meUnitario, meAutomatico])) then
     begin
-      Nota.XmlRps := FAOwner.SSL.Assinar(Nota.XmlRps,
-                                         ConfigMsgDados.XmlRps.DocElemento,
-                                         ConfigMsgDados.XmlRps.InfElemento, '', '', '', IdAttr);
+      LPreservarQuebrasLinhaAnterior := FAOwner.SSL.PreservarQuebrasLinha;
+      try
+        FAOwner.SSL.PreservarQuebrasLinha := ConfigGeral.Provedor = proPadraoNacional;
+        Nota.XmlRps := FAOwner.SSL.Assinar(Nota.XmlRps,
+                                           ConfigMsgDados.XmlRps.DocElemento,
+                                           ConfigMsgDados.XmlRps.InfElemento, '', '', '', IdAttr);
+      finally
+        FAOwner.SSL.PreservarQuebrasLinha := LPreservarQuebrasLinhaAnterior;
+      end;
 
       Response.ArquivoEnvio := Nota.XmlRps;
     end;
@@ -1542,7 +1550,8 @@ begin
 
   if aMetodo in [tmGerar, tmEnviarEvento] then
   begin
-    Result := ChangeLineBreak(aXml, '');
+    if (aMetodo = tmEnviarEvento) or (ConfigGeral.Provedor <> proPadraoNacional) then
+      Result := ChangeLineBreak(Result, '');
     Result := EncodeBase64(GZipCompress(Result));
 
     case aMetodo of

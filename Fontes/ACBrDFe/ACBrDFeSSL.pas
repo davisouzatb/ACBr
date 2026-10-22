@@ -253,7 +253,7 @@ type
     function AdicionarSignatureElement( const ConteudoXML: String; AddX509Data: Boolean;
       const docElement, IdSignature: String; const IdAttr: String = '';
       const IdSignatureValue: string = ''): String;
-    function AjustarXMLAssinado(const ConteudoXML: String; const X509DER: String = ''): String;
+    function AjustarXMLAssinado(const ConteudoXML: String; const X509DER: String = ''; const APreservarQuebrasLinha: Boolean = False): String;
     function GetSignDigestAlgorithm(const SignatureNode: String): TSSLDgst;
   public
     constructor Create(ADFeSSL: TDFeSSL); virtual;
@@ -307,6 +307,7 @@ type
   TDFeSSL = class(TPersistent)
   private
     FAntesDeAssinar: TDFeSSLAntesDeAssinar;
+    FPreservarQuebrasLinha: Boolean;
     FURLPFX: String;
     FArquivoPFX: String;
     FDadosPFX: AnsiString;
@@ -456,6 +457,7 @@ type
     property SSLCryptClass: TDFeSSLCryptClass read FSSLCryptClass;
     property SSLHttpClass: TDFeSSLHttpClass read FSSLHttpClass;
     property SSLXmlSignClass: TDFeSSLXmlSignClass read FSSLXmlSignClass;
+    property PreservarQuebrasLinha: Boolean read FPreservarQuebrasLinha write FPreservarQuebrasLinha;
   published
     property SSLCryptLib: TSSLCryptLib read FSSLCryptLib write SetSSLCryptLib
       default cryNone;
@@ -1132,7 +1134,7 @@ begin
 end;
 
 function TDFeSSLXmlSignClass.AjustarXMLAssinado(const ConteudoXML: String;
-  const X509DER: String): String;
+  const X509DER: String; const APreservarQuebrasLinha: Boolean): String;
 var
   XmlAss: String;
   PosSig, PosIni, PosFim: Integer;
@@ -1174,9 +1176,12 @@ begin
   if not XmlEhUTF8(ObtemDeclaracaoXML(XmlAss)) then
     XmlAss := RemoverDeclaracaoXML(XmlAss);
 
-  // Removendo quebras de linha //
-  XmlAss := StringReplace(XmlAss, #10, '', [rfReplaceAll]);
-  XmlAss := StringReplace(XmlAss, #13, '', [rfReplaceAll]);
+  // A DPS nacional pode conter quebras na descrição; removê-las após assinar invalida o digest.
+  if not APreservarQuebrasLinha then
+  begin
+    XmlAss := StringReplace(XmlAss, #10, '', [rfReplaceAll]);
+    XmlAss := StringReplace(XmlAss, #13, '', [rfReplaceAll]);
+  end;
 
   PosSig := PosLast('<SignatureValue>', XmlAss);
   if PosSig > 0 then
@@ -1303,6 +1308,7 @@ begin
   FSSLHttpLib  := httpNone;
   FTimeOut     := 5000;
   FTimeOutPorThread := False;
+  FPreservarQuebrasLinha := False;
   FNameSpaceURI:= '';
 
   FSSLType       := LT_TLSv1_2;

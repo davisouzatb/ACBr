@@ -1183,7 +1183,7 @@ begin
     NFe.Det[i].Prod.xProd := HOM_XPROD;
 
   Result.AppendChild(AddNode(tcStr, 'I04', 'xProd', 1, 120, 1,
-                                             NFe.Det[i].Prod.xProd, DSC_XPROD));
+                                             NFe.Det[i].Prod.xProd, DSC_XPROD, True, '', #170#176#178#179#185#186));
 
   Result.AppendChild(AddNode(tcStr, 'I05', 'NCM', 02, 08,
     IfThen(NFe.infNFe.Versao >= 2, 1, 0), NFe.Det[i].Prod.NCM, DSC_NCM));
@@ -1225,7 +1225,7 @@ begin
   Result.AppendChild(AddNode(tcEsp, 'I08', 'CFOP', 04, 04, 1,
     OnlyNumber(NFe.Det[i].Prod.CFOP), DSC_CFOP));
   Result.AppendChild(AddNode(tcStr, 'I09', 'uCom', 01, 06, 1,
-    NFe.Det[i].Prod.uCom, DSC_UCOM));
+    NFe.Det[i].Prod.uCom, DSC_UCOM, True, '', #170#176#178#179#185#186));
   Result.AppendChild(AddNode(tcDe4, 'I10', 'qCom', 00, 15, 1,
     NFe.Det[i].Prod.qCom, DSC_QCOM));
   Result.AppendChild(AddNode(FormatoValor10ou4,
@@ -1252,7 +1252,7 @@ begin
     NFe.Det[i].Prod.cBarraTrib, DSC_CBARRATRIB));
 
   Result.AppendChild(AddNode(tcStr, 'I13', 'uTrib', 01, 06, 1,
-    NFe.Det[i].Prod.uTrib, DSC_UTRIB));
+    NFe.Det[i].Prod.uTrib, DSC_UTRIB, True, '', #170#176#178#179#185#186));
   Result.AppendChild(AddNode(tcDe4, 'I14', 'qTrib', 00, 15, 1,
     NFe.Det[i].Prod.qTrib, DSC_QTRIB));
   Result.AppendChild(AddNode(FormatoValor10ou4,

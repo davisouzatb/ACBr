@@ -225,7 +225,7 @@ begin
       {$EndIf}
 
       // Ajustando o XML... MsXml, insere um cabeçalho inválido
-      XmlAss := AjustarXMLAssinado(XmlAss, FpDFeSSL.DadosCertificado.DERBase64);
+      XmlAss := AjustarXMLAssinado(XmlAss, FpDFeSSL.DadosCertificado.DERBase64, FpDFeSSL.PreservarQuebrasLinha and (docElement = 'DPS') and (infElement = 'infDPS'));
     finally
       xmldoc := nil;
       //xmldsig := nil;

@@ -1552,7 +1552,8 @@ begin
 
   Arquivo := NormatizarXml(Arquivo);
 
-  Arquivo := RemoverCaracteresDesnecessarios(Arquivo);
+  if FpAOwner.ConfigGeral.Provedor <> proPadraoNacional then
+    Arquivo := RemoverCaracteresDesnecessarios(Arquivo);
   Arquivo := RemoverPrefixosDesnecessarios(Arquivo);
 
   if FDocument = nil then
@@ -1561,17 +1562,29 @@ begin
   Document.Clear();
   Document.LoadFromXml(Arquivo);
 
-  // Não remover o espaço em branco, caso contrario vai encontrar tags que tem
-  // NFSe em sua grafia.
-  if (Pos('NFSe ', Arquivo) > 0) then
-    tpXML := txmlNFSe
-  else
-    tpXML := txmlRPS;
-
   XmlNode := Document.Root;
 
   if XmlNode = nil then
     raise Exception.Create('Arquivo xml vazio.');
+
+  if FpAOwner.ConfigGeral.Provedor = proPadraoNacional then
+  begin
+    if (XmlNode.LocalName = 'NFSe') or
+       Assigned(XmlNode.Childrens.FindAnyNs('infNFSe')) or
+       Assigned(XmlNode.Childrens.FindAnyNs('NFSe')) or
+       Assigned(XmlNode.Childrens.FindAnyNs('Nfse')) then
+      tpXML := txmlNFSe
+    else
+      tpXML := txmlRPS;
+  end
+  else
+  begin
+    // Preserva a identificação anterior dos provedores derivados.
+    if (Pos('NFSe ', Arquivo) > 0) then
+      tpXML := txmlNFSe
+    else
+      tpXML := txmlRPS;
+  end;
 
   NFSe.tpXML := tpXml;
 

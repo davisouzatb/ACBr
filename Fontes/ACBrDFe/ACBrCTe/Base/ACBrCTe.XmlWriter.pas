@@ -978,7 +978,7 @@ begin
                                              CTe.Compl.destCalc, DSC_DESTCALC));
 
         Result.AppendChild(AddNode(tcStr, '#065', 'xObs', 1, 2000, 0,
-                                                     CTe.Compl.xObs, DSC_XOBS));
+                                                     CTe.Compl.xObs, DSC_XOBS, True, '', #170#176#178#179#185#186));
 
         nodeArray := Gerar_ObsCont;
 

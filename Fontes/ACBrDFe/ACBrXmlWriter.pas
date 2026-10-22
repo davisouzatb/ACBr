@@ -90,7 +90,7 @@ type
     function AddNode(const Tipo: TACBrTipoCampo; ID, TAG: string;
       const min, max, ocorrencias: smallint; const valor: variant;
       const Descricao: string = ''; ParseTextoXML: boolean = True;
-      Atributo: string = ''): TACBrXmlNode; virtual;
+      Atributo: string = ''; const ACaracteresPermitidos: string = ''): TACBrXmlNode; virtual;
     procedure wAlerta(const ID, TAG, Descricao, Alerta: string);
     function GerarSignature(const Signature: TSignature): TACBrXmlNode;
     function CreateOptions: TACBrXmlWriterOptions; virtual; abstract;
@@ -243,7 +243,7 @@ end;
 function TACBrXmlWriter.AddNode(const Tipo: TACBrTipoCampo; ID, TAG: string;
   const min, max, ocorrencias: smallint; const valor: variant;
   const Descricao: string = ''; ParseTextoXML: boolean = True;
-  Atributo: string = ''): TACBrXmlNode;
+  Atributo: string = ''; const ACaracteresPermitidos: string = ''): TACBrXmlNode;
 
   function IsEmptyDate(wAno, wMes, wDia: word): boolean;
   begin
@@ -451,8 +451,8 @@ begin
     Result := CreateElement(Tag);
 
     if ParseTextoXML then
-      Result.Content := FiltrarTextoXML(FOpcoes.RetirarEspacos,
-        ConteudoProcessado, FOpcoes.RetirarAcentos, True, FOpcoes.FQuebraLinha)
+      Result.Content := ACBrXmlBase.FiltrarTextoXML(FOpcoes.RetirarEspacos,
+        ConteudoProcessado, FOpcoes.RetirarAcentos, True, FOpcoes.FQuebraLinha, ACaracteresPermitidos)
     else
       Result.Content := ConteudoProcessado;
 

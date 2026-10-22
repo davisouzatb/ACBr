@@ -463,7 +463,7 @@ begin
   begin
     // Esse método, sempre adiciona o texto no final do existente
     // Veja SetText, para substituir o texto
-    xmlNodeAddContent(FXmlNode, PAnsichar(ansistring(AContent)));
+    xmlNodeAddContent(FXmlNode, PAnsiChar(NativeStringToUTF8(AContent)));
   end;
 end;
 
